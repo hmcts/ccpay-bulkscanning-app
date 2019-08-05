@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.demo.controllers;
+package uk.gov.hmcts.reform.demo.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +10,7 @@ import static org.springframework.http.ResponseEntity.ok;
  * Default endpoints per application.
  */
 @RestController
-public class RootController {
+public class BulkScanningController {
 
     /**
      * Root GET endpoint.

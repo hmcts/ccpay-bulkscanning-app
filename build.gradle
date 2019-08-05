@@ -194,7 +194,7 @@ test {
   failFast = true
 }
 
-mainClassName = 'uk.gov.hmcts.reform.demo.Application'
+mainClassName = 'uk.gov.hmcts.reform.bulkscanning.Application'
 
 bootJar {
   archiveName = 'spring-boot-template.jar'
