@@ -10,6 +10,8 @@ plugins {
   id 'org.sonarqube' version '2.7.1'
 }
 
+apply from: 'liquibase.gradle'
+
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
@@ -163,20 +165,31 @@ configurations.all {
   }
 }
 
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
 dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.4'
-
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.2.RELEASE'
-
+  compile group: 'org.liquibase', name: 'liquibase-core', version: '3.7.0'
+  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.2') {
+    exclude(module: 'commons-logging')
+    exclude(module: 'slf4j-simple')
+  }
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+  testCompile group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
