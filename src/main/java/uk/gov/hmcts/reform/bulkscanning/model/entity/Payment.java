@@ -26,7 +26,7 @@ public class Payment {
     private String dcnReference;
 
     @Column(name = "bgc_reference")
-    private String bgcReference;
+    private Integer bgcReference;
 
     @Column(name = "amount")
     private BigDecimal amount;
