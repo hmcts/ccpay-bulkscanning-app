@@ -25,7 +25,7 @@ public class Envelope {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "responsible_service")
+    @Column(name = "responsible_service_id")
     private ResponsibleService responsibleService;
 
     @Column(name = "payment_status")

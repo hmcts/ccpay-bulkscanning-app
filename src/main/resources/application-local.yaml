@@ -9,9 +9,9 @@ spring:
     name: bulk-scanning
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bulk-scanning
-    username: bulk-scanning
-    password: bulk-scanning
+    url: jdbc:postgresql://localhost:5432/bulk-scan-db
+    username: postgres
+    password: admin
     properties:
       charSet: UTF-8
   jpa:

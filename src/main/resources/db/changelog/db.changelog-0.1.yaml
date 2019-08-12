@@ -89,21 +89,6 @@ databaseChangeLog:
                 constraints:
                   nullable: false
             - column:
-                name: bgc_reference
-                type: varchar(250)
-            - column:
-                name: amount
-                type: numeric(19, 2)
-            - column:
-                name: currency
-                type: varchar(255)
-            - column:
-                name: payment_method
-                type: varchar(255)
-            - column:
-                name: date_banked
-                type: TIMESTAMP WITHOUT TIME ZONE
-            - column:
                 name: date_created
                 type: TIMESTAMP WITHOUT TIME ZONE
             - column:

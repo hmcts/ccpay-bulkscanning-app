@@ -25,21 +25,6 @@ public class Payment {
     @Column(name = "dcn_reference")
     private String dcnReference;
 
-    @Column(name = "bgc_reference")
-    private String bgcReference;
-
-    @Column(name = "amount")
-    private BigDecimal amount;
-
-    @Column(name = "currency")
-    private Currency currency;
-
-    @Column(name = "payment_method")
-    private PaymentMethod paymentMethod;
-
-    @Column(name = "date_banked")
-    private LocalDateTime dateBanked;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "envelope_id", insertable = false, updatable = false)
     @ToString.Exclude

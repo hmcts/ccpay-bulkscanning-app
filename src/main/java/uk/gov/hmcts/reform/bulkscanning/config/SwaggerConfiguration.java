@@ -18,7 +18,8 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
             .useDefaultResponseMessages(false)
             .select()
-            .apis(RequestHandlerSelectors.basePackage(BulkScanningApiApplication.class.getPackage().getName() + ".controller"))
+            .apis(RequestHandlerSelectors.basePackage(
+                BulkScanningApiApplication.class.getPackage().getName() + ".controller"))
             .paths(PathSelectors.any())
             .build();
     }
