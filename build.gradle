@@ -84,24 +84,12 @@ pmd {
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
-jacocoTestReport {
-  executionData(test, integration)
-  reports {
-    xml.enabled = true
-    html.enabled true
-    csv.enabled = false
-  }
-}
-
 project.tasks['sonarqube'].dependsOn test, integration
 
 sonarqube {
   properties {
     property "sonar.projectName", "Reform :: spring-boot-template"
     property "sonar.projectKey", "uk.gov.hmcts.reform:spring-boot-template"
-    property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-    property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
-
   }
 }
 
@@ -165,13 +153,7 @@ configurations.all {
 
 
 
-test {
-  finalizedBy jacocoTestReport
-  jacoco {
-    append = true
-    destinationFile = file("${project.rootDir}/build/jacoco/test.exec")
-  }
-}
+
 dependencies {
   compile("org.springframework.boot:spring-boot-starter-web")
   testCompile("org.springframework.boot:spring-boot-starter-test")
@@ -187,3 +169,7 @@ dependencies {
   }
 }
 
+jacoco {
+  toolVersion = "0.8.4"
+  reportsDir = file("${project.rootDir}/build/jacoco")
+}
