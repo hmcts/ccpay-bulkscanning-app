@@ -36,7 +36,7 @@ asp_name = "${local.asp_name}"
 }
 data "azurerm_key_vault" "payment_key_vault" {
 name = "${local.vaultName}"
-resource_group_name = "ccpay-${local.local_env}"
+resource_group_name = "ccpay-${var.env}"
 }
 data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   name = "AppInsightsInstrumentationKey"
