@@ -174,3 +174,18 @@ dependencyCheck {
   suppressionFile = 'dependency-check-suppressions.xml'
   format='ALL'
 }
+
+test {
+  finalizedBy jacocoTestReport
+  jacoco {
+    append = true
+    destinationFile = file("${project.rootDir}/build/jacoco/test.exec")
+  }
+}
+jacocoTestReport {
+  executionData(test)
+  reports {
+    xml.enabled true
+    html.enabled true
+  }
+}
