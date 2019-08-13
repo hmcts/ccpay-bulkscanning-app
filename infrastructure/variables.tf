@@ -1,11 +1,11 @@
 variable "product" {
   type    = "string"
-  default = "payment"
+  default = "ccpay"
 }
 
 variable "component" {
   type    = "string"
-  default = "bs-payment-api"
+  default = "bulkscanning-api"
 
 }
 
