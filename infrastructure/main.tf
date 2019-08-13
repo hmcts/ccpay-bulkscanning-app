@@ -3,8 +3,8 @@ provider "azurerm" {
 }
 
 locals {
-  ase_name = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
-  asp_name = "ccpay-${var.env}"}"
+
+  asp_name = "ccpay-${var.env}"
   sku_size = "${var.env == "prod" || var.env == "sprod" || var.env == "aat" ? "I2" : "I1"}"
 
   previewVaultName = "ccpay-aat"
