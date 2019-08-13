@@ -88,8 +88,14 @@ project.tasks['sonarqube'].dependsOn test, integration
 
 sonarqube {
   properties {
-    property "sonar.projectName", "Reform :: spring-boot-template"
-    property "sonar.projectKey", "uk.gov.hmcts.reform:spring-boot-template"
+    property "sonar.host.url", "https://sonar.reform.hmcts.net/"
+    property "sonar.dynamicAnalysis", "reuseReports"
+    property "sonar.java.coveragePlugin", "jacoco"
+    property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
+    property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
+    property "sonar.exclusions", sonarExclusions.join(", ")
+    property "sonar.test.exclusions", sonarExclusions.join(", ")
+    property "sonar.coverage.exclusions", sonarExclusions.join(", ")
   }
 }
 
