@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.bulkscanning.repository.PaymentMetadataRepository;
 import uk.gov.hmcts.reform.bulkscanning.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.repository.StatusHistoryRepository;
 
+import java.time.LocalDateTime;
+
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -80,6 +82,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Envelope createEnvelope(EnvelopeDTO envelopeDto) {
-        return envelopeRepository.save(envelopeDTOMapper.toEnvelopeEntity(envelopeDto));
+        Envelope envelop = envelopeDTOMapper.toEnvelopeEntity(envelopeDto);
+        envelop.setDateCreated(LocalDateTime.now());
+        envelop.getPayments().stream().forEach(payment -> payment.setDateCreated(LocalDateTime.now()));
+        return envelopeRepository.save(envelop);
     }
 }

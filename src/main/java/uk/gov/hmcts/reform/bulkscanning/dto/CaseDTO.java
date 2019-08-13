@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 
 import java.util.Date;
 
@@ -21,11 +22,10 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Data
 public class CaseDTO {
 
-    private String id;
-
-    private String responsibleServiceId;
-
-    private String status;
+    private Integer id;
+    private String ccdReference;
+    private String exceptionRecordReference;
+    private EnvelopeDTO envelope;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
     private Date dateCreated;

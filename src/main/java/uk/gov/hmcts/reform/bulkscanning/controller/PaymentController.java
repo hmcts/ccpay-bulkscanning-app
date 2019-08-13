@@ -4,10 +4,12 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.reform.bulkscanning.dto.CaseDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
@@ -36,14 +38,17 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final PaymentDTOMapper paymentDTOMapper;
     private final PaymentMetadataDTOMapper paymentMetadataDTOMapper;
+    private final EnvelopeDTOMapper envelopeDTOMapper;
 
     @Autowired
     public PaymentController(PaymentService paymentService,
                              PaymentMetadataDTOMapper paymentMetadataDTOMapper,
-                             PaymentDTOMapper paymentDTOMapper){
+                             PaymentDTOMapper paymentDTOMapper,
+                             EnvelopeDTOMapper envelopeDTOMapper){
         this.paymentService = paymentService;
         this.paymentMetadataDTOMapper = paymentMetadataDTOMapper;
         this.paymentDTOMapper = paymentDTOMapper;
+        this.envelopeDTOMapper = envelopeDTOMapper;
     }
 
     /*
@@ -89,6 +94,7 @@ public class PaymentController {
 
             // TODO: 07-08-2019 Update payment status as complete
             paymentService.createStatusHistory(StatusHistoryDTO.envelopeDtoWith()
+                .envelope(envelopeDTOMapper.fromEnvelopeEntity(payment.getEnvelope()))
                 .status(PaymentStatus.COMPLETE)
                 .build());
             // TODO: 07-08-2019 Call Payment Service in PayHub to send complete payment details
@@ -103,21 +109,23 @@ public class PaymentController {
             payments.add(paymentDTOMapper.fromRequest(paymentRequest));
 
             Envelope envelope = paymentService.createEnvelope(EnvelopeDTO.envelopeDtoWith()
-                .payments(payments)
-                //Hardcoded for test
-                .responsibleService(ResponsibleService.DIVORCE)
-                .build());
-            EnvelopeDTO envelop = EnvelopeDTO.envelopeDtoWith()
+                                                                            //.cases(cases)
+                                                                            .paymentStatus(PaymentStatus.INCOMPLETE)
+                                                                            .payments(payments)
+                                                                            .responsibleService(ResponsibleService.DEFAULT)
+                                                                            .build());
+            /*EnvelopeDTO envelop = EnvelopeDTO.envelopeDtoWith()
                                         .id(envelope.getId())
                                         .build();
 
             payments.stream().forEach(paymentDto -> {
                 paymentDto.setEnvelope(envelop);
                 paymentService.createPayment(paymentDto);
-            });
+            });*/
 
             // TODO: 07-08-2019 Update payment status as incomplete
             paymentService.createStatusHistory(StatusHistoryDTO.envelopeDtoWith()
+                .envelope(envelopeDTOMapper.fromEnvelopeEntity(envelope))
                 .status(PaymentStatus.INCOMPLETE)
                 .build());
         }

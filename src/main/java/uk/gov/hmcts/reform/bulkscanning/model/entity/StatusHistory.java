@@ -21,7 +21,7 @@ public class StatusHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "status")
+    @Column(name = "payment_status")
     private PaymentStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
