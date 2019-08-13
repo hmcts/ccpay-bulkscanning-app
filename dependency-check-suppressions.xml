@@ -2,10 +2,9 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
     <suppress>
     <notes><![CDATA[
-   command line injections on windows - fixed on spring boot master but not released
-   ]]></notes>
-    <gav regex="true">^org\.apache\.tomcat\.embed.*$</gav>
+supress these for now as fix not available   ]]></notes>
     <cve>CVE-2019-14379</cve>
     <cve>CVE-2019-14439</cve>
+      <cve>CVE-2018-10237</cve>
   </suppress>
 </suppressions>
