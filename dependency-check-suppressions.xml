@@ -7,7 +7,5 @@
     <gav regex="true">^org\.apache\.tomcat\.embed.*$</gav>
     <cve>CVE-2019-14379</cve>
     <cve>CVE-2019-14439</cve>
-
-
   </suppress>
 </suppressions>
