@@ -1,5 +1,7 @@
 variable "product" {
   type    = "string"
+    default = "bulk-scanning-payment"
+
 }
 
 variable "component" {
