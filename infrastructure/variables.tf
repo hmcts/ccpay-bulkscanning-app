@@ -1,11 +1,12 @@
 variable "product" {
   type    = "string"
-    default = "bulk-scanning-payment"
-
+  default = "payment"
 }
 
 variable "component" {
-  type = "string"
+  type    = "string"
+  default = "bs-payment-api"
+
 }
 
 variable "location_app" {

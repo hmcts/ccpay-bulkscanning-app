@@ -15,7 +15,7 @@ locals {
 
 module "bulk-scanning-payment-api" {
   source              = "git@github.com:hmcts/cnp-module-webapp?ref=master"
-  product             = "${var.product}-api"
+  product             = "${var.product}-${var.component}"
   location            = "${var.location_app}"
   env                 = "${var.env}"
   ilbIp               = "${var.ilbIp}"
