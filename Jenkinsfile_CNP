@@ -11,7 +11,7 @@ def type = "java"
 
 def product = "ccpay"
 
-def app = "api"
+def app = "bulkscanning-api"
 
 List<LinkedHashMap<String, Object>> secrets = [
         secret('bs-idam-test-user-password', 'TEST_USER_PASSWORD'),
