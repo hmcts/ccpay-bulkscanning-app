@@ -18,7 +18,7 @@ withPipeline(type, product, app) {
     setVaultName('ccpay')
     //loadVaultSecrets(secrets)
     //enableDbMigration()
-    //enableDockerBuild()
+    enableDockerBuild()
     //installCharts()
     enableSlackNotifications('#cc-payments-tech')
 }

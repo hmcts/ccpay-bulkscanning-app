@@ -1,14 +1,14 @@
 version: '2.1'
 
 services:
-  spring-boot-template:
+  ccpay-bulkscanning-api:
     build:
       context: .
       args:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmcts/spring-boot-template
+    image: hmctspublic.azurecr.io/payment/ccpay-bulkscanning-api
     environment:
       # these environment variables are used by java-logging library
       - ROOT_APPENDER
@@ -24,3 +24,21 @@ services:
       - LOGBACK_REQUIRE_ERROR_CODE=false
     ports:
       - $SERVER_PORT:$SERVER_PORT
+    depends_on:
+      - ccpay-bulkscanning-database
+
+  ccpay-bulkscanning-database:
+    build:
+      context: docker/database
+    container_name: ccpay-bulkscanning-database
+    image: postgres:11-alpine
+    environment:
+      - POSTGRES_USER=ccpay-bulkscanning
+      - POSTGRES_PASSWORD=ccpay-bulkscanning
+      - POSTGRES_DB=ccpay-bulkscanning
+    ports:
+      - 5182:5432
+    volumes:
+      - ccpay-bulkscanning-database-data:/var/lib/postgresql/data
+volumes:
+  ccpay-bulkscanning-database-data:
