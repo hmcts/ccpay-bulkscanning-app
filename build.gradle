@@ -98,7 +98,7 @@ pmd {
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
-project.tasks['sonarqube'].dependsOn test, integration
+project.tasks['sonarqube'].dependsOn test
 
 sonarqube {
   properties {
