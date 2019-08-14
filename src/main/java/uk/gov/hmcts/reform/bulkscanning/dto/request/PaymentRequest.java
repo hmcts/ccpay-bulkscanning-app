@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -23,19 +25,19 @@ public class PaymentRequest {
     Document control number of the payment received in the envelope.
     This is the unique identifier of the payment
      */
-    //@NotEmpty(message = "document_control_number can't be Empty")
+    @NotEmpty(message = "document_control_number can't be Empty")
     private String document_control_number;
 
     /*
     Payment amount in GBP
      */
-    //@NotEmpty(message = "amount can't be Empty")
+    @NotNull(message = "amount can't be Empty")
     private BigDecimal amount;
 
     /*
     The ISO currency code
      */
-    //@NotEmpty(message = "currency can't be Empty")
+    @NotEmpty(message = "currency can't be Empty")
     private String currency;
 
     /*
@@ -47,12 +49,12 @@ public class PaymentRequest {
     /*
     Number of the credit slip containing the payment
      */
-    //@NotEmpty(message = "bank_giro_credit_slip_number can't be Empty")
+    @NotEmpty(message = "bank_giro_credit_slip_number can't be Empty")
     private String bank_giro_credit_slip_number;
 
     /*
     Date the payment was sent for banking.
      */
-    //@NotEmpty(message = "banked_date can't be Empty")
+    @NotNull(message = "banked_date can't be Null")
     private Date banked_date;
 }

@@ -21,7 +21,7 @@ public class PaymentMetadataDTOMapper {
             .amount(paymentMetadataDto.getAmount())
             .currency(paymentMetadataDto.getCurrency())
             .dateBanked(LocalDateTime.ofInstant(paymentMetadataDto.getDateBanked().toInstant(), ZoneId.systemDefault()))
-            .dateCreated(LocalDateTime.now())
+            .dateCreated(LocalDateTime.ofInstant(paymentMetadataDto.getDateCreated().toInstant(), ZoneId.systemDefault()))
             .build();
     }
 

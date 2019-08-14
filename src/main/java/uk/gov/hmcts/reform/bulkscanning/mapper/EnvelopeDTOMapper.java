@@ -75,6 +75,7 @@ public class EnvelopeDTOMapper {
         return Payment.paymentWith()
             .id(payment.getId())
             .dcnReference(payment.getDcnReference())
+            .paymentStatus(payment.getPaymentStatus())
             .dateCreated(dateToLocalDateTime(payment.getDateCreated()))
             .dateUpdated(dateToLocalDateTime(payment.getDateUpdated()))
             .build();

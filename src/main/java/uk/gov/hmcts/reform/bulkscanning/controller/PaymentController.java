@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.bulkscanning.controller;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDTO;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import java.time.LocalDateTime;
@@ -63,7 +65,7 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "Payment not Found")
     })
     @PostMapping(value = "/bulk-scan-payment")
-    @ResponseBody
+    @Transactional
     public ResponseEntity<String> createPayment(
         @RequestHeader(value = "ServiceAuthorization") String serviceAuthorization,
         @Validated @RequestBody PaymentRequest paymentRequest) throws Exception {
@@ -94,6 +96,7 @@ public class PaymentController {
             payments.add(paymentDTOMapper.fromRequest(paymentRequest));
 
             Envelope envelope = paymentService.createEnvelope(EnvelopeDTO.envelopeDtoWith()
+                                                                            .responsibleService(ResponsibleService.DIVORCE)
                                                                             .paymentStatus(PaymentStatus.INCOMPLETE)
                                                                             .payments(payments)
                                                                             .build());

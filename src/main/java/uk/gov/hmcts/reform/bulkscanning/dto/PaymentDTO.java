@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 
 import java.util.Date;
 
@@ -24,6 +25,7 @@ public class PaymentDTO {
     private Integer id;
     private String dcnReference;
     private EnvelopeDTO envelope;
+    private PaymentStatus paymentStatus;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
     private Date dateCreated;
