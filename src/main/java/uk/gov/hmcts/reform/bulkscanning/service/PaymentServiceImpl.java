@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.PaymentMetadataDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDTO;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.StatusHistoryDTOMapper;
@@ -75,9 +76,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public StatusHistory createStatusHistory(StatusHistoryDTO statusHistoryDto) {
-        StatusHistory statusHistory = statusHistoryDTOMapper.toStatusHistoryEntity(statusHistoryDto);
-        statusHistory.setDateCreated(LocalDateTime.now());
-        return statusHistoryRepository.save(statusHistory);
+        try{
+            statusHistoryDto.setDateCreated(localDateTimeToDate(LocalDateTime.now()));
+            StatusHistory statusHistory = statusHistoryDTOMapper.toStatusHistoryEntity(statusHistoryDto);
+            return statusHistoryRepository.save(statusHistory);
+        }catch(Exception ex){
+            throw new PaymentException(ex);
+        }
     }
 
     @Override

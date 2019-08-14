@@ -44,7 +44,7 @@ public class PaymentRequest {
     The method of payment i.e. Cheque or Postal Order
      */
     //@NotEmpty(message = "paymentMethod can't be Empty")
-    private String paymentMethod;
+    private String method;
 
     /*
     Number of the credit slip containing the payment

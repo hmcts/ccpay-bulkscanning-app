@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.bulkscanning.dto.PaymentMetadataDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,7 +15,6 @@ public class PaymentMetadataDTOMapper {
 
     public PaymentMetadata toPaymentEntity(PaymentMetadataDTO paymentMetadataDto){
         return PaymentMetadata.paymentMetadataWith()
-            .id(paymentMetadataDto.getId())
             .bgcReference(paymentMetadataDto.getBgcReference())
             .dcnReference(paymentMetadataDto.getDcnReference())
             .paymentMethod(paymentMetadataDto.getPaymentMethod())
@@ -31,6 +31,7 @@ public class PaymentMetadataDTOMapper {
             .bgcReference(paymentRequest.getBank_giro_credit_slip_number())
             .amount(paymentRequest.getAmount())
             .currency(Currency.valueOf(paymentRequest.getCurrency()))
+            .paymentMethod(PaymentMethod.valueOf(paymentRequest.getMethod()))
             .dateBanked(paymentRequest.getBanked_date())
             .build();
     }

@@ -2,13 +2,16 @@ package uk.gov.hmcts.reform.bulkscanning.controller;
 
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDTOMapper;
@@ -70,39 +73,47 @@ public class PaymentController {
         @RequestHeader(value = "ServiceAuthorization") String serviceAuthorization,
         @Validated @RequestBody PaymentRequest paymentRequest) throws Exception {
 
-        // TODO: 07-08-2019 Payment Request Data Validation
+        try{
+            // TODO: 07-08-2019 Payment Request Data Validation
 
-        // TODO: 07-08-2019 Insert Payment metadata in BSP DB
-        paymentService.createPaymentMetadata(paymentMetadataDTOMapper.fromRequest(paymentRequest));
+            // TODO: 07-08-2019 Insert Payment metadata in BSP DB
+            paymentService.createPaymentMetadata(paymentMetadataDTOMapper.fromRequest(paymentRequest));
 
-        // TODO: 07-08-2019 Check for existing DCN in Payment Table Bulk Scan Pay DB,
-        Payment payment = paymentService.getPaymentByDcnReference(paymentRequest.getDocument_control_number());
+            // TODO: 07-08-2019 Check for existing DCN in Payment Table Bulk Scan Pay DB,
+            Payment payment = paymentService.getPaymentByDcnReference(paymentRequest.getDocument_control_number());
 
-        // TODO: 07-08-2019 if already exists
-        // TODO: 07-08-2019 update Payment
-        if(null != payment) {
-            // TODO: 07-08-2019 Update payment status as complete
-            payment.setPaymentStatus(PaymentStatus.COMPLETE);
-            payment.setDateUpdated(LocalDateTime.now());
-            paymentService.updatePayment(payment);
+            // TODO: 07-08-2019 if already exists
+            // TODO: 07-08-2019 update Payment
+            if(null != payment) {
+                if(payment.getEnvelope().getPaymentStatus().equals(PaymentStatus.INCOMPLETE)){
+                    // TODO: 07-08-2019 Update payment status as complete
+                    payment.setPaymentStatus(PaymentStatus.COMPLETE);
+                    payment.setDateUpdated(LocalDateTime.now());
+                    paymentService.updatePayment(payment);
 
-            paymentService.updateEnvelopePaymentStatus(payment.getEnvelope());
-            // TODO: 07-08-2019 Call Payment Service in PayHub to send complete payment details
-            // TODO: 07-08-2019 Update payment Status as processed
-        }else {
-            // TODO: 07-08-2019 Else
-            // TODO: 07-08-2019 Create new payment in BSP DB if envelope doesn't exists
-            List<PaymentDTO> payments = new ArrayList<PaymentDTO>();
-            payments.add(paymentDTOMapper.fromRequest(paymentRequest));
+                    paymentService.updateEnvelopePaymentStatus(payment.getEnvelope());
+                    // TODO: 07-08-2019 Call Payment Service in PayHub to send complete payment details
+                    // TODO: 07-08-2019 Update payment Status as processed
+                }else{
+                 return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+            }else {
+                // TODO: 07-08-2019 Else
+                // TODO: 07-08-2019 Create new payment in BSP DB if envelope doesn't exists
+                List<PaymentDTO> payments = new ArrayList<PaymentDTO>();
+                payments.add(paymentDTOMapper.fromRequest(paymentRequest));
 
-            Envelope envelope = paymentService.createEnvelope(EnvelopeDTO.envelopeDtoWith()
-                                                                            .responsibleService(ResponsibleService.DIVORCE)
-                                                                            .paymentStatus(PaymentStatus.INCOMPLETE)
-                                                                            .payments(payments)
-                                                                            .build());
-            // TODO: 07-08-2019 Update payment status as incomplete
-            paymentService.updateEnvelopePaymentStatus(envelope);
+                Envelope envelope = paymentService.createEnvelope(EnvelopeDTO.envelopeDtoWith()
+                                                                      .responsibleService(ResponsibleService.DIVORCE)
+                                                                      .paymentStatus(PaymentStatus.INCOMPLETE)
+                                                                      .payments(payments)
+                                                                      .build());
+                // TODO: 07-08-2019 Update payment status as incomplete
+                paymentService.updateEnvelopePaymentStatus(envelope);
+            }
+            return new ResponseEntity<>(CREATED);
+        }catch(PaymentException pex){
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "API Failed with Exception!!!", pex);
         }
-        return new ResponseEntity<>(CREATED);
     }
 }

@@ -31,7 +31,7 @@ public class EnvelopeDTOMapper {
         return EnvelopeDTO.envelopeDtoWith()
             .id(envelope.getId())
             //.cases(toCaseDTOS(envelope.getCases()))
-            .payments(toPaymentDTOs(envelope.getPayments()))
+            //.payments(toPaymentDTOs(envelope.getPayments()))
             .responsibleService(envelope.getResponsibleService())
             .paymentStatus(envelope.getPaymentStatus())
             .dateCreated(localDateTimeToDate(envelope.getDateCreated()))
