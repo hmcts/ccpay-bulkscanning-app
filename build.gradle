@@ -147,7 +147,7 @@ dependencies {
   
   mainClassName = 'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication'
 
-  def jarName = 'bulk-scanningpayment-api.jar'
+  def jarName = 'bulk-scanning-payment-api.jar'
 
   bootJar {
     archiveName = jarName
