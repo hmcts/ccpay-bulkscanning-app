@@ -1,6 +1,5 @@
-# Spring Boot application template
-
-[![Build Status](https://travis-ci.org/hmcts/spring-boot-template.svg?branch=master)](https://travis-ci.org/hmcts/spring-boot-template)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=uk.gov.hmcts.reform%3Aay_ccpay-bulkscanning-app_master&metric=alert_status)](https://sonarcloud.io/dashboard?id=uk.gov.hmcts.reform%3Aay_ccpay-bulkscanning-app_master)
+# Bulk scanning payments API
 
 ## Purpose
 
@@ -9,8 +8,8 @@ The purpose of Bulk-Scanning API is to capture payment data from Bulk-scanning c
 
 ## What's inside
 
-The template is a working application with a minimal setup. It contains:
- * application skeleton
+The api is a working application with a setup. It contains:
+ * application 
  * setup script to prepare project
  * common plugins and libraries
  * docker setup
