@@ -19,6 +19,6 @@ withPipeline(type, product, app) {
     //loadVaultSecrets(secrets)
     //enableDbMigration()
     enableDockerBuild()
-    //installCharts()
+    installCharts()
     enableSlackNotifications('#cc-payments-tech')
 }
