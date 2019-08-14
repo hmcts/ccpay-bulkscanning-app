@@ -1,8 +1,10 @@
 management:
+  endpoint:
+    health:
+      show-details: "always"
   endpoints:
     web:
-      base-path: /
-
+      base-path: "/"
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:
   application:

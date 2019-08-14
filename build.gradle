@@ -143,8 +143,9 @@ dependencies {
   compile("org.springframework.boot:spring-boot-starter-web")
   testCompile("org.springframework.boot:spring-boot-starter-test")
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-
-  mainClassName = 'uk.gov.hmcts.reform.bulkscanning.Application'
+  compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.4'
+  
+  mainClassName = 'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication'
 
   bootJar {
 
@@ -185,4 +186,15 @@ jacocoTestReport {
     xml.enabled true
     html.enabled true
   }
+}
+run {
+  def debug = System.getProperty("debug")
+  if (debug == 'true') {
+    jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005']
+  }
+}
+
+bootRun {
+  //…other settings, like...
+  main = 'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication'
 }
