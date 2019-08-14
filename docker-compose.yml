@@ -28,8 +28,6 @@ services:
       - ccpay-bulkscanning-database
 
   ccpay-bulkscanning-database:
-    build:
-      context: docker/database
     container_name: ccpay-bulkscanning-database
     image: postgres:11-alpine
     environment:

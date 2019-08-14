@@ -173,7 +173,7 @@ dependencies {
   bootJar {
     archiveName = jarName
     manifest {
-      attributes('Implementation-Version': project.version.toString())
+      attributes 'Implementation-Title': project.name, 'Implementation-Version': project.version
     }
   }
 }
