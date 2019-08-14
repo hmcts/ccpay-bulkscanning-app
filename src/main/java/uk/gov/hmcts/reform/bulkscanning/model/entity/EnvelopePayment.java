@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,8 +16,8 @@ import java.time.LocalDateTime;
 @Builder(builderMethodName = "paymentWith")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "payment")
-public class Payment {
+@Table(name = "envelope_payment")
+public class EnvelopePayment extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,31 +26,11 @@ public class Payment {
     @Column(name = "dcn_reference")
     private String dcnReference;
 
-    @Column(name = "bgc_reference")
-    private Integer bgcReference;
-
-    @Column(name = "amount")
-    private BigDecimal amount;
-
-    @Column(name = "currency")
-    private Currency currency;
-
-    @Column(name = "payment_method")
-    private PaymentMethod paymentMethod;
-
-    @Column(name = "date_banked")
-    private LocalDateTime dateBanked;
+    @Column(name = "envelope_payment_status")
+    private String paymentStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "envelope_id", insertable = false, updatable = false)
     @ToString.Exclude
     private Envelope envelope;
-
-    @CreationTimestamp
-    @Column(name = "date_created", nullable = false)
-    private LocalDateTime dateCreated;
-
-    @UpdateTimestamp
-    @Column(name = "date_updated", nullable = false)
-    private LocalDateTime dateUpdated;
 }

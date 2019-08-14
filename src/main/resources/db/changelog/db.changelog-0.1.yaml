@@ -33,7 +33,7 @@ databaseChangeLog:
     author: yashar (generated)
     changes:
       - createTable:
-          tableName: case
+          tableName: envelope_case
           columns:
             - column:
                 name: id
@@ -73,7 +73,7 @@ databaseChangeLog:
     author: yashar (generated)
     changes:
        - createTable:
-          tableName: payment
+          tableName: envelope_payment
           columns:
             - column:
                 name: id
@@ -89,20 +89,10 @@ databaseChangeLog:
                 constraints:
                   nullable: false
             - column:
-                name: bgc_reference
-                type: varchar(250)
-            - column:
-                name: amount
-                type: numeric(19, 2)
-            - column:
-                name: currency
-                type: varchar(255)
-            - column:
-                name: payment_method
-                type: varchar(255)
-            - column:
-                name: date_banked
-                type: TIMESTAMP WITHOUT TIME ZONE
+                name: envelope_payment_status
+                type: varchar(50)
+                constraints:
+                  nullable: true
             - column:
                 name: date_created
                 type: TIMESTAMP WITHOUT TIME ZONE
@@ -115,7 +105,7 @@ databaseChangeLog:
                 name: envelope_id
                 type: int
 - changeSet:
-    id: 100004
+    id: 100004FK_3c04152jyub2e59dll7si8ggp
     author: yashar (generated)
     changes:
       - createTable:
@@ -190,7 +180,7 @@ databaseChangeLog:
     changes:
       - addForeignKeyConstraint:
           baseColumnNames: envelope_id
-          baseTableName: case
+          baseTableName: envelope_case
           constraintName: FK_3c04152jyub2e59dll7si8ggp
           deferrable: false
           initiallyDeferred: false
@@ -203,7 +193,7 @@ databaseChangeLog:
     changes:
       - addForeignKeyConstraint:
           baseColumnNames: envelope_id
-          baseTableName: payment
+          baseTableName: envelope_payment
           constraintName: FK_boc1od01im5po7i8e5biph5df
           deferrable: false
           initiallyDeferred: false

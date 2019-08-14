@@ -4,20 +4,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.bulkscanning.mapper.BSPaymentRequestMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.BSPaymentRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
+import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
+
 @Service
 public class BSConsumerServiceImpl implements BSConsumerService{
 
     @Autowired
-    PaymentRepository paymentRepository;
+    EnvelopeRepository envelopeRepository;
+
+    @Autowired
+    BulkScanningUtils bulkScanningUtils;
 
     @Autowired
     BSPaymentRequestMapper bsPaymentRequestMapper;
 
     @Override
     public void saveInitialMetadataFromBS(BSPaymentRequest bsPaymentRequest) {
-        Payment payment = bsPaymentRequestMapper.mapPaymentFromBSPaymentRequest(bsPaymentRequest);
-        paymentRepository.save(payment);
+        Envelope envelope = bsPaymentRequestMapper.mapEnvelopeFromBSPaymentRequest(bsPaymentRequest);
+
+        bulkScanningUtils.handlePaymentStatus(envelope);
+        bulkScanningUtils.insertStatusHistoryAudit(envelope);
+        envelopeRepository.save(envelope);
     }
+
+
 }

@@ -7,6 +7,7 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication;
 
 @Configuration
 @EnableSwagger2
@@ -17,7 +18,7 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
             .useDefaultResponseMessages(false)
             .select()
-            .apis(RequestHandlerSelectors.basePackage("uk.gov.hmcts.reform.bulkscanning.controller"))
+            .apis(RequestHandlerSelectors.basePackage(BulkScanningApiApplication.class.getPackage().getName() + ".controller"))
             .paths(PathSelectors.any())
             .build();
     }
