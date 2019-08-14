@@ -7,9 +7,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.junit4.SpringRunner;
-import static org.hamcrest.Matchers.equalTo;
 
 import static io.restassured.RestAssured.given;
+import static junit.framework.TestCase.assertFalse;
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @RunWith(SpringRunner.class)
@@ -19,9 +20,8 @@ public class SmokeTest {
     private String testUrl;
 
     @Before
-    public void setup() {
+    public void setUp() {
         RestAssured.baseURI = testUrl;
-//        log.info("Fees-Register-Api base url is :{}", testUrl);
     }
 
     @Test
@@ -33,6 +33,9 @@ public class SmokeTest {
             .get("/health")
             .then()
             .statusCode(200)
-            .body("status", equalTo("UP"));
+            .body(
+                "status",
+                equalTo("UP"));
+        assertFalse("passed",testUrl.isEmpty());
     }
 }
