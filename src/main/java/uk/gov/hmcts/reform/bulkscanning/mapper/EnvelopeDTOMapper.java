@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;

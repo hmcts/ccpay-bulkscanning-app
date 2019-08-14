@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder(builderMethodName = "caseWith")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "case")
+@Table(name = "envelope_case")
 public class Case {
 
     @Id

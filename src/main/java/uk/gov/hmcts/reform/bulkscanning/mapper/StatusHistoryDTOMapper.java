@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDTO;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class StatusHistoryDTOMapper {
@@ -15,7 +14,7 @@ public class StatusHistoryDTOMapper {
 
         return StatusHistory.statusHistoryWith()
             .status(statusHistoryDTO.getStatus())
-            .dateCreated(LocalDateTime.now())
+            .dateCreated(LocalDateTime.ofInstant(statusHistoryDTO.getDateCreated().toInstant(), ZoneId.systemDefault()))
             .build();
     }
 }

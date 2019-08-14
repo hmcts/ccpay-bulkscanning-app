@@ -3,26 +3,20 @@ package uk.gov.hmcts.reform.bulkscanning.controller;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.reform.bulkscanning.dto.CaseDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDTO;
-import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,13 +59,14 @@ public class PaymentController {
         @ApiResponse(code = 200, message = "Returns an envelope group id"),
         @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
         @ApiResponse(code = 401, message = "Failed authentication"),
-        @ApiResponse(code = 403, message = "Failed authorisation")
+        @ApiResponse(code = 403, message = "Failed authorisation"),
+        @ApiResponse(code = 404, message = "Payment not Found")
     })
     @PostMapping(value = "/bulk-scan-payment")
     @ResponseBody
     public ResponseEntity<String> createPayment(
         @RequestHeader(value = "ServiceAuthorization") String serviceAuthorization,
-        @Valid @RequestBody PaymentRequest paymentRequest) throws Exception {
+        @Validated @RequestBody PaymentRequest paymentRequest) throws Exception {
 
         // TODO: 07-08-2019 Payment Request Data Validation
 
@@ -84,24 +79,14 @@ public class PaymentController {
         // TODO: 07-08-2019 if already exists
         // TODO: 07-08-2019 update Payment
         if(null != payment) {
-            /*payment.setAmount(paymentRequest.getAmount());
-            payment.setCurrency(Currency.valueOf(paymentRequest.getCurrency()));
-            payment.setBgcReference(paymentRequest.getBank_giro_credit_slip_number());
-            payment.setPaymentMethod(PaymentMethod.valueOf(paymentRequest.getPaymentMethod()));
-            payment.setDateBanked(LocalDateTime.ofInstant(paymentRequest.getBanked_date().toInstant(), ZoneId.systemDefault()));
-
-            paymentService.updatePayment(payment);*/
-
             // TODO: 07-08-2019 Update payment status as complete
-            paymentService.createStatusHistory(StatusHistoryDTO.envelopeDtoWith()
-                .envelope(envelopeDTOMapper.fromEnvelopeEntity(payment.getEnvelope()))
-                .status(PaymentStatus.COMPLETE)
-                .build());
+            payment.setPaymentStatus(PaymentStatus.COMPLETE);
+            payment.setDateUpdated(LocalDateTime.now());
+            paymentService.updatePayment(payment);
+
+            paymentService.updateEnvelopePaymentStatus(payment.getEnvelope());
             // TODO: 07-08-2019 Call Payment Service in PayHub to send complete payment details
             // TODO: 07-08-2019 Update payment Status as processed
-        /*paymentService.createStatusHistory(StatusHistoryDTO.envelopeDtoWith()
-            .status(PaymentStatus.PROGRESSED)
-            .build());*/
         }else {
             // TODO: 07-08-2019 Else
             // TODO: 07-08-2019 Create new payment in BSP DB if envelope doesn't exists
@@ -109,27 +94,12 @@ public class PaymentController {
             payments.add(paymentDTOMapper.fromRequest(paymentRequest));
 
             Envelope envelope = paymentService.createEnvelope(EnvelopeDTO.envelopeDtoWith()
-                                                                            //.cases(cases)
                                                                             .paymentStatus(PaymentStatus.INCOMPLETE)
                                                                             .payments(payments)
-                                                                            .responsibleService(ResponsibleService.DEFAULT)
                                                                             .build());
-            /*EnvelopeDTO envelop = EnvelopeDTO.envelopeDtoWith()
-                                        .id(envelope.getId())
-                                        .build();
-
-            payments.stream().forEach(paymentDto -> {
-                paymentDto.setEnvelope(envelop);
-                paymentService.createPayment(paymentDto);
-            });*/
-
             // TODO: 07-08-2019 Update payment status as incomplete
-            paymentService.createStatusHistory(StatusHistoryDTO.envelopeDtoWith()
-                .envelope(envelopeDTOMapper.fromEnvelopeEntity(envelope))
-                .status(PaymentStatus.INCOMPLETE)
-                .build());
+            paymentService.updateEnvelopePaymentStatus(envelope);
         }
-
-        return new ResponseEntity<String>(CREATED);
+        return new ResponseEntity<>(CREATED);
     }
 }
