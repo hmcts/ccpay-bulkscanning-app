@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bulkscanning.util;
+package uk.gov.hmcts.reform.bulkscanning.utils;
 
 import org.springframework.stereotype.Component;
 

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.bulkscanning.model.entity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "status_history")
-public class StatusHistory extends BaseModel{
+public class StatusHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +27,12 @@ public class StatusHistory extends BaseModel{
     @JoinColumn(name = "envelope_id", insertable = false, updatable = false)
     @ToString.Exclude
     private Envelope envelope;
+
+    @CreationTimestamp
+    @Column(name = "date_created", nullable = false)
+    public LocalDateTime dateCreated;
+
+    @UpdateTimestamp
+    @Column(name = "date_updated", nullable = false)
+    private LocalDateTime dateUpdated;
 }

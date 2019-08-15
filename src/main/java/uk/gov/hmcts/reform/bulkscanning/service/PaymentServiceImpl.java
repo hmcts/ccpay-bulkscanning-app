@@ -10,23 +10,21 @@ import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.StatusHistoryDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.repository.EnvelopeRepository;
-import uk.gov.hmcts.reform.bulkscanning.repository.PaymentMetadataRepository;
-import uk.gov.hmcts.reform.bulkscanning.repository.PaymentRepository;
-import uk.gov.hmcts.reform.bulkscanning.repository.StatusHistoryRepository;
-import uk.gov.hmcts.reform.bulkscanning.util.DateUtil;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.StatusHistoryRepository;
+import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.util.DateUtil.localDateTimeToDate;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDate;
 
 
 @Service
@@ -40,6 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMetadataDTOMapper paymentMetadataDTOMapper;
     private final StatusHistoryDTOMapper statusHistoryDTOMapper;
     private final EnvelopeDTOMapper envelopeDTOMapper;
+    private final BulkScanningUtils bulkScanningUtils;
 
     @Autowired
     public PaymentServiceImpl(PaymentRepository paymentRepository,
@@ -48,7 +47,8 @@ public class PaymentServiceImpl implements PaymentService {
                               EnvelopeRepository envelopeRepository,
                               PaymentMetadataDTOMapper paymentMetadataDTOMapper,
                               StatusHistoryDTOMapper statusHistoryDTOMapper,
-                              EnvelopeDTOMapper envelopeDTOMapper) {
+                              EnvelopeDTOMapper envelopeDTOMapper,
+                              BulkScanningUtils bulkScanningUtils) {
         this.paymentRepository = paymentRepository;
         this.paymentMetadataRepository = paymentMetadataRepository;
         this.statusHistoryRepository = statusHistoryRepository;
@@ -56,16 +56,17 @@ public class PaymentServiceImpl implements PaymentService {
         this.paymentMetadataDTOMapper = paymentMetadataDTOMapper;
         this.statusHistoryDTOMapper = statusHistoryDTOMapper;
         this.envelopeDTOMapper = envelopeDTOMapper;
+        this.bulkScanningUtils = bulkScanningUtils;
     }
 
 
     @Override
-    public Payment getPaymentByDcnReference(String dcnReference) {
+    public EnvelopePayment getPaymentByDcnReference(String dcnReference) {
         return paymentRepository.findByDcnReference(dcnReference).orElse(null);
     }
 
     @Override
-    public Payment updatePayment(Payment payment) {
+    public EnvelopePayment updatePayment(EnvelopePayment payment) {
         return paymentRepository.save(payment);
     }
 
@@ -90,7 +91,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Envelope updateEnvelopePaymentStatus(Envelope envelope) {
-        List<Payment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
+        List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
         Boolean isPaymentsInComplete = payments.stream().map(payment -> payment.getPaymentStatus())
                                                         .collect(Collectors.toList())
                                                         .contains(PaymentStatus.INCOMPLETE.toString());
@@ -104,19 +105,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void updateEnvelopeStatus(Envelope envelope, PaymentStatus paymentStatus) {
         envelope.setPaymentStatus(paymentStatus.toString());
-        envelope.setDateUpdated(LocalDateTime.now());
         envelopeRepository.save(envelope);
-        /*createStatusHistory(StatusHistoryDTO.envelopeDtoWith()
-            .envelope(envelopeDTOMapper.fromEnvelopeEntity(envelope))
-            .status(paymentStatus)
-            .build());*/
+        bulkScanningUtils.insertStatusHistoryAudit(envelope);
     }
 
     @Override
     public Envelope createEnvelope(EnvelopeDTO envelopeDto) {
-        Envelope envelop = envelopeDTOMapper.toEnvelopeEntity(envelopeDto);
-        envelop.setDateCreated(LocalDateTime.now());
-        envelop.getPayments().stream().forEach(payment -> payment.setDateCreated(LocalDateTime.now()));
-        return envelopeRepository.save(envelop);
+        return envelopeRepository.save(envelopeDTOMapper.toEnvelopeEntity(envelopeDto));
     }
 }

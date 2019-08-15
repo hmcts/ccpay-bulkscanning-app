@@ -6,9 +6,12 @@ import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
+import uk.gov.hmcts.reform.bulkscanning.utils.DateUtil;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.dateToLocalDateTime;
 
 @Component
 public class PaymentMetadataDTOMapper {
@@ -20,8 +23,7 @@ public class PaymentMetadataDTOMapper {
             .paymentMethod(paymentMetadataDto.getPaymentMethod().toString())
             .amount(paymentMetadataDto.getAmount())
             .currency(paymentMetadataDto.getCurrency().toString())
-            .dateBanked(LocalDateTime.ofInstant(paymentMetadataDto.getDateBanked().toInstant(), ZoneId.systemDefault()))
-            .dateCreated(LocalDateTime.ofInstant(paymentMetadataDto.getDateCreated().toInstant(), ZoneId.systemDefault()))
+            .dateBanked(dateToLocalDateTime(paymentMetadataDto.getDateBanked()))
             .build();
     }
 

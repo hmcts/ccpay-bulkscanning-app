@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "payment_metadata")
-public class PaymentMetadata extends BaseModel{
+public class PaymentMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,4 +39,12 @@ public class PaymentMetadata extends BaseModel{
 
     @Column(name = "date_banked")
     private LocalDateTime dateBanked;
+
+    @CreationTimestamp
+    @Column(name = "date_created", nullable = false)
+    public LocalDateTime dateCreated;
+
+    @UpdateTimestamp
+    @Column(name = "date_updated", nullable = false)
+    private LocalDateTime dateUpdated;
 }

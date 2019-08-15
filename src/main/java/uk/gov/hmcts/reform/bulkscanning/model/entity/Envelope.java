@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -19,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "envelope")
-public class Envelope extends BaseModel {
+public class Envelope {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,4 +43,12 @@ public class Envelope extends BaseModel {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "envelope_id", referencedColumnName = "id", nullable = false)
     private List<StatusHistory> statusHistories;
+
+    @CreationTimestamp
+    @Column(name = "date_created", nullable = false)
+    public LocalDateTime dateCreated;
+
+    @UpdateTimestamp
+    @Column(name = "date_updated", nullable = false)
+    private LocalDateTime dateUpdated;
 }

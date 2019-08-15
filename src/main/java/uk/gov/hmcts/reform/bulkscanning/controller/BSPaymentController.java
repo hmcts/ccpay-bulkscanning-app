@@ -6,7 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDTO;
@@ -16,7 +19,7 @@ import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDTOMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
@@ -29,10 +32,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
-@SwaggerDefinition(tags = {@Tag(name = "BulkScanningController",
+@SwaggerDefinition(tags = {@Tag(name = "BSPaymentController",
     description = "Bulk Scanning Payment API to be used by the scanning supplier to share the "
         + "payment information contained in the envelope")})
-public class PaymentController {
+public class BSPaymentController {
 
     private final PaymentService paymentService;
     private final PaymentDTOMapper paymentDTOMapper;
@@ -40,10 +43,10 @@ public class PaymentController {
     private final EnvelopeDTOMapper envelopeDTOMapper;
 
     @Autowired
-    public PaymentController(PaymentService paymentService,
-                             PaymentMetadataDTOMapper paymentMetadataDTOMapper,
-                             PaymentDTOMapper paymentDTOMapper,
-                             EnvelopeDTOMapper envelopeDTOMapper){
+    public BSPaymentController(PaymentService paymentService,
+                               PaymentMetadataDTOMapper paymentMetadataDTOMapper,
+                               PaymentDTOMapper paymentDTOMapper,
+                               EnvelopeDTOMapper envelopeDTOMapper){
         this.paymentService = paymentService;
         this.paymentMetadataDTOMapper = paymentMetadataDTOMapper;
         this.paymentDTOMapper = paymentDTOMapper;
@@ -57,7 +60,7 @@ public class PaymentController {
 
         @return Success message & Status code 200 if Payment created
      */
-    @ApiOperation(value = "bulk-scan-payments", notes = "Provide meta information about the "
+    @ApiOperation(value = "Provide meta information about the "
         + "payments contained in the envelope. This operation will be called after the banking "
         + "process has been done and payments have been allocated to a BGC slip / batch")
     @ApiResponses(value = {
@@ -80,12 +83,12 @@ public class PaymentController {
             paymentService.createPaymentMetadata(paymentMetadataDTOMapper.fromRequest(paymentRequest));
 
             // TODO: 07-08-2019 Check for existing DCN in Payment Table Bulk Scan Pay DB,
-            Payment payment = paymentService.getPaymentByDcnReference(paymentRequest.getDocument_control_number());
+            EnvelopePayment payment = paymentService.getPaymentByDcnReference(paymentRequest.getDocument_control_number());
 
             // TODO: 07-08-2019 if already exists
             // TODO: 07-08-2019 update Payment
             if(null != payment) {
-                if(payment.getEnvelope().getPaymentStatus().equals(PaymentStatus.INCOMPLETE)){
+                if(payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(PaymentStatus.INCOMPLETE.toString())){
                     // TODO: 07-08-2019 Update payment status as complete
                     payment.setPaymentStatus(PaymentStatus.COMPLETE.toString());
                     payment.setDateUpdated(LocalDateTime.now());

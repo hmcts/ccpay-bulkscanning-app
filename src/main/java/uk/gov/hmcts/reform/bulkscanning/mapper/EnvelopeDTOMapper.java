@@ -4,20 +4,16 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.dto.CaseDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDTO;
 import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDTO;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.Case;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.util.DateUtil.dateToLocalDateTime;
-import static uk.gov.hmcts.reform.bulkscanning.util.DateUtil.localDateTimeToDate;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDate;
 
 @Component
 public class EnvelopeDTOMapper {
@@ -25,10 +21,8 @@ public class EnvelopeDTOMapper {
     public Envelope toEnvelopeEntity(EnvelopeDTO envelopeDTO){
         return Envelope.envelopeWith()
             .paymentStatus(envelopeDTO.getPaymentStatus().toString())
-            .payments(toPaymentEntities(envelopeDTO.getPayments()))
-            .responsibleService(envelopeDTO.getResponsibleService().toString())
-            .dateCreated(dateToLocalDateTime(envelopeDTO.getDateCreated()))
-            .dateUpdated(dateToLocalDateTime(envelopeDTO.getDateUpdated()))
+            .envelopePayments(toPaymentEntities(envelopeDTO.getPayments()))
+            .responsibleServiceId(envelopeDTO.getResponsibleService().toString())
             .build();
     }
 
@@ -37,18 +31,18 @@ public class EnvelopeDTOMapper {
             .id(envelope.getId())
             //.cases(toCaseDTOS(envelope.getCases()))
             //.payments(toPaymentDTOs(envelope.getPayments()))
-            .responsibleService(ResponsibleService.valueOf(envelope.getResponsibleService()))
+            .responsibleService(ResponsibleService.valueOf(envelope.getResponsibleServiceId()))
             .paymentStatus(PaymentStatus.valueOf(envelope.getPaymentStatus()))
             .dateCreated(localDateTimeToDate(envelope.getDateCreated()))
             .dateUpdated(localDateTimeToDate(envelope.getDateUpdated()))
             .build();
     }
 
-    public List<CaseDTO> toCaseDTOS(List<Case> caseEntities){
+    public List<CaseDTO> toCaseDTOS(List<EnvelopeCase> caseEntities){
         return caseEntities.stream().map(this::toCaseDTO).collect(Collectors.toList());
     }
 
-    public CaseDTO toCaseDTO(Case caseEntity){
+    public CaseDTO toCaseDTO(EnvelopeCase caseEntity){
         return CaseDTO.envelopeDtoWith().id(caseEntity.getId())
                                         .ccdReference(caseEntity.getCcdReference())
                                         .exceptionRecordReference(caseEntity.getExceptionRecordReference())
@@ -58,11 +52,11 @@ public class EnvelopeDTOMapper {
                                         .build();
     }
 
-    public List<PaymentDTO> toPaymentDTOs(List<Payment> payments){
+    public List<PaymentDTO> toPaymentDTOs(List<EnvelopePayment> payments){
         return payments.stream().map(this::toPaymentDTO).collect(Collectors.toList());
     }
 
-    public PaymentDTO toPaymentDTO(Payment payment){
+    public PaymentDTO toPaymentDTO(EnvelopePayment payment){
         return PaymentDTO.paymentDtoWith()
                             .id(payment.getId())
                             .dcnReference(payment.getDcnReference())
@@ -72,17 +66,15 @@ public class EnvelopeDTOMapper {
                             .build();
     }
 
-    public List<Payment> toPaymentEntities(List<PaymentDTO> payments){
+    public List<EnvelopePayment> toPaymentEntities(List<PaymentDTO> payments){
         return payments.stream().map(this::toPaymentEntity).collect(Collectors.toList());
     }
 
-    public Payment toPaymentEntity(PaymentDTO payment){
-        return Payment.paymentWith()
+    public EnvelopePayment toPaymentEntity(PaymentDTO payment){
+        return EnvelopePayment.paymentWith()
             .id(payment.getId())
             .dcnReference(payment.getDcnReference())
             .paymentStatus(payment.getPaymentStatus().toString())
-            .dateCreated(dateToLocalDateTime(payment.getDateCreated()))
-            .dateUpdated(dateToLocalDateTime(payment.getDateUpdated()))
             .build();
     }
 }
