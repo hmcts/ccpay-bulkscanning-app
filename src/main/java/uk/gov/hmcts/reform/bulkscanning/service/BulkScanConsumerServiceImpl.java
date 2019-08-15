@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 @Service
-public class BulkScanConsumerServiceImpl implements BulkScanConsumerService {
+public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
 
     @Autowired
     EnvelopeRepository envelopeRepository;
@@ -18,16 +18,16 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService {
     BulkScanningUtils bulkScanningUtils;
 
     @Autowired
-    BulkScanPaymentRequestMapper bulkScanPaymentRequestMapper;
+    BulkScanPaymentRequestMapper bsPaymentRequestMapper;
 
     @Override
     public void saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
-        Envelope envelope = bulkScanPaymentRequestMapper.mapEnvelopeFromBsPaymentRequest(bsPaymentRequest);
+        Envelope envelope = bsPaymentRequestMapper.mapEnvelopeFromBSPaymentRequest(bsPaymentRequest);
 
+        envelope = bulkScanningUtils.returnExistingEnvelope(envelope);
         bulkScanningUtils.handlePaymentStatus(envelope);
+
         bulkScanningUtils.insertStatusHistoryAudit(envelope);
         envelopeRepository.save(envelope);
     }
-
-
 }

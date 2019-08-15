@@ -15,25 +15,24 @@ import java.util.List;
 @Component
 public class BulkScanPaymentRequestMapper {
 
-    public Envelope mapEnvelopeFromBsPaymentRequest(BulkScanPaymentRequest bsPaymentRequest) {
+    public Envelope mapEnvelopeFromBSPaymentRequest(BulkScanPaymentRequest bsPaymentRequest) {
 
         List<EnvelopePayment> envelopePaymentList = new ArrayList<>();
         String[] dcnForPayments = bsPaymentRequest.getDocumentControlNumbers();
         //Set the DCNs from list
         Arrays.asList(dcnForPayments).stream().forEach(dcn -> envelopePaymentList.add(EnvelopePayment
-                                                                                          .paymentWith()
-                                                                                          .dcnReference(dcn)
-                                                                                          .paymentStatus(PaymentStatus.INCOMPLETE.toString())
-                                                                                          //by default at initial status
-                                                                                          .build()));
+            .paymentWith()
+            .dcnReference(dcn)
+            .paymentStatus(PaymentStatus.INCOMPLETE.toString()) //by default at initial status
+            .build()));
 
         List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
         EnvelopeCase envelopeCase = null;
 
-        if (StringUtils.equalsIgnoreCase(bsPaymentRequest.getIsExceptionRecord(), "true")) {
+        if (StringUtils.equalsIgnoreCase(bsPaymentRequest.getIsExceptionRecord(),"false")) {
             //If case reference present update ccd reference field
             envelopeCase = EnvelopeCase.caseWith().ccdReference(bsPaymentRequest.getCcdCaseNumber()).build();
-        } else if (StringUtils.equalsIgnoreCase(bsPaymentRequest.getIsExceptionRecord(), "false")) {
+        } else if (StringUtils.equalsIgnoreCase(bsPaymentRequest.getIsExceptionRecord(),"true")) {
             //If exception reference is present update exception reference field
             envelopeCase = EnvelopeCase.caseWith().exceptionRecordReference(bsPaymentRequest.getCcdCaseNumber()).build();
         }
@@ -47,3 +46,4 @@ public class BulkScanPaymentRequestMapper {
             .build();
     }
 }
+

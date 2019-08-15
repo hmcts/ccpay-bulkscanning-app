@@ -9,15 +9,14 @@ import io.swagger.annotations.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanningConsumerException;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
+
+import javax.validation.Valid;
 
 @RestController
 @Api(tags = {"BulkScanning"})
@@ -25,9 +24,10 @@ import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
 public class BulkScanConsumerController {
 
     @Autowired
-    BulkScanConsumerService bulkScanConsumerService;
+    BulkScanConsumerService bsConsumerService;
 
-    @ApiOperation("Get the initial meta data from bulk Scanning")
+    @ApiOperation(value = "Get the initial meta data from bulk Scanning",
+        notes = "Get the initial meta data from bulk Scanning")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Bulk Scanning Data retrieved"),
         @ApiResponse(code = 400, message = "Bad request"),
@@ -35,14 +35,8 @@ public class BulkScanConsumerController {
         @ApiResponse(code = 403, message = "Failed authorization")
     })
     @PostMapping("/bulk-scan-payment")
-    public ResponseEntity consumeInitialMetaDataBulkScanning(@RequestBody BulkScanPaymentRequest bsPaymentRequest) {
-        bulkScanConsumerService.saveInitialMetadataFromBs(bsPaymentRequest);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(BulkScanningConsumerException.class)
-    public String notFound(BulkScanningConsumerException ex) {
-        return ex.getMessage();
+    public ResponseEntity consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
+        bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 }
