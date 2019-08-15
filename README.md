@@ -1,4 +1,5 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=uk.gov.hmcts.reform%3Aay_ccpay-bulkscanning-app_master&metric=alert_status)](https://sonarcloud.io/dashboard?id=uk.gov.hmcts.reform%3Aay_ccpay-bulkscanning-app_master)
+[![Build Status](https://travis-ci.org/hmcts/spring-boot-template.svg?branch=master)](https://travis-ci.org/hmcts/ccpay-bulkscanning-app)
 # Bulk scanning payments API
 
 ## Purpose
@@ -6,7 +7,7 @@
 The purpose of Bulk-Scanning API is to capture payment data from Bulk-scanning component and Exela and move it to pay-hub once all payment data has been received.
 
 
-## What's inside
+## What's inside this application
 
 The api is a working application with a setup. It contains:
  * application 
