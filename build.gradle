@@ -111,8 +111,9 @@ def listFiles(String pattern) {
 
 sonarqube {
   properties {
+    property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.projectName", "CCPAY :: Bulkscanning payment"
-    property "sonar.jacoco.reportPath", "${listFiles('**/test.exec')}"
+    property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
     property "sonar.dynamicAnalysis", "reuseReports"
     property "sonar.java.coveragePlugin", "jacoco"
     property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
