@@ -144,6 +144,7 @@ repositories {
 def versions = [
   junit           : '5.5.0',
   reformLogging   : '5.0.1',
+  sonarPitest        : '0.5',
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2'
 ]
@@ -167,6 +168,7 @@ configurations.all {
 
 dependencies {
   compile("org.springframework.boot:spring-boot-starter-web")
+  compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
   testCompile("org.springframework.boot:spring-boot-starter-test")
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: javaLoggingVersion
@@ -174,6 +176,7 @@ dependencies {
   compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.4'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
   testCompile group: 'org.projectlombok', name: 'lombok', version: '1.16.16'
+
 
   smokeTestCompile sourceSets.test.runtimeClasspath
 
