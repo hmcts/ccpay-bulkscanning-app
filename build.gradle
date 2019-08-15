@@ -166,6 +166,7 @@ configurations.all {
 
 dependencies {
   compile("org.springframework.boot:spring-boot-starter-web")
+  compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
   testCompile("org.springframework.boot:spring-boot-starter-test")
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: javaLoggingVersion
