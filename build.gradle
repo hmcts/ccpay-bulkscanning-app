@@ -13,6 +13,8 @@ plugins {
   id 'idea'
 }
 
+apply from: 'liquibase.gradle'
+
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
@@ -150,7 +152,7 @@ def versions = [
 ]
 
 configurations.all {
-  resolutionStrategy {  
+  resolutionStrategy {
     eachDependency { DependencyResolveDetails details ->
       if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
         details.useVersion '2.9.9'
@@ -163,19 +165,43 @@ configurations.all {
   }
 }
 
-
-
-
 dependencies {
-  compile("org.springframework.boot:spring-boot-starter-web")
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+  compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.4'
+  compile group: 'io.springfox', name: 'springfox-swagger-ui', version:'2.9.0'
+  compile group: 'io.springfox', name: 'springfox-swagger2', version:'2.9.0'
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
+  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.2.RELEASE'
+  compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+  compile group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.2'
+  compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+  compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.9'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+  compile group: 'com.querydsl', name: 'querydsl-jpa', version:'4.1.4'
+  compile group: 'org.liquibase', name: 'liquibase-core', version: '3.7.0'
+  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.2') {
+    exclude(module: 'commons-logging')
+    exclude(module: 'slf4j-simple')
+  }
   compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
   testCompile("org.springframework.boot:spring-boot-starter-test")
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: javaLoggingVersion
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: javaLoggingVersion
-  compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.4'
+
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
-  testCompile group: 'org.projectlombok', name: 'lombok', version: '1.16.16'
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+  testCompile group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+
+  testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
 
   smokeTestCompile sourceSets.test.runtimeClasspath

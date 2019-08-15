@@ -1,0 +1,41 @@
+management:
+  endpoints:
+    web:
+      base-path: /
+
+#If you use a database then uncomment below lines and update db properties accordingly
+spring:
+  application:
+    name: bulk-scanning
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/bulk-scan-db
+    username: postgres
+    password: admin
+    properties:
+      charSet: UTF-8
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  liquibase:
+    enabled: ${SPRING_LIQUIBASE_ENABLED:true}
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+#    hikari:
+#      minimumIdle: 2
+#      maximumPoolSize: 10
+#      idleTimeout: 10000
+#      poolName: {to-be-defined}HikariCP
+#      maxLifetime: 7200000
+#      connectionTimeout: 30000
+#  jpa:
+#    properties:
+#      hibernate:
+#        jdbc:
+#          lob:
+#            # silence the 'wall-of-text' - unnecessary exception throw about blob types
+#            non_contextual_creation: true
