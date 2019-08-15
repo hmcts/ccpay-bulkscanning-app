@@ -34,7 +34,7 @@ asp_name = "${local.asp_name}"
     LOGBACK_REQUIRE_ERROR_CODE  = "false"
   }
 }
-odule "ccpay-bulkscanning-payment-database" {
+module "ccpay-bulkscanning-payment-database" {
   source = "git@github.com:hmcts/moj-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location_app}"
