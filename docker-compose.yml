@@ -31,9 +31,9 @@ services:
     container_name: ccpay-bulkscanning-database
     image: postgres:11-alpine
     environment:
-      - POSTGRES_USER=ccpay-bulkscanning
-      - POSTGRES_PASSWORD=ccpay-bulkscanning
-      - POSTGRES_DB=ccpay-bulkscanning
+      - POSTGRES_USER=ccpay-bulkscanning-payment
+      - POSTGRES_PASSWORD=ccpay-bulkscanning-payment
+      - POSTGRES_DB=ccpay-bulkscanning-payment
     ports:
       - 5182:5432
     volumes:

@@ -29,3 +29,13 @@ variable "capacity" {
 variable "common_tags" {
   type = "map"
 }
+
+variable "database_name" {
+  type    = "string"
+  default = "ccpay-bulkscanning-payment"
+}
+
+variable "postgresql_user" {
+  type    = "string"
+  default = "ccpay-bulkscanning-payment"
+}

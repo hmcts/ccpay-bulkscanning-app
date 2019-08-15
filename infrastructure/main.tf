@@ -34,6 +34,18 @@ asp_name = "${local.asp_name}"
     LOGBACK_REQUIRE_ERROR_CODE  = "false"
   }
 }
+odule "ccpay-bulkscanning-payment-database" {
+  source = "git@github.com:hmcts/moj-module-postgres?ref=master"
+  product = "${var.product}-${var.component}-postgres-db"
+  location = "${var.location_app}"
+  env = "${var.env}"
+  postgresql_user = "${var.postgresql_user}"
+  database_name = "${var.database_name}"
+  sku_name = "GP_Gen5_2"
+  sku_tier = "GeneralPurpose"
+  common_tags     = "${var.common_tags}"
+}
+
 data "azurerm_key_vault" "payment_key_vault" {
 name = "${local.vaultName}"
 resource_group_name = "ccpay-${var.env}"
