@@ -38,6 +38,7 @@ module "ccpay-bulkscanning-payment-database" {
   source = "git@github.com:hmcts/moj-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location_app}"
+  subscription = "${var.subscription}"
   env = "${var.env}"
   postgresql_user = "${var.postgresql_user}"
   database_name = "${var.database_name}"

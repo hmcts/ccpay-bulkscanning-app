@@ -20,7 +20,9 @@ variable "env" {
 
 variable "ilbIp" {}
 
-variable "subscription" {}
+variable "subscription" {
+  type = "string"
+}
 
 variable "capacity" {
   default = "1"
