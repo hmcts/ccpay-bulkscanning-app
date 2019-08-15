@@ -100,6 +100,13 @@ pmd {
 
 project.tasks['sonarqube'].dependsOn test
 
+def listFiles(String pattern) {
+  return new FileNameFinder()
+    .getFileNames("${project.rootDir}", pattern)
+    .stream()
+    .collect(Collectors.joining(","))
+}
+
 sonarqube {
   properties {
     property "sonar.projectName", "CCPAY :: Bulkscanning payment"
