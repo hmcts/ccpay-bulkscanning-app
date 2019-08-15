@@ -78,16 +78,12 @@ public class BulkScanPaymentController {
         @Validated @RequestBody PaymentRequest paymentRequest) {
 
         try {
-            // TODO: 07-08-2019 Payment Request Data Validation
-
-            // TODO: 07-08-2019 Insert Payment metadata in BSP DB
+            //Insert Payment metadata in BSP DB
             paymentService.createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(paymentRequest));
 
-            // TODO: 07-08-2019 Check for existing DCN in Payment Table Bulk Scan Pay DB,
+            //Check for existing DCN in Payment Table Bulk Scan Pay DB,
             EnvelopePayment payment = paymentService.getPaymentByDcnReference(paymentRequest.getDocumentControlNumber());
 
-            // TODO: 07-08-2019 if already exists
-            // TODO: 07-08-2019 update Payment
             if (null == payment) {
                 //Create new payment in BSP DB if envelope doesn't exists
                 List<PaymentDto> payments = new ArrayList<PaymentDto>();
@@ -103,14 +99,12 @@ public class BulkScanPaymentController {
                 paymentService.updateEnvelopePaymentStatus(envelope);
             } else {
                 if (payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(PaymentStatus.INCOMPLETE.toString())) {
-                    // TODO: 07-08-2019 Update payment status as complete
+                    //07-08-2019 Update payment status as complete
                     payment.setPaymentStatus(PaymentStatus.COMPLETE.toString());
                     payment.setDateUpdated(LocalDateTime.now());
                     paymentService.updatePayment(payment);
 
                     paymentService.updateEnvelopePaymentStatus(payment.getEnvelope());
-                    // TODO: 07-08-2019 Call Payment Service in PayHub to send complete payment details
-                    // TODO: 07-08-2019 Update payment Status as processed
                 } else {
                     return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
