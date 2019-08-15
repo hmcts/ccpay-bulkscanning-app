@@ -26,10 +26,10 @@ public class Envelope {
     private Integer id;
 
     @Column(name = "responsible_service_id")
-    private ResponsibleService responsibleService;
+    private String responsibleService;
 
     @Column(name = "payment_status")
-    private PaymentStatus paymentStatus;
+    private String paymentStatus;
 
     @CreationTimestamp
     @Column(name = "date_created", nullable = false)

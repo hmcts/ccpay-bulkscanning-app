@@ -67,7 +67,7 @@ public class PaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "Payment not Found")
     })
-    @PostMapping(value = "/bulk-scan-payment")
+    @PutMapping(value = "/bulk-scan-payment")
     @Transactional
     public ResponseEntity<String> createPayment(
         @RequestHeader(value = "ServiceAuthorization") String serviceAuthorization,
@@ -87,7 +87,7 @@ public class PaymentController {
             if(null != payment) {
                 if(payment.getEnvelope().getPaymentStatus().equals(PaymentStatus.INCOMPLETE)){
                     // TODO: 07-08-2019 Update payment status as complete
-                    payment.setPaymentStatus(PaymentStatus.COMPLETE);
+                    payment.setPaymentStatus(PaymentStatus.COMPLETE.toString());
                     payment.setDateUpdated(LocalDateTime.now());
                     paymentService.updatePayment(payment);
 
@@ -104,6 +104,7 @@ public class PaymentController {
                 payments.add(paymentDTOMapper.fromRequest(paymentRequest));
 
                 Envelope envelope = paymentService.createEnvelope(EnvelopeDTO.envelopeDtoWith()
+                                                                //tobe removed : Hardcoded for Testing
                                                                       .responsibleService(ResponsibleService.DIVORCE)
                                                                       .paymentStatus(PaymentStatus.INCOMPLETE)
                                                                       .payments(payments)

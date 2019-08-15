@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+import static uk.gov.hmcts.reform.bulkscanning.util.DateUtil.localDateTimeToDate;
+
 @Component
 public class PaymentDTOMapper {
 
@@ -19,8 +21,8 @@ public class PaymentDTOMapper {
             .dcnReference(paymentDto.getDcnReference())
             .envelope(Envelope.envelopeWith()
                 .id(paymentDto.getEnvelope().getId())
-                .paymentStatus(paymentDto.getEnvelope().getPaymentStatus())
-                .responsibleService(paymentDto.getEnvelope().getResponsibleService())
+                .paymentStatus(paymentDto.getEnvelope().getPaymentStatus().toString())
+                .responsibleService(paymentDto.getEnvelope().getResponsibleService().toString())
                 .build())
             .dateCreated(LocalDateTime.now())
             .build();
@@ -32,13 +34,5 @@ public class PaymentDTOMapper {
             .paymentStatus(PaymentStatus.INCOMPLETE)
             .dateCreated(localDateTimeToDate(LocalDateTime.now()))
             .build();
-    }
-
-    public Date localDateTimeToDate(LocalDateTime ldt){
-        return ldt != null ? Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant()) : null;
-    }
-
-    public LocalDateTime dateToLocalDateTime(Date date){
-        return date != null ? LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()) : null;
     }
 }

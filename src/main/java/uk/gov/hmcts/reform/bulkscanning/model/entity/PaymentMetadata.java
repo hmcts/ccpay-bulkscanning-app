@@ -32,10 +32,10 @@ public class PaymentMetadata {
     private BigDecimal amount;
 
     @Column(name = "currency")
-    private Currency currency;
+    private String currency;
 
     @Column(name = "payment_method")
-    private PaymentMethod paymentMethod;
+    private String paymentMethod;
 
     @Column(name = "date_banked")
     private LocalDateTime dateBanked;

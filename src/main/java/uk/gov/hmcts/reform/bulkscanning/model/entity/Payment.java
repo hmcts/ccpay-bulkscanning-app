@@ -27,7 +27,7 @@ public class Payment {
     private String dcnReference;
 
     @Column(name = "envelope_payment_status")
-    private PaymentStatus paymentStatus;
+    private String paymentStatus;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

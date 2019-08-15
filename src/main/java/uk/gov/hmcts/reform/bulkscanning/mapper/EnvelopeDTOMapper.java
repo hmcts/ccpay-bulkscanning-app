@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDTO;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Case;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Payment;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,14 +16,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.bulkscanning.util.DateUtil.dateToLocalDateTime;
+import static uk.gov.hmcts.reform.bulkscanning.util.DateUtil.localDateTimeToDate;
+
 @Component
 public class EnvelopeDTOMapper {
 
     public Envelope toEnvelopeEntity(EnvelopeDTO envelopeDTO){
         return Envelope.envelopeWith()
-            .paymentStatus(envelopeDTO.getPaymentStatus())
+            .paymentStatus(envelopeDTO.getPaymentStatus().toString())
             .payments(toPaymentEntities(envelopeDTO.getPayments()))
-            .responsibleService(envelopeDTO.getResponsibleService())
+            .responsibleService(envelopeDTO.getResponsibleService().toString())
             .dateCreated(dateToLocalDateTime(envelopeDTO.getDateCreated()))
             .dateUpdated(dateToLocalDateTime(envelopeDTO.getDateUpdated()))
             .build();
@@ -32,8 +37,8 @@ public class EnvelopeDTOMapper {
             .id(envelope.getId())
             //.cases(toCaseDTOS(envelope.getCases()))
             //.payments(toPaymentDTOs(envelope.getPayments()))
-            .responsibleService(envelope.getResponsibleService())
-            .paymentStatus(envelope.getPaymentStatus())
+            .responsibleService(ResponsibleService.valueOf(envelope.getResponsibleService()))
+            .paymentStatus(PaymentStatus.valueOf(envelope.getPaymentStatus()))
             .dateCreated(localDateTimeToDate(envelope.getDateCreated()))
             .dateUpdated(localDateTimeToDate(envelope.getDateUpdated()))
             .build();
@@ -75,17 +80,9 @@ public class EnvelopeDTOMapper {
         return Payment.paymentWith()
             .id(payment.getId())
             .dcnReference(payment.getDcnReference())
-            .paymentStatus(payment.getPaymentStatus())
+            .paymentStatus(payment.getPaymentStatus().toString())
             .dateCreated(dateToLocalDateTime(payment.getDateCreated()))
             .dateUpdated(dateToLocalDateTime(payment.getDateUpdated()))
             .build();
-    }
-
-    public Date localDateTimeToDate(LocalDateTime ldt){
-        return ldt != null ? Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant()) : null;
-    }
-
-    public LocalDateTime dateToLocalDateTime(Date date){
-        return date != null ? LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()) : null;
     }
 }

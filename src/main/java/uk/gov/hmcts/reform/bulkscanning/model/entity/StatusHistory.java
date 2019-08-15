@@ -22,7 +22,7 @@ public class StatusHistory {
     private Integer id;
 
     @Column(name = "payment_status")
-    private PaymentStatus status;
+    private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "envelope_id", insertable = false, updatable = false)

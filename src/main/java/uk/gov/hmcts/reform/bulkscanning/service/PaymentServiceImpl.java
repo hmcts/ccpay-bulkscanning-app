@@ -18,12 +18,15 @@ import uk.gov.hmcts.reform.bulkscanning.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.repository.PaymentMetadataRepository;
 import uk.gov.hmcts.reform.bulkscanning.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.repository.StatusHistoryRepository;
+import uk.gov.hmcts.reform.bulkscanning.util.DateUtil;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.reform.bulkscanning.util.DateUtil.localDateTimeToDate;
 
 
 @Service
@@ -90,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<Payment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
         Boolean isPaymentsInComplete = payments.stream().map(payment -> payment.getPaymentStatus())
                                                         .collect(Collectors.toList())
-                                                        .contains(PaymentStatus.INCOMPLETE);
+                                                        .contains(PaymentStatus.INCOMPLETE.toString());
         if(isPaymentsInComplete){
             updateEnvelopeStatus(envelope, PaymentStatus.INCOMPLETE);
         }else{
@@ -100,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void updateEnvelopeStatus(Envelope envelope, PaymentStatus paymentStatus) {
-        envelope.setPaymentStatus(paymentStatus);
+        envelope.setPaymentStatus(paymentStatus.toString());
         envelope.setDateUpdated(LocalDateTime.now());
         envelopeRepository.save(envelope);
         /*createStatusHistory(StatusHistoryDTO.envelopeDtoWith()
@@ -115,13 +118,5 @@ public class PaymentServiceImpl implements PaymentService {
         envelop.setDateCreated(LocalDateTime.now());
         envelop.getPayments().stream().forEach(payment -> payment.setDateCreated(LocalDateTime.now()));
         return envelopeRepository.save(envelop);
-    }
-
-    public Date localDateTimeToDate(LocalDateTime ldt){
-        return ldt != null ? Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant()) : null;
-    }
-
-    public LocalDateTime dateToLocalDateTime(Date date){
-        return date != null ? LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()) : null;
     }
 }

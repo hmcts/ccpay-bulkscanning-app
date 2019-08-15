@@ -17,9 +17,9 @@ public class PaymentMetadataDTOMapper {
         return PaymentMetadata.paymentMetadataWith()
             .bgcReference(paymentMetadataDto.getBgcReference())
             .dcnReference(paymentMetadataDto.getDcnReference())
-            .paymentMethod(paymentMetadataDto.getPaymentMethod())
+            .paymentMethod(paymentMetadataDto.getPaymentMethod().toString())
             .amount(paymentMetadataDto.getAmount())
-            .currency(paymentMetadataDto.getCurrency())
+            .currency(paymentMetadataDto.getCurrency().toString())
             .dateBanked(LocalDateTime.ofInstant(paymentMetadataDto.getDateBanked().toInstant(), ZoneId.systemDefault()))
             .dateCreated(LocalDateTime.ofInstant(paymentMetadataDto.getDateCreated().toInstant(), ZoneId.systemDefault()))
             .build();
