@@ -88,7 +88,20 @@ public class BulkScanPaymentController {
 
             // TODO: 07-08-2019 if already exists
             // TODO: 07-08-2019 update Payment
-            if (null != payment) {
+            if (null == payment) {
+                //Create new payment in BSP DB if envelope doesn't exists
+                List<PaymentDto> payments = new ArrayList<PaymentDto>();
+                payments.add(paymentDtoMapper.fromRequest(paymentRequest));
+
+                Envelope envelope = paymentService.createEnvelope(EnvelopeDto.envelopeDtoWith()
+                                                                      //tobe removed : Hardcoded for Testing
+                                                                      .responsibleService(ResponsibleService.DIVORCE)
+                                                                      .paymentStatus(PaymentStatus.INCOMPLETE)
+                                                                      .payments(payments)
+                                                                      .build());
+                //Update payment status as incomplete
+                paymentService.updateEnvelopePaymentStatus(envelope);
+            } else {
                 if (payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(PaymentStatus.INCOMPLETE.toString())) {
                     // TODO: 07-08-2019 Update payment status as complete
                     payment.setPaymentStatus(PaymentStatus.COMPLETE.toString());
@@ -101,20 +114,6 @@ public class BulkScanPaymentController {
                 } else {
                     return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
-            } else {
-                // TODO: 07-08-2019 Else
-                // TODO: 07-08-2019 Create new payment in BSP DB if envelope doesn't exists
-                List<PaymentDto> payments = new ArrayList<PaymentDto>();
-                payments.add(paymentDtoMapper.fromRequest(paymentRequest));
-
-                Envelope envelope = paymentService.createEnvelope(EnvelopeDto.envelopeDtoWith()
-                                                                      //tobe removed : Hardcoded for Testing
-                                                                      .responsibleService(ResponsibleService.DIVORCE)
-                                                                      .paymentStatus(PaymentStatus.INCOMPLETE)
-                                                                      .payments(payments)
-                                                                      .build());
-                // TODO: 07-08-2019 Update payment status as incomplete
-                paymentService.updateEnvelopePaymentStatus(envelope);
             }
             return new ResponseEntity<>(CREATED);
         } catch (PaymentException pex) {
