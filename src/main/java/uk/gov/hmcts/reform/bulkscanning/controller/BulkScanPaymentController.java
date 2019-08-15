@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.bulkscanning.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
-import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
@@ -45,17 +44,14 @@ public class BulkScanPaymentController {
     private final PaymentService paymentService;
     private final PaymentDtoMapper paymentDtoMapper;
     private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
-    private final EnvelopeDtoMapper envelopeDtoMapper;
 
     @Autowired
     public BulkScanPaymentController(PaymentService paymentService,
                                      PaymentMetadataDtoMapper paymentMetadataDtoMapper,
-                                     PaymentDtoMapper paymentDtoMapper,
-                                     EnvelopeDtoMapper envelopeDtoMapper) {
+                                     PaymentDtoMapper paymentDtoMapper) {
         this.paymentService = paymentService;
         this.paymentMetadataDtoMapper = paymentMetadataDtoMapper;
         this.paymentDtoMapper = paymentDtoMapper;
-        this.envelopeDtoMapper = envelopeDtoMapper;
     }
 
     /*
@@ -65,21 +61,21 @@ public class BulkScanPaymentController {
 
         @return Success message & Status code 200 if Payment created
      */
-    @ApiOperation(value = "Provide meta information about the "
+    @ApiOperation("Provide meta information about the "
         + "payments contained in the envelope. This operation will be called after the banking "
         + "process has been done and payments have been allocated to a BGC slip / batch")
-    @ApiResponses(value = {
+    @ApiResponses({
         @ApiResponse(code = 200, message = "Returns an envelope group id"),
         @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
         @ApiResponse(code = 401, message = "Failed authentication"),
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "Payment not Found")
     })
-    @PutMapping(value = "/bulk-scan-payment")
+    @PutMapping("/bulk-scan-payment")
     @Transactional
     public ResponseEntity<String> createPayment(
-        @RequestHeader(value = "ServiceAuthorization") String serviceAuthorization,
-        @Validated @RequestBody PaymentRequest paymentRequest) throws Exception {
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @Validated @RequestBody PaymentRequest paymentRequest) {
 
         try {
             // TODO: 07-08-2019 Payment Request Data Validation
