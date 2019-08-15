@@ -34,10 +34,10 @@ variable "common_tags" {
 
 variable "database_name" {
   type    = "string"
-  default = "ccpay-bulkscanning-payment"
+  default = "ccpay-bs-payment"
 }
 
 variable "postgresql_user" {
   type    = "string"
-  default = "ccpay-bulkscanning-payment"
+  default = "bs-payment"
 }
