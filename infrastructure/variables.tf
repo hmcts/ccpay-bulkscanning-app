@@ -21,7 +21,7 @@ variable "env" {
 variable "ilbIp" {}
 
 variable "subscription" {
-  type = "string"
+  type    = "string"
 }
 
 variable "capacity" {
@@ -34,10 +34,10 @@ variable "common_tags" {
 
 variable "database_name" {
   type    = "string"
-  default = "bulk-scanning-payment"
+  default = "ccpay-bulkscanning-payment"
 }
 
 variable "postgresql_user" {
   type    = "string"
-  default = "bulk-scanning-payment"
+  default = "ccpay-bulkscanning-payment"
 }

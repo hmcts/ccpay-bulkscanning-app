@@ -26,9 +26,9 @@ spring:
   ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:bulk-scanning-payment-postgresql}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:bulk-scanning-payment}${POSTGRES_CONNECTION_OPTIONS:}
-    username: ${POSTGRES_USERNAME:bulk-scanning-payment}
-    password: ${POSTGRES_PASSWORD:bulk-scanning-payment}
+    url: jdbc:postgresql://${POSTGRES_HOST:ccpay-bulkscanning-postgresql}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:ccpay-bulkscanning}${POSTGRES_CONNECTION_OPTIONS:}
+    username: ${POSTGRES_USERNAME:ccpay-bulkscanning}
+    password: ${POSTGRES_PASSWORD:ccpay-bulkscanning}
     properties:
       charSet: UTF-8
     tomcat:
