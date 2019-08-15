@@ -116,6 +116,8 @@ sonarqube {
     property "sonar.dynamicAnalysis", "reuseReports"
     property "sonar.java.coveragePlugin", "jacoco"
     property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
+    property "sonar.projectKey", "uk.gov.hmcts.reform:ccpay-bulkscanning-api"
+
   }
 }
 
