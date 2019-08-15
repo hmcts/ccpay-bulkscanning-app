@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.model.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 
 import javax.persistence.*;
 import java.math.BigDecimal;

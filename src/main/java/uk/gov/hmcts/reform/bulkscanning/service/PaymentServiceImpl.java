@@ -2,13 +2,13 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDTO;
-import uk.gov.hmcts.reform.bulkscanning.dto.PaymentMetadataDTO;
-import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDTO;
+import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDto;
+import uk.gov.hmcts.reform.bulkscanning.dto.PaymentMetadataDto;
+import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDto;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
-import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDTOMapper;
-import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDTOMapper;
-import uk.gov.hmcts.reform.bulkscanning.mapper.StatusHistoryDTOMapper;
+import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.mapper.StatusHistoryDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
@@ -35,9 +35,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final StatusHistoryRepository statusHistoryRepository;
     private final EnvelopeRepository envelopeRepository;
 
-    private final PaymentMetadataDTOMapper paymentMetadataDTOMapper;
-    private final StatusHistoryDTOMapper statusHistoryDTOMapper;
-    private final EnvelopeDTOMapper envelopeDTOMapper;
+    private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
+    private final StatusHistoryDtoMapper statusHistoryDtoMapper;
+    private final EnvelopeDtoMapper envelopeDtoMapper;
     private final BulkScanningUtils bulkScanningUtils;
 
     @Autowired
@@ -45,17 +45,17 @@ public class PaymentServiceImpl implements PaymentService {
                               PaymentMetadataRepository paymentMetadataRepository,
                               StatusHistoryRepository statusHistoryRepository,
                               EnvelopeRepository envelopeRepository,
-                              PaymentMetadataDTOMapper paymentMetadataDTOMapper,
-                              StatusHistoryDTOMapper statusHistoryDTOMapper,
-                              EnvelopeDTOMapper envelopeDTOMapper,
+                              PaymentMetadataDtoMapper paymentMetadataDtoMapper,
+                              StatusHistoryDtoMapper statusHistoryDtoMapper,
+                              EnvelopeDtoMapper envelopeDtoMapper,
                               BulkScanningUtils bulkScanningUtils) {
         this.paymentRepository = paymentRepository;
         this.paymentMetadataRepository = paymentMetadataRepository;
         this.statusHistoryRepository = statusHistoryRepository;
         this.envelopeRepository = envelopeRepository;
-        this.paymentMetadataDTOMapper = paymentMetadataDTOMapper;
-        this.statusHistoryDTOMapper = statusHistoryDTOMapper;
-        this.envelopeDTOMapper = envelopeDTOMapper;
+        this.paymentMetadataDtoMapper = paymentMetadataDtoMapper;
+        this.statusHistoryDtoMapper = statusHistoryDtoMapper;
+        this.envelopeDtoMapper = envelopeDtoMapper;
         this.bulkScanningUtils = bulkScanningUtils;
     }
 
@@ -71,20 +71,20 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentMetadata createPaymentMetadata(PaymentMetadataDTO paymentMetadataDto) {
+    public PaymentMetadata createPaymentMetadata(PaymentMetadataDto paymentMetadataDto) {
         paymentMetadataDto.setDateCreated(localDateTimeToDate(LocalDateTime.now()));
-        PaymentMetadata paymentMetadata = paymentMetadataDTOMapper.toPaymentEntity(paymentMetadataDto);
+        PaymentMetadata paymentMetadata = paymentMetadataDtoMapper.toPaymentEntity(paymentMetadataDto);
 
         return paymentMetadataRepository.save(paymentMetadata);
     }
 
     @Override
-    public StatusHistory createStatusHistory(StatusHistoryDTO statusHistoryDto) {
-        try{
+    public StatusHistory createStatusHistory(StatusHistoryDto statusHistoryDto) {
+        try {
             statusHistoryDto.setDateCreated(localDateTimeToDate(LocalDateTime.now()));
-            StatusHistory statusHistory = statusHistoryDTOMapper.toStatusHistoryEntity(statusHistoryDto);
+            StatusHistory statusHistory = statusHistoryDtoMapper.toStatusHistoryEntity(statusHistoryDto);
             return statusHistoryRepository.save(statusHistory);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             throw new PaymentException(ex);
         }
     }
@@ -93,11 +93,11 @@ public class PaymentServiceImpl implements PaymentService {
     public Envelope updateEnvelopePaymentStatus(Envelope envelope) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
         Boolean isPaymentsInComplete = payments.stream().map(payment -> payment.getPaymentStatus())
-                                                        .collect(Collectors.toList())
-                                                        .contains(PaymentStatus.INCOMPLETE.toString());
-        if(isPaymentsInComplete){
+            .collect(Collectors.toList())
+            .contains(PaymentStatus.INCOMPLETE.toString());
+        if (isPaymentsInComplete) {
             updateEnvelopeStatus(envelope, PaymentStatus.INCOMPLETE);
-        }else{
+        } else {
             updateEnvelopeStatus(envelope, PaymentStatus.COMPLETE);
         }
         return envelope;
@@ -110,7 +110,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Envelope createEnvelope(EnvelopeDTO envelopeDto) {
-        return envelopeRepository.save(envelopeDTOMapper.toEnvelopeEntity(envelopeDto));
+    public Envelope createEnvelope(EnvelopeDto envelopeDto) {
+        return envelopeRepository.save(envelopeDtoMapper.toEnvelopeEntity(envelopeDto));
     }
 }

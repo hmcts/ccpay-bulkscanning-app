@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.bulkscanning.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -25,8 +26,9 @@ public class PaymentRequest {
     Document control number of the payment received in the envelope.
     This is the unique identifier of the payment
      */
-    @NotEmpty(message = "document_control_number can't be Empty")
-    private String document_control_number;
+    @NotNull(message = "document_control_number can't be Empty")
+    @JsonProperty("document_control_number")
+    private String documentControlNumber;
 
     /*
     Payment amount in GBP
@@ -37,7 +39,7 @@ public class PaymentRequest {
     /*
     The ISO currency code
      */
-    @NotEmpty(message = "currency can't be Empty")
+    @NotNull(message = "currency can't be Empty")
     private String currency;
 
     /*
@@ -49,12 +51,13 @@ public class PaymentRequest {
     /*
     Number of the credit slip containing the payment
      */
-    @NotEmpty(message = "bank_giro_credit_slip_number can't be Empty")
-    private String bank_giro_credit_slip_number;
+    @NotNull(message = "bank_giro_credit_slip_number can't be Empty")
+    @JsonProperty("bank_giro_credit_slip_number")
+    private String bankGiroCreditSlipNumber;
 
     /*
     Date the payment was sent for banking.
      */
     @NotNull(message = "banked_date can't be Null")
-    private Date banked_date;
+    private Date bankedDate;
 }

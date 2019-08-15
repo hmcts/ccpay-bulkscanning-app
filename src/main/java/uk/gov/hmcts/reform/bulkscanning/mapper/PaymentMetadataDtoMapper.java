@@ -1,22 +1,18 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.bulkscanning.dto.PaymentMetadataDTO;
+import uk.gov.hmcts.reform.bulkscanning.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
-import uk.gov.hmcts.reform.bulkscanning.utils.DateUtil;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.dateToLocalDateTime;
 
 @Component
-public class PaymentMetadataDTOMapper {
+public class PaymentMetadataDtoMapper {
 
-    public PaymentMetadata toPaymentEntity(PaymentMetadataDTO paymentMetadataDto){
+    public PaymentMetadata toPaymentEntity(PaymentMetadataDto paymentMetadataDto) {
         return PaymentMetadata.paymentMetadataWith()
             .bgcReference(paymentMetadataDto.getBgcReference())
             .dcnReference(paymentMetadataDto.getDcnReference())
@@ -27,14 +23,14 @@ public class PaymentMetadataDTOMapper {
             .build();
     }
 
-    public PaymentMetadataDTO fromRequest(PaymentRequest paymentRequest){
-        return PaymentMetadataDTO.paymentMetadataDtoWith()
-            .dcnReference(paymentRequest.getDocument_control_number())
-            .bgcReference(paymentRequest.getBank_giro_credit_slip_number())
+    public PaymentMetadataDto fromRequest(PaymentRequest paymentRequest) {
+        return PaymentMetadataDto.paymentMetadataDtoWith()
+            .dcnReference(paymentRequest.getDocumentControlNumber())
+            .bgcReference(paymentRequest.getBankGiroCreditSlipNumber())
             .amount(paymentRequest.getAmount())
             .currency(Currency.valueOf(paymentRequest.getCurrency()))
             .paymentMethod(PaymentMethod.valueOf(paymentRequest.getMethod()))
-            .dateBanked(paymentRequest.getBanked_date())
+            .dateBanked(paymentRequest.getBankedDate())
             .build();
     }
 

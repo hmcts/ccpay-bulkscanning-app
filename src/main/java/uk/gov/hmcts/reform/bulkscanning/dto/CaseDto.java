@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 
 import java.util.Date;
 
@@ -20,11 +19,12 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class StatusHistoryDTO {
+public class CaseDto {
 
     private Integer id;
-    private EnvelopeDTO envelope;
-    private PaymentStatus status;
+    private String ccdReference;
+    private String exceptionRecordReference;
+    private EnvelopeDto envelope;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
     private Date dateCreated;

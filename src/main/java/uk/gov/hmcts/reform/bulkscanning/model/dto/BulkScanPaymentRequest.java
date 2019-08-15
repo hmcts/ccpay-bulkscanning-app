@@ -13,7 +13,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @NoArgsConstructor
 @Data
 @JsonInclude(NON_NULL)
-public class BSPaymentRequest {
+public class BulkScanPaymentRequest {
     private String responsibleServiceId;
     private String ccdCaseNumber;
     private String isExceptionRecord;

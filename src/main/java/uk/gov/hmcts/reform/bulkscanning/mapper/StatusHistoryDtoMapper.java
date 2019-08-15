@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDTO;
+import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
 
 @Component
-public class StatusHistoryDTOMapper {
+public class StatusHistoryDtoMapper {
 
-    public StatusHistory toStatusHistoryEntity(StatusHistoryDTO statusHistoryDTO){
+    public StatusHistory toStatusHistoryEntity(StatusHistoryDto statusHistoryDto) {
 
         return StatusHistory.statusHistoryWith()
-            .status(statusHistoryDTO.getStatus().toString())
+            .status(statusHistoryDto.getStatus().toString())
             .build();
     }
 }

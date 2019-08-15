@@ -8,31 +8,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonInclude(NON_NULL)
-@Builder(builderMethodName = "paymentMetadataDtoWith")
+@Builder(builderMethodName = "paymentDtoWith")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PaymentMetadataDTO {
+public class PaymentDto {
 
     private Integer id;
     private String dcnReference;
-    private String bgcReference;
-    private BigDecimal amount;
-    private Currency currency;
-    private PaymentMethod paymentMethod;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-    private Date dateBanked;
+    private EnvelopeDto envelope;
+    private PaymentStatus paymentStatus;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
     private Date dateCreated;
