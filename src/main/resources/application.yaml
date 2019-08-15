@@ -30,3 +30,4 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
+# 
