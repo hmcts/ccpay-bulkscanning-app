@@ -19,33 +19,30 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "envelope")
-public class Envelope {
+public class Envelope extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "responsible_service_id")
-    private String responsibleService;
+    private String responsibleServiceId;
 
     @Column(name = "payment_status")
     private String paymentStatus;
 
-    @CreationTimestamp
-    @Column(name = "date_created", nullable = false)
-    private LocalDateTime dateCreated;
-
-    @UpdateTimestamp
-    @Column(name = "date_updated", nullable = false)
-    private LocalDateTime dateUpdated;
+    @Column
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "envelope_id", referencedColumnName = "id", nullable = false)
+    private List<EnvelopePayment> envelopePayments;
 
     @Column
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "envelope_id", referencedColumnName = "id", nullable = false)
-    private List<Payment> payments;
+    private List<EnvelopeCase> envelopeCases;
 
     @Column
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "envelope_id", referencedColumnName = "id", nullable = false)
-    private List<Case> cases;
+    private List<StatusHistory> statusHistories;
 }

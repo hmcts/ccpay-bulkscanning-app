@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "envelope_case")
-public class Case {
+public class EnvelopeCase extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,12 +29,4 @@ public class Case {
     @JoinColumn(name = "envelope_id", insertable = false, updatable = false)
     @ToString.Exclude
     private Envelope envelope;
-
-    @CreationTimestamp
-    @Column(name = "date_created", nullable = false)
-    private LocalDateTime dateCreated;
-
-    @UpdateTimestamp
-    @Column(name = "date_updated", nullable = false)
-    private LocalDateTime dateUpdated;
 }

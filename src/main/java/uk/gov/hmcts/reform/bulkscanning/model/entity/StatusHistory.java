@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "status_history")
-public class StatusHistory {
+public class StatusHistory extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,12 +28,4 @@ public class StatusHistory {
     @JoinColumn(name = "envelope_id", insertable = false, updatable = false)
     @ToString.Exclude
     private Envelope envelope;
-
-    @CreationTimestamp
-    @Column(name = "date_created")
-    private LocalDateTime dateCreated;
-
-    @UpdateTimestamp
-    @Column(name = "date_updated")
-    private LocalDateTime dateUpdated;
 }
