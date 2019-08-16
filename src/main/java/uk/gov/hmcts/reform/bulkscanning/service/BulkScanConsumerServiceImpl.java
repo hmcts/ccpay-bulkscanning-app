@@ -24,10 +24,10 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService {
     public void saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
         Envelope envelope = bsPaymentRequestMapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
 
-        envelope = bulkScanningUtils.returnExistingEnvelope(envelope);
-        bulkScanningUtils.handlePaymentStatus(envelope);
+        Envelope existingEnvelope = bulkScanningUtils.returnExistingEnvelope(envelope);
+        bulkScanningUtils.handlePaymentStatus(existingEnvelope);
 
-        bulkScanningUtils.insertStatusHistoryAudit(envelope);
-        envelopeRepository.save(envelope);
+        bulkScanningUtils.insertStatusHistoryAudit(existingEnvelope);
+        envelopeRepository.save(existingEnvelope);
     }
 }

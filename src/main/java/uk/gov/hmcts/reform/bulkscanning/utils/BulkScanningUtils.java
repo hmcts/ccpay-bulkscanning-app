@@ -25,7 +25,7 @@ public class BulkScanningUtils {
     @Autowired
     StatusHistoryRepository statusHistoryRepository;
 
-    public Envelope returnExistingEnvelope(Envelope envelope) throws BulkScanCaseAlreadyExistsException {
+    public Envelope returnExistingEnvelope(Envelope envelope) {
 
         //List of existing Payments
         List<EnvelopePayment> listOfExistingPayment = envelope
@@ -37,7 +37,7 @@ public class BulkScanningUtils {
                                                                              .getDcnReference()).get())
             .collect(Collectors.toList());
 
-        if (Optional.ofNullable(listOfExistingPayment).isPresent() && listOfExistingPayment.size() > 0) {
+        if (Optional.ofNullable(listOfExistingPayment).isPresent() && listOfExistingPayment.isEmpty()) {
             envelope = listOfExistingPayment.get(0).getEnvelope();
 
             //check if existing cases are present
@@ -67,7 +67,7 @@ public class BulkScanningUtils {
             .collect(Collectors.toList());
 
         //update envelope, and status history if all the dcns are present and complete
-        if (!Optional.ofNullable(listOfIncompleteDcn).isPresent() || listOfIncompleteDcn.size() == 0) {
+        if (!Optional.ofNullable(listOfIncompleteDcn).isPresent() || listOfIncompleteDcn.isEmpty()) {
             envelope.setPaymentStatus(PaymentStatus.COMPLETE.toString()); // update envelope status to complete
         }
 
@@ -85,7 +85,7 @@ public class BulkScanningUtils {
 
         //If Status histories audit already present
         if (Optional.ofNullable(envelope.getStatusHistories()).isPresent()) {
-            statusHistoryList = envelope.getStatusHistories();
+            statusHistoryList.addAll(envelope.getStatusHistories());
         }
         statusHistoryList.add(statusHistory);
         envelope.setStatusHistories(statusHistoryList);

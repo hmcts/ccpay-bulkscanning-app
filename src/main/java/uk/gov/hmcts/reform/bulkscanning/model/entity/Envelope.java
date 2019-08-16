@@ -20,7 +20,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-
 @Entity
 @Data
 @Builder(builderMethodName = "envelopeWith")

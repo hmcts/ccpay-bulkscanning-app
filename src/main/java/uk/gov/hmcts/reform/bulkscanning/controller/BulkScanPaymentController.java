@@ -86,7 +86,7 @@ public class BulkScanPaymentController {
 
             if (null == payment) {
                 //Create new payment in BSP DB if envelope doesn't exists
-                List<PaymentDto> payments = new ArrayList<PaymentDto>();
+                List<PaymentDto> payments = new ArrayList<>();
                 payments.add(paymentDtoMapper.fromRequest(paymentRequest));
 
                 Envelope envelope = paymentService.createEnvelope(EnvelopeDto.envelopeDtoWith()

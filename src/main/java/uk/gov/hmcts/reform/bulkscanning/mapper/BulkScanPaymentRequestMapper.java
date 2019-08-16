@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
@@ -21,22 +20,20 @@ public class BulkScanPaymentRequestMapper {
         String[] dcnForPayments = bsPaymentRequest.getDocumentControlNumbers();
         //Set the DCNs from list
         Arrays.asList(dcnForPayments).stream().forEach(dcn -> envelopePaymentList.add(EnvelopePayment
-            .paymentWith()
-            .dcnReference(dcn)
-            .paymentStatus(PaymentStatus.INCOMPLETE.toString()) //by default at initial status
-            .build()));
+                                                                                          .paymentWith()
+                                                                                          .dcnReference(dcn)
+                                                                                          .paymentStatus(PaymentStatus.INCOMPLETE.toString())
+                                                                                          .build()));
 
         List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
-        EnvelopeCase envelopeCase = null;
 
-        if (StringUtils.equalsIgnoreCase(bsPaymentRequest.getIsExceptionRecord(),"false")) {
-            //If case reference present update ccd reference field
-            envelopeCase = EnvelopeCase.caseWith().ccdReference(bsPaymentRequest.getCcdCaseNumber()).build();
-        } else if (StringUtils.equalsIgnoreCase(bsPaymentRequest.getIsExceptionRecord(),"true")) {
+        if (bsPaymentRequest.getIsExceptionRecord()) {
             //If exception reference is present update exception reference field
-            envelopeCase = EnvelopeCase.caseWith().exceptionRecordReference(bsPaymentRequest.getCcdCaseNumber()).build();
+            envelopeCaseList.add(EnvelopeCase.caseWith().exceptionRecordReference(bsPaymentRequest.getCcdCaseNumber()).build());
+        } else {
+            //If case reference present update ccd reference field
+            envelopeCaseList.add(EnvelopeCase.caseWith().ccdReference(bsPaymentRequest.getCcdCaseNumber()).build());
         }
-        envelopeCaseList.add(envelopeCase);
 
         return Envelope.envelopeWith()
             .responsibleServiceId(bsPaymentRequest.getResponsibleServiceId())

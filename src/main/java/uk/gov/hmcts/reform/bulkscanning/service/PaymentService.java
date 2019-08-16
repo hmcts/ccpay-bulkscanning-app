@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.bulkscanning.service;
 
-import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.StatusHistoryDto;
@@ -11,16 +10,16 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
 
 public interface PaymentService {
 
-    EnvelopePayment getPaymentByDcnReference(String dcnReference) throws PaymentException;
+    EnvelopePayment getPaymentByDcnReference(String dcnReference);
 
-    EnvelopePayment updatePayment(EnvelopePayment payment) throws PaymentException;
+    EnvelopePayment updatePayment(EnvelopePayment payment);
 
-    PaymentMetadata createPaymentMetadata(PaymentMetadataDto paymentMetadataDto) throws PaymentException;
+    PaymentMetadata createPaymentMetadata(PaymentMetadataDto paymentMetadataDto);
 
-    StatusHistory createStatusHistory(StatusHistoryDto statusHistoryDto) throws PaymentException;
+    StatusHistory createStatusHistory(StatusHistoryDto statusHistoryDto);
 
-    Envelope updateEnvelopePaymentStatus(Envelope envelope) throws PaymentException;
+    Envelope updateEnvelopePaymentStatus(Envelope envelope);
 
-    Envelope createEnvelope(EnvelopeDto envelopeDto) throws PaymentException;
+    Envelope createEnvelope(EnvelopeDto envelopeDto);
 
 }
