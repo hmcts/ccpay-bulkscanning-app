@@ -25,7 +25,7 @@ public class BulkScanPaymentRequest {
     private String ccdCaseNumber;
 
     @JsonProperty("is_exception_record")
-    private String isExceptionRecord;
+    private boolean isExceptionRecord;
 
     @JsonProperty("document_control_numbers")
     private String[] documentControlNumbers;

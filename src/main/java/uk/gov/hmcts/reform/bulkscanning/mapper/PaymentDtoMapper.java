@@ -16,7 +16,6 @@ public class PaymentDtoMapper {
             .envelope(Envelope.envelopeWith()
                           .id(paymentDto.getEnvelope().getId())
                           .paymentStatus(paymentDto.getEnvelope().getPaymentStatus().toString())
-                          .responsibleServiceId(paymentDto.getEnvelope().getResponsibleService().toString())
                           .build())
             .build();
     }

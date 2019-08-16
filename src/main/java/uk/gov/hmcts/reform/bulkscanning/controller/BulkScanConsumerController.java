@@ -36,7 +36,6 @@ public class BulkScanConsumerController {
     })
     @PostMapping("/bulk-scan-payment")
     public ResponseEntity consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
-        bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity(bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest),HttpStatus.CREATED);
     }
 }

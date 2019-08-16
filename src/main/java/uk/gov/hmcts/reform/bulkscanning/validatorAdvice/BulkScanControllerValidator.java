@@ -13,6 +13,6 @@ public class BulkScanControllerValidator extends
 
     @ExceptionHandler(BulkScanCaseAlreadyExistsException.class)
     public ResponseEntity bsPaymentAlreadyExists(BulkScanCaseAlreadyExistsException ex) {
-        return new ResponseEntity(ex.getMessage(), HttpStatus.ALREADY_REPORTED);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.ALREADY_REPORTED);
     }
 }

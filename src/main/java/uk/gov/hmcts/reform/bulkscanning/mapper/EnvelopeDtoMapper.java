@@ -22,7 +22,6 @@ public class EnvelopeDtoMapper {
         return Envelope.envelopeWith()
             .paymentStatus(envelopeDto.getPaymentStatus().toString())
             .envelopePayments(toPaymentEntities(envelopeDto.getPayments()))
-            .responsibleServiceId(envelopeDto.getResponsibleService().toString())
             .build();
     }
 

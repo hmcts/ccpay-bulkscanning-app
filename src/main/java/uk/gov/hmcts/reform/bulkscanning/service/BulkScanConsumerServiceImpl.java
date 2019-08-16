@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
+import java.util.Optional;
+
 @Service
 public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
 
@@ -21,13 +23,17 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
     BulkScanPaymentRequestMapper bsPaymentRequestMapper;
 
     @Override
-    public void saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
-        Envelope envelope = bsPaymentRequestMapper.mapEnvelopeFromBSPaymentRequest(bsPaymentRequest);
+    public String saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
+        Envelope envelopeNew = bsPaymentRequestMapper.mapEnvelopeFromBSPaymentRequest(bsPaymentRequest);
 
-        envelope = bulkScanningUtils.returnExistingEnvelope(envelope);
-        bulkScanningUtils.handlePaymentStatus(envelope);
+        Envelope envelopeDB = bulkScanningUtils.returnExistingEnvelope(envelopeNew);
 
-        bulkScanningUtils.insertStatusHistoryAudit(envelope);
-        envelopeRepository.save(envelope);
+        //if we have envelope already in BS
+        if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
+                bulkScanningUtils.handlePaymentStatus(envelopeDB, envelopeNew);
+        }
+
+        bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
+        return envelopeRepository.save(envelopeDB).getId().toString();
     }
 }

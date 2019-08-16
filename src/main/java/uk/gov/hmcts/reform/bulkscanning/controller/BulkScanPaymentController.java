@@ -90,8 +90,6 @@ public class BulkScanPaymentController {
                 payments.add(paymentDtoMapper.fromRequest(paymentRequest));
 
                 Envelope envelope = paymentService.createEnvelope(EnvelopeDto.envelopeDtoWith()
-                                                                      //tobe removed : Hardcoded for Testing
-                                                                      .responsibleService(ResponsibleService.DIVORCE)
                                                                       .paymentStatus(PaymentStatus.INCOMPLETE)
                                                                       .payments(payments)
                                                                       .build());

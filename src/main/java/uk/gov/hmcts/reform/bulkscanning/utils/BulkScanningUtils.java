@@ -45,35 +45,61 @@ public class BulkScanningUtils {
         return envelope;
     }
 
-    public void handlePaymentStatus(Envelope envelope) {
+    public boolean isDCNAlreadyExists(List<String> listOfExistingDCN, EnvelopePayment envelopePayment) {
+        return !listOfExistingDCN.stream().noneMatch(dcn -> dcn.equalsIgnoreCase(envelopePayment.getDcnReference()));
+    }
 
-        //update DCN Status to complete if already present
-        envelope.getEnvelopePayments().stream().filter(envelopePayment ->
-            paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).isPresent()).
-            forEach(envelopePayment -> envelopePayment.setPaymentStatus(PaymentStatus.COMPLETE.toString()));
+    public Envelope handlePaymentStatus(Envelope envelopeDB, Envelope envelopeNew) {
 
-       /* //replace the objects with DB one
-        envelope.getEnvelopePayments().stream()
-            .filter(envelopePayment -> StringUtils.equalsIgnoreCase(envelopePayment.getPaymentStatus(),PaymentStatus.COMPLETE.toString()))
-            .forEach(envelopePayment ->
-                envelopePayment.setId((paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).get().getId())
-                ));
+        processAllTheDCNPayments(envelopeDB,envelopeNew);
+        completeTheEnvelopeStatus(envelopeDB);
+        getTheCaseDetailsFromBulkScan(envelopeDB,envelopeNew);
 
-        //set the envelope id
-        envelope.getEnvelopePayments().stream()
-            .filter(envelopePayment -> StringUtils.equalsIgnoreCase(envelopePayment.getPaymentStatus(),PaymentStatus.COMPLETE.toString()))
-            .forEach(envelopePayment ->
-                envelope.setId((paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).get().getEnvelope().getId())
-                ));*/
+        return envelopeDB;
+
+    }
+
+    public void getTheCaseDetailsFromBulkScan(Envelope envelopeDB, Envelope envelopeNew){
+        envelopeDB.setResponsibleServiceId(envelopeNew.getResponsibleServiceId());
+        envelopeDB.setEnvelopeCases(envelopeNew.getEnvelopeCases());
+        envelopeDB.getEnvelopeCases().stream().forEach(envelopeCase -> envelopeCase.setEnvelope(envelopeDB));
+    }
+
+    public void processAllTheDCNPayments(Envelope envelopeDB, Envelope envelopeNew) {
+
+        //List of existing DCN
+        List<String> listOfExistingDCN = envelopeNew.getEnvelopePayments().stream().filter(envelopePayment ->
+            paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).isPresent())
+            .map(envelopePayment -> paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).get())
+            .map(envelopePayment -> envelopePayment.getDcnReference()).collect(Collectors.toList());
+
+        List<EnvelopePayment> listOfNewDCNs = envelopeNew.getEnvelopePayments().stream().filter(envelopePayment ->
+            !(paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).isPresent()))
+            .collect(Collectors.toList());
+
+        if (Optional.ofNullable(listOfExistingDCN).isPresent() && listOfExistingDCN.size() > 0) {
+            //update DCN Status to complete if already present
+            envelopeDB.getEnvelopePayments().stream().filter(envelopePayment ->
+                isDCNAlreadyExists(listOfExistingDCN, envelopePayment))
+                .forEach(envelopePayment -> envelopePayment.setPaymentStatus(PaymentStatus.COMPLETE.toString()));
+        }
+
+        if (Optional.ofNullable(listOfNewDCNs).isPresent() && listOfNewDCNs.size() > 0) {
+            //add new DCN list to existing envelope DB
+            envelopeDB.getEnvelopePayments().addAll(listOfNewDCNs);
+        }
+    }
+
+    public void completeTheEnvelopeStatus(Envelope envelopeDB) {
 
         //list of incomplete DCN
-        List<EnvelopePayment> listOfIncompleteDCN = envelope.getEnvelopePayments().stream()
+        List<EnvelopePayment> listOfIncompleteDCN = envelopeDB.getEnvelopePayments().stream()
             .filter(envelopePayment -> StringUtils.equalsIgnoreCase(envelopePayment.getPaymentStatus(),PaymentStatus.INCOMPLETE.toString()))
             .collect(Collectors.toList());
 
         //update envelope, and status history if all the dcns are present and complete
         if (!Optional.ofNullable(listOfIncompleteDCN).isPresent() || listOfIncompleteDCN.size() == 0) {
-            envelope.setPaymentStatus(PaymentStatus.COMPLETE.toString()); // update envelope status to complete
+            envelopeDB.setPaymentStatus(PaymentStatus.COMPLETE.toString()); // update envelope status to complete
         }
 
     }
