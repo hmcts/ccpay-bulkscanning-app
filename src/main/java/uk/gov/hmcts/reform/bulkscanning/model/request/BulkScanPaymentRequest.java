@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bulkscanning.model.dto;
+package uk.gov.hmcts.reform.bulkscanning.model.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

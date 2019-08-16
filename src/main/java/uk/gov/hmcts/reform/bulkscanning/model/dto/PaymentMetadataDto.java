@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bulkscanning.dto;
+package uk.gov.hmcts.reform.bulkscanning.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,23 +8,31 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonInclude(NON_NULL)
-@Builder(builderMethodName = "envelopeDtoWith")
+@Builder(builderMethodName = "paymentMetadataDtoWith")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class StatusHistoryDto {
+public class PaymentMetadataDto {
 
     private Integer id;
-    private EnvelopeDto envelope;
-    private PaymentStatus status;
+    private String dcnReference;
+    private String bgcReference;
+    private BigDecimal amount;
+    private Currency currency;
+    private PaymentMethod paymentMethod;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
+    private Date dateBanked;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
     private Date dateCreated;

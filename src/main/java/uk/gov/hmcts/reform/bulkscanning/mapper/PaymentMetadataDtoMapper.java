@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.bulkscanning.dto.PaymentMetadataDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
+import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.dateToLocalDateTime;
 

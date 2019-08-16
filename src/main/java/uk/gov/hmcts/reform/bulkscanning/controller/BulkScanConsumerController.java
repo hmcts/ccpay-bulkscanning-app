@@ -12,8 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import uk.gov.hmcts.reform.bulkscanning.model.dto.BulkScanPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
 
 import javax.validation.Valid;

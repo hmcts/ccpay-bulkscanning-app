@@ -2,13 +2,13 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.PaymentMetadataDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.StatusHistoryDto;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.StatusHistoryDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.StatusHistoryDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;

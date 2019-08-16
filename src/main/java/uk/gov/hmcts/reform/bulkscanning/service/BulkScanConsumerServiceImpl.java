@@ -3,13 +3,13 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
-import uk.gov.hmcts.reform.bulkscanning.model.dto.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 @Service
-public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
+public class BulkScanConsumerServiceImpl implements BulkScanConsumerService {
 
     @Autowired
     EnvelopeRepository envelopeRepository;
@@ -22,7 +22,7 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
 
     @Override
     public void saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
-        Envelope envelope = bsPaymentRequestMapper.mapEnvelopeFromBSPaymentRequest(bsPaymentRequest);
+        Envelope envelope = bsPaymentRequestMapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
 
         envelope = bulkScanningUtils.returnExistingEnvelope(envelope);
         bulkScanningUtils.handlePaymentStatus(envelope);

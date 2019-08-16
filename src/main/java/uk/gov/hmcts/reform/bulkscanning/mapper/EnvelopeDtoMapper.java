@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.bulkscanning.dto.CaseDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.CaseDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;

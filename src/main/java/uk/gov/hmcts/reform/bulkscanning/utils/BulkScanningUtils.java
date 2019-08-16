@@ -25,12 +25,16 @@ public class BulkScanningUtils {
     @Autowired
     StatusHistoryRepository statusHistoryRepository;
 
-    public Envelope returnExistingEnvelope(Envelope envelope) throws BulkScanCaseAlreadyExistsException{
+    public Envelope returnExistingEnvelope(Envelope envelope) throws BulkScanCaseAlreadyExistsException {
 
         //List of existing Payments
-        List<EnvelopePayment> listOfExistingPayment = envelope.getEnvelopePayments().stream().filter(envelopePayment ->
-            paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).isPresent())
-            .map(envelopePayment -> paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).get())
+        List<EnvelopePayment> listOfExistingPayment = envelope
+            .getEnvelopePayments()
+            .stream()
+            .filter(envelopePayment -> paymentRepository.findByDcnReference(
+                envelopePayment.getDcnReference()).isPresent())
+            .map(envelopePayment -> paymentRepository.findByDcnReference(envelopePayment
+                                                                             .getDcnReference()).get())
             .collect(Collectors.toList());
 
         if (Optional.ofNullable(listOfExistingPayment).isPresent() && listOfExistingPayment.size() > 0) {
@@ -49,30 +53,21 @@ public class BulkScanningUtils {
 
         //update DCN Status to complete if already present
         envelope.getEnvelopePayments().stream().filter(envelopePayment ->
-            paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).isPresent()).
-            forEach(envelopePayment -> envelopePayment.setPaymentStatus(PaymentStatus.COMPLETE.toString()));
-
-       /* //replace the objects with DB one
-        envelope.getEnvelopePayments().stream()
-            .filter(envelopePayment -> StringUtils.equalsIgnoreCase(envelopePayment.getPaymentStatus(),PaymentStatus.COMPLETE.toString()))
+                                                           paymentRepository.findByDcnReference(envelopePayment.getDcnReference())
+                                                               .isPresent())
             .forEach(envelopePayment ->
-                envelopePayment.setId((paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).get().getId())
-                ));
+                         envelopePayment.setPaymentStatus(PaymentStatus.COMPLETE.toString()));
 
-        //set the envelope id
-        envelope.getEnvelopePayments().stream()
-            .filter(envelopePayment -> StringUtils.equalsIgnoreCase(envelopePayment.getPaymentStatus(),PaymentStatus.COMPLETE.toString()))
-            .forEach(envelopePayment ->
-                envelope.setId((paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).get().getEnvelope().getId())
-                ));*/
-
-        //list of incomplete DCN
-        List<EnvelopePayment> listOfIncompleteDCN = envelope.getEnvelopePayments().stream()
-            .filter(envelopePayment -> StringUtils.equalsIgnoreCase(envelopePayment.getPaymentStatus(),PaymentStatus.INCOMPLETE.toString()))
+        //list of incomplete Dcn
+        List<EnvelopePayment> listOfIncompleteDcn = envelope.getEnvelopePayments().stream()
+            .filter(envelopePayment -> StringUtils.equalsIgnoreCase(
+                envelopePayment.getPaymentStatus(),
+                PaymentStatus.INCOMPLETE.toString()
+            ))
             .collect(Collectors.toList());
 
         //update envelope, and status history if all the dcns are present and complete
-        if (!Optional.ofNullable(listOfIncompleteDCN).isPresent() || listOfIncompleteDCN.size() == 0) {
+        if (!Optional.ofNullable(listOfIncompleteDcn).isPresent() || listOfIncompleteDcn.size() == 0) {
             envelope.setPaymentStatus(PaymentStatus.COMPLETE.toString()); // update envelope status to complete
         }
 

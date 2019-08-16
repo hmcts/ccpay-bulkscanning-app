@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bulkscanning.validatorAdvice;
+package uk.gov.hmcts.reform.bulkscanning.validator;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
