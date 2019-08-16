@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
@@ -33,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -92,15 +93,15 @@ public class BulkScanPaymentController {
                 Envelope envelope = paymentService.createEnvelope(EnvelopeDto.envelopeDtoWith()
                                                                       //tobe removed : Hardcoded for Testing
                                                                       .responsibleService(ResponsibleService.DIVORCE)
-                                                                      .paymentStatus(PaymentStatus.INCOMPLETE)
+                                                                      .paymentStatus(INCOMPLETE)
                                                                       .payments(payments)
                                                                       .build());
                 //Update payment status as incomplete
                 paymentService.updateEnvelopePaymentStatus(envelope);
             } else {
-                if (payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(PaymentStatus.INCOMPLETE.toString())) {
+                if (payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(INCOMPLETE.toString())) {
                     //07-08-2019 Update payment status as complete
-                    payment.setPaymentStatus(PaymentStatus.COMPLETE.toString());
+                    payment.setPaymentStatus(COMPLETE.toString());
                     payment.setDateUpdated(LocalDateTime.now());
                     paymentService.updatePayment(payment);
 

@@ -4,12 +4,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @Component
 public class BulkScanPaymentRequestMapper {
@@ -22,7 +23,7 @@ public class BulkScanPaymentRequestMapper {
         Arrays.asList(dcnForPayments).stream().forEach(dcn -> envelopePaymentList.add(EnvelopePayment
                                                                                           .paymentWith()
                                                                                           .dcnReference(dcn)
-                                                                                          .paymentStatus(PaymentStatus.INCOMPLETE.toString())
+                                                                                          .paymentStatus(INCOMPLETE.toString())
                                                                                           .build()));
 
         List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
@@ -39,7 +40,7 @@ public class BulkScanPaymentRequestMapper {
             .responsibleServiceId(bsPaymentRequest.getResponsibleServiceId())
             .envelopePayments(envelopePaymentList)
             .envelopeCases(envelopeCaseList)
-            .paymentStatus(PaymentStatus.INCOMPLETE.toString()) ////by default at initial status
+            .paymentStatus(INCOMPLETE.toString()) ////by default at initial status
             .build();
     }
 }

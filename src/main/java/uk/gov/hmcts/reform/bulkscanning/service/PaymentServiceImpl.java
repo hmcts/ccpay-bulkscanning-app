@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDate;
 
 
@@ -94,9 +95,9 @@ public class PaymentServiceImpl implements PaymentService {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
         Boolean isPaymentsInComplete = payments.stream().map(payment -> payment.getPaymentStatus())
             .collect(Collectors.toList())
-            .contains(PaymentStatus.INCOMPLETE.toString());
+            .contains(INCOMPLETE.toString());
         if (isPaymentsInComplete) {
-            updateEnvelopeStatus(envelope, PaymentStatus.INCOMPLETE);
+            updateEnvelopeStatus(envelope, INCOMPLETE);
         } else {
             updateEnvelopeStatus(envelope, PaymentStatus.COMPLETE);
         }
