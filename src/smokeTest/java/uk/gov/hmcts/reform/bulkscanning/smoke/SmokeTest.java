@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.smoke;
 
+import groovy.util.logging.Slf4j;
 import io.restassured.RestAssured;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

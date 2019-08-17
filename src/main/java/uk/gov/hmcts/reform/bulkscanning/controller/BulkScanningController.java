@@ -23,6 +23,6 @@ public class BulkScanningController {
      */
     @GetMapping("/")
     public ResponseEntity<String> welcome() {
-        return ok("Welcome to spring-boot-template");
+        return ok("Welcome to hello world");
     }
 }
