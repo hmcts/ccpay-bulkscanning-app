@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.model;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ import lombok.experimental.Wither;
 @NoArgsConstructor
 @Wither
 @Builder
-public class CasePayments {
+public class CasePayments implements Serializable {
 
     private String ccdCaseNumber;
     private Boolean isExceptionRecord;

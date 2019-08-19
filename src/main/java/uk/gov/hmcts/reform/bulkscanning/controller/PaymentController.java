@@ -23,7 +23,7 @@ public class PaymentController {
 
     }
     @PostMapping("/bulk-scan-payments")
-    public void saveCasePayments(@PathVariable String dcn, @RequestBody CasePayments casePayments){
+    public void saveCasePayments( @RequestBody CasePayments casePayments){
 
 
         casePayments.getPayments().stream().forEach(payment -> repo.save(payment));
