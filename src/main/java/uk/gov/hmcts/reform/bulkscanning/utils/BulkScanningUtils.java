@@ -38,9 +38,9 @@ public class BulkScanningUtils {
         if (Optional.ofNullable(listOfExistingPayment).isPresent() && !listOfExistingPayment.isEmpty()) {
 
             //check if existing cases are present
-            if (Optional.ofNullable(envelope.getEnvelopeCases()).isPresent() && !envelope.getEnvelopeCases().isEmpty()) {
+           /* if (Optional.ofNullable(envelope.getEnvelopeCases()).isPresent() && !envelope.getEnvelopeCases().isEmpty()) {
                 throw new BulkScanCaseAlreadyExistsException("Bulk Scanning case already exists");
-            }
+            }*/
 
             return listOfExistingPayment.get(0).getEnvelope();
         }
