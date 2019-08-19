@@ -13,11 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
@@ -26,9 +22,12 @@ import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,25 +43,35 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
 public class BulkScanPaymentController {
 
     private final PaymentService paymentService;
+    private final BulkScanConsumerService bsConsumerService;
     private final PaymentDtoMapper paymentDtoMapper;
     private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
     @Autowired
     public BulkScanPaymentController(PaymentService paymentService,
+                                     BulkScanConsumerService bsConsumerService,
                                      PaymentMetadataDtoMapper paymentMetadataDtoMapper,
                                      PaymentDtoMapper paymentDtoMapper) {
         this.paymentService = paymentService;
+        this.bsConsumerService = bsConsumerService;
         this.paymentMetadataDtoMapper = paymentMetadataDtoMapper;
         this.paymentDtoMapper = paymentDtoMapper;
     }
 
-    /*
-        POST Endpoint
-        "name": "bulk-scanning-payments",
-        "description": "API endpoints to support payments via the bulk scanning channel"
+    @ApiOperation(value = "Get the initial meta data from bulk Scanning",
+        notes = "Get the initial meta data from bulk Scanning")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Bulk Scanning Data retrieved"),
+        @ApiResponse(code = 400, message = "Bad request"),
+        @ApiResponse(code = 401, message = "Failed authentication"),
+        @ApiResponse(code = 403, message = "Failed authorization")
+    })
+    @PostMapping("/bulk-scan-payments")
+    public ResponseEntity consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
+        bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest);
+        return new ResponseEntity(HttpStatus.CREATED);
+    }
 
-        @return Success message & Status code 200 if Payment created
-     */
     @ApiOperation("Provide meta information about the "
         + "payments contained in the envelope. This operation will be called after the banking "
         + "process has been done and payments have been allocated to a BGC slip / batch")
