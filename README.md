@@ -9,7 +9,7 @@ The purpose of Bulk-Scanning API is to capture payment data from Bulk-scanning c
 
 ## What's inside this application
 
-The api is a working application with a setup. It contains:
+The api is a working application with a setup. It contains :
  * application 
  * setup script to prepare project
  * common plugins and libraries
