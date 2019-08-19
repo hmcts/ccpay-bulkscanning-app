@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
-import uk.gov.hmcts.reform.bulkscanning.model.dto.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.util.Optional;
@@ -24,7 +24,7 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
 
     @Override
     public String saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
-        Envelope envelopeNew = bsPaymentRequestMapper.mapEnvelopeFromBSPaymentRequest(bsPaymentRequest);
+        Envelope envelopeNew = bsPaymentRequestMapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
 
         Envelope envelopeDB = bulkScanningUtils.returnExistingEnvelope(envelopeNew);
 

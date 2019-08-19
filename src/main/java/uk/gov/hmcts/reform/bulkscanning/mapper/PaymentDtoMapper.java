@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.request.PaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
+import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 
 @Component
 public class PaymentDtoMapper {
@@ -20,9 +20,9 @@ public class PaymentDtoMapper {
             .build();
     }
 
-    public PaymentDto fromRequest(PaymentRequest paymentRequest) {
+    public PaymentDto fromRequest(PaymentRequest paymentRequest, String dcnReference) {
         return PaymentDto.paymentDtoWith()
-            .dcnReference(paymentRequest.getDocumentControlNumber())
+            .dcnReference(dcnReference)
             .paymentStatus(PaymentStatus.INCOMPLETE)
             .build();
     }

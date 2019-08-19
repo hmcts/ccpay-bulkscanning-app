@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bulkscanning.dto;
+package uk.gov.hmcts.reform.bulkscanning.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,26 +9,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 
 import java.util.Date;
-import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonInclude(NON_NULL)
-@Builder(builderMethodName = "envelopeDtoWith")
+@Builder(builderMethodName = "paymentDtoWith")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class EnvelopeDto {
+public class PaymentDto {
 
     private Integer id;
-    private ResponsibleService responsibleService;
+    private String dcnReference;
+    private EnvelopeDto envelope;
     private PaymentStatus paymentStatus;
-    private List<PaymentDto> payments;
-    private List<CaseDto> cases;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
     private Date dateCreated;

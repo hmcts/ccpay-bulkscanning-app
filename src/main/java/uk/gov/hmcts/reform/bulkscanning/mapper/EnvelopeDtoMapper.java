@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.bulkscanning.dto.CaseDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.EnvelopeDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.CaseDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,9 +27,6 @@ public class EnvelopeDtoMapper {
     public EnvelopeDto fromEnvelopeEntity(Envelope envelope) {
         return EnvelopeDto.envelopeDtoWith()
             .id(envelope.getId())
-            //.cases(toCaseDTOS(envelope.getCases()))
-            //.payments(toPaymentDTOs(envelope.getPayments()))
-            .responsibleService(ResponsibleService.valueOf(envelope.getResponsibleServiceId()))
             .paymentStatus(PaymentStatus.valueOf(envelope.getPaymentStatus()))
             .dateCreated(localDateTimeToDate(envelope.getDateCreated()))
             .dateUpdated(localDateTimeToDate(envelope.getDateUpdated()))

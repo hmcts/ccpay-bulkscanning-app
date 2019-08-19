@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bulkscanning.dto.request;
+package uk.gov.hmcts.reform.bulkscanning.model.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,14 +20,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @NoArgsConstructor
 @Data
 public class PaymentRequest {
-
-    /*
-    Document control number of the payment received in the envelope.
-    This is the unique identifier of the payment
-     */
-    @NotNull(message = "document_control_number can't be Empty")
-    @JsonProperty("document_control_number")
-    private String documentControlNumber;
 
     /*
     Payment amount in GBP
@@ -59,4 +51,22 @@ public class PaymentRequest {
      */
     @NotNull(message = "banked_date can't be Null")
     private Date bankedDate;
+
+    @JsonProperty("outbound_batch_number")
+    private String outboundBatchNumber;
+
+    @JsonProperty("dcn_case")
+    private String dcnCase;
+
+    @JsonProperty("case_reference")
+    private String caseReference;
+
+    @JsonProperty("po_box")
+    private String poBox;
+
+    @JsonProperty("first_cheque_dcn_in_batch")
+    private String firstChequeDcnInBatch;
+
+    @JsonProperty("payer_name")
+    private String payerName;
 }

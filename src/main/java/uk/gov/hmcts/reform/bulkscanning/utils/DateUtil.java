@@ -14,10 +14,10 @@ public final class DateUtil {
     }
 
     public static Date localDateTimeToDate(LocalDateTime ldt) {
-        return ldt != null ? Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant()) : null;
+        return ldt == null ? null : Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static LocalDateTime dateToLocalDateTime(Date date) {
-        return date != null ? LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()) : null;
+        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 }

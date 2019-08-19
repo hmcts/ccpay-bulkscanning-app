@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bulkscanning.model.dto;
+package uk.gov.hmcts.reform.bulkscanning.model.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,7 +25,7 @@ public class BulkScanPaymentRequest {
     private String ccdCaseNumber;
 
     @JsonProperty("is_exception_record")
-    private boolean isExceptionRecord;
+    private Boolean isExceptionRecord;
 
     @JsonProperty("document_control_numbers")
     private String[] documentControlNumbers;

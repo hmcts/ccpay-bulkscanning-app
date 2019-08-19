@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bulkscanning.validatorAdvice;
+package uk.gov.hmcts.reform.bulkscanning.validator;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +13,6 @@ public class BulkScanControllerValidator extends
 
     @ExceptionHandler(BulkScanCaseAlreadyExistsException.class)
     public ResponseEntity bsPaymentAlreadyExists(BulkScanCaseAlreadyExistsException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.ALREADY_REPORTED);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 }
