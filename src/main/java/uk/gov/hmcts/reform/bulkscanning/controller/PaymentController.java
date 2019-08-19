@@ -6,27 +6,31 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.bulkscanning.db.CasePaymentsRepo;
 import uk.gov.hmcts.reform.bulkscanning.db.PaymentRepo;
-import uk.gov.hmcts.reform.bulkscanning.model.CasePayments;
+import uk.gov.hmcts.reform.bulkscanning.model.CaseDCNs;
 import uk.gov.hmcts.reform.bulkscanning.model.Payment;
 
 @RestController
 public class PaymentController {
 
     @Autowired
-    private PaymentRepo repo;
+    private PaymentRepo paymentRepo;
+
+    @Autowired
+    private CasePaymentsRepo casePaymentsRepo;
     @PutMapping("/bulk-scan-payments/{dcn}")
     public void savePayment(@PathVariable String dcn, @RequestBody Payment payment){
 
         payment.setDcnPayment(dcn);
-        repo.save(payment);
+        paymentRepo.save(payment);
 
     }
     @PostMapping("/bulk-scan-payments")
-    public void saveCasePayments( @RequestBody CasePayments casePayments){
+    public void saveCasePayments( @RequestBody CaseDCNs caseDCNs){
 
 
-        casePayments.getPayments().stream().forEach(payment -> repo.save(payment));
+        caseDCNs.getPayments().stream().forEach(payment -> casePaymentsRepo.save(payment));
     }
 
 }

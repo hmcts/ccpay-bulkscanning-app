@@ -3,13 +3,14 @@ package uk.gov.hmcts.reform.bulkscanning.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,41 +23,41 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SelectBeforeUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @SelectBeforeUpdate
-
+@DynamicUpdate
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonInclude(NON_NULL)
+@JsonInclude(NON_EMPTY)
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Wither
+@SuppressWarnings("PMD")
 public class Payment {
 
     @Id
     private String dcnPayment;
-    @NotNull
+
     @DecimalMin("0.01")
     @Positive
     @Digits(integer = 10, fraction = 2, message = "Payment amount cannot have more than 2 decimal places")
     private BigDecimal amount;
-    private String currency = "GBP";
+    private String currency;
     private PaymentMethod method;
     private String bankGiroCreditSlipNumber;
     private LocalDate bankedDate;
     private String outboundBatchNumber;
     private String dcnCase;
     private String caseReference;
-    private String ccdCaseNumber;
-    private String exceptionReference;
+
     private String poBox;
     private String firstChequeDCNInBatch;
     private String payerName;
-    private String siteId;
 
     @CreationTimestamp
     @JsonIgnore
@@ -66,13 +67,5 @@ public class Payment {
     @UpdateTimestamp
     private Date dateUpdated;
 
-    public Payment ccdCaseNumber(String ccdCaseNumber, Boolean isExceptionRecord) {
 
-        if (isExceptionRecord) {
-            this.exceptionReference = ccdCaseNumber;
-        } else {
-            this.ccdCaseNumber = ccdCaseNumber;
-        }
-        return this;
-    }
 }

@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.bulkscanning.db;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.reform.bulkscanning.model.Payment;
+import uk.gov.hmcts.reform.bulkscanning.model.CasePayment;
 
 @Repository
-public interface PaymentRepo extends CrudRepository<Payment, String> {
+public interface CasePaymentsRepo extends CrudRepository<CasePayment, String> {
 }

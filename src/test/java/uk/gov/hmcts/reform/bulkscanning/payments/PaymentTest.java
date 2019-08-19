@@ -17,17 +17,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.testcontainers.shaded.com.fasterxml.jackson.annotation.PropertyAccessor;
-import uk.gov.hmcts.reform.bulkscanning.model.CasePayments;
+import uk.gov.hmcts.reform.bulkscanning.model.CaseDCNs;
 import uk.gov.hmcts.reform.bulkscanning.model.Payment;
 import uk.gov.hmcts.reform.bulkscanning.model.PaymentMethod;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(
     locations = "classpath:application-test.properties")
+@SuppressWarnings("PMD")
 public class PaymentTest {
 
     @Autowired
@@ -38,7 +38,7 @@ public class PaymentTest {
 
         String dcns[] = {"dcn1", "dcn2"};
         mvc.perform(post("/bulk-scan-payments")
-            .content(asJsonString(CasePayments.builder().ccdCaseNumber("ccd1").isExceptionRecord(false).documentControlNumbers(dcns)))
+            .content(asJsonString(CaseDCNs.builder().ccdCaseNumber("ccd1").isExceptionRecord(false).documentControlNumbers(dcns)))
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content()
@@ -52,7 +52,7 @@ public class PaymentTest {
         mvc.perform(post("/bulk-scan-payments")
             .content(asJsonString(Payment.builder()
                 .dcnPayment("dcn1")
-                .amount(new BigDecimal(50.5))
+                .amount(new BigDecimal("50.5"))
                 .bankedDate(LocalDate.now())
                 .currency("GBP")
                 .method(PaymentMethod.CHEQUE)

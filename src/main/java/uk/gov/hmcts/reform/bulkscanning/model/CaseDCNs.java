@@ -1,36 +1,40 @@
 package uk.gov.hmcts.reform.bulkscanning.model;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonInclude(NON_NULL)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Wither
 @Builder
-public class CasePayments implements Serializable {
+public class CaseDCNs {
 
     private String ccdCaseNumber;
     private Boolean isExceptionRecord;
     private String siteId;
     private String[] documentControlNumbers;
 
-    public List<Payment> getPayments() {
+    @JsonIgnore
+    public List<CasePayment> getPayments() {
 
         return Arrays.stream(documentControlNumbers).map(dcn ->
-            Payment.builder().dcnPayment(dcn).siteId(siteId).build().ccdCaseNumber(ccdCaseNumber, isExceptionRecord))
+            CasePayment.builder().dcnPayment(dcn).siteId(siteId).build().caseNumber(ccdCaseNumber, isExceptionRecord))
             .collect(Collectors.toList());
     }
 }
