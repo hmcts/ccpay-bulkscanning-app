@@ -16,6 +16,8 @@ public interface PaymentService {
 
     PaymentMetadata createPaymentMetadata(PaymentMetadataDto paymentMetadataDto);
 
+    PaymentMetadata getPaymentMetadata(String dcnReference);
+
     StatusHistory createStatusHistory(StatusHistoryDto statusHistoryDto);
 
     Envelope updateEnvelopePaymentStatus(Envelope envelope);

@@ -20,17 +20,29 @@ public class PaymentMetadataDtoMapper {
             .amount(paymentMetadataDto.getAmount())
             .currency(paymentMetadataDto.getCurrency().toString())
             .dateBanked(dateToLocalDateTime(paymentMetadataDto.getDateBanked()))
+            .outboundBatchNumber(paymentMetadataDto.getOutboundBatchNumber())
+            .dcnCase(paymentMetadataDto.getDcnCase())
+            .caseReference(paymentMetadataDto.getCaseReference())
+            .poBox(paymentMetadataDto.getPoBox())
+            .firstChequeDcnInBatch(paymentMetadataDto.getFirstChequeDcnInBatch())
+            .payerName(paymentMetadataDto.getPayerName())
             .build();
     }
 
-    public PaymentMetadataDto fromRequest(PaymentRequest paymentRequest) {
+    public PaymentMetadataDto fromRequest(PaymentRequest paymentRequest, String dcnReference) {
         return PaymentMetadataDto.paymentMetadataDtoWith()
-            .dcnReference(paymentRequest.getDocumentControlNumber())
+            .dcnReference(dcnReference)
             .bgcReference(paymentRequest.getBankGiroCreditSlipNumber())
             .amount(paymentRequest.getAmount())
             .currency(Currency.valueOf(paymentRequest.getCurrency()))
             .paymentMethod(PaymentMethod.valueOf(paymentRequest.getMethod()))
             .dateBanked(paymentRequest.getBankedDate())
+            .outboundBatchNumber(paymentRequest.getOutboundBatchNumber())
+            .dcnCase(paymentRequest.getDcnCase())
+            .caseReference(paymentRequest.getCaseReference())
+            .poBox(paymentRequest.getPoBox())
+            .firstChequeDcnInBatch(paymentRequest.getFirstChequeDcnInBatch())
+            .payerName(paymentRequest.getPayerName())
             .build();
     }
 

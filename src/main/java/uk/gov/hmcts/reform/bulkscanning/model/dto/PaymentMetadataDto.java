@@ -30,6 +30,12 @@ public class PaymentMetadataDto {
     private BigDecimal amount;
     private Currency currency;
     private PaymentMethod paymentMethod;
+    private String outboundBatchNumber;
+    private String dcnCase;
+    private String caseReference;
+    private String poBox;
+    private String firstChequeDcnInBatch;
+    private String payerName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
     private Date dateBanked;

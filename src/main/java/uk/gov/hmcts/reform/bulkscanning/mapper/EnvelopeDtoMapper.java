@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,16 +21,12 @@ public class EnvelopeDtoMapper {
         return Envelope.envelopeWith()
             .paymentStatus(envelopeDto.getPaymentStatus().toString())
             .envelopePayments(toPaymentEntities(envelopeDto.getPayments()))
-            .responsibleServiceId(envelopeDto.getResponsibleService().toString())
             .build();
     }
 
     public EnvelopeDto fromEnvelopeEntity(Envelope envelope) {
         return EnvelopeDto.envelopeDtoWith()
             .id(envelope.getId())
-            //.cases(toCaseDTOS(envelope.getCases()))
-            //.payments(toPaymentDTOs(envelope.getPayments()))
-            .responsibleService(ResponsibleService.valueOf(envelope.getResponsibleServiceId()))
             .paymentStatus(PaymentStatus.valueOf(envelope.getPaymentStatus()))
             .dateCreated(localDateTimeToDate(envelope.getDateCreated()))
             .dateUpdated(localDateTimeToDate(envelope.getDateUpdated()))

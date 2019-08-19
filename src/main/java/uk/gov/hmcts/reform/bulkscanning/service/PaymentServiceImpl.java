@@ -80,6 +80,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public PaymentMetadata getPaymentMetadata(String dcnReference) {
+        return paymentMetadataRepository.findByDcnReference(dcnReference).orElse(null);
+    }
+
+    @Override
     public StatusHistory createStatusHistory(StatusHistoryDto statusHistoryDto) {
         try {
             statusHistoryDto.setDateCreated(localDateTimeToDate(LocalDateTime.now()));

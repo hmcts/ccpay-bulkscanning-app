@@ -16,14 +16,13 @@ public class PaymentDtoMapper {
             .envelope(Envelope.envelopeWith()
                           .id(paymentDto.getEnvelope().getId())
                           .paymentStatus(paymentDto.getEnvelope().getPaymentStatus().toString())
-                          .responsibleServiceId(paymentDto.getEnvelope().getResponsibleService().toString())
                           .build())
             .build();
     }
 
-    public PaymentDto fromRequest(PaymentRequest paymentRequest) {
+    public PaymentDto fromRequest(PaymentRequest paymentRequest, String dcnReference) {
         return PaymentDto.paymentDtoWith()
-            .dcnReference(paymentRequest.getDocumentControlNumber())
+            .dcnReference(dcnReference)
             .paymentStatus(PaymentStatus.INCOMPLETE)
             .build();
     }
