@@ -20,7 +20,9 @@ variable "env" {
 
 variable "ilbIp" {}
 
-variable "subscription" {}
+variable "subscription" {
+  type    = "string"
+}
 
 variable "capacity" {
   default = "1"
@@ -28,4 +30,14 @@ variable "capacity" {
 
 variable "common_tags" {
   type = "map"
+}
+
+variable "database_name" {
+  type    = "string"
+  default = "bspayment"
+}
+
+variable "postgresql_user" {
+  type    = "string"
+  default = "bspayment"
 }
