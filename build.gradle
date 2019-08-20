@@ -159,7 +159,6 @@ configurations.all {
 dependencies {
   compile("org.springframework.boot:spring-boot-starter-web")
   compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
-  testCompile("org.springframework.boot:spring-boot-starter-test")
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'io.springfox', name: 'springfox-swagger-ui', version:'2.9.0'
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
@@ -171,9 +170,8 @@ dependencies {
       exclude(module: 'commons-logging')
       exclude(module: 'slf4j-simple')
     }
-
-
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+  compile group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+  testCompile("org.springframework.boot:spring-boot-starter-test")
   testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.9.1'
 
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
