@@ -25,11 +25,13 @@ services:
     ports:
       - $SERVER_PORT:$SERVER_PORT
     depends_on:
-      - ccpay-bulkscanning-database
+      - ccpay-bulkscanning-db
 
-  ccpay-bulkscanning-database:
-    container_name: ccpay-bulkscanning-database
-    image: postgres:11-alpine
+  ccpay-bulkscanning-db:
+    build:
+      context: database
+    container_name: ccpay-bulkscanning-db
+    image: hmcts/ccpay-bulkscanning-db
     environment:
       - POSTGRES_USER=bspayment
       - POSTGRES_PASSWORD=bspayment
@@ -37,6 +39,6 @@ services:
     ports:
       - 5182:5432
     volumes:
-      - ccpay-bulkscanning-database-data:/var/lib/postgresql/data
+      - ccpay-bulkscanning-db-data:/var/lib/postgresql/data
 volumes:
-  ccpay-bulkscanning-database-data:
+  ccpay-bulkscanning-db-volume:
