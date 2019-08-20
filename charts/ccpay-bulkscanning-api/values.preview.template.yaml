@@ -7,6 +7,8 @@ java:
     REFORM_SERVICE_NAME: ccpay-bulkscanning
     REFORM_TEAM: ccpay
 
+postgresql:
+  enabled: true
 
 
 
