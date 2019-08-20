@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.constraints.NotBlank;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,13 +27,19 @@ import lombok.experimental.Wither;
 @Builder
 public class CaseDCNs {
 
+    @NotBlank
     private String ccdCaseNumber;
+    @NotBlank
     private Boolean isExceptionRecord;
+    @NotBlank
     private String siteId;
+    @NotBlank
     private String[] documentControlNumbers;
 
     @JsonIgnore
     public List<CasePayment> getPayments() {
+
+
 
         return Arrays.stream(documentControlNumbers).map(dcn ->
             CasePayment.builder().dcnPayment(dcn).siteId(siteId).build().caseNumber(ccdCaseNumber, isExceptionRecord))

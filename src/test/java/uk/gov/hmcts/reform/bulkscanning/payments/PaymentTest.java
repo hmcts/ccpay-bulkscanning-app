@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.bulkscanning.payments;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,41 +38,33 @@ public class PaymentTest {
     @Test
     public void givenAChequeWhenItDoesntExistAlreadyThenCreateNew() throws Exception {
 
-        String dcns[] = {"dcn1", "dcn2"};
+        String[] dcns = {"dcn1", "dcn2"};
         mvc.perform(post("/bulk-scan-payments")
-            .content(asJsonString(CaseDCNs.builder().ccdCaseNumber("ccd1").isExceptionRecord(false).documentControlNumbers(dcns)))
+            .content(asJsonString(CaseDCNs.builder().ccdCaseNumber("ccd1").isExceptionRecord(false).documentControlNumbers(dcns).build()))
             .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+            .andExpect(status().isOk());
     }
 
     @Test
     public void givenAChequeWhenItExistAlreadyThenupdateWithDetails() throws Exception {
 
-        String dcns[] = {"dcn1", "dcn2"};
-        mvc.perform(post("/bulk-scan-payments")
+        mvc.perform(put("/bulk-scan-payments/{dcn}", "dcn1")
             .content(asJsonString(Payment.builder()
-                .dcnPayment("dcn1")
                 .amount(new BigDecimal("50.5"))
-                .bankedDate(LocalDate.now())
                 .currency("GBP")
                 .method(PaymentMethod.CHEQUE)
                 .outboundBatchNumber("batch1")
                 .payerName("John Crow")
+                .build()
             ))
             .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+            .andExpect(status().isOk());
     }
 
-    public static String asJsonString(final Object obj) {
-        try {
-            
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static String asJsonString(final Object obj) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        return objectMapper.writeValueAsString(obj);
     }
 }
