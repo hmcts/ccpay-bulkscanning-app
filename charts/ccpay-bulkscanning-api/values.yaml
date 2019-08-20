@@ -1,22 +1,22 @@
-postgresql:
-  initdbScripts:
-    init.sql: |-
-      CREATE USER ccpay-bulkscanning WITH PASSWORD 'ccpay-bulkscanning';
-      CREATE DATABASE ccpay-bulkscanning WITH OWNER = ccpay-bulkscanning ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-  nameOverride: ccpay-bulkscanning-db
-  persistence:
-    enabled: false
-
 java:
   image: 'hmctspublic.azurecr.io/payment/ccpay-bulkscanning-api:latest'
   applicationPort: 8080
   environment:
-    SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ .Release.Name }}-ccpay-bulkscanning-db:5432/ccpay-bulkscanning"
-    SPRING_DATASOURCE_USERNAME: ccpay-bulkscanning
-    SPRING_DATASOURCE_PASSWORD: ccpay-bulkscanning
+    POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
+    POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
+    POSTGRES_USER: "{{ .Values.postgresql.postgresqlUsername}}"
+    POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    POSTGRES_PORT: 5432
+    LOGBACK_REQUIRE_ALERT_LEVEL: 'false'
+    LOGBACK_REQUIRE_ERROR_CODE: 'false'
     REFORM_SERVICE_NAME: ccpay-bulkscanning
     REFORM_TEAM: ccpay
     SPRING_LIQUIBASE_ENABLED: true
-
-tags:
-  postgresql-pod: true
+  postgresql:
+    image:
+      tag: 10.7.0-r68
+    postgresqlUsername: bspayment
+    postgresqlPassword: bspayment
+    postgresqlDatabase: bspayment
+    service:
+      port: 5432
