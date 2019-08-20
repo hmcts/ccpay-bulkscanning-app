@@ -17,8 +17,6 @@ databaseChangeLog:
             - column:
                 name: responsible_service_id
                 type: varchar(50)
-                constraints:
-                  nullable: false
             - column:
                 name: date_created
                 type: TIMESTAMP WITHOUT TIME ZONE

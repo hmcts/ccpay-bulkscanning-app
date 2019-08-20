@@ -35,14 +35,17 @@ public class BulkScanningUtils {
             .map(envelopePayment -> paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).get())
             .collect(Collectors.toList());
 
+
         if (Optional.ofNullable(listOfExistingPayment).isPresent() && !listOfExistingPayment.isEmpty()) {
+            Envelope existingEnvelope = listOfExistingPayment.get(0).getEnvelope();
 
             //check if existing cases are present
-           /* if (Optional.ofNullable(envelope.getEnvelopeCases()).isPresent() && !envelope.getEnvelopeCases().isEmpty()) {
+            if (Optional.ofNullable(existingEnvelope.getEnvelopeCases()).isPresent()
+                && !existingEnvelope.getEnvelopeCases().isEmpty()) {
                 throw new BulkScanCaseAlreadyExistsException("Bulk Scanning case already exists");
-            }*/
+            }
 
-            return listOfExistingPayment.get(0).getEnvelope();
+            return existingEnvelope;
         }
 
         return envelope;
