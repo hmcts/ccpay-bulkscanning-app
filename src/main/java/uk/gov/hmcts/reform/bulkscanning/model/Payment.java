@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.bulkscanning.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.DecimalMin;
@@ -11,7 +10,6 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Positive;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
