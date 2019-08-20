@@ -14,10 +14,8 @@ java:
     SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ .Release.Name }}-ccpay-bulkscanning-db:5432/ccpay-bulkscanning"
     SPRING_DATASOURCE_USERNAME: ccpay-bulkscanning
     SPRING_DATASOURCE_PASSWORD: ccpay-bulkscanning
-
     REFORM_SERVICE_NAME: ccpay-bulkscanning
     REFORM_TEAM: ccpay
-
     SPRING_LIQUIBASE_ENABLED: true
 
 tags:
