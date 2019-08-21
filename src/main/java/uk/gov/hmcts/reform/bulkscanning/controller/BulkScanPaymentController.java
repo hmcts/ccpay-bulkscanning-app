@@ -12,12 +12,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
@@ -42,10 +47,17 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
         + "payment information contained in the envelope")})
 public class BulkScanPaymentController {
 
-    private final PaymentService paymentService;
-    private final BulkScanConsumerService bsConsumerService;
-    private final PaymentDtoMapper paymentDtoMapper;
-    private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
+    @Autowired
+    PaymentService paymentService;
+
+    @Autowired
+    BulkScanConsumerService bsConsumerService;
+
+    @Autowired
+    PaymentDtoMapper paymentDtoMapper;
+
+    @Autowired
+    PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
     @Autowired
     public BulkScanPaymentController(PaymentService paymentService,
@@ -107,6 +119,21 @@ public class BulkScanPaymentController {
         } catch (PaymentException pex) {
             throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "API Failed with Exception!!!", pex);
         }
+    }
+
+    @ApiOperation("API Endpoint to update case reference for payment")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Returns an envelope group id"),
+        @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
+        @ApiResponse(code = 401, message = "Failed authentication"),
+        @ApiResponse(code = 403, message = "Failed authorisation"),
+        @ApiResponse(code = 404, message = "Provided exception reference doesn't exist"),
+    })
+    @PutMapping("/bulk-scan-cases/{exception_reference}")
+    public ResponseEntity updateCaseReferenceForExceptionRecord(@PathVariable("exception_reference") String exceptionRecordReference,
+                                                                @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
+        bsConsumerService.updateCaseReferenceForExceptionRecord(exceptionRecordReference, caseReferenceRequest);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     private void processPaymentFromExela(PaymentRequest paymentRequest, String dcnReference) {

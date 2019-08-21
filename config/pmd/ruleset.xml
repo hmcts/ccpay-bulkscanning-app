@@ -45,7 +45,7 @@
   </rule>
   <rule ref="category/java/design.xml/ExcessiveImports">
     <properties>
-      <property name="minimum" value="35"/><!-- should be reduced -->
+      <property name="minimum" value="50"/><!-- should be reduced -->
     </properties>
   </rule>
   <rule ref="category/java/design.xml/LawOfDemeter">

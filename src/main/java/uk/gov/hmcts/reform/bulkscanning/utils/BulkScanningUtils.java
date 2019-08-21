@@ -42,7 +42,7 @@ public class BulkScanningUtils {
             //check if existing cases are present
             if (Optional.ofNullable(existingEnvelope.getEnvelopeCases()).isPresent()
                 && !existingEnvelope.getEnvelopeCases().isEmpty()) {
-                throw new BulkScanCaseAlreadyExistsException("Bulk Scanning case already exists");
+                throw new BulkScanCaseAlreadyExistsException("Bulk Scanning payment details already exist");
             }
 
             return existingEnvelope;
