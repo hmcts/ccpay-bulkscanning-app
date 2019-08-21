@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
@@ -30,7 +32,7 @@ public class BulkScanPaymentRequest {
     private String ccdCaseNumber;
 
     @JsonProperty("is_exception_record")
-    @NotBlank(message = "Exception record flag is missing")
+    @NotNull(message = "Exception record flag is missing")
     private Boolean isExceptionRecord;
 
     @JsonProperty("document_control_numbers")
