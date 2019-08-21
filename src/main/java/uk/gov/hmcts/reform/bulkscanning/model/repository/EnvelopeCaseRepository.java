@@ -10,5 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface EnvelopeCaseRepository extends CrudRepository<EnvelopeCase, Integer>, JpaSpecificationExecutor<Envelope> {
+
+    Optional<EnvelopeCase> findByCcdReference(String ccdReference);
+
     Optional<EnvelopeCase> findByExceptionRecordReference(String exceptionRecordReference);
+
+    Optional<EnvelopeCase> findByEnvelopeId(Integer envelopeId);
 }

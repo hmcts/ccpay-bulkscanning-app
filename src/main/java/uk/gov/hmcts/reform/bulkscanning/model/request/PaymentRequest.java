@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.validation.constraints.NotNull;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -50,7 +50,7 @@ public class PaymentRequest {
     Date the payment was sent for banking.
      */
     @NotNull(message = "banked_date can't be Null")
-    private Date bankedDate;
+    private LocalDateTime bankedDate;
 
     @JsonProperty("outbound_batch_number")
     private String outboundBatchNumber;

@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.StatusHistoryDto;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.*;
+import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 
 public interface PaymentService {
 
@@ -23,5 +21,9 @@ public interface PaymentService {
     Envelope updateEnvelopePaymentStatus(Envelope envelope);
 
     Envelope createEnvelope(EnvelopeDto envelopeDto);
+
+    EnvelopeCase getEnvelopeCaseByCCDReference(SearchRequest searchRequest);
+
+    EnvelopeCase getEnvelopeCaseByDCN(SearchRequest searchRequest);
 
 }

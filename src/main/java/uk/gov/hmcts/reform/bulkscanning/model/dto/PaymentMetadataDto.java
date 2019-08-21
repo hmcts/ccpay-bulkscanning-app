@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -22,7 +23,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PaymentMetadataDto {
+public class PaymentMetadataDto implements Serializable {
 
     private Integer id;
     private String dcnReference;
@@ -38,11 +39,11 @@ public class PaymentMetadataDto {
     private String payerName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-    private Date dateBanked;
+    private LocalDateTime dateBanked;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-    private Date dateCreated;
+    private LocalDateTime dateCreated;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-    private Date dateUpdated;
+    private LocalDateTime dateUpdated;
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
@@ -9,19 +10,15 @@ import uk.gov.hmcts.reform.bulkscanning.mapper.StatusHistoryDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.StatusHistoryDto;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.*;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.StatusHistoryRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.*;
+import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
@@ -35,6 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMetadataRepository paymentMetadataRepository;
     private final StatusHistoryRepository statusHistoryRepository;
     private final EnvelopeRepository envelopeRepository;
+    private final EnvelopeCaseRepository envelopeCaseRepository;
 
     private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
     private final StatusHistoryDtoMapper statusHistoryDtoMapper;
@@ -49,7 +47,8 @@ public class PaymentServiceImpl implements PaymentService {
                               PaymentMetadataDtoMapper paymentMetadataDtoMapper,
                               StatusHistoryDtoMapper statusHistoryDtoMapper,
                               EnvelopeDtoMapper envelopeDtoMapper,
-                              BulkScanningUtils bulkScanningUtils) {
+                              BulkScanningUtils bulkScanningUtils,
+                              EnvelopeCaseRepository envelopeCaseRepository) {
         this.paymentRepository = paymentRepository;
         this.paymentMetadataRepository = paymentMetadataRepository;
         this.statusHistoryRepository = statusHistoryRepository;
@@ -58,6 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.statusHistoryDtoMapper = statusHistoryDtoMapper;
         this.envelopeDtoMapper = envelopeDtoMapper;
         this.bulkScanningUtils = bulkScanningUtils;
+        this.envelopeCaseRepository = envelopeCaseRepository;
     }
 
 
@@ -73,7 +73,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentMetadata createPaymentMetadata(PaymentMetadataDto paymentMetadataDto) {
-        paymentMetadataDto.setDateCreated(localDateTimeToDate(LocalDateTime.now()));
         PaymentMetadata paymentMetadata = paymentMetadataDtoMapper.toPaymentEntity(paymentMetadataDto);
 
         return paymentMetadataRepository.save(paymentMetadata);
@@ -118,5 +117,20 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Envelope createEnvelope(EnvelopeDto envelopeDto) {
         return envelopeRepository.save(envelopeDtoMapper.toEnvelopeEntity(envelopeDto));
+    }
+
+    @Override
+    public EnvelopeCase getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
+        return StringUtils.isNotEmpty(searchRequest.getCcdReference())
+                    ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(null)
+                    : envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(null);
+    }
+
+    @Override
+    public EnvelopeCase getEnvelopeCaseByDCN(SearchRequest searchRequest) {
+        Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
+        return payment.isPresent()
+            ? envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null)
+            : null;
     }
 }

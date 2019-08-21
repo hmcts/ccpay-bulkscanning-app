@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -12,12 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
@@ -26,9 +23,13 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
@@ -47,17 +48,10 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
         + "payment information contained in the envelope")})
 public class BulkScanPaymentController {
 
-    @Autowired
-    PaymentService paymentService;
-
-    @Autowired
-    BulkScanConsumerService bsConsumerService;
-
-    @Autowired
-    PaymentDtoMapper paymentDtoMapper;
-
-    @Autowired
-    PaymentMetadataDtoMapper paymentMetadataDtoMapper;
+    private final PaymentService paymentService;
+    private final BulkScanConsumerService bsConsumerService;
+    private final PaymentDtoMapper paymentDtoMapper;
+    private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
     @Autowired
     public BulkScanPaymentController(PaymentService paymentService,
@@ -134,6 +128,57 @@ public class BulkScanPaymentController {
                                                                 @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
         bsConsumerService.updateCaseReferenceForExceptionRecord(exceptionRecordReference, caseReferenceRequest);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @ApiOperation("Case with unprocessed payments details by CCD Case Reference/Exception Record")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Payments retrieved"),
+        @ApiResponse(code = 403, message = "Payments info forbidden"),
+        @ApiResponse(code = 404, message = "Payments not found")
+    })
+    @GetMapping("/cases/{ccd_reference}")
+    public ResponseEntity<String> retrieveByCCD(@PathVariable("ccd_reference") String ccdReference) throws JsonProcessingException {
+        EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByCCDReference(SearchRequest.searchRequestWith()
+                                                                                     .ccdReference(ccdReference)
+                                                                                     .exceptionRecord(ccdReference)
+                                                                                     .build());
+        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
+        envelopeCase.getEnvelope().getEnvelopePayments().stream().forEach(envelopePayment -> {
+            paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
+        });
+        SearchResponse searchResponse = SearchResponse.searchResponseWith()
+            .ccdReference(envelopeCase.getCcdReference())
+            .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
+            .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
+            .build();
+        return new ResponseEntity<>(new ObjectMapper().writeValueAsString(searchResponse), HttpStatus.OK);
+    }
+
+    @ApiOperation("Case with unprocessed payment details by Payment DCN")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Payments retrieved"),
+        @ApiResponse(code = 403, message = "Payments info forbidden"),
+        @ApiResponse(code = 404, message = "Payments not found")
+    })
+    @GetMapping("/cases")
+    public ResponseEntity<String> retrieveByDCN(@RequestParam(required = true, value = "document_control_number")
+                                                    String documentControlNumber) throws JsonProcessingException {
+
+        EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
+                                                                            .documentControlNumber(
+                                                                                documentControlNumber)
+                                                                            .build());
+        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
+        envelopeCase.getEnvelope().getEnvelopePayments().stream().forEach(envelopePayment -> {
+            paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
+        });
+        SearchResponse searchResponse = SearchResponse.searchResponseWith()
+            .ccdReference(envelopeCase.getCcdReference())
+            .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
+            .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
+            .build();
+
+        return new ResponseEntity<>(new ObjectMapper().writeValueAsString(searchResponse), HttpStatus.OK);
     }
 
     private void processPaymentFromExela(PaymentRequest paymentRequest, String dcnReference) {

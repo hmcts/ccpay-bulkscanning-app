@@ -7,7 +7,8 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 
-import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.dateToLocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class PaymentMetadataDtoMapper {
@@ -19,7 +20,7 @@ public class PaymentMetadataDtoMapper {
             .paymentMethod(paymentMetadataDto.getPaymentMethod().toString())
             .amount(paymentMetadataDto.getAmount())
             .currency(paymentMetadataDto.getCurrency().toString())
-            .dateBanked(dateToLocalDateTime(paymentMetadataDto.getDateBanked()))
+            .dateBanked(paymentMetadataDto.getDateBanked())
             .outboundBatchNumber(paymentMetadataDto.getOutboundBatchNumber())
             .dcnCase(paymentMetadataDto.getDcnCase())
             .caseReference(paymentMetadataDto.getCaseReference())
@@ -44,6 +45,30 @@ public class PaymentMetadataDtoMapper {
             .firstChequeDcnInBatch(paymentRequest.getFirstChequeDcnInBatch())
             .payerName(paymentRequest.getPayerName())
             .build();
+    }
+
+    public PaymentMetadataDto fromEntity(PaymentMetadata paymentMetadata) {
+        return PaymentMetadataDto.paymentMetadataDtoWith()
+            .id(paymentMetadata.getId())
+            .dcnReference(paymentMetadata.getDcnReference())
+            .bgcReference(paymentMetadata.getBgcReference())
+            .amount(paymentMetadata.getAmount())
+            .currency(Currency.valueOf(paymentMetadata.getCurrency()))
+            .paymentMethod(PaymentMethod.valueOf(paymentMetadata.getPaymentMethod()))
+            .dateBanked(paymentMetadata.getDateBanked())
+            .outboundBatchNumber(paymentMetadata.getOutboundBatchNumber())
+            .dcnCase(paymentMetadata.getDcnCase())
+            .caseReference(paymentMetadata.getCaseReference())
+            .poBox(paymentMetadata.getPoBox())
+            .firstChequeDcnInBatch(paymentMetadata.getFirstChequeDcnInBatch())
+            .payerName(paymentMetadata.getPayerName())
+            .dateCreated(paymentMetadata.getDateCreated())
+            .dateUpdated(paymentMetadata.getDateUpdated())
+            .build();
+    }
+
+    public List<PaymentMetadataDto> fromPaymentMetadataEntities(List<PaymentMetadata> paymentMetadata) {
+        return paymentMetadata.stream().map(this::fromEntity).collect(Collectors.toList());
     }
 
 }

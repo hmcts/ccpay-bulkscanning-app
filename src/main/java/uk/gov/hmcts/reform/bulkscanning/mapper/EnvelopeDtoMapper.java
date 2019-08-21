@@ -47,20 +47,6 @@ public class EnvelopeDtoMapper {
             .build();
     }
 
-    public List<PaymentDto> toPaymentDtos(List<EnvelopePayment> payments) {
-        return payments.stream().map(this::toPaymentDto).collect(Collectors.toList());
-    }
-
-    public PaymentDto toPaymentDto(EnvelopePayment payment) {
-        return PaymentDto.paymentDtoWith()
-            .id(payment.getId())
-            .dcnReference(payment.getDcnReference())
-            .envelope(fromEnvelopeEntity(payment.getEnvelope()))
-            .dateCreated(localDateTimeToDate(payment.getDateCreated()))
-            .dateUpdated(localDateTimeToDate(payment.getDateUpdated()))
-            .build();
-    }
-
     public List<EnvelopePayment> toPaymentEntities(List<PaymentDto> payments) {
         return payments.stream().map(this::toPaymentEntity).collect(Collectors.toList());
     }

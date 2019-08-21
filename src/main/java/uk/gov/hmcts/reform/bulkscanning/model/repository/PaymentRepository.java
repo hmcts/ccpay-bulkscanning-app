@@ -10,9 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends CrudRepository<EnvelopePayment, Integer>, JpaSpecificationExecutor<EnvelopePayment> {
-    Optional<EnvelopePayment> findByDcnReference(String dcnReference);
 
-    Optional<List<EnvelopePayment>> findByEnvelope(String envelopeId);
+    Optional<EnvelopePayment> findByDcnReference(String dcnReference);
 
     Optional<List<EnvelopePayment>> findByEnvelopeId(Integer envelopeId);
 }
