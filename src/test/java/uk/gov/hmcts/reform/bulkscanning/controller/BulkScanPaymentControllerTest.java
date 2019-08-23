@@ -130,9 +130,8 @@ public class BulkScanPaymentControllerTest {
             .andExpect(content()
                 .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
-        Assert.assertEquals(resultActions.andReturn().getResponse().getContentAsString(),
-            EXCEPTION_RECORD_NOT_EXISTS);
-
+        Assert.assertTrue(StringUtils.containsIgnoreCase(resultActions.andReturn().getResponse().getContentAsString(),
+            EXCEPTION_RECORD_NOT_EXISTS));
     }
 
    /* @Test
