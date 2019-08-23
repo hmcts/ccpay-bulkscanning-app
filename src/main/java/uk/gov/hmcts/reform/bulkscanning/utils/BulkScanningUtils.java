@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
+import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
@@ -17,6 +19,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESSED;
+import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST;
 
 @Component
 public class BulkScanningUtils {
@@ -26,6 +30,15 @@ public class BulkScanningUtils {
 
     @Autowired
     StatusHistoryRepository statusHistoryRepository;
+
+    public Envelope markPaymentAsProcessed(String dcn) {
+        if (Optional.ofNullable(dcn).isPresent()) {
+            EnvelopePayment envelopePayment = paymentRepository.findByDcnReference(dcn).orElseThrow(DcnNotExistsException::new);
+            envelopePayment.setPaymentStatus(PROCESSED.toString());
+            return envelopePayment.getEnvelope();
+        }
+        return null;
+    }
 
     public Envelope returnExistingEnvelope(Envelope envelope) {
 
@@ -40,9 +53,10 @@ public class BulkScanningUtils {
             Envelope existingEnvelope = listOfExistingPayment.get(0).getEnvelope();
 
             //check if existing cases are present
-            if (Optional.ofNullable(existingEnvelope.getEnvelopeCases()).isPresent()
+            if (Optional.ofNullable(existingEnvelope).isPresent() &&
+                Optional.ofNullable(existingEnvelope.getEnvelopeCases()).isPresent()
                 && !existingEnvelope.getEnvelopeCases().isEmpty()) {
-                throw new BulkScanCaseAlreadyExistsException("Bulk Scanning payment details already exist");
+                throw new BulkScanCaseAlreadyExistsException(BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST);
             }
 
             return existingEnvelope;
@@ -111,22 +125,37 @@ public class BulkScanningUtils {
     }
 
     public Envelope insertStatusHistoryAudit(Envelope envelope) {
+        String paymentStatus = null;
 
-        StatusHistory statusHistory = StatusHistory
-            .statusHistoryWith()
-            .envelope(envelope)
-            .status(envelope.getPaymentStatus()) //update Status History if envelope status
-            .build();
+        if (Optional.ofNullable(envelope).isPresent()) {
+            if (Optional.ofNullable(envelope.getPaymentStatus()).isPresent()) {
+                paymentStatus =  envelope.getPaymentStatus();
+            }
 
-        List<StatusHistory> statusHistoryList = new ArrayList<>();
+            StatusHistory statusHistory = StatusHistory
+                .statusHistoryWith()
+                .envelope(envelope)
+                .status(paymentStatus) //update Status History if envelope status
+                .build();
 
-        //If Status histories audit already present
-        if (Optional.ofNullable(envelope.getStatusHistories()).isPresent()) {
-            statusHistoryList.addAll(envelope.getStatusHistories());
+            List<StatusHistory> statusHistoryList = new ArrayList<>();
+
+            //If Status histories audit already present
+            if (Optional.ofNullable(envelope.getStatusHistories()).isPresent()) {
+                statusHistoryList.addAll(envelope.getStatusHistories());
+            }
+            statusHistoryList.add(statusHistory);
+            envelope.setStatusHistories(statusHistoryList);
         }
-        statusHistoryList.add(statusHistory);
-        envelope.setStatusHistories(statusHistoryList);
 
         return envelope;
+    }
+
+    public static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

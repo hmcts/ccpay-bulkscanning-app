@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
@@ -31,6 +32,7 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
     EnvelopeCaseRepository envelopeCaseRepository;
 
     @Override
+    @Transactional
     public String saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
         Envelope envelopeNew = bsPaymentRequestMapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
 
@@ -46,7 +48,9 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
     }
 
     @Override
-    public void updateCaseReferenceForExceptionRecord(String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest) {
+    @Transactional
+    public String updateCaseReferenceForExceptionRecord(String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest) {
+        //TODO yet to handle multiple envelopes with same exception reference scenario
         EnvelopeCase envelopeCase = envelopeCaseRepository.findByExceptionRecordReference(exceptionRecordReference).
             orElseThrow(ExceptionRecordNotExistsException::new);
 
@@ -55,6 +59,12 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
             envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber());
         }
 
-        envelopeCaseRepository.save(envelopeCase);
+        return envelopeCaseRepository.save(envelopeCase).getId().toString();
+    }
+
+    @Override
+    @Transactional
+    public String markPaymentAsProcessed(String dcn) {
+        return envelopeRepository.save(bulkScanningUtils.markPaymentAsProcessed(dcn)).getId().toString();
     }
 }

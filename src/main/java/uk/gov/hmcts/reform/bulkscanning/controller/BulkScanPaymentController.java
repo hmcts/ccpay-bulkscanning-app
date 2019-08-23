@@ -2,15 +2,11 @@ package uk.gov.hmcts.reform.bulkscanning.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.SwaggerDefinition;
-import io.swagger.annotations.Tag;
+import io.swagger.annotations.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -19,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
-import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
@@ -27,6 +22,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
@@ -34,6 +30,7 @@ import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +45,17 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
         + "payment information contained in the envelope")})
 public class BulkScanPaymentController {
 
-    private final PaymentService paymentService;
-    private final BulkScanConsumerService bsConsumerService;
-    private final PaymentDtoMapper paymentDtoMapper;
-    private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
+    @Autowired
+    PaymentService paymentService;
+
+    @Autowired
+    BulkScanConsumerService bsConsumerService;
+
+    @Autowired
+    PaymentDtoMapper paymentDtoMapper;
+
+    @Autowired
+    PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
     @Autowired
     public BulkScanPaymentController(PaymentService paymentService,
@@ -74,7 +78,10 @@ public class BulkScanPaymentController {
     })
     @PostMapping("/bulk-scan-payments")
     public ResponseEntity consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
-        return new ResponseEntity<>(bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest), HttpStatus.CREATED);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest));
     }
 
     @ApiOperation("Provide meta information about the "
@@ -89,16 +96,16 @@ public class BulkScanPaymentController {
     @PutMapping("/bulk-scan-payments/{document_control_number}")
     @Transactional
     public ResponseEntity<String> processPaymentFromExela(
-        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @PathVariable("document_control_number") String dcnReference,
         @Validated @RequestBody PaymentRequest paymentRequest) {
 
         try {
             // TODO: 22/08/2019 Hardcoded for Testing only
-            if (StringUtils.isNotEmpty(serviceAuthorization)
+           /* if (StringUtils.isNotEmpty(serviceAuthorization)
                 && !"AUTH123".equalsIgnoreCase(serviceAuthorization)) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
+            }*/
+           /* Commented Service Auth Code*/
             if (StringUtils.isNotEmpty(dcnReference)) {
                 //Check in Payment metadata for already existing payment from Exela
                 if (paymentService.getPaymentMetadata(dcnReference) == null) {
@@ -126,11 +133,30 @@ public class BulkScanPaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "Provided exception reference doesn't exist"),
     })
-    @PutMapping("/bulk-scan-cases/{exception_reference}")
-    public ResponseEntity updateCaseReferenceForExceptionRecord(@PathVariable("exception_reference") String exceptionRecordReference,
+    @PutMapping("/bulk-scan-cases/")
+    public ResponseEntity updateCaseReferenceForExceptionRecord(@NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
                                                                 @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
-        bsConsumerService.updateCaseReferenceForExceptionRecord(exceptionRecordReference, caseReferenceRequest);
-        return new ResponseEntity(HttpStatus.OK);
+
+        return ResponseEntity
+            .ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(bsConsumerService.updateCaseReferenceForExceptionRecord(exceptionRecordReference, caseReferenceRequest));
+    }
+
+    @ApiOperation("API Endpoint to mark payment as processed")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Returns an envelope group id"),
+        @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
+        @ApiResponse(code = 401, message = "Failed authentication"),
+        @ApiResponse(code = 403, message = "Failed authorisation"),
+        @ApiResponse(code = 404, message = "No record exists for provided DCN"),
+    })
+    @PatchMapping("/bulk-scan-payments/{dcn}/PROCESS")
+    public ResponseEntity markPaymentAsProcessed(@NotEmpty @PathVariable("dcn") String dcn) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(bsConsumerService.markPaymentAsProcessed(dcn));
     }
 
     @ApiOperation("Case with unprocessed payments details by CCD Case Reference/Exception Record")

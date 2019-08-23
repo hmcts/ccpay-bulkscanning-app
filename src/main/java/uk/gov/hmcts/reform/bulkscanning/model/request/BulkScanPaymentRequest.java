@@ -24,11 +24,11 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class BulkScanPaymentRequest {
 
     @JsonProperty("responsible_service_id")
-    @NotBlank(message = "Responsible service id is missing")
+    @NotBlank(message = "Site id is missing")
     private String responsibleServiceId;
 
     @JsonProperty("ccd_case_number")
-    @NotBlank(message = "Case number is missing")
+    @NotBlank(message = "CCD reference is missing")
     private String ccdCaseNumber;
 
     @JsonProperty("is_exception_record")
@@ -36,6 +36,6 @@ public class BulkScanPaymentRequest {
     private Boolean isExceptionRecord;
 
     @JsonProperty("document_control_numbers")
-    @NotEmpty(message = "Document Control Numbers are missing")
+    @NotEmpty(message = "Payment DCN are missing")
     private String[] documentControlNumbers;
 }

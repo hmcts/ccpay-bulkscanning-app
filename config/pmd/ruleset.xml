@@ -42,6 +42,7 @@
     <exclude name="UseUtilityClass"/>
     <exclude name="LoosePackageCoupling"/>
     <exclude name="DataClass"/>
+    <exclude name="AvoidThrowingRawExceptionTypes"/>
   </rule>
   <rule ref="category/java/design.xml/ExcessiveImports">
     <properties>
@@ -67,6 +68,7 @@
     <exclude name="BeanMembersShouldSerialize"/>
     <exclude name="MissingSerialVersionUID"/>
     <exclude name="DataflowAnomalyAnalysis"/>
+    <exclude name="AvoidDuplicateLiterals"/>
   </rule>
   <rule ref="category/java/multithreading.xml"/>
   <rule ref="category/java/performance.xml"/>
