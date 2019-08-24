@@ -2,8 +2,12 @@ package uk.gov.hmcts.reform.bulkscanning.payments;
 
 import java.math.BigDecimal;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -59,6 +63,37 @@ public class PaymentTest {
             ))
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    public void givenAPaymentDetailsCompleteThenItCanBeRetrieved() throws Exception {
+
+
+        String[] dcns = {"dcn1", "dcn2"};
+        CaseDCNs caseDCNs = CaseDCNs.builder().ccdCaseNumber("ccd1").isExceptionRecord(false).documentControlNumbers(dcns).build();
+        Payment payment = Payment.builder()
+            .amount(new BigDecimal("50.5"))
+            .currency("GBP")
+            .method(PaymentMethod.CHEQUE)
+            .outboundBatchNumber("batch1")
+            .payerName("John Crow")
+            .build();
+        mvc.perform(post("/bulk-scan-payments")
+            .content(asJsonString(caseDCNs))
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        mvc.perform(put("/bulk-scan-payments/{dcn}", "dcn1")
+            .content(asJsonString(payment))
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+        mvc.perform(get("/bulk-scan-payments?ccdCaseNumber=ccd1")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0].dcn_payment", is("dcn1"))
+            );
+
     }
 
     public static String asJsonString(final Object obj) throws JsonProcessingException {

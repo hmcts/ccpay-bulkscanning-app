@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.bulkscanning.model;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.OneToOne;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
@@ -28,7 +28,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @Wither
 
-@Table(name = "case_dcn")
 public class CaseDCN {
 
     @Id
@@ -37,6 +36,8 @@ public class CaseDCN {
     private String exceptionReference;
     private String siteId;
 
+    @OneToOne
+    private Payment payment;
 
     @JsonIgnore
     @CreationTimestamp

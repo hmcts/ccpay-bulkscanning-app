@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.bulkscanning.db.CasePaymentsRepo;
 import uk.gov.hmcts.reform.bulkscanning.db.PaymentRepo;
+import uk.gov.hmcts.reform.bulkscanning.model.CaseDCN;
 import uk.gov.hmcts.reform.bulkscanning.model.CaseDCNs;
 import uk.gov.hmcts.reform.bulkscanning.model.Payment;
 
@@ -36,9 +39,15 @@ public class PaymentController {
         caseDCNs.getPayments().stream().forEach(payment -> casePaymentsRepo.save(payment));
     }
     @GetMapping("/bulk-scan-payments/{dcn}")
-    public Optional<Payment> saveCasePayments(@PathVariable String dcn){
+    public Optional<Payment> getPaymentByDCN(@PathVariable String dcn){
 
         return paymentRepo.findById(dcn);
+
+    }
+    @GetMapping("/bulk-scan-payments")
+    public List<CaseDCN> getPaymentsForACase(@RequestParam String ccdCaseNumber){
+
+        return casePaymentsRepo.findByCcdCaseNumber(ccdCaseNumber);
 
     }
 
