@@ -37,12 +37,12 @@ public class CaseDCNs {
     private String[] documentControlNumbers;
 
     @JsonIgnore
-    public List<CasePayment> getPayments() {
+    public List<CaseDCN> getPayments() {
 
 
 
         return Arrays.stream(documentControlNumbers).map(dcn ->
-            CasePayment.builder().dcnPayment(dcn).siteId(siteId).build().caseNumber(ccdCaseNumber, isExceptionRecord))
+            CaseDCN.builder().dcnPayment(dcn).siteId(siteId).build().caseNumber(ccdCaseNumber, isExceptionRecord))
             .collect(Collectors.toList());
     }
 }

@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.bulkscanning.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.SecondaryTable;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Positive;
@@ -40,6 +42,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @Wither
 @SuppressWarnings("PMD")
+@SecondaryTable(name = "case_dcn")
 public class Payment {
 
     @Id
@@ -72,4 +75,10 @@ public class Payment {
     private Date dateUpdated;
 
 
+    @Column(table = "case_dcn")
+    private String ccdCaseNumber;
+    @Column(table = "case_dcn")
+    private String exceptionReference;
+    @Column(table = "case_dcn")
+    private String siteId;
 }
