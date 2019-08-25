@@ -9,4 +9,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.CaseDCN;
 @Repository
 public interface CasePaymentsRepo extends CrudRepository<CaseDCN, String> {
     List<CaseDCN> findByCcdCaseNumber(String ccdCaseNumber);
+
+    List<CaseDCN> findByCcdCaseNumberOrExceptionReference(String ccdCaseNumber, String exceptionReference);
+
 }

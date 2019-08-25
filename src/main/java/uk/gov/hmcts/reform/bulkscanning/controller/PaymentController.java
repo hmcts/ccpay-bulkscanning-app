@@ -47,7 +47,7 @@ public class PaymentController {
     @GetMapping("/bulk-scan-payments")
     public List<CaseDCN> getPaymentsForACase(@RequestParam String ccdCaseNumber){
 
-        return casePaymentsRepo.findByCcdCaseNumber(ccdCaseNumber);
+        return casePaymentsRepo.findByCcdCaseNumberOrExceptionReference(ccdCaseNumber,ccdCaseNumber);
 
     }
 

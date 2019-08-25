@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.bulkscanning.model;
 
 import java.util.Date;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
@@ -36,7 +38,8 @@ public class CaseDCN {
     private String exceptionReference;
     private String siteId;
 
-    @OneToOne
+    @JoinColumn (name = "dcn_payment")
+    @OneToOne(fetch = FetchType.EAGER)
     private Payment payment;
 
     @JsonIgnore
