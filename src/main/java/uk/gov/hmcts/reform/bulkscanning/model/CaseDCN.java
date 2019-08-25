@@ -7,12 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,11 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import uk.gov.hmcts.reform.bulkscanning.dto.CaseDCNDto;
 
 @Entity
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonInclude(NON_EMPTY)
 @Data
 @Builder
 @AllArgsConstructor

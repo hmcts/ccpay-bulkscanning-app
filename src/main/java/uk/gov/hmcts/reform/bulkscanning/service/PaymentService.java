@@ -39,14 +39,14 @@ public class PaymentService {
 
     }
 
-    public CaseDCNDto toCaseDCNDTO(CaseDCN caseDCN) {
+    private static ModelMapper modelMapper = new ModelMapper();
+    private CaseDCNDto toCaseDCNDTO(CaseDCN caseDCN) {
         return modelMapper.map(caseDCN, CaseDCNDto.class);
     }
 
 
-    private static ModelMapper modelMapper = new ModelMapper();
 
-    public PaymentDto toPaymentDto(Payment payment) {
+    private PaymentDto toPaymentDto(Payment payment) {
         return modelMapper.map(payment, PaymentDto.class);
     }
 
