@@ -1,9 +1,8 @@
-package uk.gov.hmcts.reform.bulkscanning.model;
+package uk.gov.hmcts.reform.bulkscanning.dto;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.validation.constraints.NotBlank;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -17,6 +16,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
+import uk.gov.hmcts.reform.bulkscanning.model.CaseDCN;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonInclude(NON_NULL)
@@ -37,9 +37,7 @@ public class CaseDCNs {
     private String[] documentControlNumbers;
 
     @JsonIgnore
-    public List<CaseDCN> getPayments() {
-
-
+    public List<CaseDCN> getCasePayments() {
 
         return Arrays.stream(documentControlNumbers).map(dcn ->
             CaseDCN.builder().dcnPayment(dcn).siteId(siteId).build().caseNumber(ccdCaseNumber, isExceptionRecord))

@@ -1,10 +1,8 @@
-package uk.gov.hmcts.reform.bulkscanning.model;
+package uk.gov.hmcts.reform.bulkscanning.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Positive;
@@ -24,14 +22,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SelectBeforeUpdate;
-import org.hibernate.annotations.UpdateTimestamp;
+import uk.gov.hmcts.reform.bulkscanning.model.PaymentMethod;
 
-@Entity
-@SelectBeforeUpdate
-@DynamicUpdate
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonInclude(NON_EMPTY)
 @Data
@@ -40,9 +32,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @Wither
 @SuppressWarnings("PMD")
-public class Payment {
+public class PaymentDto {
 
-    @Id
     private String dcnPayment;
 
     @DecimalMin("0.01")
@@ -63,13 +54,10 @@ public class Payment {
     private String firstChequeDCNInBatch;
     private String payerName;
 
-    @CreationTimestamp
     @JsonIgnore
     private Date dateCreated;
 
     @JsonIgnore
-    @UpdateTimestamp
     private Date dateUpdated;
-
 
 }

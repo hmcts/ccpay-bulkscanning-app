@@ -23,8 +23,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.bulkscanning.model.CaseDCNs;
-import uk.gov.hmcts.reform.bulkscanning.model.Payment;
+import uk.gov.hmcts.reform.bulkscanning.dto.CaseDCNs;
+import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.PaymentMethod;
 
 
@@ -53,7 +53,7 @@ public class PaymentTest {
     public void givenAChequeWhenItExistAlreadyThenupdateWithDetails() throws Exception {
 
         mvc.perform(put("/bulk-scan-payments/{dcn}", "dcn1")
-            .content(asJsonString(Payment.builder()
+            .content(asJsonString(PaymentDto.builder()
                 .amount(new BigDecimal("50.5"))
                 .currency("GBP")
                 .method(PaymentMethod.CHEQUE)
@@ -71,7 +71,7 @@ public class PaymentTest {
 
         String[] dcns = {"dcn1", "dcn2"};
         CaseDCNs caseDCNs = CaseDCNs.builder().ccdCaseNumber("ccd1").isExceptionRecord(false).documentControlNumbers(dcns).build();
-        Payment payment = Payment.builder()
+        PaymentDto payment = PaymentDto.builder()
             .amount(new BigDecimal("50.5"))
             .currency("GBP")
             .method(PaymentMethod.CHEQUE)
