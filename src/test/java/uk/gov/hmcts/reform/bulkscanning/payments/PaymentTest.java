@@ -46,7 +46,7 @@ public class PaymentTest {
         mvc.perform(post("/bulk-scan-payments")
             .content(asJsonString(CaseDCNs.builder().ccdCaseNumber("ccd1").isExceptionRecord(false).documentControlNumbers(dcns).build()))
             .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+            .andExpect(status().isCreated());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class PaymentTest {
         mvc.perform(post("/bulk-scan-payments")
             .content(asJsonString(caseDCNs))
             .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+            .andExpect(status().isCreated());
 
         mvc.perform(put("/bulk-scan-payments/{dcn}", "dcn1")
             .content(asJsonString(payment))
