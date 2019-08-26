@@ -66,7 +66,7 @@ public class PaymentTest {
         mvc.perform(get("/bulk-scan-payments?ccdCaseNumber=ccd1")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$", hasSize(2)))
             .andExpect(jsonPath("$[0].ccd_case_number", is("ccd1")));
 
     }

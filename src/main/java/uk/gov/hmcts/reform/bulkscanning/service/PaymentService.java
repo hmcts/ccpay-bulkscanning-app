@@ -45,7 +45,6 @@ public class PaymentService {
     }
 
 
-
     private PaymentDto toPaymentDto(Payment payment) {
         return modelMapper.map(payment, PaymentDto.class);
     }
@@ -56,7 +55,7 @@ public class PaymentService {
     }
 
     private Payment toPayment(PaymentDto payment) {
-        return modelMapper.map(payment,Payment.class);
+        return modelMapper.map(payment, Payment.class);
     }
 
     public void save(CaseDCN casePayment) {
@@ -66,7 +65,9 @@ public class PaymentService {
     public void updateCaseDCNs(CaseDCNDto caseDCNDto, String exceptionReference) {
         List<CaseDCN> caseDCNs = casePaymentsRepo.findByCcdCaseNumberOrExceptionReference(exceptionReference, exceptionReference);
 
-        caseDCNs.forEach(caseDCN -> caseDCN.setCcdCaseNumber(caseDCNDto.getCcdCaseNumber()));
+        caseDCNs.forEach(caseDCN -> {
+            caseDCN.setCcdCaseNumber(caseDCNDto.getCcdCaseNumber());
+            casePaymentsRepo.save(caseDCN); });
 
     }
 }
