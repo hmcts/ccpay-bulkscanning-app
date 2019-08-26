@@ -37,6 +37,13 @@ public class PaymentController {
 
         caseDCNs.getCasePayments().stream().forEach(payment -> paymentService.save(payment));
     }
+
+    @PutMapping("/bulk-scan-payments")
+    public void saveCasePayments( @RequestParam String exceptionReference,  @RequestBody CaseDCNDto caseDCNs){
+
+        paymentService.updateCaseDCNs(caseDCNs, exceptionReference);
+    }
+
     @GetMapping("/bulk-scan-payments/{dcn}")
     public PaymentDto getPaymentByDCN(@PathVariable String dcn){
 

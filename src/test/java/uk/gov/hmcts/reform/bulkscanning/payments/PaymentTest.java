@@ -50,7 +50,29 @@ public class PaymentTest {
     }
 
     @Test
-    public void givenAChequeWhenItExistAlreadyThenupdateWithDetails() throws Exception {
+    public void givenAnExceptionRecord_whenCCDRefIsUpdated_thenCCDRefIsSaved() throws Exception {
+
+        String[] dcns = {"dcn1", "dcn2"};
+        mvc.perform(post("/bulk-scan-payments")
+            .content(asJsonString(CaseDCNs.builder().ccdCaseNumber("er1").isExceptionRecord(true).documentControlNumbers(dcns).build()))
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated());
+
+        mvc.perform(put("/bulk-scan-payments?exceptionReference=er1")
+            .content(asJsonString(CaseDCNs.builder().ccdCaseNumber("ccd1").isExceptionRecord(false).build()))
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        mvc.perform(get("/bulk-scan-payments?ccdCaseNumber=ccd1")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0].ccd_case_number", is("ccd1")));
+
+    }
+
+    @Test
+    public void givenAChequeWhenItExistAlreadyThenUpdateWithDetails() throws Exception {
 
         mvc.perform(put("/bulk-scan-payments/{dcn}", "dcn1")
             .content(asJsonString(PaymentDto.builder()
