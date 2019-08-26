@@ -23,6 +23,7 @@ public class PaymentController {
 
     @Autowired
     private PaymentService paymentService;
+    private static ModelMapper modelMapper = new ModelMapper();
 
     @PutMapping("/bulk-scan-payments/{dcn}")
     public void savePayment(@PathVariable String dcn, @RequestBody PaymentDto payment){
@@ -57,7 +58,6 @@ public class PaymentController {
 
     }
 
-    private static ModelMapper modelMapper = new ModelMapper();
 
     public PaymentDto toPaymentDto() {
         return modelMapper.map(this, PaymentDto.class);

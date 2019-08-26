@@ -34,9 +34,9 @@ public class CaseDCNDto {
 
     private Date dateUpdated;
 
-    public CaseDCNDto caseNumber(String ccdCaseNumber, Boolean isExceptionRecord) {
+    public CaseDCNDto caseNumber(String ccdCaseNumber, boolean isExceptionRecord) {
 
-        if (Boolean.TRUE.equals(isExceptionRecord)) {
+        if (isExceptionRecord) {
             this.exceptionReference = ccdCaseNumber;
         } else {
             this.ccdCaseNumber = ccdCaseNumber;

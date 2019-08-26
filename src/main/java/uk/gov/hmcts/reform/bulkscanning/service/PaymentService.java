@@ -20,6 +20,7 @@ public class PaymentService {
 
     @Autowired
     private PaymentRepo paymentRepo;
+    private static ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
     private CasePaymentsRepo casePaymentsRepo;
@@ -39,7 +40,6 @@ public class PaymentService {
 
     }
 
-    private static ModelMapper modelMapper = new ModelMapper();
     private CaseDCNDto toCaseDCNDTO(CaseDCN caseDCN) {
         return modelMapper.map(caseDCN, CaseDCNDto.class);
     }
