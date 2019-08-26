@@ -36,7 +36,7 @@ public class CaseDCNDto {
 
     public CaseDCNDto caseNumber(String ccdCaseNumber, Boolean isExceptionRecord) {
 
-        if (isExceptionRecord) {
+        if (Boolean.TRUE.equals(isExceptionRecord)) {
             this.exceptionReference = ccdCaseNumber;
         } else {
             this.ccdCaseNumber = ccdCaseNumber;

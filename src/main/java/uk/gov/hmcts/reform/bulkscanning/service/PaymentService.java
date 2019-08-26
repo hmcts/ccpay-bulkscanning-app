@@ -11,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.bulkscanning.db.CasePaymentsRepo;
 import uk.gov.hmcts.reform.bulkscanning.db.PaymentRepo;
 import uk.gov.hmcts.reform.bulkscanning.dto.CaseDCNDto;
-import uk.gov.hmcts.reform.bulkscanning.dto.CaseDCNs;
 import uk.gov.hmcts.reform.bulkscanning.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.CaseDCN;
 import uk.gov.hmcts.reform.bulkscanning.model.Payment;
