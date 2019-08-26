@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDate;
@@ -16,20 +17,28 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDat
 public class PaymentDtoMapper {
 
     public EnvelopePayment toPaymentEntity(PaymentDto paymentDto) {
-        return EnvelopePayment.paymentWith()
-            .dcnReference(paymentDto.getDcnReference())
-            .envelope(Envelope.envelopeWith()
-                          .id(paymentDto.getEnvelope().getId())
-                          .paymentStatus(paymentDto.getEnvelope().getPaymentStatus().toString())
-                          .build())
-            .build();
+        if(Optional.ofNullable(paymentDto).isPresent()){
+            return EnvelopePayment.paymentWith()
+                .dcnReference(paymentDto.getDcnReference())
+                .envelope(Envelope.envelopeWith()
+                              .id(paymentDto.getEnvelope().getId())
+                              .paymentStatus(paymentDto.getEnvelope().getPaymentStatus().toString())
+                              .build())
+                .build();
+        }else {
+            return null;
+        }
     }
 
     public PaymentDto fromRequest(PaymentRequest paymentRequest, String dcnReference) {
-        return PaymentDto.paymentDtoWith()
-            .dcnReference(dcnReference)
-            .paymentStatus(PaymentStatus.INCOMPLETE)
-            .build();
+        if(Optional.ofNullable(paymentRequest).isPresent()) {
+            return PaymentDto.paymentDtoWith()
+                .dcnReference(dcnReference)
+                .paymentStatus(PaymentStatus.INCOMPLETE)
+                .build();
+        }else {
+            return null;
+        }
     }
 
     public List<PaymentDto> fromPaymentsEntity(List<EnvelopePayment> payments) {
@@ -37,11 +46,15 @@ public class PaymentDtoMapper {
     }
 
     public PaymentDto fromPaymentEntity(EnvelopePayment payment) {
-        return PaymentDto.paymentDtoWith()
-            .id(payment.getId())
-            .dcnReference(payment.getDcnReference())
-            .dateCreated(localDateTimeToDate(payment.getDateCreated()))
-            .dateUpdated(localDateTimeToDate(payment.getDateUpdated()))
-            .build();
+        if(Optional.ofNullable(payment).isPresent()) {
+            return PaymentDto.paymentDtoWith()
+                .id(payment.getId())
+                .dcnReference(payment.getDcnReference())
+                .dateCreated(localDateTimeToDate(payment.getDateCreated()))
+                .dateUpdated(localDateTimeToDate(payment.getDateUpdated()))
+                .build();
+        }else {
+            return null;
+        }
     }
 }

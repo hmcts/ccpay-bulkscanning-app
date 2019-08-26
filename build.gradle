@@ -137,7 +137,7 @@ repositories {
   maven { url "https://dl.bintray.com/hmcts/hmcts-maven" }
   jcenter()
   mavenCentral()
-  
+
 }
 
 def versions = [
@@ -181,6 +181,8 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   compile group: 'com.querydsl', name: 'querydsl-jpa', version:'4.1.4'
   compile group: 'org.liquibase', name: 'liquibase-core', version: '3.7.0'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.9.9'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
   compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.6') {
     exclude(module: 'commons-logging')
     exclude(module: 'slf4j-simple')

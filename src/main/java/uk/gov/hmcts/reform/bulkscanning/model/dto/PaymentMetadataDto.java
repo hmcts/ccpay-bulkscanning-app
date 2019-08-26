@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -39,11 +39,11 @@ public class PaymentMetadataDto implements Serializable {
     private String payerName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-    private LocalDateTime dateBanked;
+    private Date dateBanked;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-    private LocalDateTime dateCreated;
+    private Date dateCreated;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-    private LocalDateTime dateUpdated;
+    private Date dateUpdated;
 }

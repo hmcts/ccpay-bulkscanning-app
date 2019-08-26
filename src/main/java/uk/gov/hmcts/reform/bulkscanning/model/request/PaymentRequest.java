@@ -24,32 +24,32 @@ public class PaymentRequest {
     /*
     Payment amount in GBP
      */
-    @NotNull(message = "amount can't be Empty")
+    @NotNull(message = "amount can't be Blank")
     private BigDecimal amount;
 
     /*
     The ISO currency code
      */
-    @NotNull(message = "currency can't be Empty")
+    @NotNull(message = "currency can't be Blank")
     private String currency;
 
     /*
     The method of payment i.e. Cheque or Postal Order
      */
-    //@NotEmpty(message = "paymentMethod can't be Empty")
+    @NotNull(message = "paymentMethod can't be Blank")
     private String method;
 
     /*
     Number of the credit slip containing the payment
      */
-    @NotNull(message = "bank_giro_credit_slip_number can't be Empty")
+    @NotNull(message = "bank_giro_credit_slip_number can't be Blank")
     @JsonProperty("bank_giro_credit_slip_number")
     private String bankGiroCreditSlipNumber;
 
     /*
     Date the payment was sent for banking.
      */
-    @NotNull(message = "banked_date can't be Null")
+    @NotNull(message = "banked_date can't be Blank")
     private LocalDateTime bankedDate;
 
     @JsonProperty("outbound_batch_number")

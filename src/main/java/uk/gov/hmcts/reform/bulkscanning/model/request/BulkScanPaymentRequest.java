@@ -23,7 +23,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @JsonInclude(NON_NULL)
 public class BulkScanPaymentRequest {
 
-    @JsonProperty("responsible_service_id")
+    @JsonProperty("site_id")
     @NotBlank(message = "Responsible service id is missing")
     private String responsibleServiceId;
 

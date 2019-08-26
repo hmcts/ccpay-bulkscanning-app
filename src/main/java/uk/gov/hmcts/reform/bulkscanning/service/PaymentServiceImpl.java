@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -130,7 +131,20 @@ public class PaymentServiceImpl implements PaymentService {
     public EnvelopeCase getEnvelopeCaseByDCN(SearchRequest searchRequest) {
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
         return payment.isPresent()
-            ? envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null)
+            ? envelopeCaseRepository.findByEnvelopeId(payment.get()
+                                                          .getEnvelope()
+                                                          .getId())
+                                                            .orElse(EnvelopeCase.caseWith()
+                                                                        .envelope(Envelope.envelopeWith()
+                                                                                      .envelopePayments(getPayments(payment.get()))
+                                                                                      .build())
+                                                                        .build())
             : null;
+    }
+
+    public List<EnvelopePayment> getPayments(EnvelopePayment payment){
+        List<EnvelopePayment> paymentList = new ArrayList<>();
+        paymentList.add(payment);
+        return paymentList;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
@@ -38,6 +39,11 @@ public class BulkScanControllerValidator extends
     @ExceptionHandler(ExceptionRecordNotExistsException.class)
     public ResponseEntity exceptionRecordsNotExists(ExceptionRecordNotExistsException ex) {
         return new ResponseEntity<>(EXCEPTION_RECORD_NOT_EXISTS, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity handlePaymentException(PaymentException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @Override
