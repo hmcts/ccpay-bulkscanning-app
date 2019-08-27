@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDate;
@@ -18,19 +19,27 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDat
 public class EnvelopeDtoMapper {
 
     public Envelope toEnvelopeEntity(EnvelopeDto envelopeDto) {
-        return Envelope.envelopeWith()
-            .paymentStatus(envelopeDto.getPaymentStatus().toString())
-            .envelopePayments(toPaymentEntities(envelopeDto.getPayments()))
-            .build();
+        if(Optional.ofNullable(envelopeDto).isPresent()) {
+            return Envelope.envelopeWith()
+                .paymentStatus(envelopeDto.getPaymentStatus().toString())
+                .envelopePayments(toPaymentEntities(envelopeDto.getPayments()))
+                .build();
+        }else {
+            return null;
+        }
     }
 
     public EnvelopeDto fromEnvelopeEntity(Envelope envelope) {
-        return EnvelopeDto.envelopeDtoWith()
-            .id(envelope.getId())
-            .paymentStatus(PaymentStatus.valueOf(envelope.getPaymentStatus()))
-            .dateCreated(localDateTimeToDate(envelope.getDateCreated()))
-            .dateUpdated(localDateTimeToDate(envelope.getDateUpdated()))
-            .build();
+        if(Optional.ofNullable(envelope).isPresent()) {
+            return EnvelopeDto.envelopeDtoWith()
+                .id(envelope.getId())
+                .paymentStatus(PaymentStatus.valueOf(envelope.getPaymentStatus()))
+                .dateCreated(localDateTimeToDate(envelope.getDateCreated()))
+                .dateUpdated(localDateTimeToDate(envelope.getDateUpdated()))
+                .build();
+        }else {
+            return null;
+        }
     }
 
     public List<CaseDto> toCaseDtos(List<EnvelopeCase> caseEntities) {
@@ -38,13 +47,17 @@ public class EnvelopeDtoMapper {
     }
 
     public CaseDto toCaseDto(EnvelopeCase caseEntity) {
-        return CaseDto.envelopeDtoWith().id(caseEntity.getId())
-            .ccdReference(caseEntity.getCcdReference())
-            .exceptionRecordReference(caseEntity.getExceptionRecordReference())
-            .envelope(fromEnvelopeEntity(caseEntity.getEnvelope()))
-            .dateCreated(localDateTimeToDate(caseEntity.getDateCreated()))
-            .dateUpdated(localDateTimeToDate(caseEntity.getDateUpdated()))
-            .build();
+        if(Optional.ofNullable(caseEntity).isPresent()) {
+            return CaseDto.envelopeDtoWith().id(caseEntity.getId())
+                .ccdReference(caseEntity.getCcdReference())
+                .exceptionRecordReference(caseEntity.getExceptionRecordReference())
+                .envelope(fromEnvelopeEntity(caseEntity.getEnvelope()))
+                .dateCreated(localDateTimeToDate(caseEntity.getDateCreated()))
+                .dateUpdated(localDateTimeToDate(caseEntity.getDateUpdated()))
+                .build();
+        }else {
+            return null;
+        }
     }
 
     public List<EnvelopePayment> toPaymentEntities(List<PaymentDto> payments) {
@@ -52,10 +65,14 @@ public class EnvelopeDtoMapper {
     }
 
     public EnvelopePayment toPaymentEntity(PaymentDto payment) {
-        return EnvelopePayment.paymentWith()
-            .id(payment.getId())
-            .dcnReference(payment.getDcnReference())
-            .paymentStatus(payment.getPaymentStatus().toString())
-            .build();
+        if(Optional.ofNullable(payment).isPresent()) {
+            return EnvelopePayment.paymentWith()
+                .id(payment.getId())
+                .dcnReference(payment.getDcnReference())
+                .paymentStatus(payment.getPaymentStatus().toString())
+                .build();
+        }else {
+            return null;
+        }
     }
 }

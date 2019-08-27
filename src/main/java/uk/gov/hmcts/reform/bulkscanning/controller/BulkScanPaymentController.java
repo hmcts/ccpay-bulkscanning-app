@@ -1,20 +1,22 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
@@ -22,7 +24,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
@@ -30,10 +31,10 @@ import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
@@ -45,17 +46,10 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
         + "payment information contained in the envelope")})
 public class BulkScanPaymentController {
 
-    @Autowired
-    PaymentService paymentService;
-
-    @Autowired
-    BulkScanConsumerService bsConsumerService;
-
-    @Autowired
-    PaymentDtoMapper paymentDtoMapper;
-
-    @Autowired
-    PaymentMetadataDtoMapper paymentMetadataDtoMapper;
+    private final PaymentService paymentService;
+    private final BulkScanConsumerService bsConsumerService;
+    private final PaymentDtoMapper paymentDtoMapper;
+    private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
     @Autowired
     public BulkScanPaymentController(PaymentService paymentService,
@@ -94,18 +88,12 @@ public class BulkScanPaymentController {
         @ApiResponse(code = 409, message = "Conflict")
     })
     @PutMapping("/bulk-scan-payments/{document_control_number}")
-    @Transactional
     public ResponseEntity<String> processPaymentFromExela(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @PathVariable("document_control_number") String dcnReference,
-        @Validated @RequestBody PaymentRequest paymentRequest) {
+        @Valid @RequestBody PaymentRequest paymentRequest) {
 
         try {
-            // TODO: 22/08/2019 Hardcoded for Testing only
-           /* if (StringUtils.isNotEmpty(serviceAuthorization)
-                && !"AUTH123".equalsIgnoreCase(serviceAuthorization)) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }*/
-           /* Commented Service Auth Code*/
             if (StringUtils.isNotEmpty(dcnReference)) {
                 //Check in Payment metadata for already existing payment from Exela
                 if (paymentService.getPaymentMetadata(dcnReference) == null) {
@@ -115,13 +103,10 @@ public class BulkScanPaymentController {
                 }
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
-                throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Document_Control_Number missing in Exela Request"
-                );
+                throw new PaymentException("Document_Control_Number missing in Exela Request");
             }
-        } catch (PaymentException pex) {
-            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "API Failed with Exception!!!", pex);
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
         }
     }
 
@@ -165,25 +150,30 @@ public class BulkScanPaymentController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases/{ccd_reference}")
-    public ResponseEntity<String> retrieveByCCD(@PathVariable("ccd_reference") String ccdReference) throws JsonProcessingException {
-        EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByCCDReference(SearchRequest.searchRequestWith()
-                                                                                     .ccdReference(ccdReference)
-                                                                                     .exceptionRecord(ccdReference)
-                                                                                     .build());
-        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
-        if (envelopeCase == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        else {
-            envelopeCase.getEnvelope().getEnvelopePayments().stream().forEach(envelopePayment -> {
-                paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
-            });
-            SearchResponse searchResponse = SearchResponse.searchResponseWith()
-                .ccdReference(envelopeCase.getCcdReference())
-                .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
-                .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
-                .build();
-            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(searchResponse), HttpStatus.OK);
+    public ResponseEntity<SearchResponse> retrieveByCCD(@PathVariable("ccd_reference") String ccdReference) throws JsonProcessingException {
+        try {
+            EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByCCDReference(SearchRequest.searchRequestWith()
+                                                                                         .ccdReference(ccdReference)
+                                                                                         .exceptionRecord(ccdReference)
+                                                                                         .build());
+            List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
+            if (Optional.ofNullable(envelopeCase).isPresent()) {
+                envelopeCase.getEnvelope().getEnvelopePayments().stream()
+                    .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
+                    .forEach(envelopePayment -> {
+                        paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
+                    });
+                SearchResponse searchResponse = SearchResponse.searchResponseWith()
+                    .ccdReference(envelopeCase.getCcdReference())
+                    .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
+                    .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
+                    .build();
+                return new ResponseEntity<>(searchResponse, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
         }
     }
 
@@ -193,28 +183,32 @@ public class BulkScanPaymentController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases")
-    public ResponseEntity<String> retrieveByDCN(@RequestParam(required = true, value = "document_control_number")
-                                                    String documentControlNumber) throws JsonProcessingException {
+    public ResponseEntity<SearchResponse> retrieveByDCN(@RequestParam(required = true, value = "document_control_number")
+                                                            String documentControlNumber) throws JsonProcessingException {
+        try {
+            EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
+                                                                                .documentControlNumber(
+                                                                                    documentControlNumber)
+                                                                                .build());
+            List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
+            if (Optional.ofNullable(envelopeCase).isPresent()) {
+                envelopeCase.getEnvelope().getEnvelopePayments().stream()
+                    .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
+                    .forEach(envelopePayment -> {
+                        paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
+                    });
+                SearchResponse searchResponse = SearchResponse.searchResponseWith()
+                    .ccdReference(envelopeCase.getCcdReference())
+                    .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
+                    .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
+                    .build();
 
-        EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
-                                                                            .documentControlNumber(
-                                                                                documentControlNumber)
-                                                                            .build());
-        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
-        if (envelopeCase == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        else {
-            envelopeCase.getEnvelope().getEnvelopePayments().stream().forEach(envelopePayment -> {
-                paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
-            });
-            SearchResponse searchResponse = SearchResponse.searchResponseWith()
-                .ccdReference(envelopeCase.getCcdReference())
-                .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
-                .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
-                .build();
-
-            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(searchResponse), HttpStatus.OK);
+                return new ResponseEntity<>(searchResponse, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
         }
     }
 
