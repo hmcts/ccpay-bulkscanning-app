@@ -102,7 +102,7 @@ public class BulkScanPaymentController {
                 throw new PaymentException("Document_Control_Number missing in Exela Request");
             }
         } catch (Exception ex) {
-            throw new PaymentException("API Failed with Exception!!!", ex);
+            throw new PaymentException(ex);
         }
     }
 
@@ -128,28 +128,29 @@ public class BulkScanPaymentController {
     })
     @GetMapping("/cases/{ccd_reference}")
     public ResponseEntity<SearchResponse> retrieveByCCD(@PathVariable("ccd_reference") String ccdReference) throws JsonProcessingException {
-        try{
+        try {
             EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByCCDReference(SearchRequest.searchRequestWith()
                                                                                          .ccdReference(ccdReference)
                                                                                          .exceptionRecord(ccdReference)
                                                                                          .build());
             List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
             if (Optional.ofNullable(envelopeCase).isPresent()) {
-                envelopeCase.getEnvelope().getEnvelopePayments().stream().forEach(envelopePayment -> {
-                    paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
-                });
+                envelopeCase.getEnvelope().getEnvelopePayments().stream()
+                    .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
+                    .forEach(envelopePayment -> {
+                        paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
+                    });
                 SearchResponse searchResponse = SearchResponse.searchResponseWith()
                     .ccdReference(envelopeCase.getCcdReference())
                     .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
                     .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
                     .build();
                 return new ResponseEntity<>(searchResponse, HttpStatus.OK);
-            }
-            else {
+            } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        }catch (Exception ex) {
-            throw new PaymentException("API Failed with Exception!!!", ex);
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
         }
     }
 
@@ -160,17 +161,19 @@ public class BulkScanPaymentController {
     })
     @GetMapping("/cases")
     public ResponseEntity<SearchResponse> retrieveByDCN(@RequestParam(required = true, value = "document_control_number")
-                                                    String documentControlNumber) throws JsonProcessingException {
-        try{
+                                                            String documentControlNumber) throws JsonProcessingException {
+        try {
             EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
                                                                                 .documentControlNumber(
                                                                                     documentControlNumber)
                                                                                 .build());
             List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
             if (Optional.ofNullable(envelopeCase).isPresent()) {
-                envelopeCase.getEnvelope().getEnvelopePayments().stream().forEach(envelopePayment -> {
-                    paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
-                });
+                envelopeCase.getEnvelope().getEnvelopePayments().stream()
+                    .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
+                    .forEach(envelopePayment -> {
+                        paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
+                    });
                 SearchResponse searchResponse = SearchResponse.searchResponseWith()
                     .ccdReference(envelopeCase.getCcdReference())
                     .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
@@ -178,13 +181,11 @@ public class BulkScanPaymentController {
                     .build();
 
                 return new ResponseEntity<>(searchResponse, HttpStatus.OK);
-
-            }
-            else {
+            } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        }catch (Exception ex) {
-            throw new PaymentException("API Failed with Exception!!!", ex);
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
         }
     }
 

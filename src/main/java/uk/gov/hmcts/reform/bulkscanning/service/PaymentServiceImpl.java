@@ -123,26 +123,19 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public EnvelopeCase getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
         return StringUtils.isNotEmpty(searchRequest.getCcdReference())
-                    ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(null)
-                    : envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(null);
+            ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(null)
+            : envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(null);
     }
 
     @Override
     public EnvelopeCase getEnvelopeCaseByDCN(SearchRequest searchRequest) {
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
         return payment.isPresent()
-            ? envelopeCaseRepository.findByEnvelopeId(payment.get()
-                                                          .getEnvelope()
-                                                          .getId())
-                                                            .orElse(EnvelopeCase.caseWith()
-                                                                        .envelope(Envelope.envelopeWith()
-                                                                                      .envelopePayments(getPayments(payment.get()))
-                                                                                      .build())
-                                                                        .build())
+            ? envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null)
             : null;
     }
 
-    public List<EnvelopePayment> getPayments(EnvelopePayment payment){
+    public List<EnvelopePayment> getPayments(EnvelopePayment payment) {
         List<EnvelopePayment> paymentList = new ArrayList<>();
         paymentList.add(payment);
         return paymentList;
