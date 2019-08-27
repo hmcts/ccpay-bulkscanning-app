@@ -90,11 +90,6 @@ public class BulkScanPaymentController {
         @Valid @RequestBody PaymentRequest paymentRequest) {
 
         try {
-            // TODO: 22/08/2019 Hardcoded for Testing only
-            if (StringUtils.isNotEmpty(serviceAuthorization)
-                && !"AUTH123".equalsIgnoreCase(serviceAuthorization)) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
             if (StringUtils.isNotEmpty(dcnReference)) {
                 //Check in Payment metadata for already existing payment from Exela
                 if (paymentService.getPaymentMetadata(dcnReference) == null) {
