@@ -1,0 +1,230 @@
+databaseChangeLog:
+- changeSet:
+    id: 100001
+    author: yashar (generated)
+    changes:
+      - createTable:
+          tableName: envelope
+          columns:
+            - column:
+                name: id
+                type: int
+                autoIncrement: true
+                constraints:
+                  primaryKey: true
+                  nullable: false
+                  primaryKeyName: envelope_id_PK
+            - column:
+                name: responsible_service_id
+                type: varchar(50)
+            - column:
+                name: date_created
+                type: TIMESTAMP WITHOUT TIME ZONE
+            - column:
+                name: date_updated
+                type: TIMESTAMP WITHOUT TIME ZONE
+            - column:
+                name: payment_status
+                type: varchar(50)
+- changeSet:
+    id: 100002
+    author: yashar (generated)
+    changes:
+      - createTable:
+          tableName: envelope_case
+          columns:
+            - column:
+                name: id
+                type: int
+                autoIncrement: true
+                constraints:
+                  primaryKey: true
+                  nullable: false
+                  primaryKeyName: case_pk
+            - column:
+                name: ccd_reference
+                type: varchar(150)
+                constraints:
+                  nullable: true
+            - column:
+                name: date_created
+                type: TIMESTAMP WITHOUT TIME ZONE
+                constraints:
+                  nullable: true
+            - column:
+                name: exception_record_reference
+                type: varchar(150)
+                constraints:
+                   nullable: true
+            - column:
+                name: date_updated
+                type: TIMESTAMP WITHOUT TIME ZONE
+                constraints:
+                  nullable: true
+            - column:
+                constraints:
+                  nullable: false
+                name: envelope_id
+                type: int
+- changeSet:
+    id: 100003
+    author: yashar (generated)
+    changes:
+       - createTable:
+          tableName: envelope_payment
+          columns:
+            - column:
+                name: id
+                type: int
+                autoIncrement: true
+                constraints:
+                  primaryKey: true
+                  nullable: false
+                  primaryKeyName: payment_pk
+            - column:
+                name: dcn_reference
+                type: varchar(250)
+                constraints:
+                  nullable: false
+            - column:
+                name: envelope_payment_status
+                type: varchar(50)
+                constraints:
+                  nullable: true
+            - column:
+                name: date_created
+                type: TIMESTAMP WITHOUT TIME ZONE
+            - column:
+                name: date_updated
+                type: TIMESTAMP WITHOUT TIME ZONE
+            - column:
+                constraints:
+                  nullable: false
+                name: envelope_id
+                type: int
+- changeSet:
+    id: 100009
+    author: yashar (generated)
+    changes:
+      - createTable:
+          tableName: payment_metadata
+          columns:
+            - column:
+                name: id
+                type: int
+                autoIncrement: true
+                constraints:
+                  primaryKey: true
+                  nullable: false
+                  primaryKeyName: payment_metadata_pk
+            - column:
+                name: dcn_reference
+                type: varchar(250)
+                constraints:
+                  nullable: false
+            - column:
+                name: bgc_reference
+                type: varchar(250)
+            - column:
+                name: amount
+                type: numeric(19, 2)
+            - column:
+                name: currency
+                type: varchar(255)
+            - column:
+                name: payment_method
+                type: varchar(255)
+            - column:
+                name: date_banked
+                type: TIMESTAMP WITHOUT TIME ZONE
+            - column:
+                name: outbound_batch_number
+                type: varchar(255)
+            - column:
+                name: dcn_case
+                type: varchar(255)
+            - column:
+                name: case_reference
+                type: varchar(255)
+            - column:
+                name: po_box
+                type: varchar(255)
+            - column:
+                name: first_cheque_dcn_in_batch
+                type: varchar(255)
+            - column:
+                name: payer_name
+                type: varchar(255)
+            - column:
+                name: date_created
+                type: TIMESTAMP WITHOUT TIME ZONE
+            - column:
+                name: date_updated
+                type: TIMESTAMP WITHOUT TIME ZONE
+- changeSet:
+    id: 100005
+    author: yashar (generated)
+    changes:
+      - createTable:
+          tableName: status_history
+          columns:
+            - column:
+                name: id
+                type: int
+                autoIncrement: true
+                constraints:
+                  primaryKey: true
+                  nullable: false
+                  primaryKeyName: status_history_pk
+            - column:
+                name: payment_status
+                type: varchar(50)
+            - column:
+                name: date_created
+                type: TIMESTAMP WITHOUT TIME ZONE
+            - column:
+                name: date_updated
+                type: TIMESTAMP WITHOUT TIME ZONE
+            - column:
+                constraints:
+                  nullable: false
+                name: envelope_id
+                type: int
+- changeSet:
+    id: 100006
+    author: yashar (generated)
+    changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: envelope_id
+          baseTableName: envelope_case
+          constraintName: FK_3c04152jyub2e59dll7si8ggp
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: envelope
+
+- changeSet:
+    id: 100007
+    author: yashar (generated)
+    changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: envelope_id
+          baseTableName: envelope_payment
+          constraintName: FK_boc1od01im5po7i8e5biph5df
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: envelope
+
+- changeSet:
+    id: 100008
+    author: yashar (generated)
+    changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: envelope_id
+          baseTableName: status_history
+          constraintName: FK_boc1od01im5po7i8e5ciph5df
+          deferrable: false
+          initiallyDeferred: false
+          referencedColumnNames: id
+          referencedTableName: envelope

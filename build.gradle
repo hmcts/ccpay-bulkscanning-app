@@ -2,7 +2,6 @@ import java.util.stream.Collectors
 
 plugins {
   id 'application'
-  id 'checkstyle'
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
@@ -12,6 +11,8 @@ plugins {
   id 'org.sonarqube' version '2.7.1'
   id 'idea'
 }
+
+apply from: 'liquibase.gradle'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
@@ -84,13 +85,6 @@ task smoke(type: Test) {
   classpath = sourceSets.smokeTest.runtimeClasspath
 }
 
-checkstyle {
-  maxWarnings = 0
-  toolVersion = '8.18'
-  // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-  configDir = new File(rootDir, 'config/checkstyle')
-}
-
 pmd {
   toolVersion = "6.16.0"
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
@@ -108,7 +102,9 @@ def listFiles(String pattern) {
     .stream()
     .collect(Collectors.joining(","))
 }
-
+def sonarExclusions = [
+  '**/bulkscanning/**'
+  ]
 sonarqube {
   properties {
     property "sonar.projectName", "CCPAY :: Bulkscanning payment"
@@ -117,7 +113,9 @@ sonarqube {
     property "sonar.java.coveragePlugin", "jacoco"
     property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
     property "sonar.projectKey", "uk.gov.hmcts.reform:ccpay-bulkscanning-api"
-
+    property "sonar.exclusions", sonarExclusions.join(", ")
+    property "sonar.test.exclusions", sonarExclusions.join(", ")
+    property "sonar.coverage.exclusions", sonarExclusions.join(", ")
   }
 }
 
@@ -139,7 +137,7 @@ repositories {
   maven { url "https://dl.bintray.com/hmcts/hmcts-maven" }
   jcenter()
   mavenCentral()
-  
+
 }
 
 def versions = [
@@ -151,32 +149,62 @@ def versions = [
 ]
 
 configurations.all {
-  resolutionStrategy {  
+  resolutionStrategy {
     eachDependency { DependencyResolveDetails details ->
       if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
         details.useVersion '2.9.9'
       }
 
       if (details.requested.name == 'jackson-databind') {
-        details.useVersion '2.9.9.1'
+        details.useVersion '2.9.9.3'
       }
     }
   }
 }
 
-
-
-
 dependencies {
   compile("org.springframework.boot:spring-boot-starter-web")
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+  compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.4'
+  compile group: 'io.springfox', name: 'springfox-swagger-ui', version:'2.9.0'
+  compile group: 'io.springfox', name: 'springfox-swagger2', version:'2.9.0'
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
+  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.2.RELEASE'
+  compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+  compile group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.2'
+  compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+  compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.9'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+  compile group: 'com.querydsl', name: 'querydsl-jpa', version:'4.1.4'
+  compile group: 'org.liquibase', name: 'liquibase-core', version: '3.7.0'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.9.9.3'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
+  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.6') {
+    exclude(module: 'commons-logging')
+    exclude(module: 'slf4j-simple')
+  }
+  compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.4'
   compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
   testCompile("org.springframework.boot:spring-boot-starter-test")
+  testCompile group: 'org.projectlombok', name: 'lombok', version: '1.16.16'
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: javaLoggingVersion
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: javaLoggingVersion
-  compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.4'
+
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
-  testCompile group: 'org.projectlombok', name: 'lombok', version: '1.16.16'
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+  testCompile group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+
+  testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+  testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.0'
 
 
   smokeTestCompile sourceSets.test.runtimeClasspath

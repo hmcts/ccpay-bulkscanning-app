@@ -8,11 +8,10 @@ management:
   endpoint:
     health:
       show-details: "always"
-
 spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         jdbc:
@@ -22,13 +21,12 @@ spring:
     name: bulk-scanning-payment-api
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
-
   ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:ccpay-bulkscanning-postgresql}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:ccpay-bulkscanning}${POSTGRES_CONNECTION_OPTIONS:}
-    username: ${POSTGRES_USERNAME:ccpay-bulkscanning}
-    password: ${POSTGRES_PASSWORD:ccpay-bulkscanning}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:bspayment}${POSTGRES_CONNECTION_OPTIONS:}
+    username: ${POSTGRES_USERNAME:bspayment}
+    password: ${POSTGRES_PASSWORD:bspayment}
     properties:
       charSet: UTF-8
     tomcat:
@@ -47,7 +45,6 @@ spring:
       remove-abandoned-timeout: 60
       log-abandoned: true
       abandon-when-percentage-full: 0
-
 security:
   anonymousPaths:
     - "/"
