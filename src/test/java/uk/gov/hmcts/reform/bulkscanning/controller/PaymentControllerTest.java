@@ -8,20 +8,22 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
+import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
-import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
+import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -33,25 +35,21 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(locations="classpath:application-local.yaml")
-public class BulkScanPaymentControllerTest {
+public class PaymentControllerTest {
 
     @Autowired
-    MockMvc mvc;
+    MockMvc mockMvc;
 
     @Autowired
-    private BulkScanConsumerService bulkScanConsumerService;
+    private WebApplicationContext webApplicationContext;
 
-    BulkScanPaymentRequest bulkScanPaymentRequest;
-
-    CaseReferenceRequest caseReferenceRequest;
+    //@MockBean
+    @Autowired
+    private PaymentService paymentService;
 
     @Before
-    @Transactional
     public void setUp() {
-        caseReferenceRequest = CaseReferenceRequest
-            .createCaseReferenceRequest()
-            .ccdCaseNumber("CCN2")
-            .build();
+        //this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
@@ -61,7 +59,7 @@ public class BulkScanPaymentControllerTest {
             ,dcn,"AA08");
 
         //Post request
-        ResultActions resultActions = mvc.perform(post("/bulk-scan-payments")
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(bulkScanPaymentRequest))
             .contentType(MediaType.APPLICATION_JSON))
@@ -71,7 +69,7 @@ public class BulkScanPaymentControllerTest {
         Assert.assertNotNull(resultActions.andReturn().getResponse().getContentAsString());
 
         //Post Repeat request
-        ResultActions repeatRequest = mvc.perform(post("/bulk-scan-payments")
+        ResultActions repeatRequest = mockMvc.perform(post("/bulk-scan-payments")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(bulkScanPaymentRequest))
             .contentType(MediaType.APPLICATION_JSON))
@@ -82,7 +80,7 @@ public class BulkScanPaymentControllerTest {
             BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST));
 
         //PATCH Request
-        ResultActions patchRequest = mvc.perform(patch("/bulk-scan-payments/DCN2/PROCESS")
+        ResultActions patchRequest = mockMvc.perform(patch("/bulk-scan-payments/DCN2/process")
             .header("ServiceAuthorization", "service")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -92,7 +90,7 @@ public class BulkScanPaymentControllerTest {
         Assert.assertNotNull(patchRequest.andReturn().getResponse().getContentAsString());
 
         //DCN Not exists Request
-        ResultActions patchDCNNotExists = mvc.perform(patch("/bulk-scan-payments/DCN3/PROCESS")
+        ResultActions patchDCNNotExists = mockMvc.perform(patch("/bulk-scan-payments/DCN3/process")
             .header("ServiceAuthorization", "service")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
@@ -107,13 +105,12 @@ public class BulkScanPaymentControllerTest {
     @Transactional
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
         String dcn[] = {"DCN1"};
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08");
-        bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
+        paymentService.saveInitialMetadataFromBs(createBulkScanPaymentRequest("1111-2222-3333-4444"
+            ,dcn,"AA08"));
 
-        ResultActions resultActions = mvc.perform(put("/bulk-scan-cases/?exception_reference=1111-2222-3333-4444")
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-cases/?exception_reference=1111-2222-3333-4444")
             .header("ServiceAuthorization", "service")
-            .content(asJsonString(caseReferenceRequest))
+            .content(asJsonString(createCaseReferenceRequest()))
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content()
@@ -127,9 +124,9 @@ public class BulkScanPaymentControllerTest {
     @Transactional
     public void testExceptionRecordNotExists() throws Exception{
 
-        ResultActions resultActions = mvc.perform(put("/bulk-scan-cases/?exception_reference=4444-3333-2222-111")
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-cases/?exception_reference=4444-3333-2222-111")
             .header("ServiceAuthorization", "service")
-            .content(asJsonString(caseReferenceRequest))
+            .content(asJsonString(createCaseReferenceRequest()))
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(content()
@@ -172,25 +169,38 @@ public class BulkScanPaymentControllerTest {
     @Transactional
     public void testCreatePaymentFromExela() throws Exception{
 
-        ResultActions resultActions = mvc.perform(put("/bulk-scan-payments/111222333")
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/111222333")
                                                       .header("ServiceAuthorization", "service")
                                                       .content(asJsonString(createPaymentRequest()))
-                                                      .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isFound());
-
+                                                      .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(new Integer(resultActions.andReturn().getResponse().getStatus()),
                                                          new Integer(200));
     }
 
-    private PaymentRequest createPaymentRequest() {
-        return PaymentRequest.createPaymentRequestWith()
+    @Test
+    @Transactional
+    public void testSearchPaymentWithCCD() throws Exception{
+
+        ResultActions resultActions = mockMvc.perform(get("/cases/CCD1")
+                                                      .header("ServiceAuthorization", "service"));
+        Assert.assertEquals(new Integer(200), new Integer(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    private ExelaPaymentRequest createPaymentRequest() {
+        return ExelaPaymentRequest.createPaymentRequestWith()
             .amount(new BigDecimal(100.00))
-            .bankedDate(LocalDateTime.now())
+            .bankedDate(new Date())
             .bankGiroCreditSlipNumber("BGC123")
             .currency("GBP")
             .method("CHEQUE")
             .build();
     }
 
+    private CaseReferenceRequest createCaseReferenceRequest(){
+        return CaseReferenceRequest
+            .createCaseReferenceRequest()
+            .ccdCaseNumber("CCN2")
+            .build();
+    }
 
 }

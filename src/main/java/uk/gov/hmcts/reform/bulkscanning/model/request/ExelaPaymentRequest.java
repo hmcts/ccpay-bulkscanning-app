@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import javax.validation.constraints.NotNull;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -21,7 +22,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @NoArgsConstructor
 @Data
 @JsonInclude(NON_NULL)
-public class PaymentRequest {
+public class ExelaPaymentRequest {
 
     /*
     Payment amount in GBP
@@ -52,7 +53,7 @@ public class PaymentRequest {
     Date the payment was sent for banking.
      */
     @NotNull(message = "banked_date can't be Blank")
-    private LocalDateTime bankedDate;
+    private Date bankedDate;
 
     @JsonProperty("outbound_batch_number")
     private String outboundBatchNumber;

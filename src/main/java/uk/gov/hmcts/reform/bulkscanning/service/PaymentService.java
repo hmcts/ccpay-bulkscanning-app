@@ -1,31 +1,19 @@
 package uk.gov.hmcts.reform.bulkscanning.service;
 
-import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
-import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
-import uk.gov.hmcts.reform.bulkscanning.model.dto.StatusHistoryDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.*;
-import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
-
-import java.util.List;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 
 public interface PaymentService {
 
-    EnvelopePayment getPaymentByDcnReference(String dcnReference);
-
-    EnvelopePayment updatePayment(EnvelopePayment payment);
-
-    PaymentMetadata createPaymentMetadata(PaymentMetadataDto paymentMetadataDto);
-
+    void processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference);
+    SearchResponse retrieveByCCDReference(String ccdReference);
+    SearchResponse retrieveByDcn(String documentControlNumber);
     PaymentMetadata getPaymentMetadata(String dcnReference);
-
-    StatusHistory createStatusHistory(StatusHistoryDto statusHistoryDto);
-
-    Envelope updateEnvelopePaymentStatus(Envelope envelope);
-
-    Envelope createEnvelope(EnvelopeDto envelopeDto);
-
-    List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest);
-
-    EnvelopeCase getEnvelopeCaseByDCN(SearchRequest searchRequest);
+    Envelope saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest);
+    String updateCaseReferenceForExceptionRecord (String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest);
+    String markPaymentAsProcessed(String dcn);
 
 }
