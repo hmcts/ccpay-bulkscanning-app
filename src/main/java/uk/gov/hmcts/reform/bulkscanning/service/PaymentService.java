@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.bulkscanning.model.dto.StatusHistoryDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.*;
 import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 
+import java.util.List;
+
 public interface PaymentService {
 
     EnvelopePayment getPaymentByDcnReference(String dcnReference);
@@ -22,7 +24,7 @@ public interface PaymentService {
 
     Envelope createEnvelope(EnvelopeDto envelopeDto);
 
-    EnvelopeCase getEnvelopeCaseByCCDReference(SearchRequest searchRequest);
+    List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest);
 
     EnvelopeCase getEnvelopeCaseByDCN(SearchRequest searchRequest);
 

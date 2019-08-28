@@ -6,5 +6,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 public interface BulkScanConsumerService {
     Envelope saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest);
-    void updateCaseReferenceForExceptionRecord (String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest);
+    String updateCaseReferenceForExceptionRecord (String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest);
+    String markPaymentAsProcessed(String dcn);
 }

@@ -124,7 +124,7 @@ public class BulkScanPaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "Provided exception reference doesn't exist"),
     })
-    @PutMapping("/bulk-scan-cases/")
+    @PutMapping("/bulk-scan-payments")
     public ResponseEntity updateCaseReferenceForExceptionRecord(@NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
                                                                 @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
 
@@ -142,7 +142,7 @@ public class BulkScanPaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "No record exists for provided DCN"),
     })
-    @PatchMapping("/bulk-scan-payments/{dcn}/PROCESS")
+    @PatchMapping("/bulk-scan-payments/{dcn}/process")
     public ResponseEntity markPaymentAsProcessed(@NotEmpty @PathVariable("dcn") String dcn) {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -158,26 +158,30 @@ public class BulkScanPaymentController {
     @GetMapping("/cases/{ccd_reference}")
     public ResponseEntity<SearchResponse> retrieveByCCD(@PathVariable("ccd_reference") String ccdReference) throws JsonProcessingException {
         try {
-            EnvelopeCase envelopeCase = paymentService.getEnvelopeCaseByCCDReference(SearchRequest.searchRequestWith()
+            List<EnvelopeCase> envelopeCases = paymentService.getEnvelopeCaseByCCDReference(SearchRequest.searchRequestWith()
                                                                                          .ccdReference(ccdReference)
                                                                                          .exceptionRecord(ccdReference)
                                                                                          .build());
             List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
-            if (Optional.ofNullable(envelopeCase).isPresent()) {
-                envelopeCase.getEnvelope().getEnvelopePayments().stream()
-                    .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
-                    .forEach(envelopePayment -> {
-                        paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
-                    });
-                SearchResponse searchResponse = SearchResponse.searchResponseWith()
-                    .ccdReference(envelopeCase.getCcdReference())
-                    .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
-                    .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
-                    .build();
-                return new ResponseEntity<>(searchResponse, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if(Optional.ofNullable(envelopeCases).isPresent() && ! envelopeCases.isEmpty()) {
+                envelopeCases.stream().forEach(envelopeCase -> {
+                    envelopeCase.getEnvelope().getEnvelopePayments().stream()
+                        .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
+                        .forEach(envelopePayment -> {
+                            paymentMetadataList.add(paymentService.getPaymentMetadata(envelopePayment.getDcnReference()));
+                        });
+                });
             }
+         if(! paymentMetadataList.isEmpty()) {
+            SearchResponse searchResponse = SearchResponse.searchResponseWith()
+                .ccdReference(envelopeCases.get(0).getCcdReference())
+                .exceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference())
+                .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
+                .build();
+            return new ResponseEntity<>(searchResponse, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         } catch (Exception ex) {
             throw new PaymentException(ex);
         }

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,7 +34,7 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
 
     @Override
     @Transactional
-    public EnvelopeCase saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
+    public Envelope saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
         Envelope envelopeNew = bsPaymentRequestMapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
 
         Envelope envelopeDB = bulkScanningUtils.returnExistingEnvelope(envelopeNew);
@@ -52,15 +53,20 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
     @Transactional
     public String updateCaseReferenceForExceptionRecord(String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest) {
         //TODO yet to handle multiple envelopes with same exception reference scenario
-        EnvelopeCase envelopeCase = envelopeCaseRepository.findByExceptionRecordReference(exceptionRecordReference).
+        List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(exceptionRecordReference).
             orElseThrow(ExceptionRecordNotExistsException::new);
 
         if (Optional.ofNullable(caseReferenceRequest).isPresent() &&
             StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())) {
-            envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber());
+            if(Optional.ofNullable(envelopeCases).isPresent() && ! envelopeCases.isEmpty()){
+                envelopeCases.stream().forEach(envelopeCase -> {
+                    envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber());
+                });
+            }
+
         }
 
-        return envelopeCaseRepository.save(envelopeCase).getId().toString();
+        return envelopeCaseRepository.save(envelopeCases.get(0)).getId().toString();
     }
 
     @Override
