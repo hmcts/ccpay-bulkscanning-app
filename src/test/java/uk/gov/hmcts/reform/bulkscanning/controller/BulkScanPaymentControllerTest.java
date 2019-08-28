@@ -14,9 +14,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -160,6 +165,30 @@ public class BulkScanPaymentControllerTest {
             .documentControlNumbers(dcn)
             .responsibleServiceId(responsibleServiceId)
             .isExceptionRecord(true)
+            .build();
+    }
+
+    @Test
+    @Transactional
+    public void testCreatePaymentFromExela() throws Exception{
+
+        ResultActions resultActions = mvc.perform(put("/bulk-scan-payments/111222333")
+                                                      .header("ServiceAuthorization", "service")
+                                                      .content(asJsonString(createPaymentRequest()))
+                                                      .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isFound());
+
+        Assert.assertEquals(new Integer(resultActions.andReturn().getResponse().getStatus()),
+                                                         new Integer(200));
+    }
+
+    private PaymentRequest createPaymentRequest() {
+        return PaymentRequest.createPaymentRequestWith()
+            .amount(new BigDecimal(100.00))
+            .bankedDate(LocalDateTime.now())
+            .bankGiroCreditSlipNumber("BGC123")
+            .currency("GBP")
+            .method("CHEQUE")
             .build();
     }
 

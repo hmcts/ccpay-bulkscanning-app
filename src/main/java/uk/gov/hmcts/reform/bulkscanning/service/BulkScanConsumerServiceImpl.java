@@ -33,7 +33,7 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
 
     @Override
     @Transactional
-    public String saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
+    public EnvelopeCase saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
         Envelope envelopeNew = bsPaymentRequestMapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
 
         Envelope envelopeDB = bulkScanningUtils.returnExistingEnvelope(envelopeNew);
@@ -44,7 +44,8 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
         }
 
         bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
-        return envelopeRepository.save(envelopeDB).getId().toString();
+        envelopeRepository.save(envelopeDB);
+        return envelopeCaseRepository.findByEnvelopeId(envelopeDB.getId()).get();
     }
 
     @Override

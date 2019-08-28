@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,15 +72,12 @@ public class BulkScanPaymentController {
         @ApiResponse(code = 403, message = "Failed authorization")
     })
     @PostMapping("/bulk-scan-payments")
-    public ResponseEntity consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest));
+    public ResponseEntity<EnvelopeCase> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
+        EnvelopeCase envelopeCase = bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest);
+        return new ResponseEntity<>(envelopeCase, HttpStatus.CREATED);
     }
 
-    @ApiOperation("Provide meta information about the "
-        + "payments contained in the envelope. This operation will be called after the banking "
+    @ApiOperation("This operation will be called after the banking "
         + "process has been done and payments have been allocated to a BGC slip / batch")
     @ApiResponses({
         @ApiResponse(code = 200, message = "Returns an envelope group id"),
