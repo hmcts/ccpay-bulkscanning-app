@@ -45,7 +45,7 @@ public class BulkScanConsumerServiceImpl implements BulkScanConsumerService{
 
         bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
         envelopeRepository.save(envelopeDB);
-        return envelopeCaseRepository.findByEnvelopeId(envelopeDB.getId()).get();
+        return envelopeRepository.findById(envelopeDB.getId()).get();
     }
 
     @Override

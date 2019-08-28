@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.response.PaymentResponse;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.BulkScanConsumerService;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
@@ -36,6 +37,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
@@ -72,9 +74,15 @@ public class BulkScanPaymentController {
         @ApiResponse(code = 403, message = "Failed authorization")
     })
     @PostMapping("/bulk-scan-payments")
-    public ResponseEntity<EnvelopeCase> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
-        EnvelopeCase envelopeCase = bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest);
-        return new ResponseEntity<>(envelopeCase, HttpStatus.CREATED);
+    public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
+        PaymentResponse response = PaymentResponse.paymentResponseWith()
+            .paymentDCNs(bsConsumerService.saveInitialMetadataFromBs(bsPaymentRequest)
+                             .getEnvelopePayments().stream()
+                             .map(payment -> payment.getDcnReference())
+                             .collect(Collectors.toList()))
+            .build();
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @ApiOperation("This operation will be called after the banking "
