@@ -123,8 +123,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public EnvelopeCase getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
         return StringUtils.isNotEmpty(searchRequest.getCcdReference())
-            ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(null)
-            : envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(null);
+            ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference())
+            .orElse(envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(null))
+            : null;
     }
 
     @Override
