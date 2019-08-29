@@ -1,20 +1,14 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.SwaggerDefinition;
-import io.swagger.annotations.Tag;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
-import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
-import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.PaymentResponse;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
@@ -33,13 +27,10 @@ import java.util.stream.Collectors;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
     @Autowired
-    public PaymentController(PaymentService paymentService,
-                             PaymentMetadataDtoMapper paymentMetadataDtoMapper) {
+    public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
-        this.paymentMetadataDtoMapper = paymentMetadataDtoMapper;
     }
 
     @ApiOperation(value = "Get the initial meta data from bulk Scanning",

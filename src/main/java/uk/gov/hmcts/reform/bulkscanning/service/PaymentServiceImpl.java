@@ -32,43 +32,32 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PaymentRepository paymentRepository;
-    private final PaymentMetadataRepository paymentMetadataRepository;
-    private final StatusHistoryRepository statusHistoryRepository;
-    private final EnvelopeRepository envelopeRepository;
-    private final EnvelopeCaseRepository envelopeCaseRepository;
-
-    private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
-    private final StatusHistoryDtoMapper statusHistoryDtoMapper;
-    private final EnvelopeDtoMapper envelopeDtoMapper;
-    private final PaymentDtoMapper paymentDtoMapper;
-    private final BulkScanPaymentRequestMapper bsPaymentRequestMapper;
-    private final BulkScanningUtils bulkScanningUtils;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
-    public PaymentServiceImpl(PaymentRepository paymentRepository,
-                              PaymentMetadataRepository paymentMetadataRepository,
-                              StatusHistoryRepository statusHistoryRepository,
-                              EnvelopeRepository envelopeRepository,
-                              PaymentMetadataDtoMapper paymentMetadataDtoMapper,
-                              StatusHistoryDtoMapper statusHistoryDtoMapper,
-                              EnvelopeDtoMapper envelopeDtoMapper,
-                              PaymentDtoMapper paymentDtoMapper,
-                              BulkScanPaymentRequestMapper bsPaymentRequestMapper,
-                              BulkScanningUtils bulkScanningUtils,
-                              EnvelopeCaseRepository envelopeCaseRepository) {
-        this.paymentRepository = paymentRepository;
-        this.paymentMetadataRepository = paymentMetadataRepository;
-        this.statusHistoryRepository = statusHistoryRepository;
-        this.envelopeRepository = envelopeRepository;
-        this.paymentMetadataDtoMapper = paymentMetadataDtoMapper;
-        this.statusHistoryDtoMapper = statusHistoryDtoMapper;
-        this.envelopeDtoMapper = envelopeDtoMapper;
-        this.paymentDtoMapper = paymentDtoMapper;
-        this.bsPaymentRequestMapper = bsPaymentRequestMapper;
-        this.bulkScanningUtils = bulkScanningUtils;
-        this.envelopeCaseRepository = envelopeCaseRepository;
-    }
+    private PaymentMetadataRepository paymentMetadataRepository;
+
+    @Autowired
+    private EnvelopeRepository envelopeRepository;
+
+    @Autowired
+    private EnvelopeCaseRepository envelopeCaseRepository;
+
+    @Autowired
+    private PaymentMetadataDtoMapper paymentMetadataDtoMapper;
+
+    @Autowired
+    private EnvelopeDtoMapper envelopeDtoMapper;
+
+    @Autowired
+    private PaymentDtoMapper paymentDtoMapper;
+
+    @Autowired
+    private BulkScanPaymentRequestMapper bsPaymentRequestMapper;
+
+    @Autowired
+    private BulkScanningUtils bulkScanningUtils;
 
     @Override
     public void processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
@@ -84,9 +73,9 @@ public class PaymentServiceImpl implements PaymentService {
             payments.add(paymentDtoMapper.fromRequest(exelaPaymentRequest, dcnReference));
 
             Envelope envelope = createEnvelope(EnvelopeDto.envelopeDtoWith()
-                                                                  .paymentStatus(INCOMPLETE)
-                                                                  .payments(payments)
-                                                                  .build());
+                                                   .paymentStatus(INCOMPLETE)
+                                                   .payments(payments)
+                                                   .build());
             //Update payment status as incomplete
             updateEnvelopePaymentStatus(envelope);
         } else {
@@ -101,52 +90,37 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public SearchResponse retrieveByCCDReference(String ccdReference){
+    @Transactional
+    public SearchResponse retrieveByCCDReference(String ccdReference) {
         List<EnvelopeCase> envelopeCases = getEnvelopeCaseByCCDReference(SearchRequest.searchRequestWith()
-                                                                                            .ccdReference(ccdReference)
-                                                                                            .exceptionRecord(ccdReference)
-                                                                                            .build());
-        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
-        if(Optional.ofNullable(envelopeCases).isPresent() && ! envelopeCases.isEmpty()) {
-            envelopeCases.stream().forEach(envelopeCase -> {
-                envelopeCase.getEnvelope().getEnvelopePayments().stream()
-                    .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
-                    .forEach(envelopePayment -> {
-                        paymentMetadataList.add(getPaymentMetadata(envelopePayment.getDcnReference()));
-                    });
-            });
-        }
-        if(! paymentMetadataList.isEmpty()) {
-            SearchResponse searchResponse = SearchResponse.searchResponseWith()
+                                                                             .ccdReference(ccdReference)
+                                                                             .exceptionRecord(ccdReference)
+                                                                             .build());
+        List<PaymentMetadata> paymentMetadataList = getPaymentMetadataForEnvelopeCase(envelopeCases);
+        if (!paymentMetadataList.isEmpty()) {
+            return SearchResponse.searchResponseWith()
                 .ccdReference(envelopeCases.get(0).getCcdReference())
                 .exceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference())
                 .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
                 .build();
-            return searchResponse;
         }
         return null;
     }
 
     @Override
-    public SearchResponse retrieveByDcn(String documentControlNumber){
-        EnvelopeCase envelopeCase = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
-                                                                            .documentControlNumber(
-                                                                                documentControlNumber)
-                                                                            .build());
-        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
-        if (Optional.ofNullable(envelopeCase).isPresent()) {
-            envelopeCase.getEnvelope().getEnvelopePayments().stream()
-                .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
-                .forEach(envelopePayment -> {
-                    paymentMetadataList.add(getPaymentMetadata(envelopePayment.getDcnReference()));
-                });
-            SearchResponse searchResponse = SearchResponse.searchResponseWith()
-                .ccdReference(envelopeCase.getCcdReference())
-                .exceptionRecordReference(envelopeCase.getExceptionRecordReference())
+    @Transactional
+    public SearchResponse retrieveByDcn(String documentControlNumber) {
+        List<EnvelopeCase> envelopeCases = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
+                                                                    .documentControlNumber(
+                                                                        documentControlNumber)
+                                                                    .build());
+        List<PaymentMetadata> paymentMetadataList = getPaymentMetadataForEnvelopeCase(envelopeCases);
+        if (!paymentMetadataList.isEmpty()) {
+            return SearchResponse.searchResponseWith()
+                .ccdReference(envelopeCases.get(0).getCcdReference())
+                .exceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference())
                 .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
                 .build();
-
-            return searchResponse;
         }
         return null;
     }
@@ -172,19 +146,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public String updateCaseReferenceForExceptionRecord(String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest) {
         //TODO yet to handle multiple envelopes with same exception reference scenario
-        List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(exceptionRecordReference).
+        List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(
+            exceptionRecordReference).
             orElseThrow(ExceptionRecordNotExistsException::new);
 
-        if (Optional.ofNullable(caseReferenceRequest).isPresent() &&
-            org.apache.commons.lang.StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())) {
-            if(Optional.ofNullable(envelopeCases).isPresent() && ! envelopeCases.isEmpty()){
-                envelopeCases.stream().forEach(envelopeCase -> {
-                    envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber());
-                });
-            }
-
+        if (Optional.ofNullable(caseReferenceRequest).isPresent()
+            && StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())
+            && Optional.ofNullable(envelopeCases).isPresent()
+            && !envelopeCases.isEmpty()) {
+            envelopeCases.stream().forEach(envelopeCase -> {
+                envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber());
+            });
         }
-
         return envelopeCaseRepository.save(envelopeCases.get(0)).getId().toString();
     }
 
@@ -192,6 +165,26 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public String markPaymentAsProcessed(String dcn) {
         return envelopeRepository.save(bulkScanningUtils.markPaymentAsProcessed(dcn)).getId().toString();
+    }
+
+    @Override
+    @Transactional
+    public PaymentMetadata getPaymentMetadata(String dcnReference) {
+        return paymentMetadataRepository.findByDcnReference(dcnReference).orElse(null);
+    }
+
+    private List<PaymentMetadata> getPaymentMetadataForEnvelopeCase(List<EnvelopeCase> envelopeCases) {
+        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
+        if (Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()) {
+            envelopeCases.stream().forEach(envelopeCase -> {
+                envelopeCase.getEnvelope().getEnvelopePayments().stream()
+                    .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
+                    .forEach(envelopePayment -> {
+                        paymentMetadataList.add(getPaymentMetadata(envelopePayment.getDcnReference()));
+                    });
+            });
+        }
+        return paymentMetadataList;
     }
 
     @Transactional
@@ -211,11 +204,7 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentMetadataRepository.save(paymentMetadata);
     }
 
-    @Override
-    @Transactional
-    public PaymentMetadata getPaymentMetadata(String dcnReference) {
-        return paymentMetadataRepository.findByDcnReference(dcnReference).orElse(null);
-    }
+
 
     @Transactional
     private Envelope updateEnvelopePaymentStatus(Envelope envelope) {
@@ -226,7 +215,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (isPaymentsInComplete) {
             updateEnvelopeStatus(envelope, INCOMPLETE);
         } else {
-            updateEnvelopeStatus(envelope, PaymentStatus.COMPLETE);
+            updateEnvelopeStatus(envelope, COMPLETE);
         }
         return envelope;
     }
@@ -247,15 +236,19 @@ public class PaymentServiceImpl implements PaymentService {
     private List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
         return StringUtils.isNotEmpty(searchRequest.getCcdReference())
             ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference())
-            .orElse(envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(null))
+            .orElse(envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(
+                null))
             : null;
     }
 
     @Transactional
-    private EnvelopeCase getEnvelopeCaseByDCN(SearchRequest searchRequest) {
+    private List<EnvelopeCase> getEnvelopeCaseByDCN(SearchRequest searchRequest) {
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
-        return payment.isPresent()
+        EnvelopeCase envelopeCase = payment.isPresent()
             ? envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null)
+            : null;
+        return StringUtils.isNotEmpty(envelopeCase.getCcdReference())
+            ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(null)
             : null;
     }
 }
