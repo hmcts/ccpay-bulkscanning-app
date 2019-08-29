@@ -248,7 +248,7 @@ public class PaymentServiceImpl implements PaymentService {
             ? envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null)
             : null;
         return StringUtils.isNotEmpty(envelopeCase.getCcdReference())
-            ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(null)
+            ? envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).orElse(null)
             : null;
     }
 }
