@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
         + "payment information contained in the envelope")})
 public class PaymentController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PaymentController.class);
     private final PaymentService paymentService;
 
     @Autowired
@@ -43,6 +46,7 @@ public class PaymentController {
     })
     @PostMapping("/bulk-scan-payments")
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
+        LOG.info("Request received from Bulk Scan Payment : " + bsPaymentRequest);
         PaymentResponse response = PaymentResponse.paymentResponseWith()
             .paymentDCNs(paymentService.saveInitialMetadataFromBs(bsPaymentRequest)
                              .getEnvelopePayments().stream()

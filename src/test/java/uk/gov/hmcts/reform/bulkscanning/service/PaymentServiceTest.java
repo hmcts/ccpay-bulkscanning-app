@@ -12,7 +12,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
@@ -74,6 +76,12 @@ public class PaymentServiceTest {
     private EnvelopeDtoMapper envelopeDtoMapper;
 
     @Autowired
+    private PaymentDtoMapper paymentDtoMapper;
+
+    @Autowired
+    private BulkScanPaymentRequestMapper bsPaymentRequestMapper;
+
+    @Autowired
     private BulkScanningUtils bulkScanningUtils;
 
     @Before
@@ -84,6 +92,8 @@ public class PaymentServiceTest {
                                                 envelopeRepository,
                                                 paymentMetadataDtoMapper,
                                                 envelopeDtoMapper,
+                                                paymentDtoMapper,
+                                                bsPaymentRequestMapper,
                                                 bulkScanningUtils,
                                                 envelopeCaseRepository);
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()

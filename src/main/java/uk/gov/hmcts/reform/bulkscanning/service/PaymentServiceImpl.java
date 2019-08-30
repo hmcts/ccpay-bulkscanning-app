@@ -43,9 +43,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final EnvelopeDtoMapper envelopeDtoMapper;
 
-    private PaymentDtoMapper paymentDtoMapper;
+    private final PaymentDtoMapper paymentDtoMapper;
 
-    private BulkScanPaymentRequestMapper bsPaymentRequestMapper;
+    private final BulkScanPaymentRequestMapper bsPaymentRequestMapper;
 
     private final BulkScanningUtils bulkScanningUtils;
 
@@ -55,6 +55,8 @@ public class PaymentServiceImpl implements PaymentService {
                               EnvelopeRepository envelopeRepository,
                               PaymentMetadataDtoMapper paymentMetadataDtoMapper,
                               EnvelopeDtoMapper envelopeDtoMapper,
+                              PaymentDtoMapper paymentDtoMapper,
+                              BulkScanPaymentRequestMapper bsPaymentRequestMapper,
                               BulkScanningUtils bulkScanningUtils,
                               EnvelopeCaseRepository envelopeCaseRepository) {
         this.paymentRepository = paymentRepository;
@@ -62,6 +64,8 @@ public class PaymentServiceImpl implements PaymentService {
         this.envelopeRepository = envelopeRepository;
         this.paymentMetadataDtoMapper = paymentMetadataDtoMapper;
         this.envelopeDtoMapper = envelopeDtoMapper;
+        this.paymentDtoMapper = paymentDtoMapper;
+        this.bsPaymentRequestMapper = bsPaymentRequestMapper;
         this.bulkScanningUtils = bulkScanningUtils;
         this.envelopeCaseRepository = envelopeCaseRepository;
     }
