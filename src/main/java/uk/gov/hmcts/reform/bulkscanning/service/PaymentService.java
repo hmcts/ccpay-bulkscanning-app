@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 
 public interface PaymentService {
 
-    void processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference);
+    Envelope processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference);
     SearchResponse retrieveByCCDReference(String ccdReference);
     SearchResponse retrieveByDcn(String documentControlNumber);
     PaymentMetadata getPaymentMetadata(String dcnReference);

@@ -4,6 +4,5 @@ public enum PaymentMethod {
 
     CHEQUE,
     POSTAL_ORDER,
-    OFFLINE,
     CASH
 }

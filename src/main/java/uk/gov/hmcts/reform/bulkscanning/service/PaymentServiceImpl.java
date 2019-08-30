@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,35 +31,43 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-    @Autowired
-    private PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
 
-    @Autowired
-    private PaymentMetadataRepository paymentMetadataRepository;
+    private final PaymentMetadataRepository paymentMetadataRepository;
 
-    @Autowired
-    private EnvelopeRepository envelopeRepository;
+    private final EnvelopeRepository envelopeRepository;
 
-    @Autowired
-    private EnvelopeCaseRepository envelopeCaseRepository;
+    private final EnvelopeCaseRepository envelopeCaseRepository;
 
-    @Autowired
-    private PaymentMetadataDtoMapper paymentMetadataDtoMapper;
+    private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
-    @Autowired
-    private EnvelopeDtoMapper envelopeDtoMapper;
+    private final EnvelopeDtoMapper envelopeDtoMapper;
 
-    @Autowired
     private PaymentDtoMapper paymentDtoMapper;
 
-    @Autowired
     private BulkScanPaymentRequestMapper bsPaymentRequestMapper;
 
+    private final BulkScanningUtils bulkScanningUtils;
+
     @Autowired
-    private BulkScanningUtils bulkScanningUtils;
+    public PaymentServiceImpl(PaymentRepository paymentRepository,
+                              PaymentMetadataRepository paymentMetadataRepository,
+                              EnvelopeRepository envelopeRepository,
+                              PaymentMetadataDtoMapper paymentMetadataDtoMapper,
+                              EnvelopeDtoMapper envelopeDtoMapper,
+                              BulkScanningUtils bulkScanningUtils,
+                              EnvelopeCaseRepository envelopeCaseRepository) {
+        this.paymentRepository = paymentRepository;
+        this.paymentMetadataRepository = paymentMetadataRepository;
+        this.envelopeRepository = envelopeRepository;
+        this.paymentMetadataDtoMapper = paymentMetadataDtoMapper;
+        this.envelopeDtoMapper = envelopeDtoMapper;
+        this.bulkScanningUtils = bulkScanningUtils;
+        this.envelopeCaseRepository = envelopeCaseRepository;
+    }
 
     @Override
-    public void processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
+    public Envelope processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
         //Insert Payment metadata in BSP DB
         createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(exelaPaymentRequest, dcnReference));
 
@@ -77,16 +84,19 @@ public class PaymentServiceImpl implements PaymentService {
                                                    .payments(payments)
                                                    .build());
             //Update payment status as incomplete
-            updateEnvelopePaymentStatus(envelope);
+            return updateEnvelopePaymentStatus(envelope);
         } else {
-            if (payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(INCOMPLETE.toString())) {
+            if (Optional.ofNullable(payment).isPresent()
+                    && Optional.ofNullable(payment.getEnvelope()).isPresent()
+                    && Optional.ofNullable(payment.getEnvelope().getPaymentStatus()).isPresent()
+                    && payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(INCOMPLETE.toString())) {
                 //07-08-2019 Update payment status as complete
                 payment.setPaymentStatus(COMPLETE.toString());
-                payment.setDateUpdated(LocalDateTime.now());
                 updatePayment(payment);
-                updateEnvelopePaymentStatus(payment.getEnvelope());
+                return updateEnvelopePaymentStatus(payment.getEnvelope());
             }
         }
+        return null;
     }
 
     @Override
@@ -200,7 +210,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     private PaymentMetadata createPaymentMetadata(PaymentMetadataDto paymentMetadataDto) {
         PaymentMetadata paymentMetadata = paymentMetadataDtoMapper.toPaymentEntity(paymentMetadataDto);
-
         return paymentMetadataRepository.save(paymentMetadata);
     }
 
