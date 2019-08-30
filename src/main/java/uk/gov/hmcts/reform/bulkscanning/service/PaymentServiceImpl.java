@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.bulkscanning.service;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final BulkScanningUtils bulkScanningUtils;
 
+    private static final Logger LOG = LoggerFactory.getLogger(PaymentServiceImpl.class);
+
     @Autowired
     public PaymentServiceImpl(PaymentRepository paymentRepository,
                               PaymentMetadataRepository paymentMetadataRepository,
@@ -72,14 +76,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Envelope processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
-        //Insert Payment metadata in BSP DB
+        LOG.info("Insert Payment metadata in Bulk Scan Payment DB");//
         createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(exelaPaymentRequest, dcnReference));
 
-        //Check for existing DCN in Payment Table Bulk Scan Pay DB,
+        LOG.info("Check for existing DCN in Payment Table Bulk Scan Pay DB");
         EnvelopePayment payment = getPaymentByDcnReference(dcnReference);
 
         if (null == payment) {
-            //Create new payment in BSP DB if envelope doesn't exists
+            LOG.info("Create new payment in BSP DB as envelope doesn't exists");
             List<PaymentDto> payments = new ArrayList<>();
             payments.add(paymentDtoMapper.fromRequest(exelaPaymentRequest, dcnReference));
 
@@ -87,14 +91,14 @@ public class PaymentServiceImpl implements PaymentService {
                                                    .paymentStatus(INCOMPLETE)
                                                    .payments(payments)
                                                    .build());
-            //Update payment status as incomplete
+            LOG.info("Update payment status as incomplete");
             return updateEnvelopePaymentStatus(envelope);
         } else {
             if (Optional.ofNullable(payment).isPresent()
                     && Optional.ofNullable(payment.getEnvelope()).isPresent()
                     && Optional.ofNullable(payment.getEnvelope().getPaymentStatus()).isPresent()
                     && payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(INCOMPLETE.toString())) {
-                //07-08-2019 Update payment status as complete
+                LOG.info("Update payment status as Complete");
                 payment.setPaymentStatus(COMPLETE.toString());
                 updatePayment(payment);
                 return updateEnvelopePaymentStatus(payment.getEnvelope());
@@ -190,6 +194,7 @@ public class PaymentServiceImpl implements PaymentService {
     private List<PaymentMetadata> getPaymentMetadataForEnvelopeCase(List<EnvelopeCase> envelopeCases) {
         List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
         if (Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()) {
+            LOG.info("No of Envelopes exists : " + envelopeCases.size());
             envelopeCases.stream().forEach(envelopeCase -> {
                 envelopeCase.getEnvelope().getEnvelopePayments().stream()
                     .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))

@@ -70,11 +70,14 @@ public class PaymentController {
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @PathVariable("document_control_number") String dcnReference,
         @Valid @RequestBody ExelaPaymentRequest exelaPaymentRequest) {
+        LOG.info("Request received from Exela with DCN : " + dcnReference + " Request : " + exelaPaymentRequest);
         try {
-            //Check in Payment metadata for already existing payment from Exela
+            LOG.info("Check in Payment metadata for already existing payment from Exela");
             if (Optional.ofNullable(paymentService.getPaymentMetadata(dcnReference)).isPresent()) {
+                LOG.info("Payment already exists for DCN: " + dcnReference);
                 return new ResponseEntity<>(HttpStatus.CONFLICT);
             } else {
+                LOG.info("Processing Payment for DCN: " + dcnReference);
                 paymentService.processPaymentFromExela(exelaPaymentRequest, dcnReference);
             }
             return new ResponseEntity<>(HttpStatus.OK);
@@ -127,11 +130,14 @@ public class PaymentController {
     })
     @GetMapping("/cases/{ccd_reference}")
     public ResponseEntity<SearchResponse> retrieveByCCD(@PathVariable("ccd_reference") String ccdReference) {
+        LOG.info("Retrieving payments for ccdReference : " + ccdReference);
         try {
             SearchResponse searchResponse = paymentService.retrieveByCCDReference(ccdReference);
             if (Optional.ofNullable(searchResponse).isPresent()) {
+                LOG.info("SearchResponse : " + searchResponse);
                 return new ResponseEntity<>(searchResponse, HttpStatus.OK);
             } else {
+                LOG.info("Payments Not found for ccdReference : " + ccdReference);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (Exception ex) {
@@ -147,11 +153,14 @@ public class PaymentController {
     @GetMapping("/cases")
     public ResponseEntity<SearchResponse> retrieveByDCN(@RequestParam(required = true, value = "document_control_number")
                                                             String documentControlNumber) {
+        LOG.info("Retrieving payments for documentControlNumber : " + documentControlNumber);
         try {
             SearchResponse searchResponse = paymentService.retrieveByDcn(documentControlNumber);
             if (Optional.ofNullable(searchResponse).isPresent()) {
+                LOG.info("SearchResponse : " + searchResponse);
                 return new ResponseEntity<>(searchResponse, HttpStatus.OK);
             } else {
+                LOG.info("Payments not found for documentControlNumber : " + documentControlNumber);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (Exception ex) {
