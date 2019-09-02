@@ -30,6 +30,7 @@ module "bulk-scanning-payment-api" {
   instance_size = "${local.sku_size}"
 
   app_settings = {
+    TEST="true"
     LOGBACK_REQUIRE_ALERT_LEVEL = "false"
     LOGBACK_REQUIRE_ERROR_CODE = "false"
     SPRING_DATASOURCE_USERNAME = "${module.ccpay-bulkscanning-payment-database.user_name}"
