@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -52,6 +53,7 @@ public class ExelaPaymentRequest {
     Date the payment was sent for banking.
      */
     @NotNull(message = "banked_date can't be Blank")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date bankedDate;
 
     @JsonProperty("outbound_batch_number")
