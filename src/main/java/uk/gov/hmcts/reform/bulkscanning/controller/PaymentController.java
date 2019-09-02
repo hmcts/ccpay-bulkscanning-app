@@ -18,12 +18,8 @@ import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -169,55 +165,5 @@ public class PaymentController {
         } catch (Exception ex) {
             throw new PaymentException(ex);
         }
-    }
-
-    @PostMapping("/bulk-scan-payments-load")
-    public ResponseEntity<Integer> loadBsPayments(@RequestBody BulkScanPaymentRequest bulkScanPaymentRequest,
-                                                  @RequestParam(value = "count") Integer count) {
-        String ccd = bulkScanPaymentRequest.getCcdCaseNumber();
-        List<String> dcnList = Arrays.asList(bulkScanPaymentRequest.getDocumentControlNumbers());
-        IntStream.range(0, count).forEach(i -> {
-            bulkScanPaymentRequest.setCcdCaseNumber(ccd + i);
-            List<String> dcns = new ArrayList<>();
-            for (String dcn : dcnList) {
-                dcns.add(dcn + i);
-            }
-            bulkScanPaymentRequest.setDocumentControlNumbers(dcns.toArray(new String[0]));
-            paymentService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
-        });
-        /*ExecutorService service = Executors.newFixedThreadPool(1);
-        IntStream.range(0, count)
-            .forEach(i -> service.submit(() -> {
-
-            }));*/
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PostMapping("/exela-payments-load")
-    public ResponseEntity<Integer> loadExelaPayments(@RequestBody ExelaPaymentRequest exelaPaymentRequest,
-                                                     @RequestParam(required = true, value = "DCN") String dcn,
-                                                     @RequestParam(required = true, value = "count") Integer count) {
-        String bgc = exelaPaymentRequest.getBankGiroCreditSlipNumber();
-        IntStream.range(0, count).forEach(i -> {
-            String tempDcn = dcn + i;
-            exelaPaymentRequest.setBankGiroCreditSlipNumber(bgc + i);
-            if (!Optional.ofNullable(paymentService.getPaymentMetadata(tempDcn)).isPresent()) {
-                paymentService.processPaymentFromExela(exelaPaymentRequest, tempDcn);
-            }
-        });
-        /*ExecutorService service = Executors.newFixedThreadPool(10);
-        IntStream.range(0, count)
-            .forEach(i -> service.submit(() -> {
-
-
-            }));*/
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    private int getRandomNumberInRange(int min, int max) {
-        int x = (int) (Math.random() * ((max - min) + 1)) + min;
-        return x;
     }
 }
