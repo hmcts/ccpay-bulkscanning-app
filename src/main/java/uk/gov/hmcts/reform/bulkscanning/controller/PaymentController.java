@@ -47,14 +47,12 @@ public class PaymentController {
     @PostMapping("/bulk-scan-payments")
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
         LOG.info("Request received from Bulk Scan Payment : " + bsPaymentRequest);
-        PaymentResponse response = PaymentResponse.paymentResponseWith()
-            .paymentDCNs(paymentService.saveInitialMetadataFromBs(bsPaymentRequest)
-                             .getEnvelopePayments().stream()
-                             .map(payment -> payment.getDcnReference())
-                             .collect(Collectors.toList()))
-            .build();
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(PaymentResponse.paymentResponseWith()
+                                        .paymentDcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest)
+                                                         .getEnvelopePayments().stream()
+                                                         .map(payment -> payment.getDcnReference())
+                                                         .collect(Collectors.toList()))
+                                        .build(), HttpStatus.CREATED);
     }
 
     @ApiOperation("This operation will be called after the banking "
@@ -151,7 +149,7 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases")
-    public ResponseEntity<SearchResponse> retrieveByDCN(@RequestParam(required = true, value = "document_control_number")
+    public ResponseEntity<SearchResponse> retrieveByDCN(@RequestParam(value = "document_control_number")
                                                             String documentControlNumber) {
         LOG.info("Retrieving payments for documentControlNumber : " + documentControlNumber);
         try {

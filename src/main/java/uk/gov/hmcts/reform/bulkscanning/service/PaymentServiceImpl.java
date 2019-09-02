@@ -75,6 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public Envelope processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
         LOG.info("Insert Payment metadata in Bulk Scan Payment DB");//
         createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(exelaPaymentRequest, dcnReference));
@@ -96,7 +97,6 @@ public class PaymentServiceImpl implements PaymentService {
         } else {
             if (Optional.ofNullable(payment).isPresent()
                     && Optional.ofNullable(payment.getEnvelope()).isPresent()
-                    && Optional.ofNullable(payment.getEnvelope().getPaymentStatus()).isPresent()
                     && payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(INCOMPLETE.toString())) {
                 LOG.info("Update payment status as Complete");
                 payment.setPaymentStatus(COMPLETE.toString());
@@ -222,8 +222,6 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentMetadataRepository.save(paymentMetadata);
     }
 
-
-
     @Transactional
     private Envelope updateEnvelopePaymentStatus(Envelope envelope) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
@@ -241,8 +239,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     private void updateEnvelopeStatus(Envelope envelope, PaymentStatus paymentStatus) {
         envelope.setPaymentStatus(paymentStatus.toString());
-        envelopeRepository.save(envelope);
         bulkScanningUtils.insertStatusHistoryAudit(envelope);
+        envelopeRepository.save(envelope);
     }
 
     @Transactional
