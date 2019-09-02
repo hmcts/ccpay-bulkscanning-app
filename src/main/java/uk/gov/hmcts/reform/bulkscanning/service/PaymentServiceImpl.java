@@ -163,7 +163,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public String updateCaseReferenceForExceptionRecord(String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest) {
-        //TODO yet to handle multiple envelopes with same exception reference scenario
         List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(
             exceptionRecordReference).
             orElseThrow(ExceptionRecordNotExistsException::new);
@@ -175,14 +174,26 @@ public class PaymentServiceImpl implements PaymentService {
             envelopeCases.stream().forEach(envelopeCase -> {
                 envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber());
             });
+
+            envelopeCaseRepository.saveAll(envelopeCases);
+            return envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString()).collect(Collectors.toList())
+                .stream().collect(Collectors.joining(","));
         }
-        return envelopeCaseRepository.save(envelopeCases.get(0)).getId().toString();
+
+        return "";
     }
 
     @Override
     @Transactional
     public String markPaymentAsProcessed(String dcn) {
-        return envelopeRepository.save(bulkScanningUtils.markPaymentAsProcessed(dcn)).getId().toString();
+        Envelope envelopeToMarkProcessed = bulkScanningUtils.markPaymentAsProcessed(dcn);
+
+        if (Optional.ofNullable(envelopeToMarkProcessed).isPresent()) {
+            envelopeRepository.save(bulkScanningUtils.markPaymentAsProcessed(dcn));
+            return dcn;
+        }
+
+        return null;
     }
 
     @Override

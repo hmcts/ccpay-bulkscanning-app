@@ -92,7 +92,7 @@ public class PaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "Provided exception reference doesn't exist"),
     })
-    @PutMapping("/bulk-scan-payments")
+    @PutMapping("/bulk-scan-cases")
     public ResponseEntity updateCaseReferenceForExceptionRecord(@NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
                                                                 @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
 
@@ -113,13 +113,15 @@ public class PaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "No record exists for provided DCN"),
     })
-    @PatchMapping("/bulk-scan-payments/{dcn}/process")
+    @PatchMapping("/bulk-scan-payments/{dcn}/PROCESS")
     public ResponseEntity markPaymentAsProcessed(@NotEmpty @PathVariable("dcn") String dcn) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
             .body(paymentService.markPaymentAsProcessed(dcn));
     }
+
+
 
     @ApiOperation("Case with unprocessed payments details by CCD Case Reference/Exception Record")
     @ApiResponses({
