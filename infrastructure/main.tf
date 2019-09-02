@@ -30,6 +30,7 @@ module "bulk-scanning-payment-api" {
   instance_size = "${local.sku_size}"
 
   app_settings = {
+    TEST="true"
     LOGBACK_REQUIRE_ALERT_LEVEL = "false"
     LOGBACK_REQUIRE_ERROR_CODE = "false"
     SPRING_DATASOURCE_USERNAME = "${module.ccpay-bulkscanning-payment-database.user_name}"
@@ -38,7 +39,7 @@ module "bulk-scanning-payment-api" {
 
   }
 }
-module "ccpay-bulkscanning-payent-database" {
+module "ccpay-bulkscanning-payment-database" {
   source = "git@github.com:hmcts/moj-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location_app}"
