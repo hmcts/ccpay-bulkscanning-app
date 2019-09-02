@@ -149,7 +149,7 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases")
-    public ResponseEntity<SearchResponse> retrieveByDCN(@RequestParam(value = "document_control_number")
+    public ResponseEntity<SearchResponse> retrieveByDCN(@RequestParam("document_control_number")
                                                             String documentControlNumber) {
         LOG.info("Retrieving payments for documentControlNumber : " + documentControlNumber);
         try {
