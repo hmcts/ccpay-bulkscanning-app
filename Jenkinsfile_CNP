@@ -20,5 +20,6 @@ withPipeline(type, product, app) {
     //enableDbMigration()
     enableDockerBuild()
     installCharts()
+    enableAksStagingDeployment()
     enableSlackNotifications('#cc-payments-tech')
 }
