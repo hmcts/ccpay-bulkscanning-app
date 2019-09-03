@@ -1,5 +1,11 @@
 java:
-  environment:
   # Don't modify below here
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  environment:
+    SPRING_LIQUIBASE_ENABLED: true
+    REFORM_SERVICE_NAME: ccpay-bulkscanning
+    REFORM_TEAM: ccpay
+
+postgresql:
+  enabled: true
