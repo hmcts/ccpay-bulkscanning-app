@@ -119,6 +119,7 @@ public class PaymentServiceImpl implements PaymentService {
             return SearchResponse.searchResponseWith()
                 .ccdReference(envelopeCases.get(0).getCcdReference())
                 .exceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference())
+                .responsibleServiceId(envelopeCases.get(0).getEnvelope().getResponsibleServiceId())
                 .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
                 .build();
         }
@@ -137,6 +138,7 @@ public class PaymentServiceImpl implements PaymentService {
             return SearchResponse.searchResponseWith()
                 .ccdReference(envelopeCases.get(0).getCcdReference())
                 .exceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference())
+                .responsibleServiceId(envelopeCases.get(0).getEnvelope().getResponsibleServiceId())
                 .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
                 .build();
         }
