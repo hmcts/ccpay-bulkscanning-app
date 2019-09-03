@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +30,8 @@ public class PaymentDtoMapper {
         }
     }
 
-    public PaymentDto fromRequest(PaymentRequest paymentRequest, String dcnReference) {
-        if(Optional.ofNullable(paymentRequest).isPresent()) {
+    public PaymentDto fromRequest(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
+        if(Optional.ofNullable(exelaPaymentRequest).isPresent()) {
             return PaymentDto.paymentDtoWith()
                 .dcnReference(dcnReference)
                 .paymentStatus(PaymentStatus.INCOMPLETE)

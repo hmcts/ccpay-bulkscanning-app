@@ -4,5 +4,5 @@ public enum PaymentStatus {
 
     COMPLETE,
     INCOMPLETE,
-    PROGRESSED
+    PROCESSED
 }

@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
-import uk.gov.hmcts.reform.bulkscanning.model.request.PaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,21 +38,21 @@ public class PaymentMetadataDtoMapper {
 
     }
 
-    public PaymentMetadataDto fromRequest(PaymentRequest paymentRequest, String dcnReference) {
-        if(Optional.ofNullable(paymentRequest).isPresent()) {
+    public PaymentMetadataDto fromRequest(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
+        if(Optional.ofNullable(exelaPaymentRequest).isPresent()) {
             return PaymentMetadataDto.paymentMetadataDtoWith()
                 .dcnReference(dcnReference)
-                .bgcReference(paymentRequest.getBankGiroCreditSlipNumber())
-                .amount(paymentRequest.getAmount())
-                .currency(Currency.valueOf(paymentRequest.getCurrency()))
-                .paymentMethod(PaymentMethod.valueOf(paymentRequest.getMethod()))
-                .dateBanked(localDateTimeToDate(paymentRequest.getBankedDate()))
-                .outboundBatchNumber(paymentRequest.getOutboundBatchNumber())
-                .dcnCase(paymentRequest.getDcnCase())
-                .caseReference(paymentRequest.getCaseReference())
-                .poBox(paymentRequest.getPoBox())
-                .firstChequeDcnInBatch(paymentRequest.getFirstChequeDcnInBatch())
-                .payerName(paymentRequest.getPayerName())
+                .bgcReference(exelaPaymentRequest.getBankGiroCreditSlipNumber())
+                .amount(exelaPaymentRequest.getAmount())
+                .currency(Currency.valueOf(exelaPaymentRequest.getCurrency()))
+                .paymentMethod(PaymentMethod.valueOf(exelaPaymentRequest.getMethod()))
+                .dateBanked(exelaPaymentRequest.getBankedDate())
+                .outboundBatchNumber(exelaPaymentRequest.getOutboundBatchNumber())
+                .dcnCase(exelaPaymentRequest.getDcnCase())
+                .caseReference(exelaPaymentRequest.getCaseReference())
+                .poBox(exelaPaymentRequest.getPoBox())
+                .firstChequeDcnInBatch(exelaPaymentRequest.getFirstChequeDcnInBatch())
+                .payerName(exelaPaymentRequest.getPayerName())
                 .build();
         }else {
             return null;

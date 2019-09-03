@@ -5,21 +5,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
 import javax.validation.constraints.NotNull;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonInclude(NON_NULL)
+@Builder(builderMethodName = "createPaymentRequestWith")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PaymentRequest {
+@JsonInclude(NON_NULL)
+public class ExelaPaymentRequest {
 
     /*
     Payment amount in GBP
@@ -50,7 +53,8 @@ public class PaymentRequest {
     Date the payment was sent for banking.
      */
     @NotNull(message = "banked_date can't be Blank")
-    private LocalDateTime bankedDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date bankedDate;
 
     @JsonProperty("outbound_batch_number")
     private String outboundBatchNumber;
