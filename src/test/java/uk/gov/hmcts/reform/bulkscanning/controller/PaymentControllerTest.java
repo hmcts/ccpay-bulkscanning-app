@@ -15,7 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
@@ -25,9 +29,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static uk.gov.hmcts.reform.bulkscanning.service.PaymentServiceTest.CCD_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonString;
 
 @RunWith(SpringRunner.class)
@@ -48,109 +55,6 @@ public class PaymentControllerTest {
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
-
-    /*@Test
-    public void testBulkScanningPaymentRequestFirst() throws Exception{
-        String dcn[] = {"DCN2"};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-5555"
-            ,dcn,"AA08");
-
-        //Post request
-        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(bulkScanPaymentRequest))
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isCreated())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-
-        Assert.assertNotNull(resultActions.andReturn().getResponse().getContentAsString());
-
-        //Post Repeat request
-        ResultActions repeatRequest = mockMvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(bulkScanPaymentRequest))
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isConflict())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-
-        Assert.assertTrue(StringUtils.containsIgnoreCase(repeatRequest.andReturn().getResponse().getContentAsString(),
-            BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST));
-
-        //PATCH Request
-        ResultActions patchRequest = mockMvc.perform(patch("/bulk-scan-payments/DCN2/process")
-            .header("ServiceAuthorization", "service")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-
-        Assert.assertNotNull(patchRequest.andReturn().getResponse().getContentAsString());
-
-        //DCN Not exists Request
-        ResultActions patchDCNNotExists = mockMvc.perform(patch("/bulk-scan-payments/DCN3/process")
-            .header("ServiceAuthorization", "service")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound())
-            .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-
-        Assert.assertTrue(StringUtils.containsIgnoreCase(patchDCNNotExists.andReturn().getResponse().getContentAsString(),
-            DCN_NOT_EXISTS));
-    }
-
-    @Test
-    @Transactional
-    public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
-        String dcn[] = {"DCN1"};
-        paymentService.saveInitialMetadataFromBs(createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08"));
-
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(createCaseReferenceRequest()))
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-
-        Assert.assertNotNull(resultActions.andReturn().getResponse().getContentAsString());
-
-    }
-
-    @Test
-    @Transactional
-    public void testExceptionRecordNotExists() throws Exception{
-
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=4444-3333-2222-111")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(createCaseReferenceRequest()))
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound())
-            .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-
-        Assert.assertTrue(StringUtils.containsIgnoreCase(resultActions.andReturn().getResponse().getContentAsString(),
-            EXCEPTION_RECORD_NOT_EXISTS));
-    }*/
-
-   /* @Test
-    @Transactional
-    public void testMarkPaymentAsProcessed() throws Exception{
-        String dcn[] = {"DCN1"};
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08");
-        bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
-
-        ResultActions resultActions = mvc.perform(patch("/bulk-scan-payments/DCN1/PROCESS")
-            .header("ServiceAuthorization", "service")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-
-        Assert.assertNotNull(resultActions.andReturn().getResponse().getContentAsString());
-
-    }*/
 
     public BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String dcn[], String responsibleServiceId) {
         return BulkScanPaymentRequest
@@ -212,11 +116,72 @@ public class PaymentControllerTest {
             .build();
     }
 
-    /*private CaseReferenceRequest createCaseReferenceRequest(){
-        return CaseReferenceRequest
-            .createCaseReferenceRequest()
+   //Test cases for Bulk Scan endpoints bulk scan
+   @Test
+   @Transactional
+   public void testCreatePaymentForBulkScan() throws Exception{
+       String dcn[] = {"DCN1","DCN2"};
+       BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
+           ,dcn,"AA08");
+
+       when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
+           .thenReturn(mockBulkScanningEnvelope());
+
+       ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
+           .header("ServiceAuthorization", "service")
+           .content(asJsonString(bulkScanPaymentRequest))
+           .contentType(MediaType.APPLICATION_JSON));
+       Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+   }
+
+    @Test
+    @Transactional
+    public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
+        CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber("CCN2")
             .build();
-    }*/
+
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-cases/?exception_reference=1111-2222-3333-4444")
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(caseReferenceRequest))
+            .contentType(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    @Transactional
+    public void testMarkPaymentAsProcessed() throws Exception{
+        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/DCN2/process")
+            .header("ServiceAuthorization", "service")
+            .contentType(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    public static Envelope mockBulkScanningEnvelope() {
+        Envelope bsEnvelope =  Envelope.envelopeWith().id(1).build();
+
+        EnvelopePayment payment1 = EnvelopePayment.paymentWith().id(1).dcnReference("dcn1").envelope(bsEnvelope).build();
+        EnvelopePayment payment2 = EnvelopePayment.paymentWith().id(2).dcnReference("dcn2").envelope(bsEnvelope).build();
+
+        List<EnvelopePayment> envelopePaymentList = new ArrayList<>();
+        envelopePaymentList.add(payment1);
+        envelopePaymentList.add(payment2);
+
+        EnvelopeCase envelopeCase = EnvelopeCase.caseWith().id(1).ccdReference(CCD_CASE_REFERENCE).envelope(bsEnvelope).build();
+
+        List<EnvelopeCase> envelopeCasesList = new ArrayList<>();
+        envelopeCasesList.add(envelopeCase);
+
+         bsEnvelope =  Envelope
+            .envelopeWith()
+            .id(1)
+            .envelopePayments(envelopePaymentList)
+            .envelopeCases(envelopeCasesList)
+            .build();
+
+
+
+        return bsEnvelope;
+    }
 
 }

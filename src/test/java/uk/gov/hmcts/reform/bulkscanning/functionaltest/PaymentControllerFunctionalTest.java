@@ -81,7 +81,7 @@ public class PaymentControllerFunctionalTest {
             BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST));
 
         //PATCH Request
-        ResultActions patchRequest = mvc.perform(patch("/bulk-scan-payments/DCN2/PROCESS")
+        ResultActions patchRequest = mvc.perform(patch("/bulk-scan-payments/DCN2/process")
             .header("ServiceAuthorization", "service")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -91,7 +91,7 @@ public class PaymentControllerFunctionalTest {
         Assert.assertNotNull(patchRequest.andReturn().getResponse().getContentAsString());
 
         //DCN Not exists Request
-        ResultActions patchDCNNotExists = mvc.perform(patch("/bulk-scan-payments/DCN3/PROCESS")
+        ResultActions patchDCNNotExists = mvc.perform(patch("/bulk-scan-payments/DCN3/process")
             .header("ServiceAuthorization", "service")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
@@ -153,7 +153,7 @@ public class PaymentControllerFunctionalTest {
             ,dcn,"AA08");
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
-        ResultActions resultActions = mvc.perform(patch("/bulk-scan-payments/DCN1/PROCESS")
+        ResultActions resultActions = mvc.perform(patch("/bulk-scan-payments/DCN1/process")
             .header("ServiceAuthorization", "service")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -164,7 +164,7 @@ public class PaymentControllerFunctionalTest {
 
     }
 
-    public BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String dcn[], String responsibleServiceId) {
+    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String dcn[], String responsibleServiceId) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)

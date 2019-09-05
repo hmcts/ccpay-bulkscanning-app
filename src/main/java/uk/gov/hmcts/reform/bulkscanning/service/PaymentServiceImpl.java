@@ -159,7 +159,11 @@ public class PaymentServiceImpl implements PaymentService {
 
         bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
         envelopeRepository.save(envelopeDB);
-        return envelopeRepository.findById(envelopeDB.getId()).get();
+
+        if (Optional.ofNullable(envelopeRepository.findById(envelopeDB.getId())).isPresent()) {
+            return envelopeRepository.findById(envelopeDB.getId()).get();
+        }
+        return null;
     }
 
     @Override
@@ -191,7 +195,7 @@ public class PaymentServiceImpl implements PaymentService {
         Envelope envelopeToMarkProcessed = bulkScanningUtils.markPaymentAsProcessed(dcn);
 
         if (Optional.ofNullable(envelopeToMarkProcessed).isPresent()) {
-            envelopeRepository.save(bulkScanningUtils.markPaymentAsProcessed(dcn));
+            envelopeRepository.save(envelopeToMarkProcessed);
             return dcn;
         }
 

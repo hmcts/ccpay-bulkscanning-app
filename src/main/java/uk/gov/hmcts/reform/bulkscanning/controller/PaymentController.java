@@ -113,7 +113,7 @@ public class PaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "No record exists for provided DCN"),
     })
-    @PatchMapping("/bulk-scan-payments/{dcn}/PROCESS")
+    @PatchMapping("/bulk-scan-payments/{dcn}/process")
     public ResponseEntity markPaymentAsProcessed(@NotEmpty @PathVariable("dcn") String dcn) {
         return ResponseEntity
             .status(HttpStatus.OK)
