@@ -21,9 +21,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
@@ -114,8 +112,10 @@ public class PaymentServiceImpl implements PaymentService {
                                                                              .ccdReference(ccdReference)
                                                                              .exceptionRecord(ccdReference)
                                                                              .build());
-        List<PaymentMetadata> paymentMetadataList = getPaymentMetadataForEnvelopeCase(envelopeCases);
-        if (!paymentMetadataList.isEmpty()) {
+        List<PaymentMetadata> paymentMetadataList = Optional.ofNullable(envelopeCases).isPresent()
+                                                        ? getPaymentMetadataForEnvelopeCase(envelopeCases)
+                                                        : null;
+        if (Optional.ofNullable(paymentMetadataList).isPresent() && !paymentMetadataList.isEmpty()) {
             return SearchResponse.searchResponseWith()
                 .ccdReference(envelopeCases.get(0).getCcdReference())
                 .exceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference())
@@ -133,8 +133,10 @@ public class PaymentServiceImpl implements PaymentService {
                                                                     .documentControlNumber(
                                                                         documentControlNumber)
                                                                     .build());
-        List<PaymentMetadata> paymentMetadataList = getPaymentMetadataForEnvelopeCase(envelopeCases);
-        if (!paymentMetadataList.isEmpty()) {
+        List<PaymentMetadata> paymentMetadataList = Optional.ofNullable(envelopeCases).isPresent()
+            ? getPaymentMetadataForEnvelopeCase(envelopeCases)
+            : null;
+        if (Optional.ofNullable(paymentMetadataList).isPresent() && !paymentMetadataList.isEmpty()) {
             return SearchResponse.searchResponseWith()
                 .ccdReference(envelopeCases.get(0).getCcdReference())
                 .exceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference())
@@ -159,8 +161,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
         envelopeRepository.save(envelopeDB);
-
-        if (Optional.ofNullable(envelopeRepository.findById(envelopeDB.getId())).isPresent()) {
+        if(envelopeRepository.findById(envelopeDB.getId()).isPresent()){
             return envelopeRepository.findById(envelopeDB.getId()).get();
         }
         return null;
@@ -211,7 +212,7 @@ public class PaymentServiceImpl implements PaymentService {
     private List<PaymentMetadata> getPaymentMetadataForEnvelopeCase(List<EnvelopeCase> envelopeCases) {
         List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
         if (Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()) {
-            LOG.info("No of Envelopes exists : " + envelopeCases.size());
+            LOG.info("No of Envelopes exists : {}", envelopeCases.size());
             envelopeCases.stream().forEach(envelopeCase -> {
                 envelopeCase.getEnvelope().getEnvelopePayments().stream()
                     .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
@@ -223,65 +224,63 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentMetadataList;
     }
 
-    @Transactional
     private EnvelopePayment getPaymentByDcnReference(String dcnReference) {
         return paymentRepository.findByDcnReference(dcnReference).orElse(null);
     }
 
-    @Transactional
     private EnvelopePayment updatePayment(EnvelopePayment payment) {
         return paymentRepository.save(payment);
     }
 
-    @Transactional
     private PaymentMetadata createPaymentMetadata(PaymentMetadataDto paymentMetadataDto) {
         PaymentMetadata paymentMetadata = paymentMetadataDtoMapper.toPaymentEntity(paymentMetadataDto);
         return paymentMetadataRepository.save(paymentMetadata);
     }
 
-    @Transactional
     private Envelope updateEnvelopePaymentStatus(Envelope envelope) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
-        Boolean isPaymentsInComplete = payments.stream().map(payment -> payment.getPaymentStatus())
-            .collect(Collectors.toList())
-            .contains(INCOMPLETE.toString());
-        if (isPaymentsInComplete) {
-            updateEnvelopeStatus(envelope, INCOMPLETE);
-        } else {
-            updateEnvelopeStatus(envelope, COMPLETE);
+        if(Optional.ofNullable(payments).isPresent()
+                && ! payments.isEmpty()){
+            Boolean isPaymentsInComplete = payments.stream().map(payment -> payment.getPaymentStatus())
+                .collect(Collectors.toList())
+                .contains(INCOMPLETE.toString());
+            if (isPaymentsInComplete) {
+                updateEnvelopeStatus(envelope, INCOMPLETE);
+            } else {
+                updateEnvelopeStatus(envelope, COMPLETE);
+            }
         }
         return envelope;
     }
 
-    @Transactional
     private void updateEnvelopeStatus(Envelope envelope, PaymentStatus paymentStatus) {
         envelope.setPaymentStatus(paymentStatus.toString());
         bulkScanningUtils.insertStatusHistoryAudit(envelope);
         envelopeRepository.save(envelope);
     }
 
-    @Transactional
     private Envelope createEnvelope(EnvelopeDto envelopeDto) {
         return envelopeRepository.save(envelopeDtoMapper.toEnvelopeEntity(envelopeDto));
     }
 
-    @Transactional
     private List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
         return StringUtils.isNotEmpty(searchRequest.getCcdReference())
             ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference())
             .orElse(envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(
                 null))
-            : null;
+            : Collections.emptyList();
     }
 
-    @Transactional
     private List<EnvelopeCase> getEnvelopeCaseByDCN(SearchRequest searchRequest) {
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
         EnvelopeCase envelopeCase = payment.isPresent()
             ? envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null)
             : null;
-        return StringUtils.isNotEmpty(envelopeCase.getCcdReference())
-            ? envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).orElse(null)
-            : null;
+        if(Optional.ofNullable(envelopeCase).isPresent() && StringUtils.isNotEmpty(envelopeCase.getCcdReference())){
+            if(envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()){
+                return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get();
+            }
+        }
+        return Collections.emptyList();
     }
 }
