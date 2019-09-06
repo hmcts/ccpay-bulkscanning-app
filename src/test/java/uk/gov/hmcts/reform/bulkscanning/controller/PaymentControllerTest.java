@@ -15,9 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
@@ -29,11 +31,15 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
 import static uk.gov.hmcts.reform.bulkscanning.service.PaymentServiceTest.CCD_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonString;
 
@@ -78,6 +84,37 @@ public class PaymentControllerTest {
     }
 
     @Test
+    public void testCreatePaymentFromExela_Conflict() throws Exception{
+
+        Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
+                                                                    .id(1).amount(BigDecimal.valueOf(100))
+                                                                    .dcnReference("111222333")
+                                                                    .dateBanked(LocalDateTime.now())
+                                                                    .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
+                                                                    .build());
+
+        when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/111222333")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .content(asJsonString(createPaymentRequest()))
+                                                          .contentType(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(Integer.valueOf(409), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testCreatePaymentFromExela_withException() throws Exception{
+
+        when(paymentService.getPaymentMetadata(any(String.class)))
+            .thenThrow(new PaymentException("Exception in fetching Metadata"));
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/111222333")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .content(asJsonString(createPaymentRequest()))
+                                                          .contentType(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(true, resultActions.andReturn().getResponse()
+            .getContentAsString().contains("Exception in fetching Metadata"));
+    }
+
+    @Test
     @Transactional
     public void testSearchPaymentWithCCD() throws Exception{
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
@@ -89,6 +126,28 @@ public class PaymentControllerTest {
                                                       .header("ServiceAuthorization", "service")
                                                         .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testSearchPaymentWithCCD_PaymentNotFound() throws Exception{
+        SearchResponse searchResponse = null;
+        when(paymentService.retrieveByCCDReference(any(String.class)))
+            .thenReturn(searchResponse);
+        ResultActions resultActions = mockMvc.perform(get("/cases/CCD123")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .accept(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(Integer.valueOf(404), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testSearchPaymentWithCCD_Exception() throws Exception{
+        when(paymentService.retrieveByCCDReference(any(String.class)))
+            .thenThrow(new PaymentException("Exception in fetching Payments"));
+        ResultActions resultActions = mockMvc.perform(get("/cases/CCD123")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .accept(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(true, resultActions.andReturn().getResponse()
+            .getContentAsString().contains("Exception in fetching Payments"));
     }
 
     @Test
@@ -104,6 +163,28 @@ public class PaymentControllerTest {
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testSearchPaymentWithDcn_PaymentNotFound() throws Exception{
+        SearchResponse searchResponse = null;
+        when(paymentService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
+        ResultActions resultActions = mockMvc.perform(get("/cases")
+                                                          .param("document_control_number", "DCN123")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .accept(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(Integer.valueOf(404), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testSearchPaymentWithDcn_Exception() throws Exception{
+        when(paymentService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
+        ResultActions resultActions = mockMvc.perform(get("/cases")
+                                                          .param("document_control_number", "DCN123")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .accept(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(true, resultActions.andReturn().getResponse()
+            .getContentAsString().contains("Exception in fetching Payments"));
     }
 
     private ExelaPaymentRequest createPaymentRequest() {
