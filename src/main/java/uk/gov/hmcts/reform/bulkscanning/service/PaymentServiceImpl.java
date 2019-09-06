@@ -276,10 +276,10 @@ public class PaymentServiceImpl implements PaymentService {
         EnvelopeCase envelopeCase = payment.isPresent()
             ? envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null)
             : null;
-        if(Optional.ofNullable(envelopeCase).isPresent() && StringUtils.isNotEmpty(envelopeCase.getCcdReference())){
-            if(envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()){
-                return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get();
-            }
+        if(Optional.ofNullable(envelopeCase).isPresent()
+            && StringUtils.isNotEmpty(envelopeCase.getCcdReference())
+            && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()){
+            return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get();
         }
         return Collections.emptyList();
     }
