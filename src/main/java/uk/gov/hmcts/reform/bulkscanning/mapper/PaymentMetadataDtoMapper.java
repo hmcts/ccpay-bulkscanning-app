@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.*;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.dateToLocalDateTime;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDate;
 
 @Component
 public class PaymentMetadataDtoMapper {
