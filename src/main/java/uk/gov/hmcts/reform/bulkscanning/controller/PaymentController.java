@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
@@ -113,12 +114,13 @@ public class PaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "No record exists for provided DCN"),
     })
-    @PatchMapping("/bulk-scan-payments/{dcn}/process")
-    public ResponseEntity markPaymentAsProcessed(@NotEmpty @PathVariable("dcn") String dcn) {
+    @PatchMapping("/bulk-scan-payments/{dcn}/status/{status}")
+    public ResponseEntity markPaymentAsProcessed(@NotEmpty @PathVariable("dcn") String dcn,
+                                                 @NotEmpty @PathVariable("status") PaymentStatus status) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(paymentService.markPaymentAsProcessed(dcn));
+            .body(paymentService.updatePaymentStatus(dcn, status));
     }
 
 

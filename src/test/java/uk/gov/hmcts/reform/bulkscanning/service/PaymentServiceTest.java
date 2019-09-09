@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
@@ -259,12 +260,12 @@ public class PaymentServiceTest {
         envelopePayment.setEnvelope(mockBulkScanningEnvelope());
 
         doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference(DCN_REFERENCE);
-        Assert.assertEquals(DCN_REFERENCE,paymentService.markPaymentAsProcessed(DCN_REFERENCE));
+        Assert.assertEquals(DCN_REFERENCE,paymentService.updatePaymentStatus(DCN_REFERENCE, PaymentStatus.PROCESSED));
     }
 
     @Test(expected = DcnNotExistsException.class)
     @Transactional
     public void testDcnDoesNotExistExceptionPayment() throws Exception {
-        paymentService.markPaymentAsProcessed(CCD_CASE_REFERENCE_NOT_PRESENT);
+        paymentService.updatePaymentStatus(CCD_CASE_REFERENCE_NOT_PRESENT, PaymentStatus.PROCESSED);
     }
 }

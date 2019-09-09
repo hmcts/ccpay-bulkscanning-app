@@ -232,7 +232,7 @@ public class PaymentControllerTest {
     @Test
     @Transactional
     public void testMarkPaymentAsProcessed() throws Exception{
-        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/DCN2/process")
+        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/DCN2/status/PROCESSED")
             .header("ServiceAuthorization", "service")
             .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.service;
 
 import uk.gov.hmcts.reform.bulkscanning.model.entity.*;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
@@ -14,6 +15,6 @@ public interface PaymentService {
     PaymentMetadata getPaymentMetadata(String dcnReference);
     Envelope saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest);
     String updateCaseReferenceForExceptionRecord (String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest);
-    String markPaymentAsProcessed(String dcn);
+    String updatePaymentStatus(String dcn, PaymentStatus status);
 
 }

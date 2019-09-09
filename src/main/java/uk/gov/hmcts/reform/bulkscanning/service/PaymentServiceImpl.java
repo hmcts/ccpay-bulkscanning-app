@@ -192,11 +192,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public String markPaymentAsProcessed(String dcn) {
-        Envelope envelopeToMarkProcessed = bulkScanningUtils.markPaymentAsProcessed(dcn);
+    public String updatePaymentStatus(String dcn, PaymentStatus status) {
+        Envelope envelope = bulkScanningUtils.updatePaymentStatus(dcn, status);
 
-        if (Optional.ofNullable(envelopeToMarkProcessed).isPresent()) {
-            envelopeRepository.save(envelopeToMarkProcessed);
+        if (Optional.ofNullable(envelope).isPresent()) {
+            envelopeRepository.save(envelope);
             return dcn;
         }
 
