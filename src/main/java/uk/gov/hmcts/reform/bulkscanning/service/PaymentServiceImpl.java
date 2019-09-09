@@ -264,22 +264,25 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
-        return StringUtils.isNotEmpty(searchRequest.getCcdReference())
-            ? envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference())
-            .orElse(envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(
-                null))
-            : Collections.emptyList();
+        if(StringUtils.isNotEmpty(searchRequest.getCcdReference())
+            || StringUtils.isNotEmpty(searchRequest.getExceptionRecord())){
+            return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference())
+                .orElse(envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(
+                    null));
+        }
+        return Collections.emptyList();
     }
 
     private List<EnvelopeCase> getEnvelopeCaseByDCN(SearchRequest searchRequest) {
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
-        EnvelopeCase envelopeCase = payment.isPresent()
-            ? envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null)
-            : null;
-        if(Optional.ofNullable(envelopeCase).isPresent()
-            && StringUtils.isNotEmpty(envelopeCase.getCcdReference())
-            && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()){
-            return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get();
+        if(payment.isPresent()
+            && Optional.ofNullable(payment.get().getEnvelope()).isPresent()){
+            EnvelopeCase envelopeCase = envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(null);
+            if(Optional.ofNullable(envelopeCase).isPresent()){
+                searchRequest.setCcdReference(envelopeCase.getCcdReference());
+                searchRequest.setExceptionRecord(envelopeCase.getExceptionRecordReference());
+                return this.getEnvelopeCaseByCCDReference(searchRequest);
+            }
         }
         return Collections.emptyList();
     }
