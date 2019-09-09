@@ -211,7 +211,7 @@ public class PaymentServiceTest {
         String dcn[] = {"DCN1"};
         doReturn(Optional.ofNullable(mockBulkScanningEnvelope())).when(envelopeRepository).findById(null);
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
-            ,dcn,"AA08");
+            ,dcn,"AA08", true);
 
         Envelope envelopeMock = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
         Assert.assertEquals(1,envelopeMock.getId().intValue());
@@ -227,7 +227,7 @@ public class PaymentServiceTest {
         envelopePayment.setEnvelope(mockBulkScanningEnvelope());
         doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference("DCN1");
 
-        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE,dcn,"AA08");
+        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE,dcn,"AA08", true);
         paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
     }
 

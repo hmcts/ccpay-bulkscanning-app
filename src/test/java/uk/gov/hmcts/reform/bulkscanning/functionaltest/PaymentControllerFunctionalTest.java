@@ -14,6 +14,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
@@ -24,6 +27,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonString;
 
@@ -44,6 +50,12 @@ public class PaymentControllerFunctionalTest {
 
     CaseReferenceRequest caseReferenceRequest;
 
+    @Autowired
+    PaymentRepository paymentRepository;
+
+    @Autowired
+    EnvelopeRepository envelopeRepository;
+
     @Before
     @Transactional
     public void setUp() {
@@ -57,7 +69,7 @@ public class PaymentControllerFunctionalTest {
     public void testBulkScanningPaymentRequestFirst() throws Exception{
         String dcn[] = {"DCN2"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-5555"
-            ,dcn,"AA08");
+            ,dcn,"AA08", true);
 
         //Post request
         ResultActions resultActions = mvc.perform(post("/bulk-scan-payments")
@@ -110,11 +122,11 @@ public class PaymentControllerFunctionalTest {
 
         //Multiple envelopes with same exception record
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08");
+            ,dcn,"AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn2,"AA08");
+            ,dcn2,"AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         ResultActions resultActions = mvc.perform(put("/bulk-scan-cases/?exception_reference=1111-2222-3333-4444")
@@ -150,7 +162,7 @@ public class PaymentControllerFunctionalTest {
     public void testMarkPaymentAsProcessed() throws Exception{
         String dcn[] = {"DCN1"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08");
+            ,dcn,"AA08", false);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         ResultActions resultActions = mvc.perform(patch("/bulk-scan-payments/DCN1/process")
@@ -164,13 +176,114 @@ public class PaymentControllerFunctionalTest {
 
     }
 
-    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String dcn[], String responsibleServiceId) {
+    @Test
+    public void testMatchingPaymentsFromExcelaBulkScan() throws Exception{
+
+        //Request from Exela with one DCN
+        String dcn[] = {"1111-2222-4444-5555"};
+        mvc.perform(put("/bulk-scan-payments/1111-2222-4444-5555")
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(createPaymentRequest()))
+            .contentType(MediaType.APPLICATION_JSON));
+
+        //Request from bulk scan with one DCN
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+            ,dcn,"AA08", true);
+
+        //Post request
+        mvc.perform(post("/bulk-scan-payments")
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(bulkScanPaymentRequest))
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+        //Complete payment
+        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-4444-5555").get().getPaymentStatus()
+            , COMPLETE.toString());
+
+        //Complete envelope
+        Envelope finalEnvelope = envelopeRepository.findAll().iterator().next();
+        Assert.assertEquals(finalEnvelope.getPaymentStatus()
+            , COMPLETE.toString());
+    }
+
+
+    @Test
+    public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception{
+
+        //Request from Exela with one DCN
+        String dcn[] = {"1111-2222-3333-6666","1111-2222-3333-7777"};
+        mvc.perform(put("/bulk-scan-payments/1111-2222-3333-6666")
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(createPaymentRequest()))
+            .contentType(MediaType.APPLICATION_JSON));
+
+        //Request from bulk scan with two DCN
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+            ,dcn,"AA08", true);
+
+        //Post request
+        mvc.perform(post("/bulk-scan-payments")
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(bulkScanPaymentRequest))
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+        //Complete payment
+        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-6666").get().getPaymentStatus()
+            , COMPLETE.toString());
+
+        //Non Complete Payment
+        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-7777").get().getPaymentStatus()
+            , INCOMPLETE.toString());
+    }
+
+
+
+    @Test
+    public void testMatchingBulkScanFirstThenExela() throws Exception{
+        //Request from Bulk Scan with one DCN
+        String dcn[] = {"1111-2222-3333-8888","1111-2222-3333-9999"};
+
+        //Request from bulk scan with two DCN
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+            ,dcn,"AA08", true);
+
+        //Post request
+        mvc.perform(post("/bulk-scan-payments")
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(bulkScanPaymentRequest))
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+
+        mvc.perform(put("/bulk-scan-payments/1111-2222-3333-8888")
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(createPaymentRequest()))
+            .contentType(MediaType.APPLICATION_JSON));
+
+
+
+        //Complete payment
+        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-8888").get().getPaymentStatus()
+            , COMPLETE.toString());
+
+        //Non Complete Payment
+        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-9999").get().getPaymentStatus()
+            , INCOMPLETE.toString());
+
+    }
+
+    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
             .documentControlNumbers(dcn)
             .responsibleServiceId(responsibleServiceId)
-            .isExceptionRecord(true)
+            .isExceptionRecord(isExceptionRecord)
             .build();
     }
 

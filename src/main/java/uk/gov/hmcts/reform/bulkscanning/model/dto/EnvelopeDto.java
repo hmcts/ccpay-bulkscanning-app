@@ -28,7 +28,6 @@ public class EnvelopeDto {
     private ResponsibleService responsibleService;
     private PaymentStatus paymentStatus;
     private List<PaymentDto> payments;
-    private List<CaseDto> cases;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
     private Date dateCreated;

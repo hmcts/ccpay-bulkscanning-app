@@ -187,7 +187,7 @@ public class PaymentControllerTest {
             .getContentAsString().contains("Exception in fetching Payments"));
     }
 
-    private ExelaPaymentRequest createPaymentRequest() {
+    public static ExelaPaymentRequest createPaymentRequest() {
         return ExelaPaymentRequest.createPaymentRequestWith()
             .amount(BigDecimal.valueOf(100.00))
             .bankedDate(new Date())

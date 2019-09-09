@@ -199,7 +199,8 @@ dependencies {
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
-  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+  testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.4.0'
   testCompile group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
 
