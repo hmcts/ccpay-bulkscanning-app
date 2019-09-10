@@ -2,7 +2,7 @@ spring:
   cloud:
     propertiesvolume:
       prefixed: false
-      enables: true
+      enabled: true
       paths: /mnt/secrets/ccpay
       aliases:
         bulkscanning-api-POSTGRES-PASS: POSTGRES_PASSWORD
