@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    propertiesvolume:
+      prefixed: false
+      enables: true
+      paths: /mnt/secrets/ccpay
+      aliases:
+        bulkscanning-api-POSTGRES-PASS: POSTGRES_PASSWORD
+        AppInsightsInstrumentationKey: azure.app_insights_key
