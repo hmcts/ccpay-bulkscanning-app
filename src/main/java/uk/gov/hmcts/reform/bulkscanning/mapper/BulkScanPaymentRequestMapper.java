@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.Boolean.TRUE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @Component
@@ -28,7 +29,7 @@ public class BulkScanPaymentRequestMapper {
 
         List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
 
-        if (bsPaymentRequest.getIsExceptionRecord()) {
+        if (TRUE.equals(bsPaymentRequest.getIsExceptionRecord())) {
             //If exception reference is present update exception reference field
             envelopeCaseList.add(EnvelopeCase.caseWith().exceptionRecordReference(bsPaymentRequest.getCcdCaseNumber()).build());
         } else {

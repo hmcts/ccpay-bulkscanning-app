@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESSED;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST;
 
 @Component
@@ -31,10 +30,10 @@ public class BulkScanningUtils {
     @Autowired
     StatusHistoryRepository statusHistoryRepository;
 
-    public Envelope markPaymentAsProcessed(String dcn) {
+    public Envelope updatePaymentStatus(String dcn, PaymentStatus status) {
         if (Optional.ofNullable(dcn).isPresent()) {
             EnvelopePayment envelopePayment = paymentRepository.findByDcnReference(dcn).orElseThrow(DcnNotExistsException::new);
-            envelopePayment.setPaymentStatus(PROCESSED.toString());
+            envelopePayment.setPaymentStatus(status.toString());
             return envelopePayment.getEnvelope();
         }
         return null;

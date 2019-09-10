@@ -23,5 +23,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class SearchResponse implements Serializable {
     private String ccdReference;
     private String exceptionRecordReference;
+    private String responsibleServiceId;
     private List<PaymentMetadataDto> payments;
 }
