@@ -35,6 +35,7 @@ module "bulk-scanning-payment-api" {
     LOGBACK_REQUIRE_ERROR_CODE = "false"
     POSTGRES_USERNAME = "${module.ccpay-bulkscanning-payment-database.user_name}"
     POSTGRES_PASSWORD = "${module.ccpay-bulkscanning-payment-database.postgresql_password}"
+    SPRING_DATASOURCE_URL = "jdbc:postgresql://${module.ccpay-bulkscanning-payment-database.host_name}:${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}/${module.ccpay-bulkscanning-payment-database.postgresql_database}?sslmode=require"
   }
 }
 module "ccpay-bulkscanning-payment-database" {
