@@ -6,7 +6,7 @@ java:
   environment:
     POSTGRES_HOST: ccpay-bulkscanning-api-postgres-db-aat.postgres.database.azure.com
     POSTGRES_NAME: bspayment
-    POSTGRES_USER: bspayment
+    POSTGRES_USERNAME: bspayment@ccpay-bulkscanning-api-postgres-db-aat
     SPRING_LIQUIBASE_ENABLED: false
   keyVaults:
     "ccpay":

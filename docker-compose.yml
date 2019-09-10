@@ -33,9 +33,9 @@ services:
     container_name: ccpay-bulkscanning-db
     image: hmcts/ccpay-bulkscanning-db
     environment:
-      - POSTGRES_USER=bspayment
-      - POSTGRES_PASSWORD=bspayment
-      - POSTGRES_DB=bspayment
+      - POSTGRES_USERNAME=bulk-scanning
+      - POSTGRES_PASSWORD=bulk-scanning
+      - POSTGRES_DB=bulk-scanning
     ports:
       - 5182:5432
     volumes:
