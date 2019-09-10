@@ -16,7 +16,7 @@ def app = "bulkscanning-api"
 
 withPipeline(type, product, app) {
     //setVaultName('ccpay')
-    loadVaultSecrets(secrets)
+    //loadVaultSecrets(secrets)
     enableDbMigration('ccpay')
     enableDockerBuild()
     installCharts()
