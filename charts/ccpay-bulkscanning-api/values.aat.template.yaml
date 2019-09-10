@@ -3,6 +3,16 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   aadIdentityName: ccpay
+  environment:
+    POSTGRES_HOST: ccpay-bulkscanning-api-postgres-db-aat.postgres.database.azure.com
+    POSTGRES_NAME: bspayment
+    POSTGRES_USER: bspayment@ccpay-bulkscanning-api-postgres-db-aat
+    POSTGRES_PORT: 5432
+    LOGBACK_REQUIRE_ALERT_LEVEL: 'false'
+    LOGBACK_REQUIRE_ERROR_CODE: 'false'
+    REFORM_SERVICE_NAME: ccpay-bulkscanning
+    REFORM_TEAM: ccpay
+    SPRING_LIQUIBASE_ENABLED: true
   keyVaults:
     "ccpay":
       resourceGroup: ccpay
