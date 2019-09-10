@@ -3,8 +3,9 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   aadIdentityName: ccpay
-keyVaults:
-  "ccpay":
-    resourceGroup: ccpay
-    secrets:
-      - AppInsightsInstrumentationKey
+  keyVaults:
+    "ccpay":
+      resourceGroup: ccpay
+      secrets:
+        - bulkscanning-api-POSTGRES-PASS
+        - AppInsightsInstrumentationKey
