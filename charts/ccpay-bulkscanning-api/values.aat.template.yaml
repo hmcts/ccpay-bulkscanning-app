@@ -3,6 +3,10 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   aadIdentityName: ccpay
+  environment:
+    POSTGRES_HOST: ccpay-bulkscanning-api-postgres-db-aat.postgres.database.azure.com
+    POSTGRES_NAME: bspayment
+    POSTGRES_USER: bspayment@ccpay-bulkscanning-api-postgres-db-aat
   keyVaults:
     "ccpay":
       resourceGroup: ccpay
