@@ -165,6 +165,7 @@ public class PaymentController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (Exception ex) {
+            LOG.info("Exception ", ex);
             throw new PaymentException(ex);
         }
     }
