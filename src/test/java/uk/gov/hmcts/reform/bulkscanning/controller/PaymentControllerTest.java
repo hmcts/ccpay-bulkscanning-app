@@ -197,7 +197,7 @@ public class PaymentControllerTest {
             .build();
     }
 
-   //Test cases for Bulk Scan endpoints bulk scan
+   //Test cases for Bulk Scan endpoints bulk scan.
    @Test
    @Transactional
    public void testCreatePaymentForBulkScan() throws Exception{
