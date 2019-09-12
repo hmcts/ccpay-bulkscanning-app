@@ -40,7 +40,7 @@ public class PaymentController {
     @ApiOperation(value = "Get the initial meta data from bulk Scanning",
         notes = "Get the initial meta data from bulk Scanning")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Bulk Scanning Data retrieved"),
+        @ApiResponse(code = 201, message = "Bulk Scanning Data retrieved"),
         @ApiResponse(code = 400, message = "Bad request"),
         @ApiResponse(code = 401, message = "Failed authentication"),
         @ApiResponse(code = 403, message = "Failed authorization")
@@ -93,7 +93,7 @@ public class PaymentController {
         @ApiResponse(code = 403, message = "Failed authorisation"),
         @ApiResponse(code = 404, message = "Provided exception reference doesn't exist"),
     })
-    @PutMapping("/bulk-scan-cases")
+    @PutMapping("/bulk-scan-payments")
     public ResponseEntity updateCaseReferenceForExceptionRecord(@NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
                                                                 @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
 

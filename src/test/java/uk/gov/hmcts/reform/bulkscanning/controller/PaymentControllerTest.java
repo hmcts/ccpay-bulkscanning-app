@@ -222,7 +222,7 @@ public class PaymentControllerTest {
             .ccdCaseNumber("CCN2")
             .build();
 
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-cases/?exception_reference=1111-2222-3333-4444")
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(caseReferenceRequest))
             .contentType(MediaType.APPLICATION_JSON));

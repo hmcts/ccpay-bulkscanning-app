@@ -129,7 +129,7 @@ public class PaymentControllerFunctionalTest {
             ,dcn2,"AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
-        ResultActions resultActions = mvc.perform(put("/bulk-scan-cases/?exception_reference=1111-2222-3333-4444")
+        ResultActions resultActions = mvc.perform(put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(caseReferenceRequest))
             .contentType(MediaType.APPLICATION_JSON))
@@ -145,7 +145,7 @@ public class PaymentControllerFunctionalTest {
     @Transactional
     public void testExceptionRecordNotExists() throws Exception{
 
-        ResultActions resultActions = mvc.perform(put("/bulk-scan-cases/?exception_reference=4444-3333-2222-111")
+        ResultActions resultActions = mvc.perform(put("/bulk-scan-payments/?exception_reference=4444-3333-2222-111")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(caseReferenceRequest))
             .contentType(MediaType.APPLICATION_JSON))
