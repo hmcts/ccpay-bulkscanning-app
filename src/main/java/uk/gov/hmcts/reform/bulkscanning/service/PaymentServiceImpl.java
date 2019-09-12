@@ -93,8 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
             LOG.info("Update payment status as incomplete");
             return updateEnvelopePaymentStatus(envelope);
         } else {
-            if (Optional.ofNullable(payment).isPresent()
-                    && Optional.ofNullable(payment.getEnvelope()).isPresent()
+            if (Optional.ofNullable(payment.getEnvelope()).isPresent()
                     && payment.getEnvelope().getPaymentStatus().equalsIgnoreCase(INCOMPLETE.toString())) {
                 LOG.info("Update payment status as Complete");
                 payment.setPaymentStatus(COMPLETE.toString());
@@ -156,13 +155,16 @@ public class PaymentServiceImpl implements PaymentService {
 
         //if we have envelope already in BS
         if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
+            LOG.info("Existing envelope found for Bulk Scan request");
             bulkScanningUtils.handlePaymentStatus(envelopeDB, envelopeNew);
         }
 
         bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
         envelopeRepository.save(envelopeDB);
-        if(envelopeRepository.findById(envelopeDB.getId()).isPresent()){
-            return envelopeRepository.findById(envelopeDB.getId()).get();
+
+        Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
+        if(envelope.isPresent()){
+            return envelope.get();
         }
         return null;
     }
