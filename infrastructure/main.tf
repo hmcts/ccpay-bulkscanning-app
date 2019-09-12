@@ -13,42 +13,60 @@ locals {
 
 }
 
+resource "azurerm_resource_group" "rg" {
+  name     = "${var.product}-${var.component}-${var.env}"
+  location = "${var.location}"
+
+  tags = "${var.common_tags}"
+}
+
+resource "azurerm_application_insights" "appinsights" {
+  name                = "${var.product}-${var.component}-appinsights-${var.env}"
+  location            = "${var.appinsights_location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  application_type    = "Web"
+
+  tags = "${var.common_tags}"
+}
+
 module "bulk-scanning-payment-api" {
-  source = "git@github.com:hmcts/cnp-module-webapp?ref=master"
-  product = "${var.product}-${var.component}"
-  location = "${var.location_app}"
-  env = "${var.env}"
-  ilbIp = "${var.ilbIp}"
-  subscription = "${var.subscription}"
-  capacity = "${var.capacity}"
-  common_tags = "${var.common_tags}"
-  appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
+  source              = "git@github.com:hmcts/cnp-module-webapp?ref=master"
+  enable_ase          = "${var.enable_ase}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  product             = "${var.product}-${var.component}"
+  location            = "${var.location}"
+  env                 = "${var.env}"
+  ilbIp               = "${var.ilbIp}"
+  subscription        = "${var.subscription}"
+  capacity            = "${var.capacity}"
+  common_tags         = "${var.common_tags}"
+  
   appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
 
-  asp_name = "${local.asp_name}"
-  asp_rg = "${local.asp_name}"
+  asp_name      = "${local.asp_name}"
+  asp_rg        = "${local.asp_name}"
   instance_size = "${local.sku_size}"
 
   app_settings = {
     TEST="true"
     LOGBACK_REQUIRE_ALERT_LEVEL = "false"
-    LOGBACK_REQUIRE_ERROR_CODE = "false"
-    SPRING_DATASOURCE_USERNAME = "${module.ccpay-bulkscanning-payment-database.user_name}"
-    SPRING_DATASOURCE_PASSWORD = "${module.ccpay-bulkscanning-payment-database.postgresql_password}"
-    SPRING_DATASOURCE_URL = "jdbc:postgresql://${module.ccpay-bulkscanning-payment-database.host_name}:${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}/${module.ccpay-bulkscanning-payment-database.postgresql_database}?sslmode=require"
+    LOGBACK_REQUIRE_ERROR_CODE  = "false"
+    SPRING_DATASOURCE_USERNAME  = "${module.ccpay-bulkscanning-payment-database.user_name}"
+    SPRING_DATASOURCE_PASSWORD  = "${module.ccpay-bulkscanning-payment-database.postgresql_password}"
+    SPRING_DATASOURCE_URL       = "jdbc:postgresql://${module.ccpay-bulkscanning-payment-database.host_name}:${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}/${module.ccpay-bulkscanning-payment-database.postgresql_database}?sslmode=require"
   }
 }
 module "ccpay-bulkscanning-payment-database" {
-  source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product = "${var.product}-${var.component}-postgres-db"
-  location = "${var.location_app}"
-  subscription = "${var.subscription}"
-  env = "${var.env}"
+  source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
+  product         = "${var.product}-${var.component}-postgres-db"
+  location        = "${var.location}"
+  subscription    = "${var.subscription}"
+  env             = "${var.env}"
   postgresql_user = "${var.postgresql_user}"
-  database_name = "${var.database_name}"
-  sku_name = "GP_Gen5_2"
-  sku_tier = "GeneralPurpose"
-  common_tags = "${var.common_tags}"
+  database_name   = "${var.database_name}"
+  sku_name        = "GP_Gen5_2"
+  sku_tier        = "GeneralPurpose"
+  common_tags     = "${var.common_tags}"
 }
 
 # Populate Vault with DB info

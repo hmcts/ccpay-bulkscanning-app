@@ -9,7 +9,7 @@ variable "component" {
 
 }
 
-variable "location_app" {
+variable "location" {
   type    = "string"
   default = "UK South"
 }
@@ -40,4 +40,13 @@ variable "database_name" {
 variable "postgresql_user" {
   type    = "string"
   default = "bspayment"
+}
+
+variable "enable_ase" {
+  default = true
+}
+variable "appinsights_location" {
+  type        = "string"
+  default     = "West Europe"
+  description = "Location for Application Insights"
 }
