@@ -267,10 +267,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     private List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
         if(StringUtils.isNotEmpty(searchRequest.getCcdReference())
-            || StringUtils.isNotEmpty(searchRequest.getExceptionRecord())){
-            return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference())
-                .orElse(envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(
-                    null));
+            && envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).isPresent()){
+            return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).get();
+        }else if(StringUtils.isNotEmpty(searchRequest.getExceptionRecord())){
+            return envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).get();
         }
         return Collections.emptyList();
     }
