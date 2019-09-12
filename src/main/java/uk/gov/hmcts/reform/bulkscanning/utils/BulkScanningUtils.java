@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.bulkscanning.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
@@ -11,7 +13,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.StatusHistoryRepository;
+import uk.gov.hmcts.reform.bulkscanning.service.PaymentServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +26,10 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.BULK_
 @Component
 public class BulkScanningUtils {
 
-    @Autowired
-    PaymentRepository paymentRepository;
+    private static final Logger LOG = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     @Autowired
-    StatusHistoryRepository statusHistoryRepository;
+    PaymentRepository paymentRepository;
 
     public Envelope updatePaymentStatus(String dcn, PaymentStatus status) {
         if (Optional.ofNullable(dcn).isPresent()) {
@@ -98,6 +99,7 @@ public class BulkScanningUtils {
 
         if (Optional.ofNullable(listOfExistingDCN).isPresent() && !listOfExistingDCN.isEmpty()) {
             //update DCN Status to complete if already present
+            LOG.info("List of existing DCN payments: {}", listOfExistingDCN.size());
             envelopeDB.getEnvelopePayments().stream().filter(envelopePayment ->
                 isDCNAlreadyExists(listOfExistingDCN, envelopePayment))
                 .forEach(envelopePayment -> envelopePayment.setPaymentStatus(COMPLETE.toString()));
@@ -105,6 +107,7 @@ public class BulkScanningUtils {
 
         if (Optional.ofNullable(listOfNewDCNs).isPresent() && !listOfNewDCNs.isEmpty()) {
             //add new DCN list to existing envelope DB
+            LOG.info("List of New DCN payments: {}", listOfNewDCNs.size());
             envelopeDB.getEnvelopePayments().addAll(listOfNewDCNs);
         }
     }
@@ -118,6 +121,7 @@ public class BulkScanningUtils {
 
         //update envelope, and status history if all the dcns are present and complete
         if (!Optional.ofNullable(listOfIncompleteDCN).isPresent() || listOfIncompleteDCN.isEmpty()) {
+            LOG.info("Marking Envelope complete");
             envelopeDB.setPaymentStatus(COMPLETE.toString()); // update envelope status to complete
         }
 

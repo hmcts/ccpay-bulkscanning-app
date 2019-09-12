@@ -97,6 +97,7 @@ public class PaymentController {
     public ResponseEntity updateCaseReferenceForExceptionRecord(@NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
                                                                 @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
 
+        LOG.info("Request received to update case reference {}, for exception record {}", caseReferenceRequest, exceptionRecordReference);
         return ResponseEntity
             .ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -117,6 +118,7 @@ public class PaymentController {
     @PatchMapping("/bulk-scan-payments/{dcn}/status/{status}")
     public ResponseEntity markPaymentAsProcessed(@NotEmpty @PathVariable("dcn") String dcn,
                                                  @NotEmpty @PathVariable("status") PaymentStatus status) {
+        LOG.info("Request received to mark payment with DCN :{} , status : {}", dcn, status);
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)

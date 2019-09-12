@@ -239,16 +239,19 @@ public class PaymentControllerTest {
     }
 
     public static Envelope mockBulkScanningEnvelope() {
-        Envelope bsEnvelope =  Envelope.envelopeWith().id(1).build();
+        Envelope bsEnvelope =  Envelope.envelopeWith().id(1).dateUpdated(LocalDateTime.now()).dateCreated(LocalDateTime.now()).build();
 
-        EnvelopePayment payment1 = EnvelopePayment.paymentWith().id(1).dcnReference("dcn1").envelope(bsEnvelope).build();
-        EnvelopePayment payment2 = EnvelopePayment.paymentWith().id(2).dcnReference("dcn2").envelope(bsEnvelope).build();
+        EnvelopePayment payment1 = EnvelopePayment.paymentWith().id(1).dcnReference("dcn1").envelope(bsEnvelope)
+            .dateUpdated(LocalDateTime.now()).dateCreated(LocalDateTime.now()).build();
+        EnvelopePayment payment2 = EnvelopePayment.paymentWith().id(2).dcnReference("dcn2").envelope(bsEnvelope)
+            .dateUpdated(LocalDateTime.now()).dateCreated(LocalDateTime.now()).build();
 
         List<EnvelopePayment> envelopePaymentList = new ArrayList<>();
         envelopePaymentList.add(payment1);
         envelopePaymentList.add(payment2);
 
-        EnvelopeCase envelopeCase = EnvelopeCase.caseWith().id(1).ccdReference(CCD_CASE_REFERENCE).envelope(bsEnvelope).build();
+        EnvelopeCase envelopeCase = EnvelopeCase.caseWith().id(1).ccdReference(CCD_CASE_REFERENCE).envelope(bsEnvelope)
+            .dateUpdated(LocalDateTime.now()).dateCreated(LocalDateTime.now()).build();
 
         List<EnvelopeCase> envelopeCasesList = new ArrayList<>();
         envelopeCasesList.add(envelopeCase);
@@ -258,7 +261,9 @@ public class PaymentControllerTest {
             .id(1)
             .envelopePayments(envelopePaymentList)
             .envelopeCases(envelopeCasesList)
-            .build();
+             .dateUpdated(LocalDateTime.now())
+             .dateCreated(LocalDateTime.now())
+             .build();
 
 
 
