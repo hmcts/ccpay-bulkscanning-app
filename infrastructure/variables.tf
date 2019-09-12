@@ -6,7 +6,6 @@ variable "product" {
 variable "component" {
   type    = "string"
   default = "bulkscanning-api"
-
 }
 
 variable "location" {
@@ -21,7 +20,7 @@ variable "env" {
 variable "ilbIp" {}
 
 variable "subscription" {
-  type    = "string"
+  type = "string"
 }
 
 variable "capacity" {
@@ -45,6 +44,7 @@ variable "postgresql_user" {
 variable "enable_ase" {
   default = true
 }
+
 variable "appinsights_location" {
   type        = "string"
   default     = "West Europe"
