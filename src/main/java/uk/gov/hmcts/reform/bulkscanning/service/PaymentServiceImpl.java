@@ -269,8 +269,16 @@ public class PaymentServiceImpl implements PaymentService {
         if(StringUtils.isNotEmpty(searchRequest.getCcdReference())
             && envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).isPresent()){
             return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).get();
-        }else if(StringUtils.isNotEmpty(searchRequest.getExceptionRecord())){
-            return envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).get();
+        }else if(StringUtils.isNotEmpty(searchRequest.getExceptionRecord())
+            && envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).isPresent()){
+            List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).get();
+            for(EnvelopeCase envelopeCase : envelopeCases){
+                if(StringUtils.isNotEmpty(envelopeCase.getCcdReference())
+                    && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()){
+                    return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get();
+                }
+            }
+            return envelopeCases;
         }
         return Collections.emptyList();
     }
