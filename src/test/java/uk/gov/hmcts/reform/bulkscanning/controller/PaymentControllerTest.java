@@ -80,7 +80,7 @@ public class PaymentControllerTest {
                                                       .header("ServiceAuthorization", "service")
                                                       .content(asJsonString(createPaymentRequest("111222333")))
                                                       .contentType(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+        Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     @Test
