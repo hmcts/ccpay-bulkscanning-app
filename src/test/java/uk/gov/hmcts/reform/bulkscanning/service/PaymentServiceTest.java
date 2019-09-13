@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataReposito
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
@@ -193,8 +193,8 @@ public class PaymentServiceTest {
         assertThat(paymentMetadata.getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
 
-    private ExelaPaymentRequest createPaymentRequest() {
-        return ExelaPaymentRequest.createPaymentRequestWith()
+    private BulkScanPayment createPaymentRequest() {
+        return BulkScanPayment.createPaymentRequestWith()
             .amount(BigDecimal.valueOf(100.00))
             .bankedDate(new Date())
             .bankGiroCreditSlipNumber("BGC123")

@@ -22,8 +22,11 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @NoArgsConstructor
 @Data
 @JsonInclude(NON_NULL)
-public class ExelaPaymentRequest {
+public class BulkScanPayment {
 
+    @NotNull(message = "document_control_number can't be Blank")
+    @JsonProperty("document_control_number")
+    private String dcnReference;
     /*
     Payment amount in GBP
      */
@@ -55,22 +58,4 @@ public class ExelaPaymentRequest {
     @NotNull(message = "banked_date can't be Blank")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date bankedDate;
-
-    @JsonProperty("outbound_batch_number")
-    private String outboundBatchNumber;
-
-    @JsonProperty("dcn_case")
-    private String dcnCase;
-
-    @JsonProperty("case_reference")
-    private String caseReference;
-
-    @JsonProperty("po_box")
-    private String poBox;
-
-    @JsonProperty("first_cheque_dcn_in_batch")
-    private String firstChequeDcnInBatch;
-
-    @JsonProperty("payer_name")
-    private String payerName;
 }

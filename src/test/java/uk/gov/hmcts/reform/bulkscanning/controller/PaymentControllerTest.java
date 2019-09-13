@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
@@ -76,9 +76,9 @@ public class PaymentControllerTest {
     @Transactional
     public void testCreatePaymentFromExela() throws Exception{
 
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/111222333")
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                       .header("ServiceAuthorization", "service")
-                                                      .content(asJsonString(createPaymentRequest()))
+                                                      .content(asJsonString(createPaymentRequest("111222333")))
                                                       .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -94,9 +94,9 @@ public class PaymentControllerTest {
                                                                     .build());
 
         when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/111222333")
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest()))
+                                                          .content(asJsonString(createPaymentRequest("111222333")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(409), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -106,9 +106,9 @@ public class PaymentControllerTest {
 
         when(paymentService.getPaymentMetadata(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Metadata"));
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/111222333")
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest()))
+                                                          .content(asJsonString(createPaymentRequest("111222333")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(true, resultActions.andReturn().getResponse()
             .getContentAsString().contains("Exception in fetching Metadata"));
@@ -187,8 +187,9 @@ public class PaymentControllerTest {
             .getContentAsString().contains("Exception in fetching Payments"));
     }
 
-    public static ExelaPaymentRequest createPaymentRequest() {
-        return ExelaPaymentRequest.createPaymentRequestWith()
+    public static BulkScanPayment createPaymentRequest(String dcnReference) {
+        return BulkScanPayment.createPaymentRequestWith()
+            .dcnReference(dcnReference)
             .amount(BigDecimal.valueOf(100.00))
             .bankedDate(new Date())
             .bankGiroCreditSlipNumber("BGC123")
