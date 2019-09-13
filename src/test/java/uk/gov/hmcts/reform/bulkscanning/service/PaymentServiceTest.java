@@ -181,6 +181,32 @@ public class PaymentServiceTest {
 
     @Test
     @Transactional
+    public void testRetrieveByExceptionRecord() throws Exception {
+        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
+        Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
+                                                                    .id(1)
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .paymentStatus(COMPLETE.toString())
+                                                                    .build());
+        Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
+        Optional<Envelope> envelope = Optional.of(Envelope.envelopeWith().id(1).envelopePayments(payments.get())
+                                                      .paymentStatus(COMPLETE.toString())
+                                                      .build());
+        Optional<EnvelopeCase> envelopeCase = Optional.of(EnvelopeCase.caseWith()
+                                                              .id(1)
+                                                              .envelope(envelope.get())
+                                                              .ccdReference("CCD123")
+                                                              .exceptionRecordReference("EXP123")
+                                                              .build());
+        Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
+        when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
+        when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(cases);
+        SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
+        assertThat(searchResponse.getCcdReference()).isEqualTo("CCD123");
+    }
+
+    @Test
+    @Transactional
     public void testRetrieveByDcn() throws Exception {
         SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
         assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
