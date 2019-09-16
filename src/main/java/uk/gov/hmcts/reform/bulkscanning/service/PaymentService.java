@@ -4,12 +4,12 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.*;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 
 public interface PaymentService {
 
-    Envelope processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference);
+    Envelope processPaymentFromExela(BulkScanPayment bulkScanPayment, String dcnReference);
     SearchResponse retrieveByCCDReference(String ccdReference);
     SearchResponse retrieveByDcn(String documentControlNumber);
     PaymentMetadata getPaymentMetadata(String dcnReference);

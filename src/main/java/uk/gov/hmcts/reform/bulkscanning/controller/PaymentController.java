@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.response.PaymentResponse;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
@@ -56,30 +56,29 @@ public class PaymentController {
                                         .build(), HttpStatus.CREATED);
     }
 
-    @ApiOperation("This operation will be called after the banking "
-        + "process has been done and payments have been allocated to a BGC slip / batch")
+    @ApiOperation("Provide meta information about the payments contained\n" +
+        "in the envelope. This operation will be called after the banking process\n" +
+        "has been done and payments have been allocated to a BGC slip / batch")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Returns an envelope group id"),
+        @ApiResponse(code = 201, message = "Bulk Scanning Data retrieved"),
         @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
         @ApiResponse(code = 401, message = "Failed authentication"),
         @ApiResponse(code = 409, message = "Conflict")
     })
-    @PutMapping("/bulk-scan-payments/{document_control_number}")
+    @PostMapping("/bulk-scan-payment")
     public ResponseEntity<String> processPaymentFromExela(
-        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
-        @PathVariable("document_control_number") String dcnReference,
-        @Valid @RequestBody ExelaPaymentRequest exelaPaymentRequest) {
-        LOG.info("Request received from Exela with DCN : {} Request : {}", dcnReference, exelaPaymentRequest);
+        @Valid @RequestBody BulkScanPayment bulkScanPayment) {
+        LOG.info("Request received from Exela with Request : {}", bulkScanPayment);
         try {
             LOG.info("Check in Payment metadata for already existing payment from Exela");
-            if (Optional.ofNullable(paymentService.getPaymentMetadata(dcnReference)).isPresent()) {
-                LOG.info("Payment already exists for DCN: {}", dcnReference);
+            if (Optional.ofNullable(paymentService.getPaymentMetadata(bulkScanPayment.getDcnReference())).isPresent()) {
+                LOG.info("Payment already exists for DCN: {}", bulkScanPayment.getDcnReference());
                 return new ResponseEntity<>(HttpStatus.CONFLICT);
             } else {
-                LOG.info("Processing Payment for DCN: {}", dcnReference);
-                paymentService.processPaymentFromExela(exelaPaymentRequest, dcnReference);
+                LOG.info("Processing Payment for DCN: {}", bulkScanPayment.getDcnReference());
+                paymentService.processPaymentFromExela(bulkScanPayment, bulkScanPayment.getDcnReference());
             }
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Created");
         } catch (Exception ex) {
             throw new PaymentException(ex);
         }

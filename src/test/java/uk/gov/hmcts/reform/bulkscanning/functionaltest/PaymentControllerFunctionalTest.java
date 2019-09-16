@@ -181,9 +181,9 @@ public class PaymentControllerFunctionalTest {
 
         //Request from Exela with one DCN
         String dcn[] = {"1111-2222-4444-5555"};
-        mvc.perform(put("/bulk-scan-payments/1111-2222-4444-5555")
+        mvc.perform(post("/bulk-scan-payment")
             .header("ServiceAuthorization", "service")
-            .content(asJsonString(createPaymentRequest()))
+            .content(asJsonString(createPaymentRequest("1111-2222-4444-5555")))
             .contentType(MediaType.APPLICATION_JSON));
 
         //Request from bulk scan with one DCN
@@ -199,13 +199,11 @@ public class PaymentControllerFunctionalTest {
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         //Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-4444-5555").get().getPaymentStatus()
-            , COMPLETE.toString());
+        Assert.assertEquals(COMPLETE.toString(), paymentRepository.findByDcnReference("1111-2222-4444-5555").get().getPaymentStatus());
 
         //Complete envelope
         Envelope finalEnvelope = envelopeRepository.findAll().iterator().next();
-        Assert.assertEquals(finalEnvelope.getPaymentStatus()
-            , COMPLETE.toString());
+        Assert.assertEquals(COMPLETE.toString(), finalEnvelope.getPaymentStatus());
     }
 
 
@@ -214,9 +212,9 @@ public class PaymentControllerFunctionalTest {
 
         //Request from Exela with one DCN
         String dcn[] = {"1111-2222-3333-6666","1111-2222-3333-7777"};
-        mvc.perform(put("/bulk-scan-payments/1111-2222-3333-6666")
+        mvc.perform(post("/bulk-scan-payment")
             .header("ServiceAuthorization", "service")
-            .content(asJsonString(createPaymentRequest()))
+            .content(asJsonString(createPaymentRequest("1111-2222-3333-6666")))
             .contentType(MediaType.APPLICATION_JSON));
 
         //Request from bulk scan with two DCN
@@ -260,9 +258,9 @@ public class PaymentControllerFunctionalTest {
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
 
-        mvc.perform(put("/bulk-scan-payments/1111-2222-3333-8888")
+        mvc.perform(post("/bulk-scan-payment")
             .header("ServiceAuthorization", "service")
-            .content(asJsonString(createPaymentRequest()))
+            .content(asJsonString(createPaymentRequest("1111-2222-3333-8888")))
             .contentType(MediaType.APPLICATION_JSON));
 
 

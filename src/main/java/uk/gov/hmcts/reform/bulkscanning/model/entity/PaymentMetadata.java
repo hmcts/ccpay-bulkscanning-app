@@ -7,15 +7,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 @Entity
 @Data
@@ -46,24 +40,6 @@ public class PaymentMetadata {
 
     @Column(name = "date_banked")
     private LocalDateTime dateBanked;
-
-    @Column(name = "outbound_batch_number")
-    private String outboundBatchNumber;
-
-    @Column(name = "dcn_case")
-    private String dcnCase;
-
-    @Column(name = "case_reference")
-    private String caseReference;
-
-    @Column(name = "po_box")
-    private String poBox;
-
-    @Column(name = "first_cheque_dcn_in_batch")
-    private String firstChequeDcnInBatch;
-
-    @Column(name = "payer_name")
-    private String payerName;
 
     @CreationTimestamp
     @Column(name = "date_created", nullable = false)

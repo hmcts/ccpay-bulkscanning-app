@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.*;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
@@ -74,9 +74,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public Envelope processPaymentFromExela(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
+    public Envelope processPaymentFromExela(BulkScanPayment bulkScanPayment, String dcnReference) {
         LOG.info("Insert Payment metadata in Bulk Scan Payment DB");//
-        createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(exelaPaymentRequest, dcnReference));
+        createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(bulkScanPayment, dcnReference));
 
         LOG.info("Check for existing DCN in Payment Table Bulk Scan Pay DB");
         EnvelopePayment payment = getPaymentByDcnReference(dcnReference);
@@ -84,7 +84,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (null == payment) {
             LOG.info("Create new payment in BSP DB as envelope doesn't exists");
             List<PaymentDto> payments = new ArrayList<>();
-            payments.add(paymentDtoMapper.fromRequest(exelaPaymentRequest, dcnReference));
+            payments.add(paymentDtoMapper.fromRequest(bulkScanPayment, dcnReference));
 
             Envelope envelope = createEnvelope(EnvelopeDto.envelopeDtoWith()
                                                    .paymentStatus(INCOMPLETE)
@@ -269,8 +269,16 @@ public class PaymentServiceImpl implements PaymentService {
         if(StringUtils.isNotEmpty(searchRequest.getCcdReference())
             && envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).isPresent()){
             return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).get();
-        }else if(StringUtils.isNotEmpty(searchRequest.getExceptionRecord())){
-            return envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).get();
+        }else if(StringUtils.isNotEmpty(searchRequest.getExceptionRecord())
+            && envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).isPresent()){
+            List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).get();
+            for(EnvelopeCase envelopeCase : envelopeCases){
+                if(StringUtils.isNotEmpty(envelopeCase.getCcdReference())
+                    && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()){
+                    return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get();
+                }
+            }
+            return envelopeCases;
         }
         return Collections.emptyList();
     }

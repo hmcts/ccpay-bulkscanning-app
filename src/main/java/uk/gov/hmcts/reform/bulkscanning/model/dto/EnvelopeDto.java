@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleService;
 
 import java.util.Date;
 import java.util.List;
@@ -25,7 +24,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class EnvelopeDto {
 
     private Integer id;
-    private ResponsibleService responsibleService;
     private PaymentStatus paymentStatus;
     private List<PaymentDto> payments;
 

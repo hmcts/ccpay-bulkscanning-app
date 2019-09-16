@@ -5,9 +5,10 @@ import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
-import uk.gov.hmcts.reform.bulkscanning.model.request.ExelaPaymentRequest;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,12 +27,6 @@ public class PaymentMetadataDtoMapper {
                 .amount(paymentMetadataDto.getAmount())
                 .currency(paymentMetadataDto.getCurrency().toString())
                 .dateBanked(dateToLocalDateTime(paymentMetadataDto.getDateBanked()))
-                .outboundBatchNumber(paymentMetadataDto.getOutboundBatchNumber())
-                .dcnCase(paymentMetadataDto.getDcnCase())
-                .caseReference(paymentMetadataDto.getCaseReference())
-                .poBox(paymentMetadataDto.getPoBox())
-                .firstChequeDcnInBatch(paymentMetadataDto.getFirstChequeDcnInBatch())
-                .payerName(paymentMetadataDto.getPayerName())
                 .build();
         }else {
             return null;
@@ -39,21 +34,15 @@ public class PaymentMetadataDtoMapper {
 
     }
 
-    public PaymentMetadataDto fromRequest(ExelaPaymentRequest exelaPaymentRequest, String dcnReference) {
-        if(Optional.ofNullable(exelaPaymentRequest).isPresent()) {
+    public PaymentMetadataDto fromRequest(BulkScanPayment bulkScanPayment, String dcnReference) {
+        if(Optional.ofNullable(bulkScanPayment).isPresent()) {
             return PaymentMetadataDto.paymentMetadataDtoWith()
                 .dcnReference(dcnReference)
-                .bgcReference(exelaPaymentRequest.getBankGiroCreditSlipNumber())
-                .amount(exelaPaymentRequest.getAmount())
-                .currency(Currency.valueOf(exelaPaymentRequest.getCurrency()))
-                .paymentMethod(PaymentMethod.valueOf(exelaPaymentRequest.getMethod()))
-                .dateBanked(exelaPaymentRequest.getBankedDate())
-                .outboundBatchNumber(exelaPaymentRequest.getOutboundBatchNumber())
-                .dcnCase(exelaPaymentRequest.getDcnCase())
-                .caseReference(exelaPaymentRequest.getCaseReference())
-                .poBox(exelaPaymentRequest.getPoBox())
-                .firstChequeDcnInBatch(exelaPaymentRequest.getFirstChequeDcnInBatch())
-                .payerName(exelaPaymentRequest.getPayerName())
+                .bgcReference(bulkScanPayment.getBankGiroCreditSlipNumber())
+                .amount(bulkScanPayment.getAmount())
+                .currency(Currency.valueOf(bulkScanPayment.getCurrency().toUpperCase(Locale.UK)))
+                .paymentMethod(PaymentMethod.valueOf(bulkScanPayment.getMethod().toUpperCase(Locale.UK)))
+                .dateBanked(bulkScanPayment.getBankedDate())
                 .build();
         }else {
             return null;
@@ -70,12 +59,6 @@ public class PaymentMetadataDtoMapper {
                 .currency(Currency.valueOf(paymentMetadata.getCurrency()))
                 .paymentMethod(PaymentMethod.valueOf(paymentMetadata.getPaymentMethod()))
                 .dateBanked(localDateTimeToDate(paymentMetadata.getDateBanked()))
-                .outboundBatchNumber(paymentMetadata.getOutboundBatchNumber())
-                .dcnCase(paymentMetadata.getDcnCase())
-                .caseReference(paymentMetadata.getCaseReference())
-                .poBox(paymentMetadata.getPoBox())
-                .firstChequeDcnInBatch(paymentMetadata.getFirstChequeDcnInBatch())
-                .payerName(paymentMetadata.getPayerName())
                 .dateCreated(localDateTimeToDate(paymentMetadata.getDateCreated()))
                 .dateUpdated(localDateTimeToDate(paymentMetadata.getDateUpdated()))
                 .build();
