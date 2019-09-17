@@ -57,3 +57,15 @@ security:
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
     - "/search/**"
+trusted:
+  s2s:
+    service:
+      names: ccpay_bubble
+auth:
+  idam:
+    client:
+      baseUrl: ${AUTH_IDAM_CLIENT_BASEURL:#{http://dummy.dummy.net}}
+  provider:
+    service:
+      client:
+        baseUrl: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL:#{http://dummy.dummy.net}}
