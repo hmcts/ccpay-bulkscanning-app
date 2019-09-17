@@ -26,7 +26,12 @@ public class AuthCheckerConfiguration {
         return (request) -> {
             Matcher matcher = pattern.matcher(request.getRequestURI());
             boolean matched = matcher.find();
-            return Optional.ofNullable(matched ? matcher.group(1) : null);
+            if(matched){
+                return Optional.of(matcher.group(1));
+            }else {
+                return Optional.empty();
+            }
+            //return Optional.ofNullable(matched ? matcher.group(1) : null);
         };
     }
 

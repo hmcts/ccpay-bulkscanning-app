@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.config.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -19,29 +21,37 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 public class SpringSecurityConfiguration {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SpringSecurityConfiguration.class);
+
     @Configuration
     @Order(1)
     public static class ExternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
-        private AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter;
+        private final AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter;
 
         @Autowired
         public ExternalApiSecurityConfigurationAdapter(RequestAuthorizer<Service> serviceRequestAuthorizer,
                                                        AuthenticationManager authenticationManager) {
+            super();
             authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(serviceRequestAuthorizer);
             authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
         }
 
-        protected void configure(HttpSecurity http) throws Exception {
-            http
-                .requestMatchers()
-                .antMatchers(HttpMethod.POST, "/bulk-scan-payment")
-                .antMatchers(HttpMethod.POST, "/bulk-scan-payments")
-                .and()
-                .addFilter(authCheckerServiceOnlyFilter)
-                .csrf().disable()
-                .authorizeRequests()
-                .anyRequest().authenticated();
+        @Override
+        protected void configure(HttpSecurity http) {
+            try {
+                http
+                    .requestMatchers()
+                    .antMatchers(HttpMethod.POST, "/bulk-scan-payment")
+                    .antMatchers(HttpMethod.POST, "/bulk-scan-payments")
+                    .and()
+                    .addFilter(authCheckerServiceOnlyFilter)
+                    .csrf().disable()
+                    .authorizeRequests()
+                    .anyRequest().authenticated();
+            } catch (Exception e) {
+                LOG.info("Error in ExternalApiSecurityConfigurationAdapter: {}", e);
+            }
         }
     }
 
@@ -49,12 +59,13 @@ public class SpringSecurityConfiguration {
     @Order(2)
     public static class InternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
-        private AuthCheckerServiceAndAnonymousUserFilter authCheckerFilter;
+        private final AuthCheckerServiceAndAnonymousUserFilter authCheckerFilter;
 
         @Autowired
         public InternalApiSecurityConfigurationAdapter(RequestAuthorizer<User> userRequestAuthorizer,
                                                        RequestAuthorizer<Service> serviceRequestAuthorizer,
                                                        AuthenticationManager authenticationManager) {
+            super();
             authCheckerFilter = new AuthCheckerServiceAndAnonymousUserFilter(serviceRequestAuthorizer, userRequestAuthorizer);
             authCheckerFilter.setAuthenticationManager(authenticationManager);
         }
@@ -76,19 +87,23 @@ public class SpringSecurityConfiguration {
 
         @Override
         //@SuppressWarnings(value = "SPRING_CSRF_PROTECTION_DISABLED", justification = "It's safe to disable CSRF protection as application is not being hit directly from the browser")
-        protected void configure(HttpSecurity http) throws Exception {
-            http.addFilter(authCheckerFilter)
-                .sessionManagement().sessionCreationPolicy(STATELESS).and()
-                .csrf().disable()
-                .formLogin().disable()
-                .logout().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.PUT, "/bulk-scan-payments").hasAnyAuthority("payments")
-                .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/*").hasAnyAuthority("payments")
-                .antMatchers(HttpMethod.GET, "/cases").hasAnyAuthority("payments")
-                .antMatchers(HttpMethod.GET, "/cases/*").hasAnyAuthority("payments")
-                .antMatchers(HttpMethod.GET, "/api/**").permitAll()
-                .anyRequest().authenticated();
+        protected void configure(HttpSecurity http) {
+            try {
+                http.addFilter(authCheckerFilter)
+                    .sessionManagement().sessionCreationPolicy(STATELESS).and()
+                    .csrf().disable()
+                    .formLogin().disable()
+                    .logout().disable()
+                    .authorizeRequests()
+                    .antMatchers(HttpMethod.PUT, "/bulk-scan-payments").hasAnyAuthority("payments")
+                    .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/*").hasAnyAuthority("payments")
+                    .antMatchers(HttpMethod.GET, "/cases").hasAnyAuthority("payments")
+                    .antMatchers(HttpMethod.GET, "/cases/*").hasAnyAuthority("payments")
+                    .antMatchers(HttpMethod.GET, "/api/**").permitAll()
+                    .anyRequest().authenticated();
+            } catch (Exception e) {
+                LOG.info("Error in ExternalApiSecurityConfigurationAdapter: {}", e);
+            }
         }
     }
 

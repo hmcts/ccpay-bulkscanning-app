@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("local")
 @TestPropertySource(locations="classpath:application-local.yaml")
 public class PaymentControllerTest {
 
@@ -123,8 +125,9 @@ public class PaymentControllerTest {
         when(paymentService.retrieveByCCDReference(any(String.class)))
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases/CCD123")
-                                                      .header("ServiceAuthorization", "service")
-                                                        .accept(MediaType.APPLICATION_JSON));
+                                                    .header("Authorization", "user")
+                                                    .header("ServiceAuthorization", "service")
+                                                    .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
@@ -134,6 +137,7 @@ public class PaymentControllerTest {
         when(paymentService.retrieveByCCDReference(any(String.class)))
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases/CCD123")
+                                                          .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(404), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
@@ -144,6 +148,7 @@ public class PaymentControllerTest {
         when(paymentService.retrieveByCCDReference(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases/CCD123")
+                                                          .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(true, resultActions.andReturn().getResponse()
@@ -160,6 +165,7 @@ public class PaymentControllerTest {
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
             .param("document_control_number", "DCN123")
+                                                          .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
@@ -171,6 +177,7 @@ public class PaymentControllerTest {
         when(paymentService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
                                                           .param("document_control_number", "DCN123")
+                                                          .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(404), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
@@ -181,6 +188,7 @@ public class PaymentControllerTest {
         when(paymentService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases")
                                                           .param("document_control_number", "DCN123")
+                                                          .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(true, resultActions.andReturn().getResponse()
@@ -224,6 +232,7 @@ public class PaymentControllerTest {
             .build();
 
         ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444")
+            .header("Authorization", "user")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(caseReferenceRequest))
             .contentType(MediaType.APPLICATION_JSON));
@@ -234,8 +243,9 @@ public class PaymentControllerTest {
     @Transactional
     public void testMarkPaymentAsProcessed() throws Exception{
         ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/DCN2/status/PROCESSED")
-            .header("ServiceAuthorization", "service")
-            .contentType(MediaType.APPLICATION_JSON));
+          .header("Authorization", "user")
+          .header("ServiceAuthorization", "service")
+          .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 

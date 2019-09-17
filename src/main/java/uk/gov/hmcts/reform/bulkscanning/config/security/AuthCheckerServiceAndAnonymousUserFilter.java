@@ -22,11 +22,12 @@ public class AuthCheckerServiceAndAnonymousUserFilter extends AbstractPreAuthent
 
     private final RequestAuthorizer<Service> serviceRequestAuthorizer;
     private final RequestAuthorizer<User> userRequestAuthorizer;
-    private static final Set<String> anonymousRole = new HashSet<String>(Arrays.asList("ROLE_ANONYMOUS"));
+    private static final Set<String> anonymousRole = new HashSet<>(Arrays.asList("ROLE_ANONYMOUS"));
 
 
     public AuthCheckerServiceAndAnonymousUserFilter(RequestAuthorizer<Service> serviceRequestAuthorizer,
                                                     RequestAuthorizer<User> userRequestAuthorizer) {
+        super();
         this.serviceRequestAuthorizer = serviceRequestAuthorizer;
         this.userRequestAuthorizer = userRequestAuthorizer;
     }
@@ -40,16 +41,16 @@ public class AuthCheckerServiceAndAnonymousUserFilter extends AbstractPreAuthent
         }
         User user = authorizeUser(request);
 
-        if (user == null)
+        if (user == null) {
             return null;
-
+        }
         return new ServiceAndUserPair(service, user);
     }
 
     @Override
     protected Object getPreAuthenticatedCredentials(HttpServletRequest request) {
         String preAuthenticatedCredentials = request.getHeader(UserRequestAuthorizer.AUTHORISATION);
-        return (preAuthenticatedCredentials != null) ? preAuthenticatedCredentials : " " ;
+        return (preAuthenticatedCredentials == null) ? " " : preAuthenticatedCredentials;
     }
 
     private User authorizeUser(HttpServletRequest request) {

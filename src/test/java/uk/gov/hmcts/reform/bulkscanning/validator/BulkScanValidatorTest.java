@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("local")
 @TestPropertySource(locations="classpath:application-local.yaml")
 public class BulkScanValidatorTest {
 
@@ -31,6 +33,8 @@ public class BulkScanValidatorTest {
     public static final String CCD_REFERENCE_MISSING = "CCD reference is missing";
     public static final String PAYMENT_DCN_MISSING = "Payment DCN are missing";
 
+    String s2sToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjbWMiLCJleHAiOjE1MzMyMzc3NjN9.3iwg2cCa1_G9-TAMupqsQsIVBMWg9ORGir5xZyPhDabk09Ldk0-oQgDQq735TjDQzPI8AxL1PgjtOPDKeKyxfg[akiss@reformMgmtDevBastion02";
+
 
     @Test()
     @Transactional
@@ -40,7 +44,7 @@ public class BulkScanValidatorTest {
             ,null,null, false);
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
-            .header("ServiceAuthorization", "service")
+            .header("ServiceAuthorization", s2sToken)
             .content(asJsonString(bulkScanPaymentRequest))
             .contentType(MediaType.APPLICATION_JSON));
 
