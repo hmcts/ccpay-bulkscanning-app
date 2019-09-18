@@ -15,7 +15,7 @@ import static io.restassured.config.JsonConfig.jsonConfig;
 
 @Configuration
 @ComponentScan("uk.gov.hmcts.reform.bulkscanning")
-@TestPropertySource(locations="classpath:application-local.yaml")
+@TestPropertySource(locations="classpath:application-test.yaml")
 public class TestContextConfiguration {
 
     @Value("${test.url:http://localhost:8080}")

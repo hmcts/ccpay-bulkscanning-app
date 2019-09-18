@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles("local")
-@TestPropertySource(locations="classpath:application-local.yaml")
+@TestPropertySource(locations="classpath:application-test.yaml")
 public class PaymentControllerFunctionalTest {
 
     @Autowired

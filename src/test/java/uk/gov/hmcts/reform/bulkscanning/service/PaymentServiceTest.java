@@ -56,7 +56,7 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("local")
-@TestPropertySource(locations="classpath:application-local.yaml")
+@TestPropertySource(locations="classpath:application-test.yaml")
 public class PaymentServiceTest {
     MockMvc mockMvc;
 

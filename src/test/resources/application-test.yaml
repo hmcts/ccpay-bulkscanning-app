@@ -8,8 +8,20 @@ spring:
   application:
     name: bulk-scanning
   datasource:
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:9.6://localhost/features
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/bulk-scan
+    username: postgres
+    password: admin
+    properties:
+      charSet: UTF-8
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
   liquibase:
     enabled: ${SPRING_LIQUIBASE_ENABLED:true}
     change-log: classpath:/db/changelog/db.changelog-master.xml
