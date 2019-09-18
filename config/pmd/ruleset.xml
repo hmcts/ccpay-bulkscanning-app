@@ -46,6 +46,7 @@
     <exclude name="DataClass"/>
     <exclude name="AvoidThrowingRawExceptionTypes"/>
     <exclude name="UseObjectForClearerAPI"/>
+    <exclude name="FinalFieldCouldBeStatic"/>
   </rule>
   <rule ref="category/java/design.xml/ExcessiveImports">
     <properties>
