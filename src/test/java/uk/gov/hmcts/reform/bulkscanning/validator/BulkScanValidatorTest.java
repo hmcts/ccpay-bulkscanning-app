@@ -14,7 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamService;
 import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
 import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
@@ -39,9 +38,6 @@ public class BulkScanValidatorTest {
 
     @Autowired
     private TestConfigProperties testProps;
-
-    @Autowired
-    private IdamService idamService;
 
     @Autowired
     private S2sTokenService s2sTokenService;
