@@ -47,7 +47,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("local")
-@TestPropertySource(locations="classpath:application-test.yaml")
+@TestPropertySource(locations="classpath:application-local.yaml")
 public class PaymentControllerTest {
 
     MockMvc mockMvc;

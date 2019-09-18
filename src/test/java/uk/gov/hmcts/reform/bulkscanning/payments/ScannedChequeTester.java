@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("local")
 @SpringBootTest
-@TestPropertySource(locations="classpath:application-test.yaml")
+@TestPropertySource(locations="classpath:application-local.yaml")
 
 public class ScannedChequeTester {
 
