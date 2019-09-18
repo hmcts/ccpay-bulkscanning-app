@@ -9,6 +9,7 @@
   <rule ref="category/java/bestpractices.xml">
     <exclude name="GuardLogStatement"/>
     <exclude name="JUnitTestContainsTooManyAsserts"/>
+    <exclude name="UseVarargs"/>
   </rule>
   <rule ref="category/java/codestyle.xml">
     <exclude name="AtLeastOneConstructor"/>
@@ -44,6 +45,7 @@
     <exclude name="LoosePackageCoupling"/>
     <exclude name="DataClass"/>
     <exclude name="AvoidThrowingRawExceptionTypes"/>
+    <exclude name="UseObjectForClearerAPI"/>
   </rule>
   <rule ref="category/java/design.xml/ExcessiveImports">
     <properties>

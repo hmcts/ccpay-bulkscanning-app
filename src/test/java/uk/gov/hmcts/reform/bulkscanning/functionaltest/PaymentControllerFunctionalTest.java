@@ -10,11 +10,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
+import uk.gov.hmcts.reform.bulkscanning.config.TestContextConfiguration;
+import uk.gov.hmcts.reform.bulkscanning.config.IdamService;
+import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
@@ -29,6 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
+import static uk.gov.hmcts.reform.bulkscanning.config.IdamService.CMC_CITIZEN_GROUP;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
@@ -38,6 +44,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles("local")
 @TestPropertySource(locations="classpath:application-local.yaml")
 public class PaymentControllerFunctionalTest {
@@ -58,16 +65,31 @@ public class PaymentControllerFunctionalTest {
     @Autowired
     EnvelopeRepository envelopeRepository;
 
-    String s2sToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjbWMiLCJleHAiOjE1MzMyMzc3NjN9.3iwg2cCa1_G9-TAMupqsQsIVBMWg9ORGir5xZyPhDabk09Ldk0-oQgDQq735TjDQzPI8AxL1PgjtOPDKeKyxfg[akiss@reformMgmtDevBastion02";
-    String userToken = "krishnakn00@gmail.com";
+    @Autowired
+    private TestConfigProperties testProps;
+
+    @Autowired
+    private IdamService idamService;
+
+    @Autowired
+    private S2sTokenService s2sTokenService;
+
+    private static String USER_TOKEN;
+    private static String SERVICE_TOKEN;
+    private static boolean TOKENS_INITIALIZED;
 
     @Before
-    @Transactional
     public void setUp() {
         caseReferenceRequest = CaseReferenceRequest
             .createCaseReferenceRequest()
             .ccdCaseNumber("CCN2")
             .build();
+
+        if (!TOKENS_INITIALIZED) {
+            USER_TOKEN = idamService.createUserWith(CMC_CITIZEN_GROUP, "citizen").getAuthorisationToken();
+            SERVICE_TOKEN = s2sTokenService.getS2sToken(testProps.s2sServiceName, testProps.s2sServiceSecret);
+            TOKENS_INITIALIZED = true;
+        }
     }
 
     @Test
@@ -78,17 +100,17 @@ public class PaymentControllerFunctionalTest {
 
         //Post request
         ResultActions resultActions = mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", s2sToken)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(bulkScanPaymentRequest))
             .contentType(MediaType.APPLICATION_JSON))
-            //.andExpect(status().isCreated())
+            .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         Assert.assertNotNull(resultActions.andReturn().getResponse().getContentAsString());
 
         //Post Repeat request
         ResultActions repeatRequest = mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", s2sToken)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(bulkScanPaymentRequest))
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isConflict())
@@ -99,8 +121,8 @@ public class PaymentControllerFunctionalTest {
 
         //PATCH Request
         ResultActions patchRequest = mvc.perform(patch("/bulk-scan-payments/DCN2/status/PROCESSED")
-             .header("Authorization", userToken)
-             .header("ServiceAuthorization", s2sToken)
+             .header("Authorization", USER_TOKEN)
+             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content()
@@ -110,10 +132,10 @@ public class PaymentControllerFunctionalTest {
 
         //DCN Not exists Request
         ResultActions patchDCNNotExists = mvc.perform(patch("/bulk-scan-payments/DCN4/status/PROCESSED")
-            .header("Authorization", userToken)
-            .header("ServiceAuthorization", s2sToken)
+            .header("Authorization", USER_TOKEN)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(MediaType.APPLICATION_JSON))
-            //.andExpect(status().isNotFound())
+            .andExpect(status().isNotFound())
             .andExpect(content()
                 .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
@@ -137,8 +159,8 @@ public class PaymentControllerFunctionalTest {
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         ResultActions resultActions = mvc.perform(put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444")
-            .header("Authorization", userToken)
-            .header("ServiceAuthorization", s2sToken)
+            .header("Authorization", USER_TOKEN)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(caseReferenceRequest))
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -154,8 +176,8 @@ public class PaymentControllerFunctionalTest {
     public void testExceptionRecordNotExists() throws Exception{
 
         ResultActions resultActions = mvc.perform(put("/bulk-scan-payments/?exception_reference=4444-3333-2222-111")
-            .header("Authorization", userToken)
-            .header("ServiceAuthorization", s2sToken)
+            .header("Authorization", USER_TOKEN)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(caseReferenceRequest))
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
@@ -175,15 +197,14 @@ public class PaymentControllerFunctionalTest {
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         ResultActions resultActions = mvc.perform(patch("/bulk-scan-payments/DCN1/status/PROCESSED")
-            .header("Authorization", userToken)
-            .header("ServiceAuthorization", s2sToken)
+            .header("Authorization", USER_TOKEN)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content()
                 .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         Assert.assertEquals(resultActions.andReturn().getResponse().getStatus(), OK.value());
-
     }
 
     @Test
@@ -192,7 +213,7 @@ public class PaymentControllerFunctionalTest {
         //Request from Exela with one DCN
         String dcn[] = {"1111-2222-4444-5555"};
         mvc.perform(post("/bulk-scan-payment")
-            .header("ServiceAuthorization", s2sToken)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(createPaymentRequest("1111-2222-4444-5555")))
             .contentType(MediaType.APPLICATION_JSON));
 
@@ -202,10 +223,10 @@ public class PaymentControllerFunctionalTest {
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", s2sToken)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(bulkScanPaymentRequest))
             .contentType(MediaType.APPLICATION_JSON))
-            //.andExpect(status().isCreated())
+            .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         //Complete payment
@@ -213,7 +234,7 @@ public class PaymentControllerFunctionalTest {
 
         //Complete envelope
         Envelope finalEnvelope = envelopeRepository.findAll().iterator().next();
-        Assert.assertEquals(INCOMPLETE.toString(), finalEnvelope.getPaymentStatus());
+        Assert.assertEquals(COMPLETE.toString(), finalEnvelope.getPaymentStatus());
     }
 
 
@@ -223,7 +244,7 @@ public class PaymentControllerFunctionalTest {
         //Request from Exela with one DCN
         String dcn[] = {"1111-2222-3333-6666","1111-2222-3333-7777"};
         mvc.perform(post("/bulk-scan-payment")
-            .header("ServiceAuthorization", s2sToken)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(createPaymentRequest("1111-2222-3333-6666")))
             .contentType(MediaType.APPLICATION_JSON));
 
@@ -233,10 +254,10 @@ public class PaymentControllerFunctionalTest {
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", s2sToken)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(bulkScanPaymentRequest))
             .contentType(MediaType.APPLICATION_JSON))
-            //.andExpect(status().isCreated())
+            .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         //Complete payment
@@ -261,15 +282,15 @@ public class PaymentControllerFunctionalTest {
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", s2sToken)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(bulkScanPaymentRequest))
             .contentType(MediaType.APPLICATION_JSON))
-            //.andExpect(status().isCreated())
+            .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
 
         mvc.perform(post("/bulk-scan-payment")
-            .header("ServiceAuthorization", s2sToken)
+            .header("ServiceAuthorization", SERVICE_TOKEN)
             .content(asJsonString(createPaymentRequest("1111-2222-3333-8888")))
             .contentType(MediaType.APPLICATION_JSON));
 
