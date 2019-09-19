@@ -95,10 +95,10 @@ public class SpringSecurityConfiguration {
                     .formLogin().disable()
                     .logout().disable()
                     .authorizeRequests()
-                    .antMatchers(HttpMethod.PUT, "/bulk-scan-payments").hasAnyAuthority("payments")
-                    .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/*").hasAnyAuthority("payments")
-                    .antMatchers(HttpMethod.GET, "/cases").hasAnyAuthority("payments")
-                    .antMatchers(HttpMethod.GET, "/cases/*").hasAnyAuthority("payments")
+                    .antMatchers(HttpMethod.PUT, "/bulk-scan-payments").hasAnyAuthority("payments", "citizen")
+                    .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/*").hasAnyAuthority("payments", "citizen")
+                    .antMatchers(HttpMethod.GET, "/cases").hasAnyAuthority("payments", "citizen")
+                    .antMatchers(HttpMethod.GET, "/cases/*").hasAnyAuthority("payments", "citizen")
                     .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .anyRequest().authenticated();
             } catch (Exception e) {
