@@ -89,7 +89,7 @@ public class IdamService {
 
             return BEARER + tokenExchangeResponse.getAccessToken();
         }catch (Exception ex){
-
+            LOG.info(ex.getMessage());
         }
         return null;
     }
