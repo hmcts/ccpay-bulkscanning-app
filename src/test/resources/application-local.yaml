@@ -51,7 +51,7 @@ idam:
 generated:
   user:
     email:
-      pattern: ${GENERATED_USER_EMAIL_PATTERN:freg-test-user-%s@feemail.com}
+      pattern: ${GENERATED_USER_EMAIL_PATTERN:freg-test-functional-aldie-junk-user-%s@feemail.com}
 
 oauth2:
   redirect:
