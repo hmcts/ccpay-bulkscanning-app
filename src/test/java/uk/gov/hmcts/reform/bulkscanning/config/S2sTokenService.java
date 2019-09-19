@@ -25,7 +25,7 @@ public class S2sTokenService {
 
     public String getS2sToken(String microservice, String secret) {
         String otp = oneTimePasswordFactory.validOneTimePassword(secret);
-        LOG.debug("s2sApi" + s2sApi.toString());
+        LOG.info("s2sApi" + s2sApi.toString());
         return s2sApi.serviceToken(microservice, otp);
     }
 }
