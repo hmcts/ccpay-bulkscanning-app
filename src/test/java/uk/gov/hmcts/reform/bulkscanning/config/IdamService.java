@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.bulkscanning.config;
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.CreateUserRequest;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.TokenExchangeResponse;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.UserGroup;
 
 import java.util.Base64;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -29,6 +31,8 @@ public class IdamService {
     private final IdamApi idamApi;
     private final TestConfigProperties testConfig;
 
+    private static final Logger LOG = LoggerFactory.getLogger(IdamService.class);
+
     @Autowired
     public IdamService(TestConfigProperties testConfig) {
         this.testConfig = testConfig;
@@ -42,6 +46,8 @@ public class IdamService {
     public User createUserWith(String userGroup, String... roles) {
         String email = nextUserEmail();
         CreateUserRequest userRequest = userRequest(email, userGroup, roles);
+        LOG.debug("idamApi : " + idamApi.toString());
+        LOG.debug("userRequest : " + userRequest);
         idamApi.createUser(userRequest);
 
         String accessToken = authenticateUser(email, testConfig.getTestUserPassword());
@@ -86,6 +92,6 @@ public class IdamService {
     }
 
     private String nextUserEmail() {
-        return String.format(testConfig.getGeneratedUserEmailPattern(), RandomStringUtils.randomAlphanumeric(10));
+        return String.format(testConfig.getGeneratedUserEmailPattern(), UUID.randomUUID().toString());
     }
 }
