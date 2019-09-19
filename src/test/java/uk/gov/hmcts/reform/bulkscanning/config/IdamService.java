@@ -48,7 +48,11 @@ public class IdamService {
         CreateUserRequest userRequest = userRequest(email, userGroup, roles);
         LOG.info("idamApi : " + idamApi.toString());
         LOG.info("userRequest : " + userRequest);
-        idamApi.createUser(userRequest);
+        try{
+            idamApi.createUser(userRequest);
+        }catch(Exception ex){
+            LOG.info(ex.getMessage());
+        }
 
         String accessToken = authenticateUser(email, testConfig.getTestUserPassword());
 
