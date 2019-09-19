@@ -66,21 +66,32 @@ public class IdamService {
         String authorisation = username + ":" + password;
         String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
 
-        IdamApi.AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
-            BASIC + base64Authorisation,
-            CODE,
-            testConfig.getOauth2().getClientId(),
-            testConfig.getOauth2().getRedirectUrl());
+        LOG.info("username : " + username);
+        LOG.info("password : " + password);
+        LOG.info("base64Authorisation : " + base64Authorisation);
+        LOG.info("testConfig.getOauth2().getClientId() : " + testConfig.getOauth2().getClientId());
+        LOG.info("testConfig.getOauth2().getRedirectUrl() : " + testConfig.getOauth2().getRedirectUrl());
 
-        TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
-            authenticateUserResponse.getCode(),
-            AUTHORIZATION_CODE,
-            testConfig.getOauth2().getClientId(),
-            testConfig.getOauth2().getClientSecret(),
-            testConfig.getOauth2().getRedirectUrl()
-        );
+        try{
+            IdamApi.AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
+                BASIC + base64Authorisation,
+                CODE,
+                testConfig.getOauth2().getClientId(),
+                testConfig.getOauth2().getRedirectUrl());
 
-        return BEARER + tokenExchangeResponse.getAccessToken();
+            TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
+                authenticateUserResponse.getCode(),
+                AUTHORIZATION_CODE,
+                testConfig.getOauth2().getClientId(),
+                testConfig.getOauth2().getClientSecret(),
+                testConfig.getOauth2().getRedirectUrl()
+            );
+
+            return BEARER + tokenExchangeResponse.getAccessToken();
+        }catch (Exception ex){
+
+        }
+        return null;
     }
 
 
