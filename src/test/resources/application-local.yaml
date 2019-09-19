@@ -58,7 +58,7 @@ oauth2:
     uri: ${OAUTH2_REDIRECT_URI:https://moneyclaims.aat.platform.hmcts.net}
   client:
     id: ${OAUTH2_CLIENT_ID:cmc_citizen}
-    secret: ${OAUTH2_CLIENT_SECRET:NVYEC2X7XFSRENTU}
+    secret: ${OAUTH2_CLIENT_SECRET:XXXXXXXX}
 
 s2s:
   url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
