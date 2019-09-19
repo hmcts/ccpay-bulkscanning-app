@@ -59,7 +59,7 @@ generated:
 
 oauth2:
   redirect:
-    uri: ${OAUTH2_REDIRECT_URI:https://moneyclaims.aat.platform.hmcts.net}
+    uri: ${OAUTH2_REDIRECT_URI:http://payment-api-aat-staging.service.core-compute-aat.internal/mock-api/serviceCallback}
   client:
     id: ${OAUTH2_CLIENT_ID:cmc_citizen}
     secret: ${OAUTH2_CLIENT_SECRET:wrubu7ruprupAq6trexe3enay4memej7}
