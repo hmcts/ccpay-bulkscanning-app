@@ -46,7 +46,7 @@ auth:
 test:
   url: ${TEST_URL:http://localhost:8000}
   user:
-    password: ${TEST_USER_PASSWORD:password}
+    password: ${TEST_USER_PASSWORD:****}
 
 idam:
   api:
