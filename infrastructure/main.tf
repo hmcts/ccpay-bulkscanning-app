@@ -11,6 +11,12 @@ locals {
   nonPreviewVaultName = "ccpay-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
+  #region API gateway
+  thumbprints_in_quotes = "${formatlist("&quot;%s&quot;", var.bulkscanning_api_gateway_certificate_thumbprints)}"
+  thumbprints_in_quotes_str = "${join(",", local.thumbprints_in_quotes)}"
+
+  api_policy = "${replace(file("template/api-policy.xml"), "ALLOWED_CERTIFICATE_THUMBPRINTS", local.thumbprints_in_quotes_str)}"
+  api_base_path = "bulk-scanning-payment"
 }
 
 module "bulk-scanning-payment-api" {
@@ -92,3 +98,33 @@ data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   name = "AppInsightsInstrumentationKey"
   vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
 }
+
+data "template_file" "policy_template" {
+  template = "${file("${path.module}/template/api-policy.xml")}"
+
+  vars {
+    allowed_certificate_thumbprints = "${local.thumbprints_in_quotes_str}"
+  }
+}
+
+data "template_file" "api_template" {
+  template = "${file("${path.module}/template/api.json")}"
+}
+
+resource "azurerm_template_deployment" "bulk-scanning-payment" {
+  template_body       = "${data.template_file.api_template.rendered}"
+  name                = "bulk-scanning-payment-${var.env}"
+  deployment_mode     = "Incremental"
+  resource_group_name = "core-infra-${var.env}"
+  count               = "${var.env != "preview" ? 1: 0}"
+
+  parameters = {
+    apiManagementServiceName  = "core-api-mgmt-${var.env}"
+    apiName                   = "bulk-scanning-payment-api"
+    apiProductName            = "bulk-scanning-payment"
+    serviceUrl                = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
+    apiBasePath               = "${local.api_base_path}"
+    policy                    = "${data.template_file.policy_template.rendered}"
+  }
+}
+

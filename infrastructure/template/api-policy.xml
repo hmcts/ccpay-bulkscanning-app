@@ -1,0 +1,14 @@
+<policies>
+  <backend>
+    <base/>
+  </backend>
+  <inbound>
+    <base/>
+  </inbound>
+  <outbound>
+    <base/>
+  </outbound>
+  <on-error>
+    <base/>
+  </on-error>
+</policies>

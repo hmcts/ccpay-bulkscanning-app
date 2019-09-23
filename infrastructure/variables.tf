@@ -41,3 +41,9 @@ variable "postgresql_user" {
   type    = "string"
   default = "bspayment"
 }
+
+# thumbprint of the SSL certificate for API gateway tests
+variable bulkscanning_api_gateway_certificate_thumbprints {
+  type = "list"
+  default = []
+}
