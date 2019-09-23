@@ -44,7 +44,7 @@ module "bulk-scanning-payment-api" {
     SPRING_DATASOURCE_URL = "jdbc:postgresql://${module.ccpay-bulkscanning-payment-database.host_name}:${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}/${module.ccpay-bulkscanning-payment-database.postgresql_database}?sslmode=require"
 
     # S2S trusted services
-    TRUSTED_S2S_SERVICE_NAMES: "api_gw"
+    TRUSTED_S2S_SERVICE_NAMES = "api_gw, ccpay_bubble"
   }
 }
 module "ccpay-bulkscanning-payment-database" {
