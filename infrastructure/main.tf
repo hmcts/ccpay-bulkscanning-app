@@ -6,10 +6,16 @@ locals {
 
   asp_name = "ccpay-${var.env}"
   sku_size = "${var.env == "prod" || var.env == "sprod" || var.env == "aat" ? "I2" : "I1"}"
+  aseName = "core-compute-${var.env}"
+
+  local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
+  local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
   previewVaultName = "ccpay-aat"
   nonPreviewVaultName = "ccpay-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
+
+  s2sUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
 
   #region API gateway
   thumbprints_in_quotes = "${formatlist("&quot;%s&quot;", var.bulkscanning_api_gateway_certificate_thumbprints)}"
@@ -118,6 +124,9 @@ data "template_file" "policy_template" {
 
   vars {
     allowed_certificate_thumbprints = "${local.thumbprints_in_quotes_str}"
+    s2s_client_id = "${data.azurerm_key_vault_secret.s2s_client_id.value}"
+    s2s_client_secret = "${data.azurerm_key_vault_secret.s2s_client_secret.value}"
+    s2s_base_url = "${local.s2sUrl}"
   }
 }
 
