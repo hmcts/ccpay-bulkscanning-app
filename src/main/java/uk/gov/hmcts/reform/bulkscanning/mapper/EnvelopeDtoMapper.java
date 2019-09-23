@@ -31,8 +31,8 @@ public class EnvelopeDtoMapper {
     public EnvelopePayment toPaymentEntity(PaymentDto payment) {
         if(Optional.ofNullable(payment).isPresent()) {
             return EnvelopePayment.paymentWith()
-                .id(payment.getId())
                 .dcnReference(payment.getDcnReference())
+                .source(payment.getSource())
                 .paymentStatus(payment.getPaymentStatus().toString())
                 .build();
         }else {

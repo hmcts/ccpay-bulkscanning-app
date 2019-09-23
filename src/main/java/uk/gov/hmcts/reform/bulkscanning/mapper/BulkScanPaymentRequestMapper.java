@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.Boolean.TRUE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.BULK_SCAN;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @Component
@@ -24,6 +26,7 @@ public class BulkScanPaymentRequestMapper {
         Arrays.asList(dcnForPayments).stream().forEach(dcn -> envelopePaymentList.add(EnvelopePayment
                                                                                           .paymentWith()
                                                                                           .dcnReference(dcn)
+                                                                                          .source(BULK_SCAN.toString())
                                                                                           .paymentStatus(INCOMPLETE.toString())
                                                                                           .build()));
 

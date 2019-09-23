@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.EXCELA;
+
 @Component
 public class PaymentDtoMapper {
 
@@ -14,6 +16,7 @@ public class PaymentDtoMapper {
         if(Optional.ofNullable(bulkScanPayment).isPresent()) {
             return PaymentDto.paymentDtoWith()
                 .dcnReference(dcnReference)
+                .source(EXCELA.toString())
                 .paymentStatus(PaymentStatus.INCOMPLETE)
                 .build();
         }else {

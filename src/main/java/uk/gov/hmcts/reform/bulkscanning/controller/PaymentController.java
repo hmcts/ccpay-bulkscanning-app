@@ -4,23 +4,30 @@ import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.response.PaymentResponse;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
+import uk.gov.hmcts.reform.bulkscanning.utils.ExcelGeneratorUtil;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.util.Optional;
+import java.io.ByteArrayInputStream;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -168,5 +175,91 @@ public class PaymentController {
         } catch (Exception ex) {
             throw new PaymentException(ex);
         }
+    }
+
+    @ApiOperation("API to generate Report for Bulk_Scan_Payment System")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Report Generated"),
+        @ApiResponse(code = 404, message = "No Data found to generate Report")
+    })
+    @GetMapping("/report/download")
+    public ResponseEntity retrieveByReportType(
+                                    @RequestParam("date_from") Date fromDate,
+                                    @RequestParam("date_to") Date toDate,
+                                    @RequestParam("report_type") ReportType reportType) {
+        LOG.info("Retrieving payments for reportType : " + reportType);
+        try {
+            List<ReportData> reportDataList = paymentService.retrieveByReportType(fromDate, toDate, reportType);
+            if (Optional.ofNullable(reportDataList).isPresent()) {
+                LOG.info("No of Records exists : " + reportDataList.size());
+                ByteArrayInputStream in = ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
+                // return IOUtils.toByteArray(in);
+
+                HttpHeaders headers = new HttpHeaders();
+                String headerValue = "attachment; filename=" + reportType.toString();
+                headers.add("Content-Disposition", headerValue);
+
+                return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                    .body(new InputStreamResource(in));
+            } else {
+                LOG.info("Payment Records not found for Report-Type : " + reportType);
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
+        }
+    }
+
+    @PostMapping("/bulk-scan-payments-load")
+    public ResponseEntity<Integer> loadBsPayments(@RequestBody BulkScanPaymentRequest bulkScanPaymentRequest,
+                                                  @RequestParam(value = "count") Integer count) {
+        String ccd = bulkScanPaymentRequest.getCcdCaseNumber();
+        List<String> dcnList = Arrays.asList(bulkScanPaymentRequest.getDocumentControlNumbers());
+        IntStream.range(0, count).forEach(i -> {
+            bulkScanPaymentRequest.setCcdCaseNumber( ccd + i);
+            List<String> dcns = new ArrayList<>();
+            for(String dcn : dcnList){
+                dcns.add(dcn + i);
+            }
+            bulkScanPaymentRequest.setDocumentControlNumbers(dcns.toArray(new String[0]));
+            paymentService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
+        });
+        /*ExecutorService service = Executors.newFixedThreadPool(1);
+        IntStream.range(0, count)
+            .forEach(i -> service.submit(() -> {
+
+            }));*/
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/exela-payments-load")
+    public ResponseEntity<Integer> loadExelaPayments(@RequestBody BulkScanPayment exelaPaymentRequest,
+                                                     @RequestParam(required = true, value = "DCN") String dcn,
+                                                     @RequestParam(required = true, value = "count") Integer count) {
+        String bgc = exelaPaymentRequest.getBankGiroCreditSlipNumber();
+        IntStream.range(0, count).forEach(i -> {
+            String tempDcn = dcn + i;
+            exelaPaymentRequest.setBankGiroCreditSlipNumber(bgc + i);
+            if (! Optional.ofNullable(paymentService.getPaymentMetadata(tempDcn)).isPresent()) {
+                paymentService.processPaymentFromExela(exelaPaymentRequest, tempDcn);
+            }
+        });
+        /*ExecutorService service = Executors.newFixedThreadPool(10);
+        IntStream.range(0, count)
+            .forEach(i -> service.submit(() -> {
+
+
+            }));*/
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private int getRandomNumberInRange(int min, int max) {
+        int x = (int)(Math.random()*((max-min)+1))+min;
+        return x;
     }
 }
