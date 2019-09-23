@@ -42,6 +42,9 @@ module "bulk-scanning-payment-api" {
     SPRING_DATASOURCE_USERNAME = "${module.ccpay-bulkscanning-payment-database.user_name}"
     SPRING_DATASOURCE_PASSWORD = "${module.ccpay-bulkscanning-payment-database.postgresql_password}"
     SPRING_DATASOURCE_URL = "jdbc:postgresql://${module.ccpay-bulkscanning-payment-database.host_name}:${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}/${module.ccpay-bulkscanning-payment-database.postgresql_database}?sslmode=require"
+
+    # S2S trusted services
+    TRUSTED_S2S_SERVICE_NAMES: "api_gw"
   }
 }
 module "ccpay-bulkscanning-payment-database" {
@@ -96,6 +99,17 @@ data "azurerm_key_vault" "payment_key_vault" {
 }
 data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   name = "AppInsightsInstrumentationKey"
+  vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
+}
+
+# region API (gateway)
+data "azurerm_key_vault_secret" "s2s_client_secret" {
+  name = "gateway-s2s-client-secret"
+  vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "s2s_client_id" {
+  name = "gateway-s2s-client-id"
   vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
 }
 
