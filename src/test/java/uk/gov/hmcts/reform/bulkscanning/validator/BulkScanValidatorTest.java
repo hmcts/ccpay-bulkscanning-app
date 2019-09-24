@@ -27,8 +27,8 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @SpringBootTest
 @EnableFeignClients
 @AutoConfigureMockMvc
-@ActiveProfiles("local")
-@TestPropertySource(locations="classpath:application-local.yaml")
+@ActiveProfiles("test")
+@TestPropertySource(locations="classpath:application-test.yaml")
 public class BulkScanValidatorTest {
 
     @Autowired

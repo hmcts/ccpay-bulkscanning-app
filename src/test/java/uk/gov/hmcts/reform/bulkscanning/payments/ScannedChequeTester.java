@@ -10,16 +10,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles("local")
 @SpringBootTest
-@TestPropertySource(locations="classpath:application-local.yaml")
-
+@ActiveProfiles("test")
+@TestPropertySource(locations="classpath:application-test.yaml")
 public class ScannedChequeTester {
-
-
     @Test
     public void welcomeRootEndpoint() {
-
         assertThat("Welcome to world of scanning").startsWith("Welcome");
     }
 }
