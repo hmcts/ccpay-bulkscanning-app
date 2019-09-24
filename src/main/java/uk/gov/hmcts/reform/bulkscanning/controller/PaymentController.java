@@ -105,8 +105,10 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "Provided exception reference doesn't exist"),
     })
     @PutMapping("/bulk-scan-payments")
-    public ResponseEntity updateCaseReferenceForExceptionRecord(@NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
-                                                                @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
+    public ResponseEntity updateCaseReferenceForExceptionRecord(
+        @RequestHeader("Authorization") String authorization,
+        @NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
+        @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
 
         LOG.info(
             "Request received to update case reference {}, for exception record {}",
@@ -131,8 +133,10 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "No record exists for provided DCN"),
     })
     @PatchMapping("/bulk-scan-payments/{dcn}/status/{status}")
-    public ResponseEntity markPaymentAsProcessed(@NotEmpty @PathVariable("dcn") String dcn,
-                                                 @NotEmpty @PathVariable("status") PaymentStatus status) {
+    public ResponseEntity markPaymentAsProcessed(
+        @RequestHeader("Authorization") String authorization,
+        @NotEmpty @PathVariable("dcn") String dcn,
+        @NotEmpty @PathVariable("status") PaymentStatus status) {
         LOG.info("Request received to mark payment with DCN :{} , status : {}", dcn, status);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -147,7 +151,9 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases/{ccd_reference}")
-    public ResponseEntity<SearchResponse> retrieveByCCD(@PathVariable("ccd_reference") String ccdReference) {
+    public ResponseEntity<SearchResponse> retrieveByCCD(
+        @RequestHeader("Authorization") String authorization,
+        @PathVariable("ccd_reference") String ccdReference) {
         LOG.info("Retrieving payments for ccdReference {}: ", ccdReference);
         try {
             SearchResponse searchResponse = paymentService.retrieveByCCDReference(ccdReference);
@@ -169,8 +175,9 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases")
-    public ResponseEntity<SearchResponse> retrieveByDCN(@RequestParam("document_control_number")
-                                                            String documentControlNumber) {
+    public ResponseEntity<SearchResponse> retrieveByDCN(
+        @RequestHeader("Authorization") String authorization,
+        @RequestParam("document_control_number") String documentControlNumber) {
         LOG.info("Retrieving payments for documentControlNumber : {}", documentControlNumber);
         try {
             SearchResponse searchResponse = paymentService.retrieveByDcn(documentControlNumber);
@@ -193,6 +200,7 @@ public class PaymentController {
     })
     @GetMapping("/report/download")
     public ResponseEntity retrieveByReportType(
+        @RequestHeader("Authorization") String authorization,
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
         @RequestParam("report_type") ReportType reportType) {
