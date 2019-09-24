@@ -22,9 +22,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
@@ -285,5 +283,55 @@ public class PaymentControllerFunctionalTest {
             .build();
     }
 
+    @Test
+    public void testGeneratePaymentReport_Unprocessed() throws Exception{
 
+        String dcn[] = {"11112222333344441", "11112222333344442"};
+        String ccd = "1111222233334444";
+        createTestReportData(ccd, dcn);
+        ResultActions resultActions = mvc.perform(get("/report/download")
+                        .header("ServiceAuthorization", "service")
+                        .param("date_from", "01/01/2011")
+                        .param("date_to", "01/10/2011")
+                        .param("report_type", "UNPROCESSED")
+                        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
+    public void testGeneratePaymentReport_DataLoss() throws Exception{
+        String dcn[] = {"11112222333355551", "11112222333355552"};
+        String ccd = "1111222233335555";
+        createTestReportData(ccd, dcn);
+        ResultActions resultActions = mvc.perform(get("/report/download")
+                        .header("ServiceAuthorization", "service")
+                        .param("date_from", "01/01/2011")
+                        .param("date_to", "01/10/2011")
+                        .param("report_type", "DATA_LOSS")
+                        .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    private void createTestReportData(String ccd, String... dcns) throws Exception{
+        //Request from Exela with one DCN
+
+        mvc.perform(post("/bulk-scan-payment")
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(createPaymentRequest(dcns[0])))
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        //Request from bulk scan with one DCN
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd
+            ,dcns,"AA08", true);
+
+        //Post request
+        mvc.perform(post("/bulk-scan-payments")
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(bulkScanPaymentRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
 }
