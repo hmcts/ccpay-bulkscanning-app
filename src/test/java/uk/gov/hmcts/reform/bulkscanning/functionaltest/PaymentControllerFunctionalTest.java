@@ -21,6 +21,11 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -35,7 +40,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(locations="classpath:application-local.yaml")
+@TestPropertySource(locations = "classpath:application-local.yaml")
 public class PaymentControllerFunctionalTest {
 
     @Autowired
@@ -64,16 +69,16 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
-    public void testBulkScanningPaymentRequestFirst() throws Exception{
+    public void testBulkScanningPaymentRequestFirst() throws Exception {
         String dcn[] = {"DCN2"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-5555"
-            ,dcn,"AA08", true);
+            , dcn, "AA08", true);
 
         //Post request
         ResultActions resultActions = mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(bulkScanPaymentRequest))
-            .contentType(MediaType.APPLICATION_JSON))
+                                                      .header("ServiceAuthorization", "service")
+                                                      .content(asJsonString(bulkScanPaymentRequest))
+                                                      .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
@@ -81,59 +86,63 @@ public class PaymentControllerFunctionalTest {
 
         //Post Repeat request
         ResultActions repeatRequest = mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(bulkScanPaymentRequest))
-            .contentType(MediaType.APPLICATION_JSON))
+                                                      .header("ServiceAuthorization", "service")
+                                                      .content(asJsonString(bulkScanPaymentRequest))
+                                                      .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isConflict())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
-        Assert.assertTrue(StringUtils.containsIgnoreCase(repeatRequest.andReturn().getResponse().getContentAsString(),
-            BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST));
+        Assert.assertTrue(StringUtils.containsIgnoreCase(
+            repeatRequest.andReturn().getResponse().getContentAsString(),
+            BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST
+        ));
 
         //PATCH Request
         ResultActions patchRequest = mvc.perform(patch("/bulk-scan-payments/DCN2/status/PROCESSED")
-            .header("ServiceAuthorization", "service")
-            .contentType(MediaType.APPLICATION_JSON))
+                                                     .header("ServiceAuthorization", "service")
+                                                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                           .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         Assert.assertNotNull(patchRequest.andReturn().getResponse().getContentAsString());
 
         //DCN Not exists Request
         ResultActions patchDCNNotExists = mvc.perform(patch("/bulk-scan-payments/DCN3/status/PROCESSED")
-            .header("ServiceAuthorization", "service")
-            .contentType(MediaType.APPLICATION_JSON))
+                                                          .header("ServiceAuthorization", "service")
+                                                          .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                           .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
-        Assert.assertTrue(StringUtils.containsIgnoreCase(patchDCNNotExists.andReturn().getResponse().getContentAsString(),
-            DCN_NOT_EXISTS));
+        Assert.assertTrue(StringUtils.containsIgnoreCase(
+            patchDCNNotExists.andReturn().getResponse().getContentAsString(),
+            DCN_NOT_EXISTS
+        ));
     }
 
     @Test
     @Transactional
-    public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
+    public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
         String dcn[] = {"DCN5"};
         String dcn2[] = {"DCN6"};
 
         //Multiple envelopes with same exception record
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08", true);
+            , dcn, "AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn2,"AA08", true);
+            , dcn2, "AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         ResultActions resultActions = mvc.perform(put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(caseReferenceRequest))
-            .contentType(MediaType.APPLICATION_JSON))
+                                                      .header("ServiceAuthorization", "service")
+                                                      .content(asJsonString(caseReferenceRequest))
+                                                      .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                           .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         Assert.assertNotNull(resultActions.andReturn().getResponse().getContentAsString());
 
@@ -141,63 +150,68 @@ public class PaymentControllerFunctionalTest {
 
     @Test
     @Transactional
-    public void testExceptionRecordNotExists() throws Exception{
+    public void testExceptionRecordNotExists() throws Exception {
 
         ResultActions resultActions = mvc.perform(put("/bulk-scan-payments/?exception_reference=4444-3333-2222-111")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(caseReferenceRequest))
-            .contentType(MediaType.APPLICATION_JSON))
+                                                      .header("ServiceAuthorization", "service")
+                                                      .content(asJsonString(caseReferenceRequest))
+                                                      .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                           .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
-        Assert.assertTrue(StringUtils.containsIgnoreCase(resultActions.andReturn().getResponse().getContentAsString(),
-            EXCEPTION_RECORD_NOT_EXISTS));
+        Assert.assertTrue(StringUtils.containsIgnoreCase(
+            resultActions.andReturn().getResponse().getContentAsString(),
+            EXCEPTION_RECORD_NOT_EXISTS
+        ));
     }
 
     @Test
     @Transactional
-    public void testMarkPaymentAsProcessed() throws Exception{
+    public void testMarkPaymentAsProcessed() throws Exception {
         String dcn[] = {"DCN1"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08", false);
+            , dcn, "AA08", false);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         ResultActions resultActions = mvc.perform(patch("/bulk-scan-payments/DCN1/status/PROCESSED")
-            .header("ServiceAuthorization", "service")
-            .contentType(MediaType.APPLICATION_JSON))
+                                                      .header("ServiceAuthorization", "service")
+                                                      .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                           .contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         Assert.assertEquals(resultActions.andReturn().getResponse().getStatus(), OK.value());
 
     }
 
     @Test
-    public void testMatchingPaymentsFromExcelaBulkScan() throws Exception{
+    public void testMatchingPaymentsFromExcelaBulkScan() throws Exception {
 
         //Request from Exela with one DCN
         String dcn[] = {"1111-2222-4444-5555"};
         mvc.perform(post("/bulk-scan-payment")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(createPaymentRequest("1111-2222-4444-5555")))
-            .contentType(MediaType.APPLICATION_JSON));
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(createPaymentRequest("1111-2222-4444-5555")))
+                        .contentType(MediaType.APPLICATION_JSON));
 
         //Request from bulk scan with one DCN
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08", true);
+            , dcn, "AA08", true);
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(bulkScanPaymentRequest))
-            .contentType(MediaType.APPLICATION_JSON))
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(bulkScanPaymentRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         //Complete payment
-        Assert.assertEquals(COMPLETE.toString(), paymentRepository.findByDcnReference("1111-2222-4444-5555").get().getPaymentStatus());
+        Assert.assertEquals(
+            COMPLETE.toString(),
+            paymentRepository.findByDcnReference("1111-2222-4444-5555").get().getPaymentStatus()
+        );
 
         //Complete envelope
         Envelope finalEnvelope = envelopeRepository.findAll().iterator().next();
@@ -206,24 +220,24 @@ public class PaymentControllerFunctionalTest {
 
 
     @Test
-    public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception{
+    public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception {
 
         //Request from Exela with one DCN
-        String dcn[] = {"1111-2222-3333-6666","1111-2222-3333-7777"};
+        String dcn[] = {"1111-2222-3333-6666", "1111-2222-3333-7777"};
         mvc.perform(post("/bulk-scan-payment")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(createPaymentRequest("1111-2222-3333-6666")))
-            .contentType(MediaType.APPLICATION_JSON));
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(createPaymentRequest("1111-2222-3333-6666")))
+                        .contentType(MediaType.APPLICATION_JSON));
 
         //Request from bulk scan with two DCN
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08", true);
+            , dcn, "AA08", true);
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(bulkScanPaymentRequest))
-            .contentType(MediaType.APPLICATION_JSON))
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(bulkScanPaymentRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
@@ -237,30 +251,28 @@ public class PaymentControllerFunctionalTest {
     }
 
 
-
     @Test
-    public void testMatchingBulkScanFirstThenExela() throws Exception{
+    public void testMatchingBulkScanFirstThenExela() throws Exception {
         //Request from Bulk Scan with one DCN
-        String dcn[] = {"1111-2222-3333-8888","1111-2222-3333-9999"};
+        String dcn[] = {"1111-2222-3333-8888", "1111-2222-3333-9999"};
 
         //Request from bulk scan with two DCN
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08", true);
+            , dcn, "AA08", true);
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(bulkScanPaymentRequest))
-            .contentType(MediaType.APPLICATION_JSON))
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(bulkScanPaymentRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
 
         mvc.perform(post("/bulk-scan-payment")
-            .header("ServiceAuthorization", "service")
-            .content(asJsonString(createPaymentRequest("1111-2222-3333-8888")))
-            .contentType(MediaType.APPLICATION_JSON));
-
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(createPaymentRequest("1111-2222-3333-8888")))
+                        .contentType(MediaType.APPLICATION_JSON));
 
 
         //Complete payment
@@ -284,37 +296,49 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
-    public void testGeneratePaymentReport_Unprocessed() throws Exception{
+    public void testGeneratePaymentReport_Unprocessed() throws Exception {
 
         String dcn[] = {"11112222333344441", "11112222333344442"};
         String ccd = "1111222233334444";
         createTestReportData(ccd, dcn);
         ResultActions resultActions = mvc.perform(get("/report/download")
-                        .header("ServiceAuthorization", "service")
-                        .param("date_from", "01/01/2011")
-                        .param("date_to", "01/10/2011")
-                        .param("report_type", "UNPROCESSED")
-                        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk());
-        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
-    }
-
-    @Test
-    public void testGeneratePaymentReport_DataLoss() throws Exception{
-        String dcn[] = {"11112222333355551", "11112222333355552"};
-        String ccd = "1111222233335555";
-        createTestReportData(ccd, dcn);
-        ResultActions resultActions = mvc.perform(get("/report/download")
-                        .header("ServiceAuthorization", "service")
-                        .param("date_from", "01/01/2011")
-                        .param("date_to", "01/10/2011")
-                        .param("report_type", "DATA_LOSS")
-                        .contentType(MediaType.APPLICATION_JSON))
+                                                      .header("ServiceAuthorization", "service")
+                                                      .param(
+                                                          "date_from",
+                                                          getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L))
+                                                      )
+                                                      .param(
+                                                          "date_to",
+                                                          getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L))
+                                                      )
+                                                      .param("report_type", "UNPROCESSED")
+                                                      .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
     }
 
-    private void createTestReportData(String ccd, String... dcns) throws Exception{
+    @Test
+    public void testGeneratePaymentReport_DataLoss() throws Exception {
+        String dcn[] = {"11112222333355551", "11112222333355552"};
+        String ccd = "1111222233335555";
+        createTestReportData(ccd, dcn);
+        ResultActions resultActions = mvc.perform(get("/report/download")
+                                                      .header("ServiceAuthorization", "service")
+                                                      .param(
+                                                          "date_from",
+                                                          getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L))
+                                                      )
+                                                      .param(
+                                                          "date_to",
+                                                          getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L))
+                                                      )
+                                                      .param("report_type", "DATA_LOSS")
+                                                      .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    private void createTestReportData(String ccd, String... dcns) throws Exception {
         //Request from Exela with one DCN
 
         mvc.perform(post("/bulk-scan-payment")
@@ -324,7 +348,7 @@ public class PaymentControllerFunctionalTest {
 
         //Request from bulk scan with one DCN
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd
-            ,dcns,"AA08", true);
+            , dcns, "AA08", true);
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
@@ -333,5 +357,14 @@ public class PaymentControllerFunctionalTest {
                         .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    private String getReportDate(Date date) {
+        DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        return dateToLocalDateTime(date).format(reportNameDateFormat);
+    }
+
+    private LocalDateTime dateToLocalDateTime(Date date) {
+        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 }
