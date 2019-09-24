@@ -200,6 +200,7 @@ public class PaymentController {
     })
     @GetMapping("/report/download")
     public ResponseEntity retrieveByReportType(
+        @RequestHeader("Authorization") String authorization,
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
         @RequestParam("report_type") ReportType reportType) {

@@ -328,7 +328,8 @@ public class PaymentControllerFunctionalTest {
         String ccd = "1111222233334444";
         createTestReportData(ccd, dcn);
         ResultActions resultActions = mvc.perform(get("/report/download")
-                                                      .header("ServiceAuthorization", "service")
+                                                      .header("Authorization", USER_TOKEN)
+                                                      .header("ServiceAuthorization", SERVICE_TOKEN)
                                                       .param(
                                                           "date_from",
                                                           getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L))
@@ -349,7 +350,8 @@ public class PaymentControllerFunctionalTest {
         String ccd = "1111222233335555";
         createTestReportData(ccd, dcn);
         ResultActions resultActions = mvc.perform(get("/report/download")
-                                                      .header("ServiceAuthorization", "service")
+                                                      .header("Authorization", USER_TOKEN)
+                                                      .header("ServiceAuthorization", SERVICE_TOKEN)
                                                       .param(
                                                           "date_from",
                                                           getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L))
@@ -368,7 +370,8 @@ public class PaymentControllerFunctionalTest {
         //Request from Exela with one DCN
 
         mvc.perform(post("/bulk-scan-payment")
-                        .header("ServiceAuthorization", "service")
+                        .header("Authorization", USER_TOKEN)
+                        .header("ServiceAuthorization", SERVICE_TOKEN)
                         .content(asJsonString(createPaymentRequest(dcns[0])))
                         .contentType(MediaType.APPLICATION_JSON));
 
@@ -378,7 +381,8 @@ public class PaymentControllerFunctionalTest {
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
-                        .header("ServiceAuthorization", "service")
+                        .header("Authorization", USER_TOKEN)
+                        .header("ServiceAuthorization", SERVICE_TOKEN)
                         .content(asJsonString(bulkScanPaymentRequest))
                         .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
