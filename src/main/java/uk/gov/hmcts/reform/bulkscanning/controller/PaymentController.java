@@ -108,7 +108,11 @@ public class PaymentController {
     public ResponseEntity updateCaseReferenceForExceptionRecord(@NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
                                                                 @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
 
-        LOG.info("Request received to update case reference {}, for exception record {}", caseReferenceRequest, exceptionRecordReference);
+        LOG.info(
+            "Request received to update case reference {}, for exception record {}",
+            caseReferenceRequest,
+            exceptionRecordReference
+        );
         return ResponseEntity
             .ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -189,9 +193,9 @@ public class PaymentController {
     })
     @GetMapping("/report/download")
     public ResponseEntity retrieveByReportType(
-                                    @RequestParam("date_from") Date fromDate,
-                                    @RequestParam("date_to") Date toDate,
-                                    @RequestParam("report_type") ReportType reportType) {
+        @RequestParam("date_from") Date fromDate,
+        @RequestParam("date_to") Date toDate,
+        @RequestParam("report_type") ReportType reportType) {
         LOG.info("Retrieving payments for reportType : {}", reportType);
         ByteArrayInputStream in = null;
         try {
@@ -199,24 +203,19 @@ public class PaymentController {
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 in = ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
-
-                HttpHeaders headers = new HttpHeaders();
-                String fileName = reportType.toString() + "_"
-                                    + getDateForReportName(fromDate) + "_To_"
-                                        + getDateForReportName(toDate) + "_RUN_"
-                                            + getDateTimeForReportName(new Date(System.currentTimeMillis()));
-                String headerValue = "attachment; filename=" + fileName;
-                headers.add("Content-Disposition", headerValue);
-
-                return ResponseEntity
-                    .ok()
-                    .headers(headers)
-                    .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                    .body(new InputStreamResource(in));
-            } else {
-                LOG.info("Payment Records not found for Report-Type : {}", reportType);
-                return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
+            HttpHeaders headers = new HttpHeaders();
+            String fileName = reportType.toString() + "_"
+                + getDateForReportName(fromDate) + "_To_"
+                + getDateForReportName(toDate) + "_RUN_"
+                + getDateTimeForReportName(new Date(System.currentTimeMillis()));
+            String headerValue = "attachment; filename=" + fileName;
+            headers.add("Content-Disposition", headerValue);
+            return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                .body(new InputStreamResource(in));
         } catch (Exception ex) {
             throw new PaymentException(ex);
         } finally {
