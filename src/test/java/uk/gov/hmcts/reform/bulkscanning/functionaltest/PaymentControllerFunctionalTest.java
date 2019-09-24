@@ -285,39 +285,46 @@ public class PaymentControllerFunctionalTest {
 
     @Test
     public void testGeneratePaymentReport_Unprocessed() throws Exception{
-        createTestReportData();
-        mvc.perform(get("/report/download")
+
+        String dcn[] = {"11112222333344441", "11112222333344442"};
+        String ccd = "1111222233334444";
+        createTestReportData(ccd, dcn);
+        ResultActions resultActions = mvc.perform(get("/report/download")
                         .header("ServiceAuthorization", "service")
                         .param("date_from", "01/01/2011")
                         .param("date_to", "01/10/2011")
                         .param("report_type", "UNPROCESSED")
                         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
     }
 
     @Test
     public void testGeneratePaymentReport_DataLoss() throws Exception{
-        createTestReportData();
-        mvc.perform(get("/report/download")
+        String dcn[] = {"11112222333355551", "11112222333355552"};
+        String ccd = "1111222233335555";
+        createTestReportData(ccd, dcn);
+        ResultActions resultActions = mvc.perform(get("/report/download")
                         .header("ServiceAuthorization", "service")
                         .param("date_from", "01/01/2011")
                         .param("date_to", "01/10/2011")
                         .param("report_type", "DATA_LOSS")
                         .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
     }
 
-    public void createTestReportData() throws Exception{
+    private void createTestReportData(String ccd, String... dcns) throws Exception{
         //Request from Exela with one DCN
-        String dcn[] = {"1111-2222-4444-5555", "1111-2222-4444-6666"};
+
         mvc.perform(post("/bulk-scan-payment")
                         .header("ServiceAuthorization", "service")
-                        .content(asJsonString(createPaymentRequest("1111-2222-4444-5555")))
+                        .content(asJsonString(createPaymentRequest(dcns[0])))
                         .contentType(MediaType.APPLICATION_JSON));
 
         //Request from bulk scan with one DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
-            ,dcn,"AA08", true);
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd
+            ,dcns,"AA08", true);
 
         //Post request
         mvc.perform(post("/bulk-scan-payments")
