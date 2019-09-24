@@ -7,19 +7,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
-import uk.gov.hmcts.reform.bulkscanning.mapper.*;
+import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
+import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
-import uk.gov.hmcts.reform.bulkscanning.model.entity.*;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.*;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.SearchRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
@@ -29,7 +37,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.BOTH;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.EXCELA;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
@@ -251,6 +258,7 @@ public class PaymentServiceImpl implements PaymentService {
                     reportDataList.add(record);
                 });
             }
+            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
             return reportDataList;
         }
         if (reportType.equals(ReportType.DATA_LOSS)) {
@@ -274,6 +282,7 @@ public class PaymentServiceImpl implements PaymentService {
                     reportDataList.add(record);
                 });
             }
+            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
             return reportDataList;
         }
         return null;
@@ -362,18 +371,5 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
         return Collections.emptyList();
-    }
-
-    private List<PaymentMetadata> getPaymentMetadataForPayments(List<EnvelopePayment> envelopePayments) {
-        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
-        if (Optional.ofNullable(envelopePayments).isPresent() && !envelopePayments.isEmpty()) {
-            LOG.info("No of EnvelopePayments exists : " + envelopePayments.size());
-            envelopePayments.stream()
-                .forEach(envelopePayment -> {
-                    paymentMetadataList.add(getPaymentMetadata(envelopePayment.getDcnReference()));
-                });
-
-        }
-        return paymentMetadataList;
     }
 }

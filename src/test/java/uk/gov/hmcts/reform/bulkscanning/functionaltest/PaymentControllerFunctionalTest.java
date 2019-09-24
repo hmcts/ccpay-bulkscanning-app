@@ -22,9 +22,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
@@ -285,5 +283,48 @@ public class PaymentControllerFunctionalTest {
             .build();
     }
 
+    @Test
+    public void testGeneratePaymentReport_Unprocessed() throws Exception{
+        createTestReportData();
+        mvc.perform(get("/report/download")
+                        .header("ServiceAuthorization", "service")
+                        .param("date_from", "01/01/2011")
+                        .param("date_to", "01/10/2011")
+                        .param("report_type", "UNPROCESSED")
+                        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+    }
 
+    @Test
+    public void testGeneratePaymentReport_DataLoss() throws Exception{
+        createTestReportData();
+        mvc.perform(get("/report/download")
+                        .header("ServiceAuthorization", "service")
+                        .param("date_from", "01/01/2011")
+                        .param("date_to", "01/10/2011")
+                        .param("report_type", "DATA_LOSS")
+                        .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+    }
+
+    public void createTestReportData() throws Exception{
+        //Request from Exela with one DCN
+        String dcn[] = {"1111-2222-4444-5555", "1111-2222-4444-6666"};
+        mvc.perform(post("/bulk-scan-payment")
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(createPaymentRequest("1111-2222-4444-5555")))
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        //Request from bulk scan with one DCN
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+            ,dcn,"AA08", true);
+
+        //Post request
+        mvc.perform(post("/bulk-scan-payments")
+                        .header("ServiceAuthorization", "service")
+                        .content(asJsonString(bulkScanPaymentRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
 }

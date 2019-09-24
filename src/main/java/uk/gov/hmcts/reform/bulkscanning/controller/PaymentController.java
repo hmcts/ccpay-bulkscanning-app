@@ -25,9 +25,14 @@ import uk.gov.hmcts.reform.bulkscanning.utils.ExcelGeneratorUtil;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateForReportName;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateTimeForReportName;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -187,16 +192,20 @@ public class PaymentController {
                                     @RequestParam("date_from") Date fromDate,
                                     @RequestParam("date_to") Date toDate,
                                     @RequestParam("report_type") ReportType reportType) {
-        LOG.info("Retrieving payments for reportType : " + reportType);
+        LOG.info("Retrieving payments for reportType : {}", reportType);
+        ByteArrayInputStream in = null;
         try {
             List<ReportData> reportDataList = paymentService.retrieveByReportType(fromDate, toDate, reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
-                LOG.info("No of Records exists : " + reportDataList.size());
-                ByteArrayInputStream in = ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
-                // return IOUtils.toByteArray(in);
+                LOG.info("No of Records exists : {}", reportDataList.size());
+                in = ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
 
                 HttpHeaders headers = new HttpHeaders();
-                String headerValue = "attachment; filename=" + reportType.toString();
+                String fileName = reportType.toString() + "_"
+                                    + getDateForReportName(fromDate) + "_To_"
+                                        + getDateForReportName(toDate) + "_RUN_"
+                                            + getDateTimeForReportName(new Date(System.currentTimeMillis()));
+                String headerValue = "attachment; filename=" + fileName;
                 headers.add("Content-Disposition", headerValue);
 
                 return ResponseEntity
@@ -205,15 +214,21 @@ public class PaymentController {
                     .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
                     .body(new InputStreamResource(in));
             } else {
-                LOG.info("Payment Records not found for Report-Type : " + reportType);
+                LOG.info("Payment Records not found for Report-Type : {}", reportType);
                 return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
         } catch (Exception ex) {
             throw new PaymentException(ex);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                LOG.error(e.getMessage());
+            }
         }
     }
 
-    @PostMapping("/bulk-scan-payments-load")
+    /*@PostMapping("/bulk-scan-payments-load")
     public ResponseEntity<Integer> loadBsPayments(@RequestBody BulkScanPaymentRequest bulkScanPaymentRequest,
                                                   @RequestParam(value = "count") Integer count) {
         String ccd = bulkScanPaymentRequest.getCcdCaseNumber();
@@ -227,11 +242,11 @@ public class PaymentController {
             bulkScanPaymentRequest.setDocumentControlNumbers(dcns.toArray(new String[0]));
             paymentService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
         });
-        /*ExecutorService service = Executors.newFixedThreadPool(1);
+        *//*ExecutorService service = Executors.newFixedThreadPool(1);
         IntStream.range(0, count)
             .forEach(i -> service.submit(() -> {
 
-            }));*/
+            }));*//*
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -248,12 +263,12 @@ public class PaymentController {
                 paymentService.processPaymentFromExela(exelaPaymentRequest, tempDcn);
             }
         });
-        /*ExecutorService service = Executors.newFixedThreadPool(10);
+        *//*ExecutorService service = Executors.newFixedThreadPool(10);
         IntStream.range(0, count)
             .forEach(i -> service.submit(() -> {
 
 
-            }));*/
+            }));*//*
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -261,5 +276,5 @@ public class PaymentController {
     private int getRandomNumberInRange(int min, int max) {
         int x = (int)(Math.random()*((max-min)+1))+min;
         return x;
-    }
+    }*/
 }

@@ -11,10 +11,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static org.apache.poi.ss.usermodel.IndexedColors.BLACK;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType.DATA_LOSS;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType.UNPROCESSED;
+
 public class ExcelGeneratorUtil {
     public static ByteArrayInputStream exportToExcel(ReportType reportType, List<ReportData> reportDataList) throws IOException {
-        String[] cols_Data_Loss = {"Loss_Resp", "Payment_Asset_DCN", "Resp_Service ID", "Resp_Service Name", "Date_Banked", "BGC_Batch", "Payment_Method", "Amount"};
-        String[] cols_Unprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref", "Date_Banked", "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
+        String[] colsDataLoss = {"Loss_Resp", "Payment_Asset_DCN", "Resp_Service ID", "Resp_Service Name", "Date_Banked", "BGC_Batch", "Payment_Method", "Amount"};
+        String[] colsUnprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref", "Date_Banked", "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
         try(
             Workbook workbook = new XSSFWorkbook();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -25,7 +29,7 @@ public class ExcelGeneratorUtil {
 
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
-            headerFont.setColor(IndexedColors.BLACK.getIndex());
+            headerFont.setColor(BLACK.getIndex());
 
             CellStyle headerCellStyle = workbook.createCellStyle();
             headerCellStyle.setFont(headerFont);
@@ -34,10 +38,10 @@ public class ExcelGeneratorUtil {
             Row headerRow = sheet.createRow(0);
 
             // Header
-            if(reportType.equals(ReportType.UNPROCESSED)){
-                for (int col = 0; col < cols_Unprocessed.length; col++) {
+            if(reportType.equals(UNPROCESSED)){
+                for (int col = 0; col < colsUnprocessed.length; col++) {
                     Cell cell = headerRow.createCell(col);
-                    cell.setCellValue(cols_Unprocessed[col]);
+                    cell.setCellValue(colsUnprocessed[col]);
                     cell.setCellStyle(headerCellStyle);
                 }
                 int rowIdx = 1;
@@ -55,10 +59,10 @@ public class ExcelGeneratorUtil {
                     row.createCell(8).setCellValue(reportData.getAmount().toString());
                 }
             }
-            else if(reportType.equals(ReportType.DATA_LOSS)){
-                for (int col = 0; col < cols_Data_Loss.length; col++) {
+            else if(reportType.equals(DATA_LOSS)){
+                for (int col = 0; col < colsDataLoss.length; col++) {
                     Cell cell = headerRow.createCell(col);
-                    cell.setCellValue(cols_Data_Loss[col]);
+                    cell.setCellValue(colsDataLoss[col]);
                     cell.setCellStyle(headerCellStyle);
                 }
                 int rowIdx = 1;
