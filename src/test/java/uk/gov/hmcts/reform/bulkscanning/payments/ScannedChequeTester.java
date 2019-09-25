@@ -11,8 +11,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("test")
-@TestPropertySource(locations="classpath:application-test.yaml")
+@ActiveProfiles("local")
+@TestPropertySource(locations="classpath:application-local.yaml")
 public class ScannedChequeTester {
     @Test
     public void welcomeRootEndpoint() {

@@ -17,8 +17,8 @@ import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-@TestPropertySource(locations="classpath:application-test.yaml")
+@ActiveProfiles("local")
+@TestPropertySource(locations="classpath:application-local.yaml")
 public class BulkScanningUtilsTest {
 
     @Test
