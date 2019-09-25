@@ -79,8 +79,8 @@ public class PaymentControllerFunctionalTest {
     @Autowired
     private S2sTokenService s2sTokenService;
 
-    private static String USER_TOKEN;
-    private static String SERVICE_TOKEN;
+    private static String USER_TOKEN = "Dummy";
+    private static String SERVICE_TOKEN = "Dummy";
     private static boolean TOKENS_INITIALIZED;
 
     @Before
