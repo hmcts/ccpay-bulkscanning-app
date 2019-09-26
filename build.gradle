@@ -87,7 +87,7 @@ task smoke(type: Test) {
 
 pmd {
   toolVersion = "6.16.0"
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
+  sourceSets = [sourceSets.main, sourceSets.integrationTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
   ruleSets = []
@@ -210,6 +210,8 @@ dependencies {
   compileOnly 'org.projectlombok:lombok:1.18.10'
   annotationProcessor 'org.projectlombok:lombok:1.18.10'
   testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+  functionalTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+  smokeTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.0.4.RELEASE'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit

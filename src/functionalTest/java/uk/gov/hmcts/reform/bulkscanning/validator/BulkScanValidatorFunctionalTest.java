@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.bulkscanning.validator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,21 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.reform.bulkscanning.backdoors.RestActions;
-import uk.gov.hmcts.reform.bulkscanning.backdoors.ServiceResolverBackdoor;
-import uk.gov.hmcts.reform.bulkscanning.backdoors.UserResolverBackdoor;
+import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
+import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerFunctionalTest.createBulkScanPaymentRequest;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerFunctionalTest.createBulkScanPaymentRequest;
+import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonString;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -31,40 +29,30 @@ import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerF
 @AutoConfigureMockMvc
 @ActiveProfiles("local")
 @TestPropertySource(locations="classpath:application-local.yaml")
-public class BulkScanValidatorTest {
+public class BulkScanValidatorFunctionalTest {
 
+    @Autowired
     MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    protected ServiceResolverBackdoor serviceRequestAuthorizer;
-
-    @Autowired
-    protected UserResolverBackdoor userRequestAuthorizer;
-
-    private static final String USER_ID = UserResolverBackdoor.AUTHENTICATED_USER_ID;
-
-    RestActions restActions;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     public static final String RESPONSIBLE_SERVICE_ID_MISSING = "Responsible service id is missing";
     public static final String CCD_REFERENCE_MISSING = "CCD reference is missing";
     public static final String PAYMENT_DCN_MISSING = "Payment DCN are missing";
 
+    @Autowired
+    private TestConfigProperties testProps;
+
+    @Autowired
+    private S2sTokenService s2sTokenService;
+
+    private static String SERVICE_TOKEN = "Dummy";
+    private static boolean TOKENS_INITIALIZED;
+
     @Before
     public void setUp() {
-        MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-        this.restActions = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
-
-        restActions
-            .withAuthorizedService("cmc")
-            .withAuthorizedUser(USER_ID)
-            .withUserId(USER_ID)
-            .withReturnUrl("https://www.gooooogle.com");
+        if (!TOKENS_INITIALIZED) {
+            SERVICE_TOKEN = s2sTokenService.getS2sToken(testProps.s2sServiceName, testProps.s2sServiceSecret);
+            TOKENS_INITIALIZED = true;
+        }
     }
 
     @Test()
@@ -74,7 +62,10 @@ public class BulkScanValidatorTest {
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
             ,null,null, false);
 
-        ResultActions resultActions = restActions.post("/bulk-scan-payments/", bulkScanPaymentRequest);
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
+            .header("ServiceAuthorization", SERVICE_TOKEN)
+            .content(asJsonString(bulkScanPaymentRequest))
+            .contentType(MediaType.APPLICATION_JSON));
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
 
