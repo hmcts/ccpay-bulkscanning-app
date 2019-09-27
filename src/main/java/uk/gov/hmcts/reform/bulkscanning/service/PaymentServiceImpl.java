@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.bulkscanning.utils.DateUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.BOTH;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.*;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
@@ -278,7 +278,9 @@ public class PaymentServiceImpl implements PaymentService {
                         record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
                         record.setRespServiceName(payment.getEnvelope().getResponsibleServiceId());
                     }
-                    record.setLossResp(payment.getSource());
+                    String lossResp = payment.getSource().equalsIgnoreCase(BULK_SCAN.toString())
+                                        ? EXCELA.toString() : BULK_SCAN.toString();
+                    record.setLossResp(lossResp);
                     reportDataList.add(record);
                 });
             }
