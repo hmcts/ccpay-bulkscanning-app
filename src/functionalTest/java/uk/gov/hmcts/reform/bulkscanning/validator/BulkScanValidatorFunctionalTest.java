@@ -61,11 +61,6 @@ public class BulkScanValidatorFunctionalTest {
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
             ,null,null, false);
 
-        /*ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .content(asJsonString(bulkScanPaymentRequest))
-            .contentType(MediaType.APPLICATION_JSON));*/
-
         Response response = RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .body(bulkScanPaymentRequest)
@@ -75,8 +70,8 @@ public class BulkScanValidatorFunctionalTest {
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(response.getStatusCode()));
 
-        //Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(RESPONSIBLE_SERVICE_ID_MISSING));
-        //Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(CCD_REFERENCE_MISSING));
-        //Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(PAYMENT_DCN_MISSING));
+        Assert.assertTrue(response.andReturn().asString().contains(RESPONSIBLE_SERVICE_ID_MISSING));
+        Assert.assertTrue(response.andReturn().asString().contains(CCD_REFERENCE_MISSING));
+        Assert.assertTrue(response.andReturn().asString().contains(PAYMENT_DCN_MISSING));
     }
 }
