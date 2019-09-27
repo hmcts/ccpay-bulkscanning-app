@@ -14,7 +14,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
 import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
@@ -30,9 +29,6 @@ import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerFunct
 @TestPropertySource(locations="classpath:application-test.yaml")
 public class BulkScanValidatorFunctionalTest {
 
-    @Autowired
-    MockMvc mockMvc;
-
     public static final String RESPONSIBLE_SERVICE_ID_MISSING = "Responsible service id is missing";
     public static final String CCD_REFERENCE_MISSING = "CCD reference is missing";
     public static final String PAYMENT_DCN_MISSING = "Payment DCN are missing";
@@ -43,7 +39,7 @@ public class BulkScanValidatorFunctionalTest {
     @Autowired
     private S2sTokenService s2sTokenService;
 
-    private static String SERVICE_TOKEN = "Dummy";
+    private static String SERVICE_TOKEN;
     private static boolean TOKENS_INITIALIZED;
 
     @Before
