@@ -30,3 +30,15 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
+trusted:
+  s2s:
+    service:
+      names: ccpay_bubble
+auth:
+  idam:
+    client:
+      baseUrl: ${AUTH_IDAM_CLIENT_BASEURL:#{http://dummy.dummy.net}}
+  provider:
+    service:
+      client:
+        baseUrl: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL:#{http://dummy.dummy.net}}

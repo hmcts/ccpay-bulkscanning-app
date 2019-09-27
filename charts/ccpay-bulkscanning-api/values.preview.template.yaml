@@ -6,6 +6,8 @@ java:
     SPRING_LIQUIBASE_ENABLED: true
     REFORM_SERVICE_NAME: ccpay-bulkscanning
     REFORM_TEAM: ccpay
+    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    AUTH_IDAM_CLIENT_BASEURL: "https://idam-api.aat.platform.hmcts.net"
 
 postgresql:
   enabled: true

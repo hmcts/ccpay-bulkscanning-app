@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Component
@@ -19,5 +20,15 @@ public final class DateUtil {
 
     public static LocalDateTime dateToLocalDateTime(Date date) {
         return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+    }
+
+    public static String getDateForReportName(Date date){
+        DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("ddMMyy");
+        return dateToLocalDateTime(date).format(reportNameDateFormat);
+    }
+
+    public static String getDateTimeForReportName(Date date){
+        DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("ddMMyy_HHmmss");
+        return dateToLocalDateTime(date).format(reportNameDateFormat);
     }
 }

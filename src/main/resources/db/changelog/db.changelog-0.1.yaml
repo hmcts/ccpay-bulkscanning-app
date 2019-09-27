@@ -92,6 +92,11 @@ databaseChangeLog:
                 constraints:
                   nullable: true
             - column:
+                name: source
+                type: varchar(50)
+                constraints:
+                  nullable: true
+            - column:
                 name: date_created
                 type: TIMESTAMP WITHOUT TIME ZONE
             - column:

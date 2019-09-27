@@ -39,6 +39,9 @@ public class EnvelopePayment {
     @Column(name = "envelope_payment_status")
     private String paymentStatus;
 
+    @Column(name = "source")
+    private String source;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "envelope_id", insertable = false, updatable = false)
     @ToString.Exclude
