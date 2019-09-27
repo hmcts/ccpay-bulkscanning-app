@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerFunctionalTest.createBulkScanPaymentRequest;
+import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerFnTest.createBulkScanPaymentRequest;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

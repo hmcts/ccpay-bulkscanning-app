@@ -45,7 +45,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.mockBulkScanningEnvelope;
-import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerFunctionalTest.createBulkScanPaymentRequest;
+import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerFnTest.createBulkScanPaymentRequest;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;

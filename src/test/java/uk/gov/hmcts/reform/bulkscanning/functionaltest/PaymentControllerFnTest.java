@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 @ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles({"local", "test"})
 //@TestPropertySource(locations="classpath:application-local.yaml")
-public class PaymentControllerFunctionalTest {
+public class PaymentControllerFnTest {
 
     MockMvc mvc;
 
