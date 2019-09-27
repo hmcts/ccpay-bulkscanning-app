@@ -24,7 +24,6 @@ import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerFunct
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableFeignClients
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @TestPropertySource(locations="classpath:application-test.yaml")
 public class BulkScanValidatorFunctionalTest {

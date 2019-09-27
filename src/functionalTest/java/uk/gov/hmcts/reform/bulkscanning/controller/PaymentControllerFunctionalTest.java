@@ -9,6 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -42,6 +44,8 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 
 
 @RunWith(SpringRunner.class)
+@SpringBootTest
+@EnableFeignClients
 @ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles("test")
 @TestPropertySource(locations="classpath:application-test.yaml")
