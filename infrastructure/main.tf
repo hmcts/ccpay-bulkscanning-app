@@ -14,6 +14,7 @@ locals {
   previewVaultName = "ccpay-aat"
   nonPreviewVaultName = "ccpay-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
+  s2sUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
 
   s2sUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
 
@@ -51,6 +52,12 @@ module "bulk-scanning-payment-api" {
 
     # S2S trusted services
     TRUSTED_S2S_SERVICE_NAMES = "api_gw, ccpay_bubble"
+
+    # idam
+    AUTH_IDAM_CLIENT_BASEURL = "${var.idam_api_url}"
+
+    # service-auth-provider
+    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL = "${local.s2sUrl}"
   }
 }
 module "ccpay-bulkscanning-payment-database" {

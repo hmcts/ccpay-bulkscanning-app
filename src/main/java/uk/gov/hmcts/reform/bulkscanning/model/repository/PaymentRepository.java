@@ -14,4 +14,6 @@ public interface PaymentRepository extends CrudRepository<EnvelopePayment, Integ
     Optional<EnvelopePayment> findByDcnReference(String dcnReference);
 
     Optional<List<EnvelopePayment>> findByEnvelopeId(Integer envelopeId);
+
+    Optional<List<EnvelopePayment>> findByPaymentStatus(String paymentStatus);
 }
