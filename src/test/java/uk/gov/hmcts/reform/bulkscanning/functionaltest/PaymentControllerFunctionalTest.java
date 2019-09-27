@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -39,7 +38,6 @@ import java.util.Date;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
@@ -52,8 +50,8 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 @EnableFeignClients
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = TestContextConfiguration.class)
-@ActiveProfiles("local")
-@TestPropertySource(locations="classpath:application-local.yaml")
+@ActiveProfiles({"local", "test"})
+//@TestPropertySource(locations="classpath:application-local.yaml")
 public class PaymentControllerFunctionalTest {
 
     MockMvc mvc;
