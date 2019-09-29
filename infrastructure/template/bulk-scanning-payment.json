@@ -1,0 +1,131 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Bulk Scanning Payment API to be used by the scanning supplier to share the payment information contained in the envelope",
+    "version": "1.0.0",
+    "title": "Bulk Scanning Payment API"
+  },
+  "host": "callback.service.host.url",
+  "tags": [
+    {
+      "name": "bulk-scanning-payments",
+      "description": "API endpoints to support payments via the bulk scanning channel"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "apiKeyHeader": {
+      "type": "apiKey",
+      "name": "Ocp-Apim-Subscription-Key",
+      "in": "header"
+    },
+    "apiKeyQuery": {
+      "type": "apiKey",
+      "name": "subscription-key",
+      "in": "query"
+    }
+  },
+  "security": [
+    {
+      "apiKeyHeader": []
+    },
+    {
+      "apiKeyQuery": []
+    }
+  ],
+  "paths": {
+    "/bulk-scan-payment": {
+      "post": {
+        "tags": [
+          "bulk-scanning-payments"
+        ],
+        "summary": "Provide meta information about the payments contained in the envelope. This operation will be called after the banking process has been done and payments have been allocated to a BGC slip / batch",
+        "description": "",
+        "operationId": "bulk-scan-payment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "BulkScanPayment",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BulkScanPayment"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "created"
+          },
+          "400": {
+            "description": "Request failed due to malformed syntax"
+          },
+          "401": {
+            "description": "Failed authentication"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "403": {
+            "description": "Failed authorisation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BulkScanPayment": {
+      "type": "object",
+      "properties": {
+        "document_control_number": {
+          "type": "string",
+          "description": "Document control number of the payment received in the envelope. This is the unique identifier of the payment",
+          "example": "XXYYYYZZZZ"
+        },
+        "amount": {
+          "type": "integer",
+          "format": "double",
+          "description": "Payment amount in GBP",
+          "example": "550.00"
+        },
+        "currency": {
+          "type": "string",
+          "description": "The ISO currency code",
+          "example": "GBP",
+          "enum": [
+            "GBP"
+          ]
+        },
+        "method": {
+          "type": "string",
+          "description": "The method of payment i.e. Cheque, Postal Order or Cash",
+          "example": "Cheque",
+          "enum": [
+            "Cheque",
+            "PostalOrder",
+            "Cash"
+          ]
+        },
+        "bank_giro_credit_slip_number": {
+          "type": "integer",
+          "description": "Number of the credit slip containing the payment",
+          "example": 123456
+        },
+        "banked_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date the payment was sent for banking.",
+          "example": "2018-01-01"
+        }
+      }
+    }
+  }
+}

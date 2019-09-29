@@ -138,23 +138,79 @@ data "template_file" "policy_template" {
 }
 
 data "template_file" "api_template" {
-  template = "${file("${path.module}/template/api.json")}"
+  template = "${file("${path.module}/template/bulk-scanning-payment.json")}"
 }
 
-resource "azurerm_template_deployment" "bulk-scanning-payment" {
-  template_body       = "${data.template_file.api_template.rendered}"
-  name                = "bulk-scanning-payment-${var.env}"
-  deployment_mode     = "Incremental"
-  resource_group_name = "core-infra-${var.env}"
-  count               = "${var.env != "preview" ? 1: 0}"
 
-  parameters = {
-    apiManagementServiceName  = "core-api-mgmt-${var.env}"
-    apiName                   = "bulk-scanning-payment-api"
-    apiProductName            = "bulk-scanning-payment"
-    serviceUrl                = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
-    apiBasePath               = "${local.api_base_path}"
-    policy                    = "${data.template_file.policy_template.rendered}"
+resource "azurerm_api_management_group" "bulk-scanning-payments-api-group" {
+  name                = "bulk-scanning-payment2"
+  resource_group_name = "core-infra-${var.env}"
+  api_management_name = "core-api-mgmt-${var.env}"
+  display_name        = "Developers"
+  description         = "Developers group"
+}
+
+resource "azurerm_api_management_product" "bulk-scanning-payment-product" {
+  product_id            = "bulk-scanning-payment-api2"
+  api_management_name   = "core-api-mgmt-${var.env}"
+  resource_group_name   = "core-infra-${var.env}"
+  display_name          = "bulk-scanning-payment-api-product2"
+  subscription_required = false
+  approval_required     = false
+  published             = true
+}
+
+resource "azurerm_api_management_api_policy" "bulk-scanning-payment-policy" {
+  api_name            = "${azurerm_api_management_api.bulk-scanning-payment2.name}"
+  api_management_name = "core-api-mgmt-${var.env}"
+  resource_group_name = "core-infra-${var.env}"
+  xml_content = "${data.template_file.policy_template.rendered}"
+}
+
+resource "azurerm_api_management_api_operation" "bulk-scanning-payment-operation" {
+  operation_id        = "bulkscanning-payment-post2"
+  api_name            = "${azurerm_api_management_api.bulk-scanning-payment2.name}"
+  api_management_name = "core-api-mgmt-${var.env}"
+  resource_group_name = "core-infra-${var.env}"
+  display_name        = "Post Bulkscanning payment Operation"
+  method              = "POST"
+  url_template        = "/bulk-scan-payment"
+  description         = "Used by third party scanning service to post payments data into Bulk-scanning service"
+
+  request {
+    representation {
+      content_type = "application/json"
+      type_name = "object"
+      sample = {
+        "document_control_number": "XXYYYYZZZZ",
+        "amount": "550.00",
+        "currency": "GBP",
+        "method": "Cheque",
+        "bank_giro_credit_slip_number": 123456,
+        "banked_date": "2018-01-01"
+      }
+    }
   }
+  response {
+    description = "Created"
+    status_code = 200
+  }
+
+}
+
+resource "azurerm_api_management_api" "bulk-scanning-payment2" {
+  name                = "bulk-scanning-payment-${var.env}2"
+  resource_group_name = "core-infra-${var.env}"
+  display_name        = "bulk-scanning payments API2"
+  revision            = 1
+  api_management_name = "core-api-mgmt-${var.env}"
+  protocols           = ["https"]
+  service_url         = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
+  path                =  "${local.api_base_path}"
+  import {
+    content_format = "swagger-json"
+    content_value = "${data.template_file.api_template.rendered}"
+  }
+
 }
 
