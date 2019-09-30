@@ -137,7 +137,7 @@ public class PaymentController {
         @RequestHeader("Authorization") String authorization,
         @NotEmpty @PathVariable("dcn") String dcn,
         @NotEmpty @PathVariable("status") PaymentStatus status) {
-        LOG.info("Request received to mark payment with DCN :{} , status : {}", dcn, status);
+        LOG.info("Request received to mark payment with DCN : {} , status : {}", dcn, status);
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
@@ -154,7 +154,7 @@ public class PaymentController {
     public ResponseEntity<SearchResponse> retrieveByCCD(
         @RequestHeader("Authorization") String authorization,
         @PathVariable("ccd_reference") String ccdReference) {
-        LOG.info("Retrieving payments for ccdReference {}: ", ccdReference);
+        LOG.info("Retrieving payments for ccdReference {} : ", ccdReference);
         try {
             SearchResponse searchResponse = paymentService.retrieveByCCDReference(ccdReference);
             if (Optional.ofNullable(searchResponse).isPresent()) {
