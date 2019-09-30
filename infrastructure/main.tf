@@ -15,7 +15,7 @@ locals {
   nonPreviewVaultName = "ccpay-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
   s2sUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
-  
+
   #region API gateway
   thumbprints_in_quotes = "${formatlist("&quot;%s&quot;", var.bulkscanning_api_gateway_certificate_thumbprints)}"
   thumbprints_in_quotes_str = "${join(",", local.thumbprints_in_quotes)}"
@@ -33,7 +33,6 @@ module "bulk-scanning-payment-api" {
   subscription = "${var.subscription}"
   capacity = "${var.capacity}"
   common_tags = "${var.common_tags}"
-  appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
   appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
 
   asp_name = "${local.asp_name}"
