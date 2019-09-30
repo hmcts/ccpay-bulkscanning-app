@@ -31,8 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateForReportName;
-import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateTimeForReportName;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.*;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -207,7 +206,8 @@ public class PaymentController {
         LOG.info("Retrieving payments for reportType : {}", reportType);
         ByteArrayInputStream in = null;
         try {
-            List<ReportData> reportDataList = paymentService.retrieveByReportType(fromDate, toDate, reportType);
+            List<ReportData> reportDataList = paymentService
+                        .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 in = ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
