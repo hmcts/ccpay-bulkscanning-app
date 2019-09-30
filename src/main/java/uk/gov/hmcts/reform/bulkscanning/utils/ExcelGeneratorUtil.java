@@ -86,8 +86,6 @@ public class ExcelGeneratorUtil {
             CellStyle ageCellStyle = workbook.createCellStyle();
             ageCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("#"));
 
-
-
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         }

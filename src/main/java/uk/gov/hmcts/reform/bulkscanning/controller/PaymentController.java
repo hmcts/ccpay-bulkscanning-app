@@ -228,7 +228,9 @@ public class PaymentController {
             throw new PaymentException(ex);
         } finally {
             try {
-                in.close();
+                if (Optional.ofNullable(in).isPresent()) {
+                    in.close();
+                }
             } catch (IOException e) {
                 LOG.error(e.getMessage());
             }
