@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
@@ -248,7 +249,10 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                     if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
                         record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-                        record.setRespServiceName(payment.getEnvelope().getResponsibleServiceId());
+                        if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                            && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+                            record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
+                        }
                         if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()
                             && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
                             record.setCcdRef(payment.getEnvelope().getEnvelopeCases().get(0).getCcdReference());
@@ -258,7 +262,7 @@ public class PaymentServiceImpl implements PaymentService {
                     reportDataList.add(record);
                 });
             }
-            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
+            //reportDataList.sort(Comparator.comparing(ReportData::getDateBanked));
             return reportDataList;
         }
         if (reportType.equals(ReportType.DATA_LOSS)) {
@@ -276,7 +280,10 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                     if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
                         record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-                        record.setRespServiceName(payment.getEnvelope().getResponsibleServiceId());
+                        if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+                            record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
+                        }
                     }
                     String lossResp = payment.getSource().equalsIgnoreCase(BULK_SCAN.toString())
                                         ? EXCELA.toString() : BULK_SCAN.toString();
@@ -284,7 +291,7 @@ public class PaymentServiceImpl implements PaymentService {
                     reportDataList.add(record);
                 });
             }
-            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
+            //reportDataList.sort(Comparator.comparing(ReportData::getDateBanked));
             return reportDataList;
         }
         return null;

@@ -21,6 +21,9 @@ spring:
     name: bulk-scanning-payment-api
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
   ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
@@ -69,3 +72,4 @@ auth:
     service:
       client:
         baseUrl: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL:#{http://dummy.dummy.net}}
+

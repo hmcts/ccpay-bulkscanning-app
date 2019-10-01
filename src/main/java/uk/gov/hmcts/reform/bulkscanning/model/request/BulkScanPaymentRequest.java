@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -24,8 +25,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class BulkScanPaymentRequest {
 
     @JsonProperty("site_id")
-    @NotBlank(message = "Responsible service id is missing")
-    private String responsibleServiceId;
+    private ResponsibleSiteId responsibleServiceId;
 
     @JsonProperty("ccd_case_number")
     @NotBlank(message = "CCD reference is missing")
