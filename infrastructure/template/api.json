@@ -114,11 +114,11 @@
             "responses": [
               {
                 "statusCode": 201,
-                "description": "created"
+                "description": "Created"
               },
               {
                 "statusCode": 400,
-                "description": "bad request"
+                "description": "Request failed due to malformed syntax"
               },
               {
                 "statusCode": 401,
@@ -126,7 +126,11 @@
               },
               {
                 "statusCode": 403,
-                "description": "Invalid subscription-key"
+                "description": "Failed authorisation"
+              },
+              {
+                "statusCode": 409,
+                "description": "Conflict"
               }
             ]
           }
