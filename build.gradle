@@ -87,7 +87,7 @@ task smoke(type: Test) {
 
 pmd {
   toolVersion = "6.16.0"
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
+  sourceSets = [sourceSets.main, sourceSets.integrationTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
   ruleSets = []
@@ -170,7 +170,6 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
-  compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.4'
   compile group: 'io.springfox', name: 'springfox-swagger-ui', version:'2.9.0'
   compile group: 'io.springfox', name: 'springfox-swagger2', version:'2.9.0'
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.2.RELEASE'
@@ -187,7 +186,6 @@ dependencies {
     exclude(module: 'slf4j-simple')
   }
   compile group: 'org.springframework.boot', name: 'spring-boot-autoconfigure'
-  compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.4'
   compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: javaLoggingVersion
@@ -212,6 +210,8 @@ dependencies {
   compileOnly 'org.projectlombok:lombok:1.18.10'
   annotationProcessor 'org.projectlombok:lombok:1.18.10'
   testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+  functionalTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+  smokeTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.0.4.RELEASE'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit

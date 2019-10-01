@@ -8,20 +8,8 @@ spring:
   application:
     name: bulk-scanning
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bulk-scan
-    username: postgres
-    password: admin
-    properties:
-      charSet: UTF-8
-  jpa:
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        jdbc:
-          lob:
-            non_contextual_creation: true
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:9.6://localhost/features
   liquibase:
     enabled: ${SPRING_LIQUIBASE_ENABLED:true}
     change-log: classpath:/db/changelog/db.changelog-master.xml
@@ -39,6 +27,10 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
+security:
+  oauth2:
+    resource:
+      filter-order: 3
 trusted:
   s2s:
     service:
@@ -54,7 +46,7 @@ auth:
 test:
   url: ${TEST_URL:http://localhost:8000}
   user:
-    password: ${TEST_USER_PASSWORD:password}
+    password: ${TEST_USER_PASSWORD:LevelAt12}
 
 idam:
   api:
@@ -70,10 +62,10 @@ oauth2:
     uri: ${OAUTH2_REDIRECT_URI:https://moneyclaims.aat.platform.hmcts.net}
   client:
     id: ${OAUTH2_CLIENT_ID:cmc_citizen}
-    secret: ${OAUTH2_CLIENT_SECRET:XXXXXXXX}
+    secret: ${OAUTH2_CLIENT_SECRET:wrubu7ruprupAq6trexe3enay4memej7}
 
 s2s:
   url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   service:
     name: ${S2S_SERVICE_NAME:cmc}
-    secret: ${S2S_SERVICE_SECRET:AAAAAAAAAAAAAAAA}
+    secret: ${S2S_SERVICE_SECRET:RD53IBEKQTO4WMQY}
