@@ -250,7 +250,7 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "No Data found to generate Report")
     })
     @GetMapping("/report/data")
-    public ResponseEntity<List<ReportData>> retrieveDataByReportType(
+    public ResponseEntity<List<?>> retrieveDataByReportType(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
@@ -258,8 +258,8 @@ public class PaymentController {
         LOG.info("Retrieving payments for reportType : {}", reportType);
 
         try {
-            List<ReportData> reportDataList = paymentService
-                .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
+            List<?> reportDataList = paymentService
+                .retrieveDataByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 return new ResponseEntity<>(reportDataList, HttpStatus.OK);

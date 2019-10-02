@@ -289,6 +289,34 @@ public class PaymentControllerFnTest {
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
     }
 
+    @Test
+    public void testGetPaymentReportData_DataLoss() throws Exception {
+        String dcn[] = {"11112222333355551", "11112222333355552"};
+        String ccd = "1111222233335555";
+        createTestReportData(ccd, dcn);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L)));
+        params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
+        params.add("report_type", "DATA_LOSS");
+        ResultActions resultActions = restActions.get("/report/data", params);
+
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
+    public void testGetPaymentReportData_Unprocessed() throws Exception {
+        String dcn[] = {"11112222333355551", "11112222333355552"};
+        String ccd = "1111222233335555";
+        createTestReportData(ccd, dcn);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L)));
+        params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
+        params.add("report_type", "UNPROCESSED");
+        ResultActions resultActions = restActions.get("/report/data", params);
+
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
     private void createTestReportData(String ccd, String... dcns) throws Exception {
         //Request from Exela with one DCN
 

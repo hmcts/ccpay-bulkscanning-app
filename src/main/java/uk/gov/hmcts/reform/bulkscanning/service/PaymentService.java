@@ -22,4 +22,5 @@ public interface PaymentService {
     String updateCaseReferenceForExceptionRecord (String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest);
     String updatePaymentStatus(String dcn, PaymentStatus status);
     List<ReportData> retrieveByReportType(Date fromDate, Date toDate, ReportType reportType);
+    List<?> retrieveDataByReportType(Date fromDate, Date toDate, ReportType reportType);
 }
