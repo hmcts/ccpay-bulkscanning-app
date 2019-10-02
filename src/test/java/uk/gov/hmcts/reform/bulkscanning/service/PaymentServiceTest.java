@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
@@ -225,8 +227,8 @@ public class PaymentServiceTest {
             .amount(BigDecimal.valueOf(100.00))
             .bankedDate(new Date())
             .bankGiroCreditSlipNumber("BGC123")
-            .currency("GBP")
-            .method("CHEQUE")
+            .currency(Currency.valueOf("GBP"))
+            .method(PaymentMethod.valueOf("CHEQUE"))
             .build();
     }
 

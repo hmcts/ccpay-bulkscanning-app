@@ -50,9 +50,10 @@ sourceSets {
     testClassesDirs = sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
   }
-
-
-
+  task functionalTest(type: Test, description: 'Runs the functional tests', group: 'Verification') {
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+  }
 }
 idea {
   module {
@@ -86,8 +87,8 @@ task smoke(type: Test) {
 }
 
 pmd {
-  toolVersion = "6.16.0"
-  sourceSets = [sourceSets.main, sourceSets.integrationTest, sourceSets.smokeTest]
+  toolVersion = "6.18.0"
+  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
   ruleSets = []

@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.bulkscanning.config.IdamService;
 import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
 import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
 import uk.gov.hmcts.reform.bulkscanning.config.TestContextConfiguration;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
@@ -310,7 +311,7 @@ public class PaymentControllerFunctionalTest {
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
             .documentControlNumbers(dcn)
-            .responsibleServiceId(responsibleServiceId)
+            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId))
             .isExceptionRecord(isExceptionRecord)
             .build();
     }

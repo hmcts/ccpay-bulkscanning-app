@@ -262,7 +262,7 @@ public class PaymentServiceImpl implements PaymentService {
                     reportDataList.add(record);
                 });
             }
-            //reportDataList.sort(Comparator.comparing(ReportData::getDateBanked));
+            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
             return reportDataList;
         }
         if (reportType.equals(ReportType.DATA_LOSS)) {
@@ -291,7 +291,7 @@ public class PaymentServiceImpl implements PaymentService {
                     reportDataList.add(record);
                 });
             }
-            //reportDataList.sort(Comparator.comparing(ReportData::getDateBanked));
+            reportDataList.sort(Comparator.comparing(ReportData::getLossResp));
             return reportDataList;
         }
         return null;

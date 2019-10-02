@@ -208,6 +208,7 @@ public class PaymentController {
         LOG.info("Retrieving payments for reportType : {}", reportType);
         byte[] reportBytes = null;
         HSSFWorkbook workbook = null;
+        ByteArrayOutputStream baos = null;
         try {
             List<ReportData> reportDataList = paymentService
                         .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
@@ -215,7 +216,7 @@ public class PaymentController {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 workbook = (HSSFWorkbook) ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
             }
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            baos = new ByteArrayOutputStream();
             workbook.write(baos);
             reportBytes = baos.toByteArray();
             HttpHeaders headers = new HttpHeaders();
@@ -230,13 +231,44 @@ public class PaymentController {
         } catch (Exception ex) {
             throw new PaymentException(ex);
         } finally {
-            try {
-                if (Optional.ofNullable(workbook).isPresent()) {
+            if (Optional.ofNullable(baos).isPresent()
+                    && Optional.ofNullable(workbook).isPresent()) {
+                try {
+                    baos.close();
                     workbook.close();
+                } catch (IOException e) {
+                    LOG.error(e.getMessage());
                 }
-            } catch (IOException e) {
-                LOG.error(e.getMessage());
             }
+
+        }
+    }
+
+    @ApiOperation("API to retrieve Report Data from Bulk_Scan_Payment System")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Report Generated"),
+        @ApiResponse(code = 404, message = "No Data found to generate Report")
+    })
+    @GetMapping("/report/data")
+    public ResponseEntity<List<ReportData>> retrieveDataByReportType(
+        @RequestHeader("Authorization") String authorization,
+        @RequestParam("date_from") Date fromDate,
+        @RequestParam("date_to") Date toDate,
+        @RequestParam("report_type") ReportType reportType) {
+        LOG.info("Retrieving payments for reportType : {}", reportType);
+
+        try {
+            List<ReportData> reportDataList = paymentService
+                .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
+            if (Optional.ofNullable(reportDataList).isPresent()) {
+                LOG.info("No of Records exists : {}", reportDataList.size());
+                return new ResponseEntity<>(reportDataList, HttpStatus.OK);
+            }else {
+                LOG.info("No Data found for ReportType : {}", reportType);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
         }
     }
 
