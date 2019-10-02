@@ -9,7 +9,7 @@ spring:
     name: bulk-scanning
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bulk-scanning
+    url: jdbc:postgresql://localhost:5432/bulk-scan
     username: postgres
     password: admin
     properties:
@@ -39,3 +39,15 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
+trusted:
+  s2s:
+    service:
+      names: ccpay_bubble
+auth:
+  provider:
+    service:
+      client:
+        baseUrl: http://localhost:23443
+  idam:
+    client:
+      baseUrl: http://localhost:23443

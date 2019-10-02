@@ -41,3 +41,7 @@ variable "postgresql_user" {
   type    = "string"
   default = "bspayment"
 }
+
+variable "idam_api_url" {
+  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
+}

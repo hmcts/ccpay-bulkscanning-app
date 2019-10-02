@@ -24,6 +24,7 @@ public class PaymentDto {
 
     private Integer id;
     private String dcnReference;
+    private String source;
     private EnvelopeDto envelope;
     private PaymentStatus paymentStatus;
 

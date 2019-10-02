@@ -6,10 +6,15 @@ locals {
 
   asp_name = "ccpay-${var.env}"
   sku_size = "${var.env == "prod" || var.env == "sprod" || var.env == "aat" ? "I2" : "I1"}"
+  aseName = "core-compute-${var.env}"
+
+  local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
+  local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
   previewVaultName = "ccpay-aat"
   nonPreviewVaultName = "ccpay-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
+  s2sUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
 
 }
 
@@ -36,6 +41,10 @@ module "bulk-scanning-payment-api" {
     SPRING_DATASOURCE_USERNAME = "${module.ccpay-bulkscanning-payment-database.user_name}"
     SPRING_DATASOURCE_PASSWORD = "${module.ccpay-bulkscanning-payment-database.postgresql_password}"
     SPRING_DATASOURCE_URL = "jdbc:postgresql://${module.ccpay-bulkscanning-payment-database.host_name}:${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}/${module.ccpay-bulkscanning-payment-database.postgresql_database}?sslmode=require"
+    # idam
+    AUTH_IDAM_CLIENT_BASEURL = "${var.idam_api_url}"
+    # service-auth-provider
+    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL = "${local.s2sUrl}"
   }
 }
 module "ccpay-bulkscanning-payment-database" {
