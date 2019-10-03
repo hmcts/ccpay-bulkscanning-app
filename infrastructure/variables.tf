@@ -42,6 +42,12 @@ variable "postgresql_user" {
   default = "bspayment"
 }
 
+# thumbprint of the SSL certificate for API gateway tests
+variable bulkscanning_api_gateway_certificate_thumbprints {
+  type = "list"
+  default = []
+}
+
 variable "idam_api_url" {
   default = "http://betaDevBccidamAppLB.reform.hmcts.net"
 }

@@ -16,6 +16,12 @@ locals {
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
   s2sUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
 
+  #region API gateway
+  thumbprints_in_quotes = "${formatlist("&quot;%s&quot;", var.bulkscanning_api_gateway_certificate_thumbprints)}"
+  thumbprints_in_quotes_str = "${join(",", local.thumbprints_in_quotes)}"
+
+  api_policy = "${replace(file("template/api-policy.xml"), "ALLOWED_CERTIFICATE_THUMBPRINTS", local.thumbprints_in_quotes_str)}"
+  api_base_path = "bulk-scanning-payment"
 }
 
 module "bulk-scanning-payment-api" {
@@ -27,7 +33,6 @@ module "bulk-scanning-payment-api" {
   subscription = "${var.subscription}"
   capacity = "${var.capacity}"
   common_tags = "${var.common_tags}"
-  appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
   appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
 
   asp_name = "${local.asp_name}"
@@ -41,8 +46,13 @@ module "bulk-scanning-payment-api" {
     SPRING_DATASOURCE_USERNAME = "${module.ccpay-bulkscanning-payment-database.user_name}"
     SPRING_DATASOURCE_PASSWORD = "${module.ccpay-bulkscanning-payment-database.postgresql_password}"
     SPRING_DATASOURCE_URL = "jdbc:postgresql://${module.ccpay-bulkscanning-payment-database.host_name}:${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}/${module.ccpay-bulkscanning-payment-database.postgresql_database}?sslmode=require"
+
+    # S2S trusted services
+    TRUSTED_S2S_SERVICE_NAMES = "api_gw, ccpay_bubble"
+
     # idam
     AUTH_IDAM_CLIENT_BASEURL = "${var.idam_api_url}"
+
     # service-auth-provider
     AUTH_PROVIDER_SERVICE_CLIENT_BASEURL = "${local.s2sUrl}"
   }
@@ -101,3 +111,47 @@ data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   name = "AppInsightsInstrumentationKey"
   vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
 }
+
+# region API (gateway)
+data "azurerm_key_vault_secret" "s2s_client_secret" {
+  name = "gateway-s2s-client-secret"
+  vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "s2s_client_id" {
+  name = "gateway-s2s-client-id"
+  vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
+}
+
+data "template_file" "policy_template" {
+  template = "${file("${path.module}/template/api-policy.xml")}"
+
+  vars {
+    allowed_certificate_thumbprints = "${local.thumbprints_in_quotes_str}"
+    s2s_client_id = "${data.azurerm_key_vault_secret.s2s_client_id.value}"
+    s2s_client_secret = "${data.azurerm_key_vault_secret.s2s_client_secret.value}"
+    s2s_base_url = "${local.s2sUrl}"
+  }
+}
+
+data "template_file" "api_template" {
+  template = "${file("${path.module}/template/api.json")}"
+}
+
+resource "azurerm_template_deployment" "bulk-scanning-payment" {
+  template_body       = "${data.template_file.api_template.rendered}"
+  name                = "bulk-scanning-payment-${var.env}"
+  deployment_mode     = "Incremental"
+  resource_group_name = "core-infra-${var.env}"
+  count               = "${var.env != "preview" ? 1: 0}"
+
+  parameters = {
+    apiManagementServiceName  = "core-api-mgmt-${var.env}"
+    apiName                   = "bulk-scanning-payment-api"
+    apiProductName            = "bulk-scanning-payment"
+    serviceUrl                = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
+    apiBasePath               = "${local.api_base_path}"
+    policy                    = "${data.template_file.policy_template.rendered}"
+  }
+}
+
