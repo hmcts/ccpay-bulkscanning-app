@@ -13,16 +13,6 @@ def product = "ccpay"
 
 def app = "bulkscanning-api"
 
-
-static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
-  [ $class: 'AzureKeyVaultSecret',
-    secretType: 'Secret',
-    name: secretName,
-    version: '',
-    envVariable: envVar
-  ]
-}
-
 def secrets = [
   'ccpay-${env}': [
     secret('cmc-service-secret', 'S2S_SERVICE_SECRET'),
@@ -32,6 +22,15 @@ def secrets = [
     secret('gov-pay-keys-cmc', 'GOV_PAY_AUTH_KEY_CMC')
   ]
 ]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
 
 withPipeline(type, product, app) {
     //setVaultName('ccpay')
