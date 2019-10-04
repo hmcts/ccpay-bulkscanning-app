@@ -20,6 +20,9 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
@@ -67,7 +70,7 @@ public class PaymentControllerTest {
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
             .documentControlNumbers(dcn)
-            .responsibleServiceId(responsibleServiceId)
+            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId))
             .isExceptionRecord(true)
             .build();
     }
@@ -199,8 +202,8 @@ public class PaymentControllerTest {
             .amount(BigDecimal.valueOf(100.00))
             .bankedDate(new Date())
             .bankGiroCreditSlipNumber("BGC123")
-            .currency("GBP")
-            .method("CHEQUE")
+            .currency(Currency.valueOf("GBP"))
+            .method(PaymentMethod.valueOf("CHEQUE"))
             .build();
     }
 

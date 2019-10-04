@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.bulkscanning.backdoors.UserResolverBackdoor;
 import uk.gov.hmcts.reform.bulkscanning.config.TestContextConfiguration;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
@@ -249,12 +250,24 @@ public class PaymentControllerFnTest {
 
     }
 
+    @Test
+    public void testProcessNewPaymentsFromExela() throws Exception {
+
+        //Request from Exela with one DCN
+        restActions.post("/bulk-scan-payment",
+                         createPaymentRequest("1111-2222-3333-12345"));
+
+        //New payment should be saved with Incomplete status
+        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-12345").get().getPaymentStatus()
+            , INCOMPLETE.toString());
+    }
+
     public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
             .documentControlNumbers(dcn)
-            .responsibleServiceId(responsibleServiceId)
+            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId))
             .isExceptionRecord(isExceptionRecord)
             .build();
     }
@@ -266,7 +279,7 @@ public class PaymentControllerFnTest {
         String ccd = "1111222233334444";
         createTestReportData(ccd, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L)));
+        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L)));
         params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
         params.add("report_type", "UNPROCESSED");
         ResultActions resultActions = restActions.get("/report/download", params);
@@ -280,10 +293,38 @@ public class PaymentControllerFnTest {
         String ccd = "1111222233335555";
         createTestReportData(ccd, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L)));
+        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L)));
         params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
         params.add("report_type", "DATA_LOSS");
         ResultActions resultActions = restActions.get("/report/download", params);
+
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
+    public void testGetPaymentReportData_DataLoss() throws Exception {
+        String dcn[] = {"11112222333355551", "11112222333355552"};
+        String ccd = "1111222233335555";
+        createTestReportData(ccd, dcn);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L)));
+        params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
+        params.add("report_type", "DATA_LOSS");
+        ResultActions resultActions = restActions.get("/report/data", params);
+
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
+    public void testGetPaymentReportData_Unprocessed() throws Exception {
+        String dcn[] = {"11112222333355551", "11112222333355552"};
+        String ccd = "1111222233335555";
+        createTestReportData(ccd, dcn);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L)));
+        params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
+        params.add("report_type", "UNPROCESSED");
+        ResultActions resultActions = restActions.get("/report/data", params);
 
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
     }

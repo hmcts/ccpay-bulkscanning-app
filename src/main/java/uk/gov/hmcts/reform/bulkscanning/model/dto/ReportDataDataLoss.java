@@ -14,16 +14,16 @@ import java.math.BigDecimal;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonInclude(NON_NULL)
 @Builder(builderMethodName = "recordWith")
+@JsonInclude(NON_NULL)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ReportData {
+public class ReportDataDataLoss {
     @Builder.Default
-    private String exceptionRef = StringUtils.EMPTY;
+    private String lossResp = StringUtils.EMPTY;
     @Builder.Default
-    private String ccdRef = StringUtils.EMPTY;
+    private String paymentAssetDcn = StringUtils.EMPTY;
     @Builder.Default
     private String respServiceId = StringUtils.EMPTY;
     @Builder.Default
@@ -35,9 +35,5 @@ public class ReportData {
     @Builder.Default
     private String paymentMethod = StringUtils.EMPTY;
     @Builder.Default
-    private String paymentAssetDcn = StringUtils.EMPTY;
-    @Builder.Default
     private BigDecimal amount = BigDecimal.ZERO;
-    @Builder.Default
-    private String lossResp = StringUtils.EMPTY;
 }

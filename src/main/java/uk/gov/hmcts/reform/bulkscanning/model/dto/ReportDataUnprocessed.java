@@ -19,25 +19,24 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ReportData {
-    @Builder.Default
-    private String exceptionRef = StringUtils.EMPTY;
-    @Builder.Default
-    private String ccdRef = StringUtils.EMPTY;
+public class ReportDataUnprocessed {
+
     @Builder.Default
     private String respServiceId = StringUtils.EMPTY;
     @Builder.Default
     private String respServiceName = StringUtils.EMPTY;
     @Builder.Default
+    private String exceptionRef = StringUtils.EMPTY;
+    @Builder.Default
+    private String ccdRef = StringUtils.EMPTY;
+    @Builder.Default
     private String dateBanked = StringUtils.EMPTY;
     @Builder.Default
     private String bgcBatch = StringUtils.EMPTY;
     @Builder.Default
-    private String paymentMethod = StringUtils.EMPTY;
-    @Builder.Default
     private String paymentAssetDcn = StringUtils.EMPTY;
     @Builder.Default
-    private BigDecimal amount = BigDecimal.ZERO;
+    private String paymentMethod = StringUtils.EMPTY;
     @Builder.Default
-    private String lossResp = StringUtils.EMPTY;
+    private BigDecimal amount = BigDecimal.ZERO;
 }

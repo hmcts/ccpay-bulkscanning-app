@@ -25,24 +25,10 @@ spring:
   liquibase:
     enabled: ${SPRING_LIQUIBASE_ENABLED:true}
     change-log: classpath:/db/changelog/db.changelog-master.xml
-#    hikari:
-#      minimumIdle: 2
-#      maximumPoolSize: 10
-#      idleTimeout: 10000
-#      poolName: {to-be-defined}HikariCP
-#      maxLifetime: 7200000
-#      connectionTimeout: 30000
-#  jpa:
-#    properties:
-#      hibernate:
-#        jdbc:
-#          lob:
-#            # silence the 'wall-of-text' - unnecessary exception throw about blob types
-#            non_contextual_creation: true
 trusted:
   s2s:
     service:
-      names: ccpay_bubble
+      names: ccpay_bubble,cmc,bulk_scan_processor
 auth:
   provider:
     service:

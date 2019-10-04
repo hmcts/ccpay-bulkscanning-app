@@ -11,16 +11,14 @@ import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
-import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
-import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
-import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
-import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.*;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
@@ -231,9 +229,9 @@ public class PaymentServiceImpl implements PaymentService {
     public List<ReportData> retrieveByReportType(Date fromDate, Date toDate, ReportType reportType) {
         List<ReportData> reportDataList = new ArrayList<>();
         if (reportType.equals(ReportType.UNPROCESSED)) {
-            List<EnvelopePayment> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString()).get();
-            if (!payments.isEmpty()) {
-                payments.stream()
+            Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString());
+            if (payments.isPresent()) {
+                payments.get().stream()
                     .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
                     && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                     .forEach(payment -> {
@@ -248,7 +246,10 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                     if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
                         record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-                        record.setRespServiceName(payment.getEnvelope().getResponsibleServiceId());
+                        if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                            && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+                            record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
+                        }
                         if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()
                             && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
                             record.setCcdRef(payment.getEnvelope().getEnvelopeCases().get(0).getCcdReference());
@@ -257,14 +258,17 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                     reportDataList.add(record);
                 });
+                reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
             }
-            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
             return reportDataList;
         }
         if (reportType.equals(ReportType.DATA_LOSS)) {
-            List<EnvelopePayment> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString()).get();
-            if (!payments.isEmpty()) {
-                payments.stream().forEach(payment -> {
+            Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString());
+            if (payments.isPresent()) {
+                payments.get().stream()
+                    .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
+                        && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
+                    .forEach(payment -> {
                     ReportData record = ReportData.recordWith().build();
                     record.setPaymentAssetDcn(payment.getDcnReference());
                     Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
@@ -276,15 +280,99 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                     if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
                         record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-                        record.setRespServiceName(payment.getEnvelope().getResponsibleServiceId());
+                        if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+                            record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
+                        }
                     }
                     String lossResp = payment.getSource().equalsIgnoreCase(BULK_SCAN.toString())
                                         ? EXCELA.toString() : BULK_SCAN.toString();
                     record.setLossResp(lossResp);
                     reportDataList.add(record);
                 });
+                reportDataList.sort(Comparator.comparing(ReportData::getLossResp));
             }
-            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
+            return reportDataList;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public List<?> retrieveDataByReportType(Date fromDate, Date toDate, ReportType reportType) {
+
+        if (reportType.equals(ReportType.UNPROCESSED)) {
+            List<ReportDataUnprocessed> reportDataList = new ArrayList<>();
+            Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString());
+            if (payments.isPresent()) {
+                payments.get().stream()
+                    .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
+                        && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
+                    .forEach(payment -> {
+                        ReportDataUnprocessed record = ReportDataUnprocessed.recordWith().build();
+                        record.setPaymentAssetDcn(payment.getDcnReference());
+                        Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
+                        if (paymentMetadata.isPresent()) {
+                            record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
+                            record.setBgcBatch(paymentMetadata.get().getBgcReference());
+                            record.setPaymentMethod(paymentMetadata.get().getPaymentMethod());
+                            record.setAmount(paymentMetadata.get().getAmount());
+                        }
+                        if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
+                            record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
+                            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+                                record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
+                            }
+                            if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()
+                                && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
+                                String ccdRef = Optional.ofNullable(payment.getEnvelope().getEnvelopeCases().get(0).getCcdReference()).isPresent()
+                                                    ? payment.getEnvelope().getEnvelopeCases().get(0).getCcdReference()
+                                                    : StringUtils.EMPTY;
+                                record.setCcdRef(ccdRef);
+                                String exceptionRef = Optional.ofNullable(payment.getEnvelope().getEnvelopeCases().get(0).getExceptionRecordReference()).isPresent()
+                                    ? payment.getEnvelope().getEnvelopeCases().get(0).getExceptionRecordReference()
+                                    : StringUtils.EMPTY;
+                                record.setExceptionRef(exceptionRef);
+                            }
+                        }
+                        reportDataList.add(record);
+                    });
+                reportDataList.sort(Comparator.comparing(ReportDataUnprocessed::getRespServiceId));
+            }
+            return reportDataList;
+        }
+        if (reportType.equals(ReportType.DATA_LOSS)) {
+            List<ReportDataDataLoss> reportDataList = new ArrayList<>();
+            Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString());
+            if (payments.isPresent()) {
+                payments.get().stream()
+                    .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
+                        && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
+                    .forEach(payment -> {
+                    ReportDataDataLoss record = ReportDataDataLoss.recordWith().build();
+                    record.setPaymentAssetDcn(payment.getDcnReference());
+                    Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
+                    if (paymentMetadata.isPresent()) {
+                        record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
+                        record.setBgcBatch(paymentMetadata.get().getBgcReference());
+                        record.setPaymentMethod(paymentMetadata.get().getPaymentMethod());
+                        record.setAmount(paymentMetadata.get().getAmount());
+                    }
+                    if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
+                        record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
+                        if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                            && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+                            record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
+                        }
+                    }
+                    String lossResp = payment.getSource().equalsIgnoreCase(BULK_SCAN.toString())
+                        ? EXCELA.toString() : BULK_SCAN.toString();
+                    record.setLossResp(lossResp);
+                    reportDataList.add(record);
+                });
+                reportDataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
+            }
             return reportDataList;
         }
         return null;

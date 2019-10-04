@@ -8,9 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.CreateUserRequest;
+import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.AuthenticateUserResponse;
+import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.UserGroup;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.Role;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.TokenExchangeResponse;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.UserGroup;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -73,7 +74,7 @@ public class IdamService {
         LOG.info("testConfig.getOauth2().getRedirectUrl() : " + testConfig.getOauth2().getRedirectUrl());
 
         try{
-            IdamApi.AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
+            AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
                 BASIC + base64Authorisation,
                 CODE,
                 testConfig.getOauth2().getClientId(),

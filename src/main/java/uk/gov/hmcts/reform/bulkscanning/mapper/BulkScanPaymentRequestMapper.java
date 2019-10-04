@@ -40,7 +40,7 @@ public class BulkScanPaymentRequestMapper {
         }
 
         return Envelope.envelopeWith()
-            .responsibleServiceId(bsPaymentRequest.getResponsibleServiceId())
+            .responsibleServiceId(bsPaymentRequest.getResponsibleServiceId().toString())
             .envelopePayments(envelopePaymentList)
             .envelopeCases(envelopeCaseList)
             .paymentStatus(INCOMPLETE.toString()) ////by default at initial status

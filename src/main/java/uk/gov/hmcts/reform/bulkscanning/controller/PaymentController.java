@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
 import io.swagger.annotations.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,17 +22,17 @@ import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 import uk.gov.hmcts.reform.bulkscanning.utils.ExcelGeneratorUtil;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateForReportName;
-import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateTimeForReportName;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.*;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -200,39 +200,72 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "No Data found to generate Report")
     })
     @GetMapping("/report/download")
-    public ResponseEntity retrieveByReportType(
+    public ResponseEntity<?> retrieveByReportType(
+        @RequestHeader("Authorization") String authorization,
+        @RequestParam("date_from") Date fromDate,
+        @RequestParam("date_to") Date toDate,
+        @RequestParam("report_type") ReportType reportType,
+        HttpServletResponse response) {
+        LOG.info("Retrieving payments for reportType : {}", reportType);
+        byte[] reportBytes = null;
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            List<ReportData> reportDataList = paymentService
+                        .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
+            if (Optional.ofNullable(reportDataList).isPresent()) {
+                LOG.info("No of Records exists : {}", reportDataList.size());
+                workbook = (HSSFWorkbook) ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
+            }
+            workbook.write(baos);
+            reportBytes = baos.toByteArray();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+            String fileName = reportType.toString() + "_"
+                + getDateForReportName(fromDate) + "_To_"
+                + getDateForReportName(toDate) + "_RUN_"
+                + getDateTimeForReportName(new Date(System.currentTimeMillis()))
+                + ".xls";
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            return new ResponseEntity<byte[]>(reportBytes, headers, HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
+        } finally {
+            try {
+                baos.close();
+                workbook.close();
+            } catch (IOException e) {
+                LOG.error(e.getMessage());
+            }
+
+        }
+    }
+
+    @ApiOperation("API to retrieve Report Data from Bulk_Scan_Payment System")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Report Generated"),
+        @ApiResponse(code = 404, message = "No Data found to generate Report")
+    })
+    @GetMapping("/report/data")
+    public ResponseEntity<List<?>> retrieveDataByReportType(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
         @RequestParam("report_type") ReportType reportType) {
         LOG.info("Retrieving payments for reportType : {}", reportType);
-        ByteArrayInputStream in = null;
+
         try {
-            List<ReportData> reportDataList = paymentService.retrieveByReportType(fromDate, toDate, reportType);
+            List<?> reportDataList = paymentService
+                .retrieveDataByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
-                in = ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
+                return new ResponseEntity<>(reportDataList, HttpStatus.OK);
+            }else {
+                LOG.info("No Data found for ReportType : {}", reportType);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-            HttpHeaders headers = new HttpHeaders();
-            String fileName = reportType.toString() + "_"
-                + getDateForReportName(fromDate) + "_To_"
-                + getDateForReportName(toDate) + "_RUN_"
-                + getDateTimeForReportName(new Date(System.currentTimeMillis()));
-            String headerValue = "attachment; filename=" + fileName;
-            headers.add("Content-Disposition", headerValue);
-            return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                .body(new InputStreamResource(in));
         } catch (Exception ex) {
             throw new PaymentException(ex);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                LOG.error(e.getMessage());
-            }
         }
     }
 
