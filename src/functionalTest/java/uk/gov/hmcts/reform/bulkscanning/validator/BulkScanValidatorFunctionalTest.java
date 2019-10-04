@@ -53,7 +53,7 @@ public class BulkScanValidatorFunctionalTest {
     public void testFieldLevelValidation() throws Exception{
         String dcn[] = {""};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
-            ,null,null, false);
+            ,null,"AA08", false);
 
         Response response = RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
@@ -64,7 +64,6 @@ public class BulkScanValidatorFunctionalTest {
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(response.getStatusCode()));
 
-        Assert.assertTrue(response.andReturn().asString().contains(RESPONSIBLE_SERVICE_ID_MISSING));
         Assert.assertTrue(response.andReturn().asString().contains(CCD_REFERENCE_MISSING));
         Assert.assertTrue(response.andReturn().asString().contains(PAYMENT_DCN_MISSING));
     }
