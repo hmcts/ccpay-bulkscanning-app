@@ -208,8 +208,8 @@ public class PaymentController {
         HttpServletResponse response) {
         LOG.info("Retrieving payments for reportType : {}", reportType);
         byte[] reportBytes = null;
-        HSSFWorkbook workbook = null;
-        ByteArrayOutputStream baos = null;
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             List<ReportData> reportDataList = paymentService
                         .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
@@ -217,7 +217,6 @@ public class PaymentController {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 workbook = (HSSFWorkbook) ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
             }
-            baos = new ByteArrayOutputStream();
             workbook.write(baos);
             reportBytes = baos.toByteArray();
             HttpHeaders headers = new HttpHeaders();

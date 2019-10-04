@@ -229,9 +229,9 @@ public class PaymentServiceImpl implements PaymentService {
     public List<ReportData> retrieveByReportType(Date fromDate, Date toDate, ReportType reportType) {
         List<ReportData> reportDataList = new ArrayList<>();
         if (reportType.equals(ReportType.UNPROCESSED)) {
-            List<EnvelopePayment> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString()).get();
-            if (!payments.isEmpty()) {
-                payments.stream()
+            Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString());
+            if (payments.isPresent()) {
+                payments.get().stream()
                     .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
                     && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                     .forEach(payment -> {
@@ -258,14 +258,14 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                     reportDataList.add(record);
                 });
+                reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
             }
-            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
             return reportDataList;
         }
         if (reportType.equals(ReportType.DATA_LOSS)) {
-            List<EnvelopePayment> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString()).get();
-            if (!payments.isEmpty()) {
-                payments.stream()
+            Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString());
+            if (payments.isPresent()) {
+                payments.get().stream()
                     .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
                         && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                     .forEach(payment -> {
@@ -290,8 +290,8 @@ public class PaymentServiceImpl implements PaymentService {
                     record.setLossResp(lossResp);
                     reportDataList.add(record);
                 });
+                reportDataList.sort(Comparator.comparing(ReportData::getLossResp));
             }
-            reportDataList.sort(Comparator.comparing(ReportData::getLossResp));
             return reportDataList;
         }
         return null;
@@ -303,9 +303,9 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (reportType.equals(ReportType.UNPROCESSED)) {
             List<ReportDataUnprocessed> reportDataList = new ArrayList<>();
-            List<EnvelopePayment> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString()).get();
-            if (!payments.isEmpty()) {
-                payments.stream()
+            Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString());
+            if (payments.isPresent()) {
+                payments.get().stream()
                     .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
                         && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                     .forEach(payment -> {
@@ -338,15 +338,15 @@ public class PaymentServiceImpl implements PaymentService {
                         }
                         reportDataList.add(record);
                     });
+                reportDataList.sort(Comparator.comparing(ReportDataUnprocessed::getRespServiceId));
             }
-            reportDataList.sort(Comparator.comparing(ReportDataUnprocessed::getRespServiceId));
             return reportDataList;
         }
         if (reportType.equals(ReportType.DATA_LOSS)) {
             List<ReportDataDataLoss> reportDataList = new ArrayList<>();
-            List<EnvelopePayment> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString()).get();
-            if (!payments.isEmpty()) {
-                payments.stream()
+            Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString());
+            if (payments.isPresent()) {
+                payments.get().stream()
                     .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
                         && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                     .forEach(payment -> {
@@ -371,8 +371,8 @@ public class PaymentServiceImpl implements PaymentService {
                     record.setLossResp(lossResp);
                     reportDataList.add(record);
                 });
+                reportDataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
             }
-            reportDataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
             return reportDataList;
         }
         return null;
