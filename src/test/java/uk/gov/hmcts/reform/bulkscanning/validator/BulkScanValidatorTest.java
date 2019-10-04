@@ -71,13 +71,12 @@ public class BulkScanValidatorTest {
     public void testFieldLevelValidation() throws Exception{
         String dcn[] = {""};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
-            ,null,null, false);
+            , null, "AA08", false);
 
         ResultActions resultActions = restActions.post("/bulk-scan-payments/", bulkScanPaymentRequest);
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
 
-        Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(RESPONSIBLE_SERVICE_ID_MISSING));
         Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(CCD_REFERENCE_MISSING));
         Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(PAYMENT_DCN_MISSING));
     }

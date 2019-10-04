@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.AuthenticateUserResponse;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.UserGroup;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.Role;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.TokenExchangeResponse;
-import uk.gov.hmcts.reform.bulkscanning.config.User;
 
 import java.util.Base64;
 import java.util.UUID;

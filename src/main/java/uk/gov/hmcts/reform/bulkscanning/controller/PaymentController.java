@@ -232,14 +232,11 @@ public class PaymentController {
         } catch (Exception ex) {
             throw new PaymentException(ex);
         } finally {
-            if (Optional.ofNullable(baos).isPresent()
-                    && Optional.ofNullable(workbook).isPresent()) {
-                try {
-                    baos.close();
-                    workbook.close();
-                } catch (IOException e) {
-                    LOG.error(e.getMessage());
-                }
+            try {
+                baos.close();
+                workbook.close();
+            } catch (IOException e) {
+                LOG.error(e.getMessage());
             }
 
         }

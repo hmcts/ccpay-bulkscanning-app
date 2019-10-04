@@ -265,7 +265,10 @@ public class PaymentServiceImpl implements PaymentService {
         if (reportType.equals(ReportType.DATA_LOSS)) {
             List<EnvelopePayment> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString()).get();
             if (!payments.isEmpty()) {
-                payments.stream().forEach(payment -> {
+                payments.stream()
+                    .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
+                        && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
+                    .forEach(payment -> {
                     ReportData record = ReportData.recordWith().build();
                     record.setPaymentAssetDcn(payment.getDcnReference());
                     Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
