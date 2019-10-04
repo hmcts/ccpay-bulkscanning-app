@@ -250,6 +250,18 @@ public class PaymentControllerFnTest {
 
     }
 
+    @Test
+    public void testProcessNewPaymentsFromExela() throws Exception {
+
+        //Request from Exela with one DCN
+        restActions.post("/bulk-scan-payment",
+                         createPaymentRequest("1111-2222-3333-12345"));
+
+        //New payment should be saved with Incomplete status
+        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-12345").get().getPaymentStatus()
+            , INCOMPLETE.toString());
+    }
+
     public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
