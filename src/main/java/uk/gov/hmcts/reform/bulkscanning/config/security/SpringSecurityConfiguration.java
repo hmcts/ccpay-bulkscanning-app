@@ -99,8 +99,8 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/*").hasAnyAuthority("payments", "citizen")
                     .antMatchers(HttpMethod.GET, "/cases").hasAnyAuthority("payments", "citizen")
                     .antMatchers(HttpMethod.GET, "/cases/*").hasAnyAuthority("payments", "citizen")
-                    .antMatchers(HttpMethod.GET, "/report/data*").hasAnyAuthority("payments", "citizen")
-                    .antMatchers(HttpMethod.GET, "/report/download*").hasAnyAuthority("payments", "citizen")
+                    .antMatchers(HttpMethod.GET, "/report/data").hasAnyAuthority("payments", "citizen")
+                    .antMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority("payments", "citizen")
                     .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .anyRequest().authenticated();
             } catch (Exception e) {

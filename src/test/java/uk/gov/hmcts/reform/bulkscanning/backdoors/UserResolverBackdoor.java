@@ -23,7 +23,7 @@ public class UserResolverBackdoor implements SubjectResolver<User>{
 
         tokenToUserMap.put("Bearer user-1", new User(CITIZEN_ID, ImmutableSet.of("citizen")));
         tokenToUserMap.put("Bearer caseworker-2", new User(CASEWORKER_ID, ImmutableSet.of("caseworker", "payments")));
-        tokenToUserMap.put("Bearer authenticated-3", new User(AUTHENTICATED_USER_ID, ImmutableSet.of()));
+        tokenToUserMap.put("Bearer authenticated-3", new User(AUTHENTICATED_USER_ID, ImmutableSet.of("payments", "citizen")));
         tokenToUserMap.put("Bearer solicitor-4", new User(SOLICITOR_ID, ImmutableSet.of("caseworker", "caseworker-probate-solicitor")));
     }
 
