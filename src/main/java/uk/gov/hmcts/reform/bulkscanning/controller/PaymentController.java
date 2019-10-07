@@ -107,7 +107,6 @@ public class PaymentController {
     })
     @PutMapping("/bulk-scan-payments")
     public ResponseEntity updateCaseReferenceForExceptionRecord(
-        @RequestHeader("Authorization") String authorization,
         @NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
         @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
 
