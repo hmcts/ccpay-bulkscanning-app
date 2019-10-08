@@ -359,7 +359,9 @@ public class PaymentServiceImpl implements PaymentService {
         if(Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()){
             SearchResponse searchResponse = SearchResponse.searchResponseWith().build();
             searchResponse.setIsAllPaymentsProcessed(checkForAllPaymentsStatus(envelopeCases, PROCESSED.toString()));
-            if(!searchResponse.getIsAllPaymentsProcessed()){
+            if(searchResponse.getIsAllPaymentsProcessed()){
+                return searchResponse;
+            } else {
                 List<PaymentMetadata> paymentMetadataList = getPaymentMetadataForEnvelopeCase(envelopeCases);
                 if (Optional.ofNullable(paymentMetadataList).isPresent()
                     && !paymentMetadataList.isEmpty()
@@ -371,8 +373,6 @@ public class PaymentServiceImpl implements PaymentService {
                         .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
                         .build();
                 }
-            } else {
-                return searchResponse;
             }
         }
         return null;
@@ -415,13 +415,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Envelope updateEnvelopePaymentStatus(Envelope envelope, PaymentStatus paymentStatus) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
-        if (Optional.ofNullable(payments).isPresent() && !payments.isEmpty()) {
-            if (payments.stream()
-                .map(payment -> payment.getPaymentStatus())
-                .collect(Collectors.toList())
-                .stream().allMatch(paymentStatus.toString() :: equals)) {
-                updateEnvelopeStatus(envelope, paymentStatus);
-            }
+        if (Optional.ofNullable(payments).isPresent()
+            && !payments.isEmpty()
+            && payments.stream()
+            .map(payment -> payment.getPaymentStatus())
+            .collect(Collectors.toList())
+            .stream().allMatch(paymentStatus.toString() :: equals)) {
+            updateEnvelopeStatus(envelope, paymentStatus);
         }
         return envelope;
     }
