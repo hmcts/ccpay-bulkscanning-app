@@ -140,7 +140,6 @@ public class PaymentController {
         LOG.info("Request received to mark payment with DCN : {} , status : {}", dcn, status);
         return ResponseEntity
             .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
             .body(paymentService.updatePaymentStatus(dcn, status));
     }
 
