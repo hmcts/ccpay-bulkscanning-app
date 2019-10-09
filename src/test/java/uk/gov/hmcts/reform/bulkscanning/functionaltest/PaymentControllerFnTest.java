@@ -166,7 +166,6 @@ public class PaymentControllerFnTest {
     }
 
     @Test
-    @Transactional
     public void testMarkPaymentAsProcessed() throws Exception {
         String dcn[] = {"DCN1"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
@@ -260,6 +259,48 @@ public class PaymentControllerFnTest {
         //New payment should be saved with Incomplete status
         Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-12345").get().getPaymentStatus()
             , INCOMPLETE.toString());
+    }
+
+    @Test
+    public void testSearchByCCDForProcessed() throws Exception {
+        String dcns[] = {"1111-6666-7777-8888", "1111-6666-7777-9999"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-6666-7777-4444"
+            , dcns, "AA08", true);
+
+        //Payment Request from Bulk-Scan System
+        restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
+
+        //Payment Request from Exela for Payment DCN 1111-6666-7777-8888
+        restActions.post("/bulk-scan-payment", createPaymentRequest("1111-6666-7777-8888"));
+
+        //Payment Request from Exela for Payment DCN 1111-6666-7777-9999
+        restActions.post("/bulk-scan-payment", createPaymentRequest("1111-6666-7777-9999"));
+
+        //Update Payment Status once Payment Allocated to Fee for DCN 1111-6666-7777-8888
+        restActions.patch("/bulk-scan-payments/1111-6666-7777-8888/status/PROCESSED");
+
+        //Update Payment Status once Payment Allocated to Fee for DCN 1111-6666-7777-9999
+        restActions.patch("/bulk-scan-payments/1111-6666-7777-9999/status/PROCESSED");
+
+        //Calling Search API by DCN and validate response
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("document_control_number", "1111-6666-7777-9999");
+        ResultActions resultActions = restActions.get("/cases", params);
+
+        Assert.assertEquals(404, resultActions.andReturn().getResponse().getStatus());
+        Assert.assertEquals(true, resultActions.andReturn().getResponse()
+                                        .getContentAsString()
+                                        .startsWith("All Payments Processed/Allocated"));
+
+        //Calling Search API by CCD and validate response
+        resultActions = restActions.get("/cases/1111-6666-7777-4444", params);
+
+        Assert.assertEquals(404, resultActions.andReturn().getResponse().getStatus());
+        Assert.assertEquals(true, resultActions.andReturn().getResponse()
+            .getContentAsString()
+            .startsWith("All Payments Processed/Allocated"));
+
+
     }
 
     public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
