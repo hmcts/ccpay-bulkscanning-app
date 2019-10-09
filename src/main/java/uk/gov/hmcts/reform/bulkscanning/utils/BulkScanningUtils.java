@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.BOTH;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Both;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST;
 
@@ -105,7 +105,7 @@ public class BulkScanningUtils {
                 isDCNAlreadyExists(listOfExistingDCN, envelopePayment))
                 .forEach(envelopePayment -> {
                     LOG.info("Updating Payment Source to BOTH as we have received payment from Bulk_Scan & Excela");
-                    envelopePayment.setSource(BOTH.toString());
+                    envelopePayment.setSource(Both.toString());
                     envelopePayment.setPaymentStatus(COMPLETE.toString());
                 });
         }

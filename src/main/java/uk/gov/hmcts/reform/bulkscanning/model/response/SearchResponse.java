@@ -25,4 +25,6 @@ public class SearchResponse implements Serializable {
     private String exceptionRecordReference;
     private String responsibleServiceId;
     private List<PaymentMetadataDto> payments;
+    @Builder.Default
+    private Boolean isAllPaymentsProcessed = false;
 }

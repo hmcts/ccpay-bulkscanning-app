@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.Boolean.TRUE;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.BULK_SCAN;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_Scan;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @Component
@@ -25,7 +25,7 @@ public class BulkScanPaymentRequestMapper {
         Arrays.asList(dcnForPayments).stream().forEach(dcn -> envelopePaymentList.add(EnvelopePayment
                                                                                           .paymentWith()
                                                                                           .dcnReference(dcn)
-                                                                                          .source(BULK_SCAN.toString())
+                                                                                          .source(Bulk_Scan.toString())
                                                                                           .paymentStatus(INCOMPLETE.toString())
                                                                                           .build()));
 

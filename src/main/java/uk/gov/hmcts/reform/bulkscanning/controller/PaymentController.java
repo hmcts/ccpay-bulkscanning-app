@@ -140,7 +140,6 @@ public class PaymentController {
         LOG.info("Request received to mark payment with DCN : {} , status : {}", dcn, status);
         return ResponseEntity
             .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
             .body(paymentService.updatePaymentStatus(dcn, status));
     }
 
@@ -151,7 +150,7 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases/{ccd_reference}")
-    public ResponseEntity<SearchResponse> retrieveByCCD(
+    public ResponseEntity<?> retrieveByCCD(
         @RequestHeader("Authorization") String authorization,
         @PathVariable("ccd_reference") String ccdReference) {
         LOG.info("Retrieving payments for ccdReference {} : ", ccdReference);
@@ -159,10 +158,14 @@ public class PaymentController {
             SearchResponse searchResponse = paymentService.retrieveByCCDReference(ccdReference);
             if (Optional.ofNullable(searchResponse).isPresent()) {
                 LOG.info("SearchResponse : {}", searchResponse);
-                return new ResponseEntity<>(searchResponse, HttpStatus.OK);
+                if(searchResponse.getIsAllPaymentsProcessed()){
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("All Payments Processed/Allocated for ccdReference : " + ccdReference);
+                } else {
+                    return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
+                }
             } else {
                 LOG.info("Payments Not found for ccdReference : {}", ccdReference);
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for ccdReference : " + ccdReference);
             }
         } catch (Exception ex) {
             throw new PaymentException(ex);
@@ -175,7 +178,7 @@ public class PaymentController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases")
-    public ResponseEntity<SearchResponse> retrieveByDCN(
+    public ResponseEntity<?> retrieveByDCN(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("document_control_number") String documentControlNumber) {
         LOG.info("Retrieving payments for documentControlNumber : {}", documentControlNumber);
@@ -183,10 +186,14 @@ public class PaymentController {
             SearchResponse searchResponse = paymentService.retrieveByDcn(documentControlNumber);
             if (Optional.ofNullable(searchResponse).isPresent()) {
                 LOG.info("SearchResponse : {}", searchResponse);
-                return new ResponseEntity<>(searchResponse, HttpStatus.OK);
+                if(searchResponse.getIsAllPaymentsProcessed()){
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("All Payments Processed/Allocated for documentControlNumber : " + documentControlNumber);
+                } else {
+                    return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
+                }
             } else {
-                LOG.info("Payments not found for documentControlNumber : {}", documentControlNumber);
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                LOG.info("Payments Not found for documentControlNumber : {}", documentControlNumber);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for documentControlNumber : " + documentControlNumber);
             }
         } catch (Exception ex) {
             throw new PaymentException(ex);
