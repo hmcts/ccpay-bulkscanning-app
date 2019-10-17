@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +69,7 @@ public class PaymentControllerTest {
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
             .documentControlNumbers(dcn)
-            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId))
+            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId).toString())
             .isExceptionRecord(true)
             .build();
     }
@@ -200,10 +199,10 @@ public class PaymentControllerTest {
         return BulkScanPayment.createPaymentRequestWith()
             .dcnReference(dcnReference)
             .amount(BigDecimal.valueOf(100.00))
-            .bankedDate(new Date())
+            .bankedDate(LocalDateTime.now())
             .bankGiroCreditSlipNumber("BGC123")
-            .currency(Currency.valueOf("GBP"))
-            .method(PaymentMethod.valueOf("CHEQUE"))
+            .currency(Currency.valueOf("GBP").toString())
+            .method(PaymentMethod.valueOf("CHEQUE").toString())
             .build();
     }
 
