@@ -225,10 +225,10 @@ public class PaymentServiceTest {
     private BulkScanPayment createPaymentRequest() {
         return BulkScanPayment.createPaymentRequestWith()
             .amount(BigDecimal.valueOf(100.00))
-            .bankedDate(new Date())
+            .bankedDate(LocalDateTime.now())
             .bankGiroCreditSlipNumber("BGC123")
-            .currency(Currency.valueOf("GBP"))
-            .method(PaymentMethod.valueOf("CHEQUE"))
+            .currency(Currency.valueOf("GBP").toString())
+            .method(PaymentMethod.valueOf("CHEQUE").toString())
             .build();
     }
 

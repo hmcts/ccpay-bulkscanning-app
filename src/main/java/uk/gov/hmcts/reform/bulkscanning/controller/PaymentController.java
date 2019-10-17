@@ -158,11 +158,7 @@ public class PaymentController {
             SearchResponse searchResponse = paymentService.retrieveByCCDReference(ccdReference);
             if (Optional.ofNullable(searchResponse).isPresent()) {
                 LOG.info("SearchResponse : {}", searchResponse);
-                if(searchResponse.getIsAllPaymentsProcessed()){
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("All Payments Processed/Allocated for ccdReference : " + ccdReference);
-                } else {
-                    return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
-                }
+                return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
             } else {
                 LOG.info("Payments Not found for ccdReference : {}", ccdReference);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for ccdReference : " + ccdReference);
@@ -186,11 +182,7 @@ public class PaymentController {
             SearchResponse searchResponse = paymentService.retrieveByDcn(documentControlNumber);
             if (Optional.ofNullable(searchResponse).isPresent()) {
                 LOG.info("SearchResponse : {}", searchResponse);
-                if(searchResponse.getIsAllPaymentsProcessed()){
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("All Payments Processed/Allocated for documentControlNumber : " + documentControlNumber);
-                } else {
-                    return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
-                }
+                return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
             } else {
                 LOG.info("Payments Not found for documentControlNumber : {}", documentControlNumber);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for documentControlNumber : " + documentControlNumber);

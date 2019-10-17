@@ -39,9 +39,9 @@ public class PaymentMetadataDtoMapper {
                 .dcnReference(dcnReference)
                 .bgcReference(bulkScanPayment.getBankGiroCreditSlipNumber())
                 .amount(bulkScanPayment.getAmount())
-                .currency(Currency.valueOf(bulkScanPayment.getCurrency().toString()))
-                .paymentMethod(PaymentMethod.valueOf(bulkScanPayment.getMethod().toString()))
-                .dateBanked(bulkScanPayment.getBankedDate())
+                .currency(Currency.valueOf(bulkScanPayment.getCurrency()))
+                .paymentMethod(PaymentMethod.valueOf(bulkScanPayment.getMethod()))
+                .dateBanked(localDateTimeToDate(bulkScanPayment.getBankedDate()))
                 .build();
         }else {
             return null;
