@@ -287,20 +287,14 @@ public class PaymentControllerFnTest {
         params.add("document_control_number", "1111-6666-7777-9999");
         ResultActions resultActions = restActions.get("/cases", params);
 
-        Assert.assertEquals(404, resultActions.andReturn().getResponse().getStatus());
-        Assert.assertEquals(true, resultActions.andReturn().getResponse()
-                                        .getContentAsString()
-                                        .startsWith("All Payments Processed/Allocated"));
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+        Assert.assertEquals(true, resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
 
         //Calling Search API by CCD and validate response
         resultActions = restActions.get("/cases/1111-6666-7777-4444", params);
 
-        Assert.assertEquals(404, resultActions.andReturn().getResponse().getStatus());
-        Assert.assertEquals(true, resultActions.andReturn().getResponse()
-            .getContentAsString()
-            .startsWith("All Payments Processed/Allocated"));
-
-
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+        Assert.assertEquals(true, resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
     }
 
     public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
