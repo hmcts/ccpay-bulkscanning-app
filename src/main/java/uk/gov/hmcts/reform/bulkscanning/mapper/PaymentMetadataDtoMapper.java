@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,8 +40,8 @@ public class PaymentMetadataDtoMapper {
                 .dcnReference(dcnReference)
                 .bgcReference(bulkScanPayment.getBankGiroCreditSlipNumber())
                 .amount(bulkScanPayment.getAmount())
-                .currency(Currency.valueOf(bulkScanPayment.getCurrency()))
-                .paymentMethod(PaymentMethod.valueOf(bulkScanPayment.getMethod()))
+                .currency(Currency.valueOf(bulkScanPayment.getCurrency().toUpperCase(Locale.UK)))
+                .paymentMethod(PaymentMethod.valueOf(bulkScanPayment.getMethod().toUpperCase(Locale.UK)))
                 .dateBanked(localDateTimeToDate(bulkScanPayment.getBankedDate()))
                 .build();
         }else {

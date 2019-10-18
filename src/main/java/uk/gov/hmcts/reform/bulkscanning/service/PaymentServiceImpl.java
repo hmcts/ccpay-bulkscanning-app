@@ -463,7 +463,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private Envelope createEnvelope(EnvelopeDto envelopeDto) {
-        return envelopeRepository.save(envelopeDtoMapper.toEnvelopeEntity(envelopeDto));
+        Envelope envelope = envelopeRepository.save(envelopeDtoMapper.toEnvelopeEntity(envelopeDto));
+        bulkScanningUtils.insertStatusHistoryAudit(envelope);
+        return envelope;
     }
 
     private List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
