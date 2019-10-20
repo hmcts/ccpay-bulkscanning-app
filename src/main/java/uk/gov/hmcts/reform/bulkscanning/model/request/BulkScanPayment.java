@@ -9,14 +9,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -41,12 +39,14 @@ public class BulkScanPayment {
     /*
     The ISO currency code
      */
-    private Currency currency;
+    @NotBlank(message = "currency can't be Blank")
+    private String currency;
 
     /*
     The method of payment i.e. Cheque or Postal Order
      */
-    private PaymentMethod method;
+    @NotBlank(message = "payment_Method can't be Blank")
+    private String method;
 
     /*
     Number of the credit slip containing the payment
@@ -60,5 +60,5 @@ public class BulkScanPayment {
      */
     @NotNull(message = "banked_date can't be Blank")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date bankedDate;
+    private LocalDateTime bankedDate;
 }

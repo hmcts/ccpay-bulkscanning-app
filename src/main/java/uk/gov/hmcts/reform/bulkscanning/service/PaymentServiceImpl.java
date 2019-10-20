@@ -134,6 +134,16 @@ public class PaymentServiceImpl implements PaymentService {
                                                                     .documentControlNumber(
                                                                         documentControlNumber)
                                                                     .build());
+        if(envelopeCases == null){
+            // No Payment exists for the searched DCN
+            LOG.info("Payment Not exists for the searched DCN !!!");
+            return null;
+        }
+        if(envelopeCases.isEmpty()){
+            return SearchResponse.searchResponseWith()
+                .allPaymentsStatus(INCOMPLETE)
+                .build();
+        }
         return searchForEnvelopeCasePayments(envelopeCases);
     }
 
@@ -356,29 +366,32 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private SearchResponse searchForEnvelopeCasePayments(List<EnvelopeCase> envelopeCases) {
-        if(Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()){
-            SearchResponse searchResponse = SearchResponse.searchResponseWith().build();
-            searchResponse.setIsAllPaymentsProcessed(checkForAllPaymentsStatus(envelopeCases, PROCESSED.toString()));
-            if(searchResponse.getIsAllPaymentsProcessed()){
-                return searchResponse;
-            } else {
+        SearchResponse searchResponse = SearchResponse.searchResponseWith().build();
+        if(Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()
+            && Optional.ofNullable(envelopeCases.get(0).getEnvelope()).isPresent()){
+            if(checkForAllEnvelopesStatus(envelopeCases, PROCESSED.toString())){
+                searchResponse.setAllPaymentsStatus(PROCESSED);
+            }else if(checkForAllEnvelopesStatus(envelopeCases, COMPLETE.toString())){
+                searchResponse.setAllPaymentsStatus(COMPLETE);
+            }else{
+                searchResponse.setAllPaymentsStatus(INCOMPLETE);
+            }
+            if(searchResponse.getAllPaymentsStatus().equals(INCOMPLETE)
+                    || searchResponse.getAllPaymentsStatus().equals(COMPLETE)){
                 List<PaymentMetadata> paymentMetadataList = getPaymentMetadataForEnvelopeCase(envelopeCases);
                 if (Optional.ofNullable(paymentMetadataList).isPresent()
-                    && !paymentMetadataList.isEmpty()
-                    && Optional.ofNullable(envelopeCases.get(0).getEnvelope()).isPresent()) {
-                    return SearchResponse.searchResponseWith()
-                        .ccdReference(envelopeCases.get(0).getCcdReference())
-                        .exceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference())
-                        .responsibleServiceId(envelopeCases.get(0).getEnvelope().getResponsibleServiceId())
-                        .payments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList))
-                        .build();
+                    && !paymentMetadataList.isEmpty()) {
+                    searchResponse.setPayments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList));
                 }
             }
+            searchResponse.setCcdReference(envelopeCases.get(0).getCcdReference());
+            searchResponse.setExceptionRecordReference(envelopeCases.get(0).getExceptionRecordReference());
+            searchResponse.setResponsibleServiceId(envelopeCases.get(0).getEnvelope().getResponsibleServiceId());
         }
-        return null;
+        return searchResponse;
     }
 
-    private Boolean checkForAllPaymentsStatus(List<EnvelopeCase> envelopeCases, String status) {
+    private Boolean checkForAllEnvelopesStatus(List<EnvelopeCase> envelopeCases, String status) {
         return envelopeCases.stream()
             .map(envelopeCase -> envelopeCase.getEnvelope().getPaymentStatus())
             .collect(Collectors.toList())
@@ -415,15 +428,32 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Envelope updateEnvelopePaymentStatus(Envelope envelope, PaymentStatus paymentStatus) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
-        if (Optional.ofNullable(payments).isPresent()
-            && !payments.isEmpty()
-            && payments.stream()
-            .map(payment -> payment.getPaymentStatus())
-            .collect(Collectors.toList())
-            .stream().allMatch(paymentStatus.toString() :: equals)) {
+        if (checkAllPaymentsStatus(paymentStatus, payments)) {
             updateEnvelopeStatus(envelope, paymentStatus);
+        }else if (checkAnyPaymentsStatus(INCOMPLETE, payments)){
+            updateEnvelopeStatus(envelope, INCOMPLETE);
+        }else if (checkAnyPaymentsStatus(COMPLETE, payments)){
+            updateEnvelopeStatus(envelope, COMPLETE);
         }
         return envelope;
+    }
+
+    private boolean checkAllPaymentsStatus(PaymentStatus paymentStatus, List<EnvelopePayment> payments) {
+        return Optional.ofNullable(payments).isPresent()
+            && !payments.isEmpty()
+            && payments.stream()
+                            .map(payment -> payment.getPaymentStatus())
+                            .collect(Collectors.toList())
+                            .stream().allMatch(paymentStatus.toString() :: equals);
+    }
+
+    private boolean checkAnyPaymentsStatus(PaymentStatus paymentStatus, List<EnvelopePayment> payments) {
+        return Optional.ofNullable(payments).isPresent()
+            && ! payments.isEmpty()
+            && ! payments.stream()
+            .filter(payment -> payment.getPaymentStatus().equalsIgnoreCase(paymentStatus.toString()))
+            .collect(Collectors.toList())
+            .isEmpty();
     }
 
     private Envelope updateEnvelopeStatus(Envelope envelope, PaymentStatus paymentStatus) {
@@ -433,7 +463,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private Envelope createEnvelope(EnvelopeDto envelopeDto) {
-        return envelopeRepository.save(envelopeDtoMapper.toEnvelopeEntity(envelopeDto));
+        Envelope envelope = envelopeRepository.save(envelopeDtoMapper.toEnvelopeEntity(envelopeDto));
+        bulkScanningUtils.insertStatusHistoryAudit(envelope);
+        return envelope;
     }
 
     private List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
@@ -465,7 +497,8 @@ public class PaymentServiceImpl implements PaymentService {
                 searchRequest.setExceptionRecord(envelopeCase.getExceptionRecordReference());
                 return this.getEnvelopeCaseByCCDReference(searchRequest);
             }
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+        return null;
     }
 }

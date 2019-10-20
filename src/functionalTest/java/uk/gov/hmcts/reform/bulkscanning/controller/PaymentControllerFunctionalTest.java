@@ -311,7 +311,7 @@ public class PaymentControllerFunctionalTest {
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
             .documentControlNumbers(dcn)
-            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId))
+            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId).toString())
             .isExceptionRecord(isExceptionRecord)
             .build();
     }

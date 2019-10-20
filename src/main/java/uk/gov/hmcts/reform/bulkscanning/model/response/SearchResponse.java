@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 
 import java.io.Serializable;
 import java.util.List;
@@ -25,6 +26,5 @@ public class SearchResponse implements Serializable {
     private String exceptionRecordReference;
     private String responsibleServiceId;
     private List<PaymentMetadataDto> payments;
-    @Builder.Default
-    private Boolean isAllPaymentsProcessed = false;
+    private PaymentStatus allPaymentsStatus;
 }
