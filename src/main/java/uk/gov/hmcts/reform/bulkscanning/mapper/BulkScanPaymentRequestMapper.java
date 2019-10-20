@@ -4,11 +4,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static java.lang.Boolean.TRUE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_Scan;
@@ -40,7 +42,8 @@ public class BulkScanPaymentRequestMapper {
         }
 
         return Envelope.envelopeWith()
-            .responsibleServiceId(bsPaymentRequest.getResponsibleServiceId().toString())
+            .responsibleServiceId(ResponsibleSiteId.valueOf(bsPaymentRequest.getResponsibleServiceId().toUpperCase(
+                Locale.UK)).toString())
             .envelopePayments(envelopePaymentList)
             .envelopeCases(envelopeCaseList)
             .paymentStatus(INCOMPLETE.toString()) ////by default at initial status

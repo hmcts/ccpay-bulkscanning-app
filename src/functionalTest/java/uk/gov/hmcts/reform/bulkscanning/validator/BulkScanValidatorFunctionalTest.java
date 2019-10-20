@@ -60,7 +60,7 @@ public class BulkScanValidatorFunctionalTest {
             .body(bulkScanPaymentRequest)
             .contentType(ContentType.JSON)
             .when()
-            .post("/bulk-scan-payments/");
+            .post("/bulk-scan-payments");
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(response.getStatusCode()));
 
