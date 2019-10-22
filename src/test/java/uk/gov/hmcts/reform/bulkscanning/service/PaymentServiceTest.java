@@ -35,12 +35,14 @@ import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,7 +60,6 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles({"local", "test"})
-//@TestPropertySource(locations="classpath:application-local.yaml")
 public class PaymentServiceTest {
     MockMvc mockMvc;
 
@@ -105,8 +106,6 @@ public class PaymentServiceTest {
     public static final String DCN_REFERENCE = "DCN1";
 
     public static final String TEST_DCN_REFERENCE = "123-123";
-
-
 
     @Before
     public void setUp() {
@@ -178,46 +177,6 @@ public class PaymentServiceTest {
 
         Envelope envelopeMock = paymentService.processPaymentFromExela(createPaymentRequest(), TEST_DCN_REFERENCE);
         assertThat(envelopeMock.getEnvelopePayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
-    }
-
-    @Test
-    @Transactional
-    public void testRetrieveByCCDReference() throws Exception {
-        SearchResponse searchResponse = paymentService.retrieveByCCDReference(TEST_DCN_REFERENCE);
-        assertThat(searchResponse.getCcdReference()).isEqualTo(TEST_DCN_REFERENCE);
-    }
-
-    @Test
-    @Transactional
-    public void testRetrieveByExceptionRecord() throws Exception {
-        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
-        Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
-                                                                    .id(1)
-                                                                    .dcnReference(TEST_DCN_REFERENCE)
-                                                                    .paymentStatus(COMPLETE.toString())
-                                                                    .build());
-        Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
-        Optional<Envelope> envelope = Optional.of(Envelope.envelopeWith().id(1).envelopePayments(payments.get())
-                                                      .paymentStatus(COMPLETE.toString())
-                                                      .build());
-        Optional<EnvelopeCase> envelopeCase = Optional.of(EnvelopeCase.caseWith()
-                                                              .id(1)
-                                                              .envelope(envelope.get())
-                                                              .ccdReference("CCD123")
-                                                              .exceptionRecordReference("EXP123")
-                                                              .build());
-        Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
-        when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
-        when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(cases);
-        SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
-        assertThat(searchResponse.getCcdReference()).isEqualTo("CCD123");
-    }
-
-    @Test
-    @Transactional
-    public void testRetrieveByDcn() throws Exception {
-        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
-        assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
 
     @Test
