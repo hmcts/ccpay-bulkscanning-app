@@ -96,6 +96,7 @@ public class PaymentServiceTest {
 
     private CaseReferenceRequest caseReferenceRequest;
 
+    @Autowired
     private AppInsightsAuditRepository auditRepository;
 
     public static final String CCD_CASE_REFERENCE = "11112222333344441";

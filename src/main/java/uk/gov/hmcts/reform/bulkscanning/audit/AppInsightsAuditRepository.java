@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -34,13 +35,16 @@ public class AppInsightsAuditRepository implements AuditRepository {
 
     @Override
     public void trackPaymentEvent(String name, EnvelopePayment payment) {
-        Map<String, String> properties = new ConcurrentHashMap<>();
-        properties.put("paymentEnvelopeId", payment.getEnvelope().getId().toString());
-        properties.put("dcnReference", payment.getDcnReference());
-        properties.put("paymentStatus", payment.getPaymentStatus());
-        properties.put("source", payment.getSource());
+        if(Optional.ofNullable(payment.getSource()).isPresent()
+                && Optional.ofNullable(payment.getPaymentStatus()).isPresent()
+                && Optional.ofNullable(payment.getDcnReference()).isPresent()){
+            Map<String, String> properties = new ConcurrentHashMap<>();
+            properties.put("dcnReference", payment.getDcnReference());
+            properties.put("paymentStatus", payment.getPaymentStatus());
+            properties.put("source", payment.getSource());
 
-        LOG.info("Payment event tracked for DCN {}", payment.getDcnReference());
-        telemetry.trackEvent(name, properties,null);
+            LOG.info("Payment event tracked for DCN {}", payment.getDcnReference());
+            telemetry.trackEvent(name, properties,null);
+        }
     }
 }
