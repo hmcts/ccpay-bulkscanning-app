@@ -86,7 +86,7 @@ public class PaymentController {
             LOG.info("Check in Payment metadata for already existing payment from Exela");
             if (Optional.ofNullable(paymentService.getPaymentMetadata(bulkScanPayment.getDcnReference())).isPresent()) {
                 LOG.info("Payment already exists for DCN: {}", bulkScanPayment.getDcnReference());
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Exela Payment details already exists");
             } else {
                 LOG.info("Processing Payment for DCN: {}", bulkScanPayment.getDcnReference());
                 paymentService.processPaymentFromExela(bulkScanPayment, bulkScanPayment.getDcnReference());

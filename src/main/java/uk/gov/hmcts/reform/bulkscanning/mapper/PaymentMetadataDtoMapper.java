@@ -31,7 +31,6 @@ public class PaymentMetadataDtoMapper {
         }else {
             return null;
         }
-
     }
 
     public PaymentMetadataDto fromRequest(BulkScanPayment bulkScanPayment, String dcnReference) {
