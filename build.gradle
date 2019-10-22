@@ -189,7 +189,10 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-autoconfigure'
   compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: javaLoggingVersion
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: javaLoggingVersion
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: javaLoggingVersion
+  compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'5.0'
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
   compile group:'org.apache.poi', name: 'poi', version: '4.0.1'
   compile group:'org.apache.poi', name: 'poi-ooxml', version: '4.0.1'

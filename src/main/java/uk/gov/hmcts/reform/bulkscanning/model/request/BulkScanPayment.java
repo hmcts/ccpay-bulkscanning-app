@@ -43,7 +43,7 @@ public class BulkScanPayment {
     private String currency;
 
     /*
-    The method of payment i.e. Cheque or Postal Order
+    The method of payment i.e. Cheque, Postal Order, CASH
      */
     @NotBlank(message = "payment_Method can't be Blank")
     private String method;

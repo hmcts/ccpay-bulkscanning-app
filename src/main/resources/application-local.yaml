@@ -9,7 +9,7 @@ spring:
     name: bulk-scanning
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bulk-scan
+    url: jdbc:postgresql://localhost:5432/bulk-scan-db
     username: postgres
     password: admin
     properties:
@@ -37,3 +37,6 @@ auth:
   idam:
     client:
       baseUrl: http://localhost:23443
+azure:
+  application-insights:
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}

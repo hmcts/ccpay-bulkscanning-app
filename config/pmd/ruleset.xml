@@ -50,9 +50,9 @@
     <exclude name="FinalFieldCouldBeStatic"/>
     <exclude name="SignatureDeclareThrowsException"/>
   </rule>
-  <rule ref="category/java/design.xml/ExcessiveImports">
+  <rule ref="category/java/design.xml/ExcessiveParameterList">
     <properties>
-      <property name="minimum" value="50"/><!-- should be reduced -->
+      <property name="minimum" value="20"/><!-- should be reduced -->
     </properties>
   </rule>
   <rule ref="category/java/design.xml/LawOfDemeter">

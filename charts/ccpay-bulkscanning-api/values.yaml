@@ -14,6 +14,7 @@ java:
     REFORM_SERVICE_NAME: ccpay-bulkscanning
     REFORM_TEAM: ccpay
     SPRING_LIQUIBASE_ENABLED: true
+    APPINSIGHTS_INSTRUMENTATIONKEY: fake-key
   postgresql:
     image:
       tag: 10.7.0-r68
