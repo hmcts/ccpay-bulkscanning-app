@@ -202,3 +202,9 @@ Here are some other functionalities it provides:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+#### Environment variables
+
+The following environment variables are required:
+
+- `APPINSIGHTS_INSTRUMENTATIONKEY`, app insights key to send telemetry events.
