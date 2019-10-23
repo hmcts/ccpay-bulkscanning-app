@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -82,12 +83,11 @@ public class PaymentControllerTest {
     }
 
     @Test
-    @Transactional
     public void testCreatePaymentFromExela_Conflict() throws Exception{
 
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
                                                                     .id(1).amount(BigDecimal.valueOf(100))
-                                                                    .dcnReference("111222333444")
+                                                                    .dcnReference("111222333")
                                                                     .dateBanked(LocalDateTime.now())
                                                                     .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
                                                                     .build());
@@ -95,7 +95,7 @@ public class PaymentControllerTest {
         when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("111222333444")))
+                                                          .content(asJsonString(createPaymentRequest("111222333")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(409), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -212,12 +212,13 @@ public class PaymentControllerTest {
            ,dcn,"AA08");
 
        when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
-           .thenReturn(mockBulkScanningEnvelope());
+           .thenReturn(Arrays.asList(dcn));
 
        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
            .header("ServiceAuthorization", "service")
            .content(asJsonString(bulkScanPaymentRequest))
            .contentType(MediaType.APPLICATION_JSON));
+
        Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
    }
 

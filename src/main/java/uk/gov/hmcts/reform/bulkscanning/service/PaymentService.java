@@ -18,7 +18,7 @@ public interface PaymentService {
     SearchResponse retrieveByCCDReference(String ccdReference);
     SearchResponse retrieveByDcn(String documentControlNumber);
     PaymentMetadata getPaymentMetadata(String dcnReference);
-    Envelope saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest);
+    List<String> saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest);
     String updateCaseReferenceForExceptionRecord (String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest);
     String updatePaymentStatus(String dcn, PaymentStatus status);
     List<ReportData> retrieveByReportType(Date fromDate, Date toDate, ReportType reportType);
