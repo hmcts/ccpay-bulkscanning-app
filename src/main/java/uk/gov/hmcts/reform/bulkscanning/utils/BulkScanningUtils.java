@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
@@ -41,7 +42,8 @@ public class BulkScanningUtils {
         return null;
     }
 
-    public Envelope returnExistingEnvelope(Envelope envelope) {
+    public List<Envelope> returnExistingEnvelopeList(Envelope envelope) {
+        List<Envelope> existingEnvelopeList = new ArrayList<>();
 
         //List of existing Payments
         List<EnvelopePayment> listOfExistingPayment = envelope.getEnvelopePayments().stream().filter(envelopePayment ->
@@ -49,9 +51,25 @@ public class BulkScanningUtils {
             .map(envelopePayment -> paymentRepository.findByDcnReference(envelopePayment.getDcnReference()).get())
             .collect(Collectors.toList());
 
-
         if (Optional.ofNullable(listOfExistingPayment).isPresent() && !listOfExistingPayment.isEmpty()) {
-            Envelope existingEnvelope = listOfExistingPayment.get(0).getEnvelope();
+            //Existing envelopeList
+            existingEnvelopeList = listOfExistingPayment.stream().
+                map(envelopePayment -> listOfExistingEnvelope(envelopePayment)).
+                filter(envelope1 -> Optional.ofNullable(envelope1.getId()).isPresent()).
+                collect(Collectors.toList());
+        } else {
+            //New Envelope
+            existingEnvelopeList.add(envelope);
+        }
+
+        return existingEnvelopeList;
+    }
+
+    public Envelope listOfExistingEnvelope(EnvelopePayment envelopePayment) {
+        Envelope existingEnvelope = null;
+
+        if (Optional.ofNullable(envelopePayment).isPresent()) {
+             existingEnvelope = envelopePayment.getEnvelope();
 
             //check if existing cases are present
             if (Optional.ofNullable(existingEnvelope).isPresent() &&
@@ -60,10 +78,9 @@ public class BulkScanningUtils {
                 throw new BulkScanCaseAlreadyExistsException(BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST);
             }
 
-            return existingEnvelope;
         }
 
-        return envelope;
+        return existingEnvelope;
     }
 
     public boolean isDCNAlreadyExists(List<String> listOfExistingDCN, EnvelopePayment envelopePayment) {
@@ -82,7 +99,9 @@ public class BulkScanningUtils {
 
     public void mergeTheCaseDetailsFromBulkScan(Envelope envelopeDB, Envelope envelopeNew){
         envelopeDB.setResponsibleServiceId(envelopeNew.getResponsibleServiceId());
-        envelopeDB.setEnvelopeCases(envelopeNew.getEnvelopeCases());
+        List<EnvelopeCase> envelopeCaseList = new ArrayList<>(envelopeNew.getEnvelopeCases());
+
+        envelopeDB.setEnvelopeCases(envelopeCaseList);
         envelopeDB.getEnvelopeCases().stream().forEach(envelopeCase -> envelopeCase.setEnvelope(envelopeDB));
     }
 
