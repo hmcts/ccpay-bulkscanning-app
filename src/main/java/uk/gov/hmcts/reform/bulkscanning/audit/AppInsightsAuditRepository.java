@@ -6,14 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+//@Component
 public class AppInsightsAuditRepository implements AuditRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(AppInsightsAuditRepository.class);

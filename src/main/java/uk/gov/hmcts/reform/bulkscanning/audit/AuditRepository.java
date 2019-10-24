@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.bulkscanning.audit;
 
-import org.springframework.scheduling.annotation.Async;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 
 import java.util.Map;
 
-@Async
+//@Async
 public interface AuditRepository {
 
     void trackPaymentEvent(String name, EnvelopePayment payment);
