@@ -13,7 +13,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.reform.bulkscanning.audit.AppInsightsAuditRepository;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
@@ -40,7 +39,10 @@ import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -96,9 +98,6 @@ public class PaymentServiceTest {
 
     private CaseReferenceRequest caseReferenceRequest;
 
-    @Autowired
-    private AppInsightsAuditRepository auditRepository;
-
     public static final String CCD_CASE_REFERENCE = "11112222333344441";
     public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "99998888333344441";
     public static final String EXCEPTION_RECORD_REFERENCE = "44443333222211111";
@@ -119,8 +118,7 @@ public class PaymentServiceTest {
                                                 paymentDtoMapper,
                                                 bsPaymentRequestMapper,
                                                 bulkScanningUtils,
-                                                envelopeCaseRepository,
-                                                auditRepository);
+                                                envelopeCaseRepository);
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
             .id(1).amount(BigDecimal.valueOf(100))
             .dcnReference(TEST_DCN_REFERENCE)

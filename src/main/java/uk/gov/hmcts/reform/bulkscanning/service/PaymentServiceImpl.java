@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.reform.bulkscanning.audit.AppInsightsAuditRepository;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
@@ -50,8 +49,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final EnvelopeCaseRepository envelopeCaseRepository;
 
-    private final AppInsightsAuditRepository auditRepository;
-
     private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
     private final EnvelopeDtoMapper envelopeDtoMapper;
@@ -73,8 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
                               PaymentDtoMapper paymentDtoMapper,
                               BulkScanPaymentRequestMapper bsPaymentRequestMapper,
                               BulkScanningUtils bulkScanningUtils,
-                              EnvelopeCaseRepository envelopeCaseRepository,
-                              AppInsightsAuditRepository auditRepository) {
+                              EnvelopeCaseRepository envelopeCaseRepository) {
         this.paymentRepository = paymentRepository;
         this.paymentMetadataRepository = paymentMetadataRepository;
         this.envelopeRepository = envelopeRepository;
@@ -84,7 +80,6 @@ public class PaymentServiceImpl implements PaymentService {
         this.bsPaymentRequestMapper = bsPaymentRequestMapper;
         this.bulkScanningUtils = bulkScanningUtils;
         this.envelopeCaseRepository = envelopeCaseRepository;
-        this.auditRepository = auditRepository;
     }
 
     @Override
@@ -106,7 +101,6 @@ public class PaymentServiceImpl implements PaymentService {
                                                    .payments(payments)
                                                    .build());
             LOG.info("Envelope created with status as incomplete");
-            auditRepository.trackPaymentEvent("EXELA_PAYMENT", envelope.getEnvelopePayments().get(0));
             return envelope;
         } else {
             if (Optional.ofNullable(payment.getEnvelope()).isPresent()
@@ -116,7 +110,6 @@ public class PaymentServiceImpl implements PaymentService {
                 LOG.info("Updating Payment Source to BOTH as we have received payment from Bulk_Scan & Excela");
                 payment.setSource(Both.toString());
                 updatePayment(payment);
-                auditRepository.trackPaymentEvent("EXELA_PAYMENT", payment);
                 return updateEnvelopePaymentStatus(payment.getEnvelope(), COMPLETE);
             }
         }
@@ -173,13 +166,6 @@ public class PaymentServiceImpl implements PaymentService {
                 bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
                 envelopeRepository.save(envelopeDB);
 
-                if(Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
-                    && ! envelopeDB.getEnvelopePayments().isEmpty()){
-                    envelopeDB.getEnvelopePayments().stream().forEach(payment -> {
-                        auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment);
-                    });
-                }
-
                 Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
 
                 List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
@@ -226,12 +212,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (Optional.ofNullable(envelope).isPresent()) {
             envelopeRepository.save(envelope);
             updateEnvelopePaymentStatus(envelope, PROCESSED);
-            if(Optional.ofNullable(envelope.getEnvelopePayments()).isPresent()
-                && ! envelope.getEnvelopePayments().isEmpty()){
-                envelope.getEnvelopePayments().stream().forEach(payment -> {
-                    auditRepository.trackPaymentEvent("PAYMENT_STATUS_UPDATE", payment);
-                });
-            }
             return dcn;
         }
         return null;
