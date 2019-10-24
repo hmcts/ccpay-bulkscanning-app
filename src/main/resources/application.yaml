@@ -72,6 +72,3 @@ auth:
     service:
       client:
         baseUrl: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL}
-azure:
-  application-insights:
-    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}

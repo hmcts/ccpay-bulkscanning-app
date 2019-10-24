@@ -37,6 +37,3 @@ auth:
   idam:
     client:
       baseUrl: http://localhost:23443
-azure:
-  application-insights:
-    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
