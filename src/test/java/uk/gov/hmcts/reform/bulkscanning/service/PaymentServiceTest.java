@@ -98,9 +98,6 @@ public class PaymentServiceTest {
 
     private CaseReferenceRequest caseReferenceRequest;
 
-    /*@Autowired
-    private AppInsightsAuditRepository auditRepository;*/
-
     public static final String CCD_CASE_REFERENCE = "11112222333344441";
     public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "99998888333344441";
     public static final String EXCEPTION_RECORD_REFERENCE = "44443333222211111";
@@ -121,8 +118,7 @@ public class PaymentServiceTest {
                                                 paymentDtoMapper,
                                                 bsPaymentRequestMapper,
                                                 bulkScanningUtils,
-                                                envelopeCaseRepository/*,
-                                                auditRepository*/);
+                                                envelopeCaseRepository);
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
             .id(1).amount(BigDecimal.valueOf(100))
             .dcnReference(TEST_DCN_REFERENCE)
@@ -250,8 +246,9 @@ public class PaymentServiceTest {
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
             ,dcn,"AA08", true);
 
-        Envelope envelopeMock = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
-        Assert.assertEquals(1,envelopeMock.getId().intValue());
+        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
+
+        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
     }
 
     @Test(expected = BulkScanCaseAlreadyExistsException.class)

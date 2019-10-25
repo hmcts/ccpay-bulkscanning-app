@@ -49,8 +49,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final EnvelopeCaseRepository envelopeCaseRepository;
 
-    //private final AppInsightsAuditRepository auditRepository;
-
     private final PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
     private final EnvelopeDtoMapper envelopeDtoMapper;
@@ -72,8 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
                               PaymentDtoMapper paymentDtoMapper,
                               BulkScanPaymentRequestMapper bsPaymentRequestMapper,
                               BulkScanningUtils bulkScanningUtils,
-                              EnvelopeCaseRepository envelopeCaseRepository/*,
-                              AppInsightsAuditRepository auditRepository*/) {
+                              EnvelopeCaseRepository envelopeCaseRepository) {
         this.paymentRepository = paymentRepository;
         this.paymentMetadataRepository = paymentMetadataRepository;
         this.envelopeRepository = envelopeRepository;
@@ -83,7 +80,6 @@ public class PaymentServiceImpl implements PaymentService {
         this.bsPaymentRequestMapper = bsPaymentRequestMapper;
         this.bulkScanningUtils = bulkScanningUtils;
         this.envelopeCaseRepository = envelopeCaseRepository;
-        //this.auditRepository = auditRepository;
     }
 
     @Override
@@ -105,7 +101,6 @@ public class PaymentServiceImpl implements PaymentService {
                                                    .payments(payments)
                                                    .build());
             LOG.info("Envelope created with status as incomplete");
-            //auditRepository.trackPaymentEvent("EXELA_PAYMENT", envelope.getEnvelopePayments().get(0));
             return envelope;
         } else {
             if (Optional.ofNullable(payment.getEnvelope()).isPresent()
@@ -115,7 +110,6 @@ public class PaymentServiceImpl implements PaymentService {
                 LOG.info("Updating Payment Source to BOTH as we have received payment from Bulk_Scan & Excela");
                 payment.setSource(Both.toString());
                 updatePayment(payment);
-                //auditRepository.trackPaymentEvent("EXELA_PAYMENT", payment);
                 return updateEnvelopePaymentStatus(payment.getEnvelope(), COMPLETE);
             }
         }
@@ -155,29 +149,36 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public Envelope saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
+    public List<String> saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
+        List<String> listOfAllPayments = new ArrayList<>();
+
         Envelope envelopeNew = bsPaymentRequestMapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
+        List<Envelope> listOfExistingEnvelope = bulkScanningUtils.returnExistingEnvelopeList(envelopeNew);
 
-        Envelope envelopeDB = bulkScanningUtils.returnExistingEnvelope(envelopeNew);
+        if (Optional.ofNullable(listOfExistingEnvelope).isPresent() && !listOfExistingEnvelope.isEmpty()) {
+            for (Envelope envelopeDB: listOfExistingEnvelope) {
+                //if we have envelope already in BS
+                if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
+                    LOG.info("Existing envelope found for Bulk Scan request");
+                    bulkScanningUtils.handlePaymentStatus(envelopeDB, envelopeNew);
+                }
 
-        //if we have envelope already in BS
-        if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
-            LOG.info("Existing envelope found for Bulk Scan request");
-            bulkScanningUtils.handlePaymentStatus(envelopeDB, envelopeNew);
+                bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
+                envelopeRepository.save(envelopeDB);
+
+                Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
+
+                List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
+                    Collectors.toList());
+
+                listOfAllPayments.addAll(paymentDCNList);
+            }
         }
 
-        bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
-        envelopeRepository.save(envelopeDB);
-        /*if(Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
-                && ! envelopeDB.getEnvelopePayments().isEmpty()){
-            envelopeDB.getEnvelopePayments().stream().forEach(payment -> {
-                auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment);
-            });
-        }*/
-        Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
-        if (envelope.isPresent()) {
-            return envelope.get();
+        if (Optional.ofNullable(listOfAllPayments).isPresent() && !listOfAllPayments.isEmpty()) {
+            return listOfAllPayments;
         }
+
         return null;
     }
 
@@ -211,12 +212,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (Optional.ofNullable(envelope).isPresent()) {
             envelopeRepository.save(envelope);
             updateEnvelopePaymentStatus(envelope, PROCESSED);
-            /*if(Optional.ofNullable(envelope.getEnvelopePayments()).isPresent()
-                && ! envelope.getEnvelopePayments().isEmpty()){
-                envelope.getEnvelopePayments().stream().forEach(payment -> {
-                    auditRepository.trackPaymentEvent("PAYMENT_STATUS_UPDATE", payment);
-                });
-            }*/
             return dcn;
         }
         return null;

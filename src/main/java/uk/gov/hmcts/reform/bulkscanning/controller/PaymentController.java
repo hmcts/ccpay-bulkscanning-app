@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.*;
 
@@ -62,10 +61,7 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
         LOG.info("Request received from Bulk Scan Payment : {}", bsPaymentRequest);
         return new ResponseEntity<>(PaymentResponse.paymentResponseWith()
-                                        .paymentDcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest)
-                                                         .getEnvelopePayments().stream()
-                                                         .map(payment -> payment.getDcnReference())
-                                                         .collect(Collectors.toList()))
+                                        .paymentDcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest))
                                         .build(), HttpStatus.CREATED);
     }
 
