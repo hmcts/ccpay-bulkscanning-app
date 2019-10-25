@@ -178,7 +178,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (Optional.ofNullable(listOfAllPayments).isPresent() && !listOfAllPayments.isEmpty()) {
             return listOfAllPayments;
         }
-
         return null;
     }
 
