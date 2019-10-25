@@ -34,7 +34,6 @@ module "bulk-scanning-payment-api" {
   capacity = "${var.capacity}"
   common_tags = "${var.common_tags}"
   appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
-  appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
 
   asp_name = "${local.asp_name}"
   asp_rg = "${local.asp_name}"
