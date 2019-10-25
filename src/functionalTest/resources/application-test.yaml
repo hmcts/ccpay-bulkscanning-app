@@ -69,6 +69,7 @@ s2s:
   service:
     name: ${S2S_SERVICE_NAME:cmc}
     secret: ${S2S_SERVICE_SECRET:RD53IBEKQTO4WMQY}
+
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}

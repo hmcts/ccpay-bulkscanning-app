@@ -207,8 +207,9 @@ public class PaymentServiceTest {
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
             ,dcn,"AA08", true);
 
-        Envelope envelopeMock = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
-        Assert.assertEquals(1,envelopeMock.getId().intValue());
+        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
+
+        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
     }
 
     @Test(expected = BulkScanCaseAlreadyExistsException.class)

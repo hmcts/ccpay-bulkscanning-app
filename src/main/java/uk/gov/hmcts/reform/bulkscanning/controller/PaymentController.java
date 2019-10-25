@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -49,10 +48,7 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
         LOG.info("Request received from Bulk Scan Payment : {}", bsPaymentRequest);
         return new ResponseEntity<>(PaymentResponse.paymentResponseWith()
-                                        .paymentDcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest)
-                                                         .getEnvelopePayments().stream()
-                                                         .map(payment -> payment.getDcnReference())
-                                                         .collect(Collectors.toList()))
+                                        .paymentDcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest))
                                         .build(), HttpStatus.CREATED);
     }
 

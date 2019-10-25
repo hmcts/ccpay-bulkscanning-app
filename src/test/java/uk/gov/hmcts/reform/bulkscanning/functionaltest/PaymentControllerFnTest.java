@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
@@ -41,8 +42,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 
 
@@ -69,6 +69,9 @@ public class PaymentControllerFnTest {
 
     @Autowired
     EnvelopeRepository envelopeRepository;
+
+    @Autowired
+    PaymentMetadataRepository paymentMetadataRepository;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -175,6 +178,15 @@ public class PaymentControllerFnTest {
         ResultActions resultActions = restActions.patch("/bulk-scan-payments/DCN1/status/PROCESSED");
 
         Assert.assertEquals(resultActions.andReturn().getResponse().getStatus(), OK.value());
+
+        EnvelopePayment payment1 = paymentRepository.findByDcnReference("DCN1").get();
+        Assert.assertEquals(PROCESSED.toString(), payment1.getPaymentStatus());
+
+        //Delete Envelope for DCN 1111-2222-3333-4444
+        Envelope envelopeSecond = envelopeRepository.findById(payment1.getEnvelope().getId()).get();
+
+        //delete envelope
+        envelopeRepository.delete(envelopeSecond);
     }
 
     @Test
@@ -247,6 +259,53 @@ public class PaymentControllerFnTest {
         Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-9999").get().getPaymentStatus()
             , INCOMPLETE.toString());
 
+    }
+
+    @Test
+    public void testMatchingMultipleEnvelopesFromExelaBulkScan() throws Exception {
+        String dcn1 = "0000-1111-2222-3333";
+        String dcn2 = "0000-1111-2222-3334";
+
+        String dcn[] = {dcn1, dcn2};
+
+        //Request from Exela with DCN dcn1
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn1));
+
+        //Request from Exela with DCN dcn2
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn2));
+
+        //Request from bulk scan with Two DCN
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+            , dcn, "AA08", true);
+
+        Thread.sleep(4000);
+
+        //Post request
+        restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
+
+       //Complete payment for DCN dcn1
+        EnvelopePayment payment = paymentRepository.findByDcnReference(dcn1).get();
+        Assert.assertEquals(COMPLETE.toString(), payment.getPaymentStatus());
+
+        //Envelope complete for DCN dcn2
+        Envelope envelopeFirst = envelopeRepository.findById(payment.getEnvelope().getId()).get();
+        Assert.assertEquals(COMPLETE.toString(), envelopeFirst.getPaymentStatus());
+
+        //Complete payment for DCN dcn2
+        EnvelopePayment payment1 = paymentRepository.findByDcnReference(dcn2).get();
+        Assert.assertEquals(COMPLETE.toString(), payment1.getPaymentStatus());
+
+        //Envelope complete for DCN dcn2
+        Envelope envelopeSecond = envelopeRepository.findById(payment1.getEnvelope().getId()).get();
+        Assert.assertEquals(COMPLETE.toString(), envelopeSecond.getPaymentStatus());
+
+        //delete envelopes
+        envelopeRepository.delete(envelopeFirst);
+        envelopeRepository.delete(envelopeSecond);
+
+        //delete payment metadata
+        paymentMetadataRepository.delete(paymentMetadataRepository.findByDcnReference(dcn1).get());
+        paymentMetadataRepository.delete(paymentMetadataRepository.findByDcnReference(dcn2).get());
     }
 
     @Test
