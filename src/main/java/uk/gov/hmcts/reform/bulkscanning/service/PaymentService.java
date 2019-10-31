@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 
+import java.util.List;
+
 public interface PaymentService {
 
     Envelope processPaymentFromExela(BulkScanPayment bulkScanPayment, String dcnReference);

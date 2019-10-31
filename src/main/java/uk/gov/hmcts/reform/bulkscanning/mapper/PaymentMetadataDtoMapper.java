@@ -37,7 +37,7 @@ public class PaymentMetadataDtoMapper {
         if(Optional.ofNullable(bulkScanPayment).isPresent()) {
             return PaymentMetadataDto.paymentMetadataDtoWith()
                 .dcnReference(dcnReference)
-                .bgcReference(bulkScanPayment.getBankGiroCreditSlipNumber())
+                .bgcReference(bulkScanPayment.getBankGiroCreditSlipNumber().toString())
                 .amount(bulkScanPayment.getAmount())
                 .currency(Currency.valueOf(bulkScanPayment.getCurrency().toUpperCase(Locale.UK)))
                 .paymentMethod(PaymentMethod.valueOf(bulkScanPayment.getMethod().toUpperCase(Locale.UK)))

@@ -190,7 +190,7 @@ public class PaymentServiceTest {
         return BulkScanPayment.createPaymentRequestWith()
             .amount(BigDecimal.valueOf(100.00))
             .bankedDate(LocalDateTime.now())
-            .bankGiroCreditSlipNumber("BGC123")
+            .bankGiroCreditSlipNumber(Integer.parseInt("BGC123"))
             .currency(Currency.valueOf("GBP").toString())
             .method(PaymentMethod.valueOf("CHEQUE").toString())
             .build();

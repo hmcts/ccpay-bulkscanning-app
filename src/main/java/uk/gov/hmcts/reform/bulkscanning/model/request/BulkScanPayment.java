@@ -51,9 +51,9 @@ public class BulkScanPayment {
     /*
     Number of the credit slip containing the payment
      */
-    @NotBlank(message = "bank_giro_credit_slip_number can't be Blank")
+    @NotNull(message = "bank_giro_credit_slip_number can't be Blank")
     @JsonProperty("bank_giro_credit_slip_number")
-    private String bankGiroCreditSlipNumber;
+    private Integer bankGiroCreditSlipNumber;
 
     /*
     Date the payment was sent for banking.
