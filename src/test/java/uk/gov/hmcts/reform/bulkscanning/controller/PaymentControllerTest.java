@@ -196,8 +196,8 @@ public class PaymentControllerTest {
         return BulkScanPayment.createPaymentRequestWith()
             .dcnReference(dcnReference)
             .amount(BigDecimal.valueOf(100.00))
-            .bankedDate(LocalDateTime.now())
-            .bankGiroCreditSlipNumber("BGC123")
+            .bankedDate("2019-10-31")
+            .bankGiroCreditSlipNumber(123456)
             .currency(Currency.valueOf("GBP").toString())
             .method(PaymentMethod.valueOf("CHEQUE").toString())
             .build();

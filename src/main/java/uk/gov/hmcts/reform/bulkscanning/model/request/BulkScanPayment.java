@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.model.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -10,11 +11,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -28,12 +30,15 @@ public class BulkScanPayment {
 
     @NotBlank(message = "document_control_number can't be Blank")
     @JsonProperty("document_control_number")
+    @Size(min = 17, max = 17, message = "document_control_number length must be 17 Characters")
     private String dcnReference;
     /*
     Payment amount in GBP
      */
-    @NotNull(message = "amount can't be Blank")
+    @NotNull(message = "Payment amount can't be Blank")
     @DecimalMin("0.01")
+    @Positive
+    @Digits(integer = 10, fraction = 2, message = "Payment amount could be max 12 digits with 2 decimal places")
     private BigDecimal amount;
 
     /*
@@ -51,14 +56,64 @@ public class BulkScanPayment {
     /*
     Number of the credit slip containing the payment
      */
-    @NotBlank(message = "bank_giro_credit_slip_number can't be Blank")
+    @NotNull(message = "bank_giro_credit_slip_number can't be Blank")
     @JsonProperty("bank_giro_credit_slip_number")
-    private String bankGiroCreditSlipNumber;
+    @Positive
+    @Digits(integer = 6, fraction = 0,
+        message = "bank_giro_credit_slip_number length must not be greater than 6 digits")
+    private Integer bankGiroCreditSlipNumber;
 
     /*
     Date the payment was sent for banking.
      */
-    @NotNull(message = "banked_date can't be Blank")
+    @NotBlank(message = "banked_date can't be Blank")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDateTime bankedDate;
+    private String bankedDate;
+
+    @JsonIgnore
+    @AssertFalse(message = "Invalid Banked Date. Date format should be yyyy-MM-dd(i.e 9999-01-01) " +
+        "or should never be a future data")
+    public boolean isValidBankedDateFormat() {
+        if (bankedDate != null) {
+            if(! bankedDate.matches("\\d{4}-\\d{2}-\\d{2}")){
+                return true;
+            }
+            SimpleDateFormat sdfrmt = new SimpleDateFormat("yyyy-MM-dd");
+            sdfrmt.setLenient(false);
+            try {
+                Date givenDate = sdfrmt.parse(bankedDate);
+                Date currDate = new Date(System.currentTimeMillis());
+                if (givenDate.after(currDate)) {
+                    return true;
+                }
+            } catch (ParseException e) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @JsonIgnore
+    @AssertFalse(message = "Invalid Payment Method. Examples could be Cash/Cheque/PostalOrder")
+    public boolean isValidPaymentMethod() {
+        String[] validMethods = {"Cash", "Cheque", "PostalOrder"};
+        if (method != null) {
+            if (! Arrays.asList(validMethods).stream().anyMatch(vm -> vm.equalsIgnoreCase(method))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @JsonIgnore
+    @AssertFalse(message = "Invalid Currency. Examples could be GBP")
+    public boolean isValidCurrency() {
+        String[] validCurrencys = {"GBP"};
+        if (currency != null) {
+            if (! Arrays.asList(validCurrencys).stream().anyMatch(vm -> vm.equalsIgnoreCase(currency))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

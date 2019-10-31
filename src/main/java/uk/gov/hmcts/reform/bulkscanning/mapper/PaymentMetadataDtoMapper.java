@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.mapper;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentMetadataDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
@@ -35,13 +37,16 @@ public class PaymentMetadataDtoMapper {
 
     public PaymentMetadataDto fromRequest(BulkScanPayment bulkScanPayment, String dcnReference) {
         if(Optional.ofNullable(bulkScanPayment).isPresent()) {
+            String paymentMethod = bulkScanPayment.getMethod().equalsIgnoreCase("PostalOrder")
+                ? PaymentMethod.POSTAL_ORDER.toString()
+                : bulkScanPayment.getMethod().toUpperCase(Locale.UK);
             return PaymentMetadataDto.paymentMetadataDtoWith()
                 .dcnReference(dcnReference)
-                .bgcReference(bulkScanPayment.getBankGiroCreditSlipNumber())
+                .bgcReference(bulkScanPayment.getBankGiroCreditSlipNumber().toString())
                 .amount(bulkScanPayment.getAmount())
                 .currency(Currency.valueOf(bulkScanPayment.getCurrency().toUpperCase(Locale.UK)))
-                .paymentMethod(PaymentMethod.valueOf(bulkScanPayment.getMethod().toUpperCase(Locale.UK)))
-                .dateBanked(localDateTimeToDate(bulkScanPayment.getBankedDate()))
+                .paymentMethod(PaymentMethod.valueOf(paymentMethod))
+                .dateBanked(DateTime.parse(bulkScanPayment.getBankedDate()).withZone(DateTimeZone.UTC).toDate())
                 .build();
         }else {
             return null;
