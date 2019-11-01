@@ -45,22 +45,13 @@ public class BulkScanPaymentRequest {
     @AssertFalse(message = "Invalid ResponsibleServiceId. Examples could be AA08/AA07")
     public boolean isValidResponsibleServiceId() {
         String[] validResponsibleServiceIds = {"AA08", "AA07"};
-        if (responsibleServiceId != null) {
-            if (! Arrays.asList(validResponsibleServiceIds).stream().anyMatch(vm -> vm.equalsIgnoreCase(responsibleServiceId))) {
-                return true;
-            }
-        }
-        return false;
+        return responsibleServiceId != null && !Arrays.asList(validResponsibleServiceIds).stream().anyMatch(vm -> vm.equalsIgnoreCase(
+            responsibleServiceId));
     }
 
     @JsonIgnore
     @AssertFalse(message = "document_control_number length must be 17 Characters")
     public boolean isValidDocumentControlNumbers() {
-        if (documentControlNumbers != null) {
-            if (Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> dcn.length() != 17)) {
-                return true;
-            }
-        }
-        return false;
+        return documentControlNumbers != null && Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> dcn.length() != 17);
     }
 }

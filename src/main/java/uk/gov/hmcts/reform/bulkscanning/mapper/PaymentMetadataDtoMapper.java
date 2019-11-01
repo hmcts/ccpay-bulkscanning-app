@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.POSTAL_ORDER;
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.dateToLocalDateTime;
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDate;
 
@@ -38,7 +39,7 @@ public class PaymentMetadataDtoMapper {
     public PaymentMetadataDto fromRequest(BulkScanPayment bulkScanPayment, String dcnReference) {
         if(Optional.ofNullable(bulkScanPayment).isPresent()) {
             String paymentMethod = bulkScanPayment.getMethod().equalsIgnoreCase("PostalOrder")
-                ? PaymentMethod.POSTAL_ORDER.toString()
+                ? POSTAL_ORDER.toString()
                 : bulkScanPayment.getMethod().toUpperCase(Locale.UK);
             return PaymentMetadataDto.paymentMetadataDtoWith()
                 .dcnReference(dcnReference)

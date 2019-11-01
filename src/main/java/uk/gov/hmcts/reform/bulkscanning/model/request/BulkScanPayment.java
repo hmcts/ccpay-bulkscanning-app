@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -78,7 +79,7 @@ public class BulkScanPayment {
             if(! bankedDate.matches("\\d{4}-\\d{2}-\\d{2}")){
                 return true;
             }
-            SimpleDateFormat sdfrmt = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdfrmt = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
             sdfrmt.setLenient(false);
             try {
                 Date givenDate = sdfrmt.parse(bankedDate);
@@ -97,23 +98,13 @@ public class BulkScanPayment {
     @AssertFalse(message = "Invalid Payment Method. Examples could be Cash/Cheque/PostalOrder")
     public boolean isValidPaymentMethod() {
         String[] validMethods = {"Cash", "Cheque", "PostalOrder"};
-        if (method != null) {
-            if (! Arrays.asList(validMethods).stream().anyMatch(vm -> vm.equalsIgnoreCase(method))) {
-                return true;
-            }
-        }
-        return false;
+        return method != null && ! Arrays.asList(validMethods).stream().anyMatch(vm -> vm.equalsIgnoreCase(method));
     }
 
     @JsonIgnore
     @AssertFalse(message = "Invalid Currency. Examples could be GBP")
     public boolean isValidCurrency() {
         String[] validCurrencys = {"GBP"};
-        if (currency != null) {
-            if (! Arrays.asList(validCurrencys).stream().anyMatch(vm -> vm.equalsIgnoreCase(currency))) {
-                return true;
-            }
-        }
-        return false;
+        return currency != null && ! Arrays.asList(validCurrencys).stream().anyMatch(vm -> vm.equalsIgnoreCase(currency));
     }
 }

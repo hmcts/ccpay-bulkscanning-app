@@ -117,11 +117,11 @@ public class PaymentControllerTest {
     @Transactional
     public void testSearchPaymentWithCCD() throws Exception{
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
-            .ccdReference("CCD123")
+            .ccdReference("CCD1231111111111")
             .build();
         when(paymentService.retrieveByCCDReference(any(String.class)))
             .thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases/CCD123")
+        ResultActions resultActions = mockMvc.perform(get("/cases/CCD1231111111111")
                                                     .header("Authorization", "user")
                                                     .header("ServiceAuthorization", "service")
                                                     .accept(MediaType.APPLICATION_JSON));
@@ -133,7 +133,7 @@ public class PaymentControllerTest {
         SearchResponse searchResponse = null;
         when(paymentService.retrieveByCCDReference(any(String.class)))
             .thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases/CCD123")
+        ResultActions resultActions = mockMvc.perform(get("/cases/CCD1231111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -144,7 +144,7 @@ public class PaymentControllerTest {
     public void testSearchPaymentWithCCD_Exception() throws Exception{
         when(paymentService.retrieveByCCDReference(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Payments"));
-        ResultActions resultActions = mockMvc.perform(get("/cases/CCD123")
+        ResultActions resultActions = mockMvc.perform(get("/cases/CCD1231111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -156,12 +156,12 @@ public class PaymentControllerTest {
     @Transactional
     public void testSearchPaymentWithDcn() throws Exception{
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
-            .ccdReference("CCD123")
+            .ccdReference("CCD1231111111111")
             .build();
         when(paymentService.retrieveByDcn(any(String.class)))
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
-            .param("document_control_number", "DCN123")
+            .param("document_control_number", "DCN12311111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -173,7 +173,7 @@ public class PaymentControllerTest {
         SearchResponse searchResponse = null;
         when(paymentService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "DCN123")
+                                                          .param("document_control_number", "DCN12311111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -184,7 +184,7 @@ public class PaymentControllerTest {
     public void testSearchPaymentWithDcn_Exception() throws Exception{
         when(paymentService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "DCN123")
+                                                          .param("document_control_number", "DCN12311111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -197,7 +197,7 @@ public class PaymentControllerTest {
             .dcnReference(dcnReference)
             .amount(BigDecimal.valueOf(100.00))
             .bankedDate("2019-10-31")
-            .bankGiroCreditSlipNumber(123456)
+            .bankGiroCreditSlipNumber(123_456)
             .currency(Currency.valueOf("GBP").toString())
             .method(PaymentMethod.valueOf("CHEQUE").toString())
             .build();
@@ -207,7 +207,7 @@ public class PaymentControllerTest {
    @Test
    @Transactional
    public void testCreatePaymentForBulkScan() throws Exception{
-       String dcn[] = {"DCN1","DCN2"};
+       String dcn[] = {"DCN11111111111111","DCN21111111111111"};
        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
            ,dcn,"AA08");
 
