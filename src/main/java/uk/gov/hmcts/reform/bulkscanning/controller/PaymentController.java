@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.bulkscanning.utils.ExcelGeneratorUtil;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
@@ -103,8 +104,14 @@ public class PaymentController {
     })
     @PutMapping("/bulk-scan-payments")
     public ResponseEntity updateCaseReferenceForExceptionRecord(
-        @NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
-        @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
+        @NotEmpty
+        @RequestParam("exception_reference")
+        @Size(min = 16, max = 16, message = "Length must be 16 Characters")
+            String exceptionRecordReference,
+        @Valid
+        @RequestBody
+        @Size(min = 16, max = 16, message = "Length must be 16 Characters")
+            CaseReferenceRequest caseReferenceRequest) {
 
         LOG.info(
             "Request received to update case reference {}, for exception record {}",

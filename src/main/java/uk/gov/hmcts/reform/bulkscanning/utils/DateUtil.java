@@ -44,5 +44,4 @@ public final class DateUtil {
         LocalDateTime endOfDay = localDateTime.with(LocalTime.MAX);
         return localDateTimeToDate(endOfDay);
     }
-
 }
