@@ -37,7 +37,7 @@ public class BulkScanPayment {
     Payment amount in GBP
      */
     @NotNull(message = "Payment amount can't be Blank")
-    @DecimalMin(value = "0.01", message = "Payment Amount must be greater than 0.01")
+    @DecimalMin(value = "0.01", message = "Payment Amount must be greater than or equal to 0.01")
     @Digits(integer = 10, fraction = 2, message = "Payment Amount cannot have more than 2 decimal places")
     private BigDecimal amount;
 
