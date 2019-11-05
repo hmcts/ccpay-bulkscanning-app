@@ -37,8 +37,7 @@ public class BulkScanPayment {
     Payment amount in GBP
      */
     @NotNull(message = "Payment amount can't be Blank")
-    @DecimalMin("0.01")
-    @Positive
+    @DecimalMin(value = "0.01", message = "Payment Amount must be greater than 0.01")
     @Digits(integer = 10, fraction = 2, message = "Payment Amount cannot have more than 2 decimal places")
     private BigDecimal amount;
 
@@ -59,7 +58,6 @@ public class BulkScanPayment {
      */
     @NotNull(message = "bank_giro_credit_slip_number can't be Blank")
     @JsonProperty("bank_giro_credit_slip_number")
-    @Positive
     @Digits(integer = 6, fraction = 0,
         message = "bank_giro_credit_slip_number length must not be greater than 6 digits")
     private Integer bankGiroCreditSlipNumber;
