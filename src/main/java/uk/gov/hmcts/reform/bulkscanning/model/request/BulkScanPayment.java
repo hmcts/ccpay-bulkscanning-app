@@ -39,7 +39,7 @@ public class BulkScanPayment {
     @NotNull(message = "Payment amount can't be Blank")
     @DecimalMin("0.01")
     @Positive
-    @Digits(integer = 10, fraction = 2, message = "Payment amount could be max 12 digits with 2 decimal places")
+    @Digits(integer = 10, fraction = 2, message = "Payment Amount cannot have more than 2 decimal places")
     private BigDecimal amount;
 
     /*
@@ -72,8 +72,7 @@ public class BulkScanPayment {
     private String bankedDate;
 
     @JsonIgnore
-    @AssertFalse(message = "Invalid Banked Date. Date format should be yyyy-MM-dd(i.e 9999-01-01) " +
-        "or should never be a future data")
+    @AssertFalse(message = "Invalid Banked Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")
     public boolean isValidBankedDateFormat() {
         if (bankedDate != null) {
             if(! bankedDate.matches("\\d{4}-\\d{2}-\\d{2}")){
@@ -95,14 +94,14 @@ public class BulkScanPayment {
     }
 
     @JsonIgnore
-    @AssertFalse(message = "Invalid Payment Method. Examples could be Cash/Cheque/PostalOrder")
+    @AssertFalse(message = "Invalid Payment Method. Accepted value Cash/Cheque/PostalOrder")
     public boolean isValidPaymentMethod() {
         String[] validMethods = {"Cash", "Cheque", "PostalOrder"};
         return method != null && ! Arrays.asList(validMethods).stream().anyMatch(vm -> vm.equalsIgnoreCase(method));
     }
 
     @JsonIgnore
-    @AssertFalse(message = "Invalid Currency. Examples could be GBP")
+    @AssertFalse(message = "Invalid Currency. Accepted value GBP")
     public boolean isValidCurrency() {
         String[] validCurrencys = {"GBP"};
         return currency != null && ! Arrays.asList(validCurrencys).stream().anyMatch(vm -> vm.equalsIgnoreCase(currency));
