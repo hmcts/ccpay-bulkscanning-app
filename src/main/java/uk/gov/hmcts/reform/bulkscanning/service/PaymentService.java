@@ -11,7 +11,7 @@ public interface PaymentService {
 
     Envelope processPaymentFromExela(BulkScanPayment bulkScanPayment, String dcnReference);
     PaymentMetadata getPaymentMetadata(String dcnReference);
-    Envelope saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest);
+    List<String> saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest);
     String updateCaseReferenceForExceptionRecord (String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest);
     String updatePaymentStatus(String dcn, PaymentStatus status);
 }

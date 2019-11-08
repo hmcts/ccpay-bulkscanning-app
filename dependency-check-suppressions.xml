@@ -179,5 +179,6 @@ temporarily supressing it as we are not impacted by it.   ]]></notes>
     <cve>CVE-2019-16943</cve>
     <cve>CVE-2019-17267</cve>
     <cve>CVE-2019-17531</cve>
+    <cve>CVE-2017-7525</cve>
   </suppress>
 </suppressions>

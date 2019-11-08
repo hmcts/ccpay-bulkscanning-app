@@ -89,7 +89,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public Envelope processPaymentFromExela(BulkScanPayment bulkScanPayment, String dcnReference) {
-        LOG.info("Insert Payment metadata in Bulk Scan Payment DB");//
+        LOG.info("Insert Payment metadata in Bulk Scan Payment DB");
         createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(bulkScanPayment, dcnReference));
 
         LOG.info("Check for existing DCN in Payment Table Bulk Scan Pay DB");
@@ -124,28 +124,41 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public Envelope saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
+    public List<String> saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
+        List<String> listOfAllPayments = new ArrayList<>();
+
         Envelope envelopeNew = bsPaymentRequestMapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
+        List<Envelope> listOfExistingEnvelope = bulkScanningUtils.returnExistingEnvelopeList(envelopeNew);
 
-        Envelope envelopeDB = bulkScanningUtils.returnExistingEnvelope(envelopeNew);
+        if (Optional.ofNullable(listOfExistingEnvelope).isPresent() && !listOfExistingEnvelope.isEmpty()) {
+            for (Envelope envelopeDB: listOfExistingEnvelope) {
+                //if we have envelope already in BS
+                if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
+                    LOG.info("Existing envelope found for Bulk Scan request");
+                    bulkScanningUtils.handlePaymentStatus(envelopeDB, envelopeNew);
+                }
 
-        //if we have envelope already in BS
-        if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
-            LOG.info("Existing envelope found for Bulk Scan request");
-            bulkScanningUtils.handlePaymentStatus(envelopeDB, envelopeNew);
+                bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
+                envelopeRepository.save(envelopeDB);
+
+                if(Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
+                    && ! envelopeDB.getEnvelopePayments().isEmpty()){
+                    envelopeDB.getEnvelopePayments().stream().forEach(payment -> {
+                        auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment);
+                    });
+                }
+
+                Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
+
+                List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
+                    Collectors.toList());
+
+                listOfAllPayments.addAll(paymentDCNList);
+            }
         }
 
-        bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
-        envelopeRepository.save(envelopeDB);
-        if(Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
-                && ! envelopeDB.getEnvelopePayments().isEmpty()){
-            envelopeDB.getEnvelopePayments().stream().forEach(payment -> {
-                auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment);
-            });
-        }
-        Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
-        if (envelope.isPresent()) {
-            return envelope.get();
+        if (Optional.ofNullable(listOfAllPayments).isPresent() && !listOfAllPayments.isEmpty()) {
+            return listOfAllPayments;
         }
         return null;
     }

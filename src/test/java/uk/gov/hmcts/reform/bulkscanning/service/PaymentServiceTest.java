@@ -25,8 +25,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
@@ -100,12 +98,12 @@ public class PaymentServiceTest {
     @Autowired
     private AppInsightsAuditRepository auditRepository;
 
-    public static final String CCD_CASE_REFERENCE = "11112222333344441";
-    public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "99998888333344441";
-    public static final String EXCEPTION_RECORD_REFERENCE = "44443333222211111";
-    public static final String DCN_REFERENCE = "DCN1";
+    public static final String CCD_CASE_REFERENCE = "1111222233334444";
+    public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "9999888833334444";
+    public static final String EXCEPTION_RECORD_REFERENCE = "4444333322221111";
+    public static final String DCN_REFERENCE = "DCN11111111111111";
 
-    public static final String TEST_DCN_REFERENCE = "123-123";
+    public static final String TEST_DCN_REFERENCE = "12312311111111111";
 
     @Before
     public void setUp() {
@@ -189,10 +187,10 @@ public class PaymentServiceTest {
     private BulkScanPayment createPaymentRequest() {
         return BulkScanPayment.createPaymentRequestWith()
             .amount(BigDecimal.valueOf(100.00))
-            .bankedDate(LocalDateTime.now())
-            .bankGiroCreditSlipNumber("BGC123")
-            .currency(Currency.valueOf("GBP").toString())
-            .method(PaymentMethod.valueOf("CHEQUE").toString())
+            .bankedDate("2019-10-31")
+            .bankGiroCreditSlipNumber(123_456)
+            .currency("GBP")
+            .method("CHEQUE")
             .build();
     }
 
@@ -207,8 +205,9 @@ public class PaymentServiceTest {
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
             ,dcn,"AA08", true);
 
-        Envelope envelopeMock = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
-        Assert.assertEquals(1,envelopeMock.getId().intValue());
+        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
+
+        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
     }
 
     @Test(expected = BulkScanCaseAlreadyExistsException.class)

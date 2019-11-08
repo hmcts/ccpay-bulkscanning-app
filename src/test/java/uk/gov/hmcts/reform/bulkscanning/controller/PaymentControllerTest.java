@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +62,7 @@ public class PaymentControllerTest {
     @Transactional
     public void testCreatePaymentFromExela() throws Exception{
 
-        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment/")
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                       .header("ServiceAuthorization", "service")
                                                       .content(asJsonString(createPaymentRequest("111222333")))
                                                       .contentType(MediaType.APPLICATION_JSON));
@@ -80,7 +81,7 @@ public class PaymentControllerTest {
                                                                     .build());
 
         when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
-        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment/")
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
                                                           .content(asJsonString(createPaymentRequest("111222333444")))
                                                           .contentType(MediaType.APPLICATION_JSON));
@@ -93,7 +94,7 @@ public class PaymentControllerTest {
 
         when(paymentService.getPaymentMetadata(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Metadata"));
-        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment/")
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
                                                           .content(asJsonString(createPaymentRequest("111222333")))
                                                           .contentType(MediaType.APPLICATION_JSON));
@@ -105,17 +106,18 @@ public class PaymentControllerTest {
    @Test
    @Transactional
    public void testCreatePaymentForBulkScan() throws Exception{
-       String dcn[] = {"DCN1","DCN2"};
+       String dcn[] = {"DCN11111111111111","DCN21111111111111"};
        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
            ,dcn,"AA08");
 
        when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
-           .thenReturn(mockBulkScanningEnvelope());
+           .thenReturn(Arrays.asList(dcn));
 
        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
            .header("ServiceAuthorization", "service")
            .content(asJsonString(bulkScanPaymentRequest))
            .contentType(MediaType.APPLICATION_JSON));
+
        Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
    }
 

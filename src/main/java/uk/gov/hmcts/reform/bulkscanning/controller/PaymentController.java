@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -49,10 +49,7 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
         LOG.info("Request received from Bulk Scan Payment : {}", bsPaymentRequest);
         return new ResponseEntity<>(PaymentResponse.paymentResponseWith()
-                                        .paymentDcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest)
-                                                         .getEnvelopePayments().stream()
-                                                         .map(payment -> payment.getDcnReference())
-                                                         .collect(Collectors.toList()))
+                                        .paymentDcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest))
                                         .build(), HttpStatus.CREATED);
     }
 
@@ -94,8 +91,14 @@ public class PaymentController {
     })
     @PutMapping("/bulk-scan-payments")
     public ResponseEntity updateCaseReferenceForExceptionRecord(
-        @NotEmpty @RequestParam("exception_reference") String exceptionRecordReference,
-        @Valid @RequestBody CaseReferenceRequest caseReferenceRequest) {
+        @NotEmpty
+        @RequestParam("exception_reference")
+        @Size(min = 16, max = 16, message = "Length must be 16 Characters")
+            String exceptionRecordReference,
+        @Valid
+        @RequestBody
+        @Size(min = 16, max = 16, message = "Length must be 16 Characters")
+            CaseReferenceRequest caseReferenceRequest) {
 
         LOG.info(
             "Request received to update case reference {}, for exception record {}",

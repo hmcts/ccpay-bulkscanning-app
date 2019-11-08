@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
+import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
@@ -41,8 +42,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 
 
@@ -71,6 +71,9 @@ public class PaymentControllerFnTest {
     EnvelopeRepository envelopeRepository;
 
     @Autowired
+    PaymentMetadataRepository paymentMetadataRepository;
+
+    @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Autowired
@@ -90,7 +93,7 @@ public class PaymentControllerFnTest {
     public void setUp() {
         caseReferenceRequest = CaseReferenceRequest
             .createCaseReferenceRequest()
-            .ccdCaseNumber("CCN2")
+            .ccdCaseNumber("CCN21111111111111")
             .build();
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
@@ -105,8 +108,8 @@ public class PaymentControllerFnTest {
 
     @Test
     public void testBulkScanningPaymentRequestFirst() throws Exception{
-        String dcn[] = {"DCN2"};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-5555"
+        String dcn[] = {"DCN21111111111111"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555"
             ,dcn,"AA08", true);
 
         //Post request
@@ -123,12 +126,12 @@ public class PaymentControllerFnTest {
         ));
 
         //PATCH Request
-        ResultActions patchRequest = restActions.patch("/bulk-scan-payments/DCN2/status/PROCESSED");
+        ResultActions patchRequest = restActions.patch("/bulk-scan-payments/DCN21111111111111/status/PROCESSED");
 
         Assert.assertNotNull(patchRequest.andReturn().getResponse().getContentAsString());
 
         //DCN Not exists Request
-        ResultActions patchDCNNotExists = restActions.patch("/bulk-scan-payments/DCN4/status/PROCESSED");
+        ResultActions patchDCNNotExists = restActions.patch("/bulk-scan-payments/DCN41111111111111/status/PROCESSED");
 
         Assert.assertTrue(StringUtils.containsIgnoreCase(patchDCNNotExists.andReturn().getResponse().getContentAsString(),
             DCN_NOT_EXISTS));
@@ -137,19 +140,19 @@ public class PaymentControllerFnTest {
     @Test
     @Transactional
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
-        String dcn[] = {"DCN5"};
-        String dcn2[] = {"DCN6"};
+        String dcn[] = {"DCN51111111111111"};
+        String dcn2[] = {"DCN61111111111111"};
 
         //Multiple envelopes with same exception record
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn, "AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn2, "AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
-        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444", caseReferenceRequest);
+        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=1111222233334444", caseReferenceRequest);
 
         Assert.assertNotNull(resultActions.andReturn().getResponse().getContentAsString());
 
@@ -159,7 +162,7 @@ public class PaymentControllerFnTest {
     @Transactional
     public void testExceptionRecordNotExists() throws Exception {
 
-        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=4444-3333-2222-111", caseReferenceRequest);
+        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=444433332222111", caseReferenceRequest);
 
         Assert.assertTrue(StringUtils.containsIgnoreCase(resultActions.andReturn().getResponse().getContentAsString(),
             EXCEPTION_RECORD_NOT_EXISTS));
@@ -167,32 +170,41 @@ public class PaymentControllerFnTest {
 
     @Test
     public void testMarkPaymentAsProcessed() throws Exception {
-        String dcn[] = {"DCN1"};
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+        String dcn[] = {"DCN11111111111111"};
+        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn, "AA08", false);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
-        ResultActions resultActions = restActions.patch("/bulk-scan-payments/DCN1/status/PROCESSED");
+        ResultActions resultActions = restActions.patch("/bulk-scan-payments/DCN11111111111111/status/PROCESSED");
 
         Assert.assertEquals(resultActions.andReturn().getResponse().getStatus(), OK.value());
+
+        EnvelopePayment payment1 = paymentRepository.findByDcnReference("DCN11111111111111").get();
+        Assert.assertEquals(PROCESSED.toString(), payment1.getPaymentStatus());
+
+        //Delete Envelope for DCN 1111-2222-3333-4444
+        Envelope envelopeSecond = envelopeRepository.findById(payment1.getEnvelope().getId()).get();
+
+        //delete envelope
+        envelopeRepository.delete(envelopeSecond);
     }
 
     @Test
     public void testMatchingPaymentsFromExcelaBulkScan() throws Exception {
 
         //Request from Exela with one DCN
-        String dcn[] = {"1111-2222-4444-5555"};
-        restActions.post("/bulk-scan-payment", createPaymentRequest("1111-2222-4444-5555"));
+        String dcn[] = {"11112222444455551"};
+        restActions.post("/bulk-scan-payment", createPaymentRequest("11112222444455551"));
 
         //Request from bulk scan with one DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn, "AA08", true);
 
         //Post request
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         //Complete payment
-        EnvelopePayment payment = paymentRepository.findByDcnReference("1111-2222-4444-5555").get();
+        EnvelopePayment payment = paymentRepository.findByDcnReference("11112222444455551").get();
         Assert.assertEquals(COMPLETE.toString(), payment.getPaymentStatus());
 
         //Complete envelope
@@ -205,22 +217,22 @@ public class PaymentControllerFnTest {
     public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception {
 
         //Request from Exela with one DCN
-        String dcn[] = {"1111-2222-3333-6666", "1111-2222-3333-7777"};
-        restActions.post("/bulk-scan-payment", createPaymentRequest("1111-2222-3333-6666"));
+        String dcn[] = {"11112222333366661", "11112222333377771"};
+        restActions.post("/bulk-scan-payment", createPaymentRequest("11112222333366661"));
 
         //Request from bulk scan with two DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn, "AA08", true);
 
         //Post request
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         //Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-6666").get().getPaymentStatus()
+        Assert.assertEquals(paymentRepository.findByDcnReference("11112222333366661").get().getPaymentStatus()
             , COMPLETE.toString());
 
         //Non Complete Payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-7777").get().getPaymentStatus()
+        Assert.assertEquals(paymentRepository.findByDcnReference("11112222333377771").get().getPaymentStatus()
             , INCOMPLETE.toString());
     }
 
@@ -228,25 +240,72 @@ public class PaymentControllerFnTest {
     @Test
     public void testMatchingBulkScanFirstThenExela() throws Exception {
         //Request from Bulk Scan with one DCN
-        String dcn[] = {"1111-2222-3333-8888", "1111-2222-3333-9999"};
+        String dcn[] = {"11112222333388881", "11112222333399991"};
 
         //Request from bulk scan with two DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-2222-3333-4444"
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn, "AA08", true);
 
         //Post request
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
-        restActions.post("/bulk-scan-payment", createPaymentRequest("1111-2222-3333-8888"));
+        restActions.post("/bulk-scan-payment", createPaymentRequest("11112222333388881"));
 
         //Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-8888").get().getPaymentStatus()
+        Assert.assertEquals(paymentRepository.findByDcnReference("11112222333388881").get().getPaymentStatus()
             , COMPLETE.toString());
 
         //Non Complete Payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-9999").get().getPaymentStatus()
+        Assert.assertEquals(paymentRepository.findByDcnReference("11112222333399991").get().getPaymentStatus()
             , INCOMPLETE.toString());
 
+    }
+
+    @Test
+    public void testMatchingMultipleEnvelopesFromExelaBulkScan() throws Exception {
+        String dcn1 = "00001111222233331";
+        String dcn2 = "00001111222233341";
+
+        String dcn[] = {dcn1, dcn2};
+
+        //Request from Exela with DCN dcn1
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn1));
+
+        //Request from Exela with DCN dcn2
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn2));
+
+        //Request from bulk scan with Two DCN
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
+            , dcn, "AA08", true);
+
+        Thread.sleep(4000);
+
+        //Post request
+        restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
+
+       //Complete payment for DCN dcn1
+        EnvelopePayment payment = paymentRepository.findByDcnReference(dcn1).get();
+        Assert.assertEquals(COMPLETE.toString(), payment.getPaymentStatus());
+
+        //Envelope complete for DCN dcn2
+        Envelope envelopeFirst = envelopeRepository.findById(payment.getEnvelope().getId()).get();
+        Assert.assertEquals(COMPLETE.toString(), envelopeFirst.getPaymentStatus());
+
+        //Complete payment for DCN dcn2
+        EnvelopePayment payment1 = paymentRepository.findByDcnReference(dcn2).get();
+        Assert.assertEquals(COMPLETE.toString(), payment1.getPaymentStatus());
+
+        //Envelope complete for DCN dcn2
+        Envelope envelopeSecond = envelopeRepository.findById(payment1.getEnvelope().getId()).get();
+        Assert.assertEquals(COMPLETE.toString(), envelopeSecond.getPaymentStatus());
+
+        //delete envelopes
+        envelopeRepository.delete(envelopeFirst);
+        envelopeRepository.delete(envelopeSecond);
+
+        //delete payment metadata
+        paymentMetadataRepository.delete(paymentMetadataRepository.findByDcnReference(dcn1).get());
+        paymentMetadataRepository.delete(paymentMetadataRepository.findByDcnReference(dcn2).get());
     }
 
     @Test
@@ -254,44 +313,44 @@ public class PaymentControllerFnTest {
 
         //Request from Exela with one DCN
         restActions.post("/bulk-scan-payment",
-                         createPaymentRequest("1111-2222-3333-12345"));
+                         createPaymentRequest("11112222333312345"));
 
         //New payment should be saved with Incomplete status
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-12345").get().getPaymentStatus()
+        Assert.assertEquals(paymentRepository.findByDcnReference("11112222333312345").get().getPaymentStatus()
             , INCOMPLETE.toString());
     }
 
     @Test
     public void testSearchByCCDForProcessed() throws Exception {
-        String dcns[] = {"1111-6666-7777-8888", "1111-6666-7777-9999"};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111-6666-7777-4444"
+        String dcns[] = {"11116666777788881", "11116666777799991"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677774444"
             , dcns, "AA08", true);
 
         //Payment Request from Bulk-Scan System
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         //Payment Request from Exela for Payment DCN 1111-6666-7777-8888
-        restActions.post("/bulk-scan-payment", createPaymentRequest("1111-6666-7777-8888"));
+        restActions.post("/bulk-scan-payment", createPaymentRequest("11116666777788881"));
 
         //Payment Request from Exela for Payment DCN 1111-6666-7777-9999
-        restActions.post("/bulk-scan-payment", createPaymentRequest("1111-6666-7777-9999"));
+        restActions.post("/bulk-scan-payment", createPaymentRequest("11116666777799991"));
 
         //Update Payment Status once Payment Allocated to Fee for DCN 1111-6666-7777-8888
-        restActions.patch("/bulk-scan-payments/1111-6666-7777-8888/status/PROCESSED");
+        restActions.patch("/bulk-scan-payments/11116666777788881/status/PROCESSED");
 
         //Update Payment Status once Payment Allocated to Fee for DCN 1111-6666-7777-9999
-        restActions.patch("/bulk-scan-payments/1111-6666-7777-9999/status/PROCESSED");
+        restActions.patch("/bulk-scan-payments/11116666777799991/status/PROCESSED");
 
         //Calling Search API by DCN and validate response
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("document_control_number", "1111-6666-7777-9999");
+        params.add("document_control_number", "11116666777799991");
         ResultActions resultActions = restActions.get("/cases", params);
 
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
         Assert.assertEquals(true, resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
 
         //Calling Search API by CCD and validate response
-        resultActions = restActions.get("/cases/1111-6666-7777-4444", params);
+        resultActions = restActions.get("/cases/1111666677774444", params);
 
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
         Assert.assertEquals(true, resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
