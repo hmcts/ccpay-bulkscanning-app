@@ -1,5 +1,5 @@
 java:
-  image: 'hmctspublic.azurecr.io/payment/ccpay-bulkscanning-api:latest'
+  image: 'hmctspublic.azurecr.io/ccpay/bulkscanning-api:latest'
   applicationPort: 8080
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
