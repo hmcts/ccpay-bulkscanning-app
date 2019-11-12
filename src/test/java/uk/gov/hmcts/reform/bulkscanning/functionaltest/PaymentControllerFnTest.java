@@ -162,7 +162,7 @@ public class PaymentControllerFnTest {
     @Transactional
     public void testExceptionRecordNotExists() throws Exception {
 
-        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=444433332222111", caseReferenceRequest);
+        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=4444333322221111", caseReferenceRequest);
 
         Assert.assertTrue(StringUtils.containsIgnoreCase(resultActions.andReturn().getResponse().getContentAsString(),
             EXCEPTION_RECORD_NOT_EXISTS));

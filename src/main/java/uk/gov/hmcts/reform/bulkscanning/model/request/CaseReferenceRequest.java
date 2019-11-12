@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -23,5 +24,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class CaseReferenceRequest {
     @JsonProperty("ccd_case_number")
     @NotBlank(message = "Ccd case number should not be null")
+    @Size(min = 16, max = 16, message = "ccd_case_number Length must be 16 Characters")
     String ccdCaseNumber;
 }

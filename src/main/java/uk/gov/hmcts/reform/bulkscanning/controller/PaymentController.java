@@ -43,7 +43,7 @@ public class PaymentController {
         @ApiResponse(code = 400, message = "Bad request"),
         @ApiResponse(code = 401, message = "Failed authentication"),
         @ApiResponse(code = 403, message = "Failed authorization"),
-        @ApiResponse(code = 409, message = "Conflict")
+        @ApiResponse(code = 409, message = "Payment DCN already exists")
     })
     @PostMapping("/bulk-scan-payments")
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
@@ -60,7 +60,8 @@ public class PaymentController {
         @ApiResponse(code = 201, message = "Bulk Scanning Data retrieved"),
         @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
         @ApiResponse(code = 401, message = "Failed authentication"),
-        @ApiResponse(code = 409, message = "Conflict")
+        @ApiResponse(code = 403, message = "Failed authorisation"),
+        @ApiResponse(code = 409, message = "Payment DCN already exists")
     })
     @PostMapping("/bulk-scan-payment")
     public ResponseEntity<String> processPaymentFromExela(
@@ -93,11 +94,10 @@ public class PaymentController {
     public ResponseEntity updateCaseReferenceForExceptionRecord(
         @NotEmpty
         @RequestParam("exception_reference")
-        @Size(min = 16, max = 16, message = "Length must be 16 Characters")
+        @Size(min = 16, max = 16, message = "exception_reference Length must be 16 Characters")
             String exceptionRecordReference,
         @Valid
         @RequestBody
-        @Size(min = 16, max = 16, message = "Length must be 16 Characters")
             CaseReferenceRequest caseReferenceRequest) {
 
         LOG.info(

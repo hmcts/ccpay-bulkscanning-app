@@ -125,10 +125,10 @@ public class PaymentControllerTest {
     @Transactional
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
         CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
-            .ccdCaseNumber("CCN2")
+            .ccdCaseNumber("CCN2111111111111")
             .build();
 
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444")
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111222233334444")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(caseReferenceRequest))
             .contentType(MediaType.APPLICATION_JSON));
@@ -178,8 +178,8 @@ public class PaymentControllerTest {
         return BulkScanPayment.createPaymentRequestWith()
             .dcnReference(dcnReference)
             .amount(BigDecimal.valueOf(100.00))
-            .bankedDate(LocalDateTime.now())
-            .bankGiroCreditSlipNumber("BGC123")
+            .bankedDate("2019-10-31")
+            .bankGiroCreditSlipNumber(123_456)
             .currency(Currency.valueOf("GBP").toString())
             .method(PaymentMethod.valueOf("CHEQUE").toString())
             .build();
