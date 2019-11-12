@@ -10,6 +10,7 @@ java:
     POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    POSTGRES_CONNECTION_OPTIONS: "?sslmode=allow"
     POSTGRES_PORT: 5432
     LOGBACK_REQUIRE_ALERT_LEVEL: 'false'
     LOGBACK_REQUIRE_ERROR_CODE: 'false'
@@ -17,6 +18,7 @@ java:
     REFORM_TEAM: ccpay
     SPRING_LIQUIBASE_ENABLED: true
     APPINSIGHTS_INSTRUMENTATIONKEY: fake-key
+    SPRING_CLOUD_PROPERTIESVOLUME_ENABLED: false
   postgresql:
     postgresqlUsername: bspayment
     postgresqlPassword: bspayment
