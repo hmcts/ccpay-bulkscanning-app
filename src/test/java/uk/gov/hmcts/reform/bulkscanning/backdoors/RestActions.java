@@ -80,18 +80,26 @@ public class RestActions {
 
     public ResultActions post(String urlTemplate, Object requestBody) {
         return translateException(() -> mvc.perform(MockMvcRequestBuilders.post(urlTemplate)
-            .headers(httpHeaders)
-            .content(toJson(requestBody))
-            .contentType(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)));
+                                                        .headers(httpHeaders)
+                                                        .content(toJson(requestBody))
+                                                        .contentType(APPLICATION_JSON)
+                                                        .accept(APPLICATION_JSON)));
+    }
+
+    public ResultActions post(String urlTemplate, String requestBody) {
+        return translateException(() -> mvc.perform(MockMvcRequestBuilders.post(urlTemplate)
+                                                        .headers(httpHeaders)
+                                                        .content(requestBody)
+                                                        .contentType(APPLICATION_JSON)
+                                                        .accept(APPLICATION_JSON)));
     }
 
     public ResultActions postWithFormData(String urlTemplate, String requestBody) {
         return translateException(() -> mvc.perform(MockMvcRequestBuilders.post(urlTemplate)
-            .headers(httpHeaders)
-            .content(requestBody)
-            .contentType(APPLICATION_FORM_URLENCODED_VALUE)
-            .accept(APPLICATION_JSON)));
+                                                        .headers(httpHeaders)
+                                                        .content(requestBody)
+                                                        .contentType(APPLICATION_FORM_URLENCODED_VALUE)
+                                                        .accept(APPLICATION_JSON)));
     }
 
     public ResultActions patch(String urlTemplate) {
