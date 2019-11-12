@@ -4,6 +4,7 @@ java:
   ingressHost: ccpay-bulkscanning-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: ccpay
   environment:
+    POSTGRES_PORT: 5432
     POSTGRES_HOST: ccpay-bulkscanning-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
     POSTGRES_NAME: bspayment
     POSTGRES_USERNAME: bspayment@ccpay-bulkscanning-api-postgres-db-{{ .Values.global.environment }}
@@ -11,6 +12,8 @@ java:
     SPRING_LIQUIBASE_ENABLED: false
     AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     AUTH_IDAM_CLIENT_BASEURL: "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
+    REFORM_SERVICE_NAME: ccpay-bulkscanning
+    REFORM_TEAM: ccpay
   keyVaults:
     "ccpay":
       resourceGroup: ccpay
