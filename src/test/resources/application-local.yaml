@@ -1,0 +1,42 @@
+management:
+  endpoints:
+    web:
+      base-path: /
+
+#If you use a database then uncomment below lines and update db properties accordingly
+spring:
+  application:
+    name: bulk-scanning
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/bulk-scan
+    username: postgres
+    password: admin
+    properties:
+      charSet: UTF-8
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  liquibase:
+    enabled: ${SPRING_LIQUIBASE_ENABLED:true}
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+trusted:
+  s2s:
+    service:
+      names: ccpay_bubble,cmc,bulk_scan_processor
+auth:
+  provider:
+    service:
+      client:
+        baseUrl: http://localhost:23443
+  idam:
+    client:
+      baseUrl: http://localhost:23443
+azure:
+  application-insights:
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
