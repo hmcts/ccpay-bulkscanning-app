@@ -56,7 +56,7 @@ public class PaymentController {
         @ApiResponse(code = 400, message = "Bad request"),
         @ApiResponse(code = 401, message = "Failed authentication"),
         @ApiResponse(code = 403, message = "Failed authorization"),
-        @ApiResponse(code = 409, message = "Conflict")
+        @ApiResponse(code = 409, message = "Payment DCN already exists")
     })
     @PostMapping("/bulk-scan-payments")
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
@@ -73,7 +73,8 @@ public class PaymentController {
         @ApiResponse(code = 201, message = "Bulk Scanning Data retrieved"),
         @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
         @ApiResponse(code = 401, message = "Failed authentication"),
-        @ApiResponse(code = 409, message = "Conflict")
+        @ApiResponse(code = 403, message = "Failed authorization"),
+        @ApiResponse(code = 409, message = "Payment DCN already exists")
     })
     @PostMapping("/bulk-scan-payment")
     public ResponseEntity<String> processPaymentFromExela(
@@ -83,7 +84,7 @@ public class PaymentController {
             LOG.info("Check in Payment metadata for already existing payment from Exela");
             if (Optional.ofNullable(paymentService.getPaymentMetadata(bulkScanPayment.getDcnReference())).isPresent()) {
                 LOG.info("Payment already exists for DCN: {}", bulkScanPayment.getDcnReference());
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Exela Payment details already exists");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Payment DCN already exists");
             } else {
                 LOG.info("Processing Payment for DCN: {}", bulkScanPayment.getDcnReference());
                 paymentService.processPaymentFromExela(bulkScanPayment, bulkScanPayment.getDcnReference());
