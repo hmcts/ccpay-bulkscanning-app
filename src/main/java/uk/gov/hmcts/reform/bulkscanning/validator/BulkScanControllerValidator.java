@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.validator;
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,8 +30,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 
 
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.bulkscanning.controller")
-public class BulkScanControllerValidator extends
-    ResponseEntityExceptionHandler {
+public class BulkScanControllerValidator extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(BulkScanCaseAlreadyExistsException.class)
@@ -92,6 +93,27 @@ public class BulkScanControllerValidator extends
 
         return new ResponseEntity<>(body, headers, status);
 
+    }
+
+    @Override
+    public ResponseEntity<Object> handleHttpMessageNotReadable(
+        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+        String exceptionMessage = null;
+
+        Throwable rootCause = ex.getRootCause();
+        if(rootCause instanceof UnrecognizedPropertyException)
+        {
+            exceptionMessage = "Unknown field: " + ((UnrecognizedPropertyException) rootCause).getPropertyName();
+            logger.debug("exceptionMessage: " + exceptionMessage);
+        }
+
+        Map<String, Object> body = new ConcurrentHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", exceptionMessage);
+
+        return new ResponseEntity<Object>(body, new HttpHeaders(), status);
     }
 
 

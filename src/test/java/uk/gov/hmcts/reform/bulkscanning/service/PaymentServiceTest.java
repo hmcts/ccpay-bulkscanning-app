@@ -25,8 +25,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
@@ -40,7 +38,10 @@ import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -99,12 +100,12 @@ public class PaymentServiceTest {
     @Autowired
     private AppInsightsAuditRepository auditRepository;
 
-    public static final String CCD_CASE_REFERENCE = "11112222333344441";
-    public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "99998888333344441";
-    public static final String EXCEPTION_RECORD_REFERENCE = "44443333222211111";
-    public static final String DCN_REFERENCE = "DCN1";
+    public static final String CCD_CASE_REFERENCE = "1111222233334444";
+    public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "9999888833334444";
+    public static final String EXCEPTION_RECORD_REFERENCE = "4444333322221111";
+    public static final String DCN_REFERENCE = "DCN11111111111111";
 
-    public static final String TEST_DCN_REFERENCE = "123-123";
+    public static final String TEST_DCN_REFERENCE = "12312311111111111";
 
 
 
@@ -230,10 +231,10 @@ public class PaymentServiceTest {
     private BulkScanPayment createPaymentRequest() {
         return BulkScanPayment.createPaymentRequestWith()
             .amount(BigDecimal.valueOf(100.00))
-            .bankedDate(LocalDateTime.now())
-            .bankGiroCreditSlipNumber("BGC123")
-            .currency(Currency.valueOf("GBP").toString())
-            .method(PaymentMethod.valueOf("CHEQUE").toString())
+            .bankedDate("2019-10-31")
+            .bankGiroCreditSlipNumber(123_456)
+            .currency("GBP")
+            .method("CHEQUE")
             .build();
     }
 

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.model.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -9,9 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
+import java.util.Arrays;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -25,10 +25,12 @@ public class BulkScanPaymentRequest {
 
     @JsonProperty("site_id")
     @NotBlank(message = "site_id is missing")
+    @Size(min = 4, max = 4, message = "site_id length must be 4 Characters")
     private String responsibleServiceId;
 
     @JsonProperty("ccd_case_number")
     @NotBlank(message = "CCD reference is missing")
+    @Size(min = 16, max = 16, message = "ccd_case_number length must be 16 Characters")
     private String ccdCaseNumber;
 
     @JsonProperty("is_exception_record")
@@ -38,4 +40,18 @@ public class BulkScanPaymentRequest {
     @JsonProperty("document_control_numbers")
     @NotEmpty(message = "Payment DCN are missing")
     private String[] documentControlNumbers;
+
+    @JsonIgnore
+    @AssertFalse(message = "Invalid site_id. Accepted values are AA08 or AA07")
+    public boolean isValidResponsibleServiceId() {
+        String[] validResponsibleServiceIds = {"AA08", "AA07"};
+        return responsibleServiceId != null && !Arrays.asList(validResponsibleServiceIds).stream().anyMatch(vm -> vm.equalsIgnoreCase(
+            responsibleServiceId));
+    }
+
+    @JsonIgnore
+    @AssertFalse(message = "document_control_number length must be 17 Characters")
+    public boolean isValidDocumentControlNumbers() {
+        return documentControlNumbers != null && Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> dcn.length() != 17);
+    }
 }

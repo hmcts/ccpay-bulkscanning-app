@@ -90,7 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public Envelope processPaymentFromExela(BulkScanPayment bulkScanPayment, String dcnReference) {
-        LOG.info("Insert Payment metadata in Bulk Scan Payment DB");//
+        LOG.info("Insert Payment metadata in Bulk Scan Payment DB");
         createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(bulkScanPayment, dcnReference));
 
         LOG.info("Check for existing DCN in Payment Table Bulk Scan Pay DB");
@@ -192,7 +192,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (Optional.ofNullable(listOfAllPayments).isPresent() && !listOfAllPayments.isEmpty()) {
             return listOfAllPayments;
         }
-
         return null;
     }
 
