@@ -24,21 +24,21 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class BulkScanPaymentRequest {
 
     @JsonProperty("site_id")
-    @NotBlank(message = "site_id is missing")
+    @NotBlank(message = "site_id can't be Blank")
     @Size(min = 4, max = 4, message = "site_id length must be 4 Characters")
     private String responsibleServiceId;
 
     @JsonProperty("ccd_case_number")
-    @NotBlank(message = "CCD reference is missing")
+    @NotBlank(message = "ccd_case_number can't be Blank")
     @Size(min = 16, max = 16, message = "ccd_case_number length must be 16 Characters")
     private String ccdCaseNumber;
 
     @JsonProperty("is_exception_record")
-    @NotNull(message = "Exception record flag is missing")
+    @NotNull(message = "is_exception_record flag can't be Blank")
     private Boolean isExceptionRecord;
 
     @JsonProperty("document_control_numbers")
-    @NotEmpty(message = "Payment DCN are missing")
+    @NotEmpty(message = "document_control_numbers can't be Blank")
     private String[] documentControlNumbers;
 
     @JsonIgnore
