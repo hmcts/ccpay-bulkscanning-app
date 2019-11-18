@@ -226,10 +226,10 @@ public class PaymentControllerTest {
     @Transactional
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
         CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
-            .ccdCaseNumber("CCN2")
+            .ccdCaseNumber("CCN2111111111111")
             .build();
 
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111-2222-3333-4444")
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111222233334444")
             .header("Authorization", "user")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(caseReferenceRequest))
@@ -240,7 +240,7 @@ public class PaymentControllerTest {
     @Test
     @Transactional
     public void testMarkPaymentAsProcessed() throws Exception{
-        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/DCN2/status/PROCESSED")
+        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/DCN21111111111111/status/PROCESSED")
           .header("Authorization", "user")
           .header("ServiceAuthorization", "service")
           .contentType(MediaType.APPLICATION_JSON));

@@ -93,7 +93,7 @@ public class PaymentControllerFnTest {
     public void setUp() {
         caseReferenceRequest = CaseReferenceRequest
             .createCaseReferenceRequest()
-            .ccdCaseNumber("CCN21111111111111")
+            .ccdCaseNumber("CCN2111111111111")
             .build();
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
@@ -162,7 +162,7 @@ public class PaymentControllerFnTest {
     @Transactional
     public void testExceptionRecordNotExists() throws Exception {
 
-        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=444433332222111", caseReferenceRequest);
+        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=4444333322221111", caseReferenceRequest);
 
         Assert.assertTrue(StringUtils.containsIgnoreCase(resultActions.andReturn().getResponse().getContentAsString(),
             EXCEPTION_RECORD_NOT_EXISTS));
