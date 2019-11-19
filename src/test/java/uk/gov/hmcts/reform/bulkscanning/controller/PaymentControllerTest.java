@@ -70,12 +70,11 @@ public class PaymentControllerTest {
     }
 
     @Test
-    @Transactional
     public void testCreatePaymentFromExela_Conflict() throws Exception{
 
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
                                                                     .id(1).amount(BigDecimal.valueOf(100))
-                                                                    .dcnReference("111222333444")
+                                                                    .dcnReference("111222333")
                                                                     .dateBanked(LocalDateTime.now())
                                                                     .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
                                                                     .build());
@@ -83,13 +82,12 @@ public class PaymentControllerTest {
         when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("111222333444")))
+                                                          .content(asJsonString(createPaymentRequest("111222333")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(409), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     @Test
-    @Transactional
     public void testCreatePaymentFromExela_withException() throws Exception{
 
         when(paymentService.getPaymentMetadata(any(String.class)))
@@ -129,6 +127,7 @@ public class PaymentControllerTest {
             .build();
 
         ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111222233334444")
+            .header("Authorization", "user")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(caseReferenceRequest))
             .contentType(MediaType.APPLICATION_JSON));
@@ -138,7 +137,7 @@ public class PaymentControllerTest {
     @Test
     @Transactional
     public void testMarkPaymentAsProcessed() throws Exception{
-        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/DCN2/status/PROCESSED")
+        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/DCN21111111111111/status/PROCESSED")
           .header("Authorization", "user")
           .header("ServiceAuthorization", "service")
           .contentType(MediaType.APPLICATION_JSON));

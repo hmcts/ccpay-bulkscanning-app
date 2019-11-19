@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.bulkscanning.validator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,8 @@ import uk.gov.hmcts.reform.bulkscanning.backdoors.RestActions;
 import uk.gov.hmcts.reform.bulkscanning.backdoors.ServiceResolverBackdoor;
 import uk.gov.hmcts.reform.bulkscanning.backdoors.UserResolverBackdoor;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
+
+import java.math.BigDecimal;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -50,9 +54,10 @@ public class BulkScanValidatorTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public static final String RESPONSIBLE_SERVICE_ID_MISSING = "Responsible service id is missing";
-    public static final String CCD_REFERENCE_MISSING = "CCD reference is missing";
-    public static final String PAYMENT_DCN_MISSING = "Payment DCN are missing";
+    public static final String RESPONSIBLE_SERVICE_ID_MISSING = "site_id can't be Blank";
+    public static final String CCD_REFERENCE_MISSING = "ccd_case_number can't be Blank";
+    public static final String PAYMENT_DCN_MISSING = "document_control_numbers can't be Blank";
+    public static final String UNKNOWN_FIELD = "Unknown field";
 
     @Before
     public void setUp() {
@@ -79,5 +84,35 @@ public class BulkScanValidatorTest {
 
         Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(CCD_REFERENCE_MISSING));
         Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(PAYMENT_DCN_MISSING));
+    }
+
+    @Test()
+    @Transactional
+    public void testRequestValidation_AdditionalFields() throws Exception{
+
+
+        ResultActions resultActions = restActions.post("/bulk-scan-payment/", new ExelaPayment(BigDecimal.ONE,
+                                                                                                "123456",
+                                                                                                "2019-01-01",
+                                                                                                "GBP",
+                                                                                                "11112222333344448",
+                                                                                                "CASH",
+                                                                                                "Unknown"));
+
+        Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+
+        Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(UNKNOWN_FIELD));
+    }
+
+    @AllArgsConstructor
+    @Getter
+    class ExelaPayment {
+        private BigDecimal amount;
+        private String bank_giro_credit_slip_number;
+        private String banked_date;
+        private String currency;
+        private String document_control_number;
+        private String method;
+        private String additional_field;
     }
 }

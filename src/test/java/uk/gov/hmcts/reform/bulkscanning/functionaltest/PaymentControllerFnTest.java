@@ -93,7 +93,7 @@ public class PaymentControllerFnTest {
     public void setUp() {
         caseReferenceRequest = CaseReferenceRequest
             .createCaseReferenceRequest()
-            .ccdCaseNumber("CCN21111111111111")
+            .ccdCaseNumber("CCN2111111111111")
             .build();
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();

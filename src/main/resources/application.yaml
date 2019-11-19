@@ -24,6 +24,8 @@ spring:
   jackson:
     mapper:
       accept-case-insensitive-enums: true
+    deserialization:
+      fail-on-unknown-properties: true
   ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver

@@ -50,7 +50,7 @@ public class BulkScanPayment {
     /*
     The method of payment i.e. Cheque, Postal Order, CASH
      */
-    @NotBlank(message = "payment_Method can't be Blank")
+    @NotBlank(message = "payment Method can't be Blank")
     private String method;
 
     /*
@@ -58,6 +58,7 @@ public class BulkScanPayment {
      */
     @NotNull(message = "bank_giro_credit_slip_number can't be Blank")
     @JsonProperty("bank_giro_credit_slip_number")
+    @Min(value = 0, message = "bank_giro_credit_slip_number must be Positive")
     @Digits(integer = 6, fraction = 0,
         message = "bank_giro_credit_slip_number length must not be greater than 6 digits")
     private Integer bankGiroCreditSlipNumber;
@@ -70,7 +71,7 @@ public class BulkScanPayment {
     private String bankedDate;
 
     @JsonIgnore
-    @AssertFalse(message = "Invalid Banked Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")
+    @AssertFalse(message = "Invalid Banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")
     public boolean isValidBankedDateFormat() {
         if (bankedDate != null) {
             if(! bankedDate.matches("\\d{4}-\\d{2}-\\d{2}")){
