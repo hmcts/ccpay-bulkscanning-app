@@ -131,7 +131,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<Envelope> listOfExistingEnvelope = bulkScanningUtils.returnExistingEnvelopeList(envelopeNew);
 
         if (Optional.ofNullable(listOfExistingEnvelope).isPresent() && !listOfExistingEnvelope.isEmpty()) {
-            for (Envelope envelopeDB: listOfExistingEnvelope) {
+            for (Envelope envelopeDB : listOfExistingEnvelope) {
                 //if we have envelope already in BS
                 if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
                     LOG.info("Existing envelope found for Bulk Scan request");
@@ -141,8 +141,8 @@ public class PaymentServiceImpl implements PaymentService {
                 bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
                 envelopeRepository.save(envelopeDB);
 
-                if(Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
-                    && ! envelopeDB.getEnvelopePayments().isEmpty()){
+                if (Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
+                    && !envelopeDB.getEnvelopePayments().isEmpty()) {
                     envelopeDB.getEnvelopePayments().stream().forEach(payment -> {
                         auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment);
                     });
@@ -193,8 +193,8 @@ public class PaymentServiceImpl implements PaymentService {
         if (Optional.ofNullable(envelope).isPresent()) {
             envelopeRepository.save(envelope);
             updateEnvelopePaymentStatus(envelope, PROCESSED);
-            if(Optional.ofNullable(envelope.getEnvelopePayments()).isPresent()
-                && ! envelope.getEnvelopePayments().isEmpty()){
+            if (Optional.ofNullable(envelope.getEnvelopePayments()).isPresent()
+                && !envelope.getEnvelopePayments().isEmpty()) {
                 envelope.getEnvelopePayments().stream().forEach(payment -> {
                     auditRepository.trackPaymentEvent("PAYMENT_STATUS_UPDATE", payment);
                 });
@@ -227,9 +227,9 @@ public class PaymentServiceImpl implements PaymentService {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
         if (checkAllPaymentsStatus(paymentStatus, payments)) {
             updateEnvelopeStatus(envelope, paymentStatus);
-        }else if (checkAnyPaymentsStatus(INCOMPLETE, payments)){
+        } else if (checkAnyPaymentsStatus(INCOMPLETE, payments)) {
             updateEnvelopeStatus(envelope, INCOMPLETE);
-        }else if (checkAnyPaymentsStatus(COMPLETE, payments)){
+        } else if (checkAnyPaymentsStatus(COMPLETE, payments)) {
             updateEnvelopeStatus(envelope, COMPLETE);
         }
         return envelope;
@@ -239,15 +239,15 @@ public class PaymentServiceImpl implements PaymentService {
         return Optional.ofNullable(payments).isPresent()
             && !payments.isEmpty()
             && payments.stream()
-                            .map(payment -> payment.getPaymentStatus())
-                            .collect(Collectors.toList())
-                            .stream().allMatch(paymentStatus.toString() :: equals);
+            .map(payment -> payment.getPaymentStatus())
+            .collect(Collectors.toList())
+            .stream().allMatch(paymentStatus.toString()::equals);
     }
 
     private boolean checkAnyPaymentsStatus(PaymentStatus paymentStatus, List<EnvelopePayment> payments) {
         return Optional.ofNullable(payments).isPresent()
-            && ! payments.isEmpty()
-            && ! payments.stream()
+            && !payments.isEmpty()
+            && !payments.stream()
             .filter(payment -> payment.getPaymentStatus().equalsIgnoreCase(paymentStatus.toString()))
             .collect(Collectors.toList())
             .isEmpty();

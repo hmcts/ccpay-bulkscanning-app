@@ -53,7 +53,7 @@ public class SearchServiceImpl implements SearchService {
     @Transactional
     public SearchResponse retrieveByCCDReference(String ccdReference) {
 
-        List<EnvelopeCase> envelopeCases = getEnvelopeCaseByCCDReference(SearchRequest.searchRequestWith()
+        List<EnvelopeCase> envelopeCases = getEnvelopeCaseByCcdReference(SearchRequest.searchRequestWith()
                                                                              .ccdReference(ccdReference)
                                                                              .exceptionRecord(ccdReference)
                                                                              .build());
@@ -67,12 +67,12 @@ public class SearchServiceImpl implements SearchService {
                                                                     .documentControlNumber(
                                                                         documentControlNumber)
                                                                     .build());
-        if(envelopeCases == null){
+        if (envelopeCases == null) {
             // No Payment exists for the searched DCN
             LOG.info("Payment Not exists for the searched DCN !!!");
             return null;
         }
-        if(envelopeCases.isEmpty()){
+        if (envelopeCases.isEmpty()) {
             return SearchResponse.searchResponseWith()
                 .allPaymentsStatus(INCOMPLETE)
                 .build();
@@ -86,17 +86,17 @@ public class SearchServiceImpl implements SearchService {
 
     private SearchResponse searchForEnvelopeCasePayments(List<EnvelopeCase> envelopeCases) {
         SearchResponse searchResponse = SearchResponse.searchResponseWith().build();
-        if(Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()
-            && Optional.ofNullable(envelopeCases.get(0).getEnvelope()).isPresent()){
-            if(checkForAllEnvelopesStatus(envelopeCases, PROCESSED.toString())){
+        if (Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()
+            && Optional.ofNullable(envelopeCases.get(0).getEnvelope()).isPresent()) {
+            if (checkForAllEnvelopesStatus(envelopeCases, PROCESSED.toString())) {
                 searchResponse.setAllPaymentsStatus(PROCESSED);
-            }else if(checkForAllEnvelopesStatus(envelopeCases, COMPLETE.toString())){
+            } else if (checkForAllEnvelopesStatus(envelopeCases, COMPLETE.toString())) {
                 searchResponse.setAllPaymentsStatus(COMPLETE);
-            }else{
+            } else {
                 searchResponse.setAllPaymentsStatus(INCOMPLETE);
             }
-            if(searchResponse.getAllPaymentsStatus().equals(INCOMPLETE)
-                    || searchResponse.getAllPaymentsStatus().equals(COMPLETE)){
+            if (searchResponse.getAllPaymentsStatus().equals(INCOMPLETE)
+                || searchResponse.getAllPaymentsStatus().equals(COMPLETE)) {
                 List<PaymentMetadata> paymentMetadataList = getPaymentMetadataForEnvelopeCase(envelopeCases);
                 if (Optional.ofNullable(paymentMetadataList).isPresent()
                     && !paymentMetadataList.isEmpty()) {
@@ -114,7 +114,7 @@ public class SearchServiceImpl implements SearchService {
         return envelopeCases.stream()
             .map(envelopeCase -> envelopeCase.getEnvelope().getPaymentStatus())
             .collect(Collectors.toList())
-            .stream().allMatch(status :: equals);
+            .stream().allMatch(status::equals);
     }
 
     private List<PaymentMetadata> getPaymentMetadataForEnvelopeCase(List<EnvelopeCase> envelopeCases) {
@@ -132,7 +132,7 @@ public class SearchServiceImpl implements SearchService {
         return paymentMetadataList;
     }
 
-    private List<EnvelopeCase> getEnvelopeCaseByCCDReference(SearchRequest searchRequest) {
+    private List<EnvelopeCase> getEnvelopeCaseByCcdReference(SearchRequest searchRequest) {
         if (StringUtils.isNotEmpty(searchRequest.getCcdReference())
             && envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).isPresent()) {
             return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).get();
@@ -159,7 +159,7 @@ public class SearchServiceImpl implements SearchService {
             if (Optional.ofNullable(envelopeCase).isPresent()) {
                 searchRequest.setCcdReference(envelopeCase.getCcdReference());
                 searchRequest.setExceptionRecord(envelopeCase.getExceptionRecordReference());
-                return this.getEnvelopeCaseByCCDReference(searchRequest);
+                return this.getEnvelopeCaseByCcdReference(searchRequest);
             }
             return Collections.emptyList();
         }

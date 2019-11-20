@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.bulkscanning.config;
 
-
 import feign.Feign;
 import feign.jackson.JacksonEncoder;
 import org.slf4j.Logger;
@@ -28,10 +27,10 @@ public class S2sTokenService {
         LOG.info("s2sApi : " + s2sApi.toString());
         LOG.info("microservice : " + microservice);
         LOG.info("secret : " + secret);
-        try{
+        try {
             return s2sApi.serviceToken(microservice, otp);
-        }catch(Exception ex){
-           LOG.info(ex.getMessage());
+        } catch (Exception ex) {
+            LOG.info(ex.getMessage());
         }
         return null;
     }
