@@ -47,11 +47,11 @@ public class SearchControllerTest {
     @Transactional
     public void testSearchPaymentWithCCD() throws Exception{
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
-            .ccdReference("CCD1231111111111")
+            .ccdReference("9881231111111111")
             .build();
         when(searchService.retrieveByCCDReference(any(String.class)))
             .thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases/CCD1231111111111")
+        ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -63,7 +63,7 @@ public class SearchControllerTest {
         SearchResponse searchResponse = null;
         when(searchService.retrieveByCCDReference(any(String.class)))
             .thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases/CCD1231111111111")
+        ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -74,7 +74,7 @@ public class SearchControllerTest {
     public void testSearchPaymentWithCCD_Exception() throws Exception{
         when(searchService.retrieveByCCDReference(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Payments"));
-        ResultActions resultActions = mockMvc.perform(get("/cases/CCD1231111111111")
+        ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -86,12 +86,12 @@ public class SearchControllerTest {
     @Transactional
     public void testSearchPaymentWithDcn() throws Exception{
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
-            .ccdReference("CCD1231111111111")
+            .ccdReference("9881231111111111")
             .build();
         when(searchService.retrieveByDcn(any(String.class)))
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "DCN12311111111111")
+                                                          .param("document_control_number", "98712311111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -103,7 +103,7 @@ public class SearchControllerTest {
         SearchResponse searchResponse = null;
         when(searchService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "DCN12311111111111")
+                                                          .param("document_control_number", "98712311111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -114,11 +114,12 @@ public class SearchControllerTest {
     public void testSearchPaymentWithDcn_Exception() throws Exception{
         when(searchService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "DCN12311111111111")
+                                                          .param("document_control_number", "98712311111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(true, resultActions.andReturn().getResponse()
             .getContentAsString().contains("Exception in fetching Payments"));
     }
+
 }
