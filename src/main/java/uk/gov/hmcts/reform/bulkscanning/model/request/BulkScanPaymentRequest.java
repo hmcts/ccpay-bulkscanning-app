@@ -30,7 +30,8 @@ public class BulkScanPaymentRequest {
 
     @JsonProperty("ccd_case_number")
     @NotBlank(message = "ccd_case_number can't be Blank")
-    @Size(min = 16, max = 16, message = "ccd_case_number length must be 16 Characters")
+    @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "ccd_case_number should be numeric")
+    @Size(min = 16, max = 16, message = "ccd_case_number length must be 16 digits")
     private String ccdCaseNumber;
 
     @JsonProperty("is_exception_record")
@@ -50,8 +51,10 @@ public class BulkScanPaymentRequest {
     }
 
     @JsonIgnore
-    @AssertFalse(message = "document_control_number length must be 17 Characters")
+    @AssertFalse(message = "document_control_number must be 17 digit numeric")
     public boolean isValidDocumentControlNumbers() {
-        return documentControlNumbers != null && Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> dcn.length() != 17);
+        return documentControlNumbers != null
+            && (Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> dcn.length() != 17)
+            || Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> ! dcn.matches("-?\\d+(\\.\\d+)?")));
     }
 }
