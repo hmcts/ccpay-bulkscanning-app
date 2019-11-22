@@ -74,13 +74,16 @@ public class SpringSecurityConfiguration {
         @Override
         public void configure(WebSecurity web) {
             web.ignoring().antMatchers("/swagger-ui.html",
-                "/webjars/springfox-swagger-ui/**",
-                "/swagger-resources/**",
-                "/health",
-                "/health/liveness",
-                "/info",
-                "/favicon.ico",
-                "/mock-api/**");
+                                       "/webjars/springfox-swagger-ui/**",
+                                       "/swagger-resources/**",
+                                       "/v2/**",
+                                       "/refdata/**",
+                                       "/health",
+                                       "/health/liveness",
+                                       "/info",
+                                       "/favicon.ico",
+                                       "/mock-api/**",
+                                       "/");
         }
 
         @Override
