@@ -2,6 +2,7 @@ import java.util.stream.Collectors
 
 plugins {
   id 'application'
+  //id 'checkstyle'
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
@@ -85,6 +86,13 @@ task smoke(type: Test) {
   testClassesDirs = sourceSets.smokeTest.output.classesDirs
   classpath = sourceSets.smokeTest.runtimeClasspath
 }
+
+/*checkstyle {
+  maxWarnings = 0
+  toolVersion = '8.18'
+  // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
+  configDir = new File(rootDir, 'config/checkstyle')
+}*/
 
 pmd {
   toolVersion = "6.18.0"
@@ -203,6 +211,7 @@ dependencies {
   compile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
   compile group: 'org.jboss.aerogear', name: 'aerogear-otp-java', version:'1.0.0'
   compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.3'
+  compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
   testCompile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
   testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
     exclude(module: 'commons-logging')

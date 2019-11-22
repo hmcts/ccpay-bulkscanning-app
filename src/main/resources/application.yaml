@@ -52,7 +52,6 @@ spring:
       abandon-when-percentage-full: 0
 security:
   anonymousPaths:
-    - "/"
     - "/health"
     - "/health/liveness"
     - "/actuator/**"

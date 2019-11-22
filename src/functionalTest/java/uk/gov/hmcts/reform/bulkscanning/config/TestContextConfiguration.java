@@ -15,11 +15,11 @@ import static io.restassured.config.JsonConfig.jsonConfig;
 
 @Configuration
 @ComponentScan("uk.gov.hmcts.reform.bulkscanning")
-@TestPropertySource(locations="classpath:application-test.yaml")
+@TestPropertySource(locations = "classpath:application-test.yaml")
 public class TestContextConfiguration {
 
     @Value("${test.url:http://localhost:8080}")
-    private String baseURL;
+    private String baseurl;
 
     @PostConstruct
     public void initialize() {
@@ -27,9 +27,9 @@ public class TestContextConfiguration {
             .objectMapperConfig(
                 ObjectMapperConfig.objectMapperConfig().jackson2ObjectMapperFactory((cls, charset) -> new ObjectMapper())
             )
-        .jsonConfig(jsonConfig().numberReturnType(JsonPathConfig.NumberReturnType.BIG_DECIMAL));
+            .jsonConfig(jsonConfig().numberReturnType(JsonPathConfig.NumberReturnType.BIG_DECIMAL));
         RestAssured.useRelaxedHTTPSValidation();
-        RestAssured.baseURI = baseURL;
+        RestAssured.baseURI = baseurl;
     }
 
 }

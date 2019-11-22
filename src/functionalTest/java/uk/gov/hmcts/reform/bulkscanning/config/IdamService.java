@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.CreateUserRequest;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.AuthenticateUserResponse;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.UserGroup;
+import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.CreateUserRequest;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.Role;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.TokenExchangeResponse;
+import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.UserGroup;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -49,9 +49,9 @@ public class IdamService {
         CreateUserRequest userRequest = userRequest(email, userGroup, roles);
         LOG.info("idamApi : " + idamApi.toString());
         LOG.info("userRequest : " + userRequest);
-        try{
+        try {
             idamApi.createUser(userRequest);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.info(ex.getMessage());
         }
 
@@ -73,12 +73,13 @@ public class IdamService {
         LOG.info("testConfig.getOauth2().getClientId() : " + testConfig.getOauth2().getClientId());
         LOG.info("testConfig.getOauth2().getRedirectUrl() : " + testConfig.getOauth2().getRedirectUrl());
 
-        try{
+        try {
             AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
                 BASIC + base64Authorisation,
                 CODE,
                 testConfig.getOauth2().getClientId(),
-                testConfig.getOauth2().getRedirectUrl());
+                testConfig.getOauth2().getRedirectUrl()
+            );
 
             TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
                 authenticateUserResponse.getCode(),
@@ -89,7 +90,7 @@ public class IdamService {
             );
 
             return BEARER + tokenExchangeResponse.getAccessToken();
-        }catch (Exception ex){
+        } catch (Exception ex) {
             LOG.info(ex.getMessage());
         }
         return null;
@@ -101,8 +102,8 @@ public class IdamService {
             .email(email)
             .password(testConfig.getTestUserPassword())
             .roles(Stream.of(roles)
-                .map(Role::new)
-                .collect(toList()))
+                       .map(Role::new)
+                       .collect(toList()))
             .userGroup(new UserGroup(userGroup))
             .build();
     }

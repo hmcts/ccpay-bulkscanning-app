@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
@@ -25,7 +24,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
 import java.math.BigDecimal;
@@ -45,7 +43,6 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles({"local", "test"})
-//@TestPropertySource(locations="classpath:application-local.yaml")
 public class PaymentControllerTest {
 
     MockMvc mockMvc;
@@ -59,16 +56,6 @@ public class PaymentControllerTest {
     @Before
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
-
-    public BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String dcn[], String responsibleServiceId) {
-        return BulkScanPaymentRequest
-            .createBSPaymentRequestWith()
-            .ccdCaseNumber(ccdCaseNumber)
-            .documentControlNumbers(dcn)
-            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId).toString())
-            .isExceptionRecord(true)
-            .build();
     }
 
     /*@Test
@@ -113,97 +100,7 @@ public class PaymentControllerTest {
             .getContentAsString().contains("Exception in fetching Metadata"));
     }*/
 
-    @Test
-    @Transactional
-    public void testSearchPaymentWithCCD() throws Exception{
-        SearchResponse searchResponse = SearchResponse.searchResponseWith()
-            .ccdReference("9881231111111111")
-            .build();
-        when(paymentService.retrieveByCCDReference(any(String.class)))
-            .thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
-                                                    .header("Authorization", "user")
-                                                    .header("ServiceAuthorization", "service")
-                                                    .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
-    }
-
-    @Test
-    public void testSearchPaymentWithCCD_PaymentNotFound() throws Exception{
-        SearchResponse searchResponse = null;
-        when(paymentService.retrieveByCCDReference(any(String.class)))
-            .thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
-                                                          .header("Authorization", "user")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(Integer.valueOf(404), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
-    }
-
-    @Test
-    public void testSearchPaymentWithCCD_Exception() throws Exception{
-        when(paymentService.retrieveByCCDReference(any(String.class)))
-            .thenThrow(new PaymentException("Exception in fetching Payments"));
-        ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
-                                                          .header("Authorization", "user")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(true, resultActions.andReturn().getResponse()
-            .getContentAsString().contains("Exception in fetching Payments"));
-    }
-
-    @Test
-    @Transactional
-    public void testSearchPaymentWithDcn() throws Exception{
-        SearchResponse searchResponse = SearchResponse.searchResponseWith()
-            .ccdReference("9881231111111111")
-            .build();
-        when(paymentService.retrieveByDcn(any(String.class)))
-            .thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases")
-            .param("document_control_number", "98712311111111111")
-                                                          .header("Authorization", "user")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
-    }
-
-    @Test
-    public void testSearchPaymentWithDcn_PaymentNotFound() throws Exception{
-        SearchResponse searchResponse = null;
-        when(paymentService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "98712311111111111")
-                                                          .header("Authorization", "user")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(Integer.valueOf(404), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
-    }
-
-    @Test
-    public void testSearchPaymentWithDcn_Exception() throws Exception{
-        when(paymentService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
-        ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "98712311111111111")
-                                                          .header("Authorization", "user")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(true, resultActions.andReturn().getResponse()
-            .getContentAsString().contains("Exception in fetching Payments"));
-    }
-
-    public static BulkScanPayment createPaymentRequest(String dcnReference) {
-        return BulkScanPayment.createPaymentRequestWith()
-            .dcnReference(dcnReference)
-            .amount(BigDecimal.valueOf(100.00))
-            .bankedDate("2019-10-31")
-            .bankGiroCreditSlipNumber(123)
-            .currency(Currency.valueOf("GBP").toString())
-            .method(PaymentMethod.valueOf("CHEQUE").toString())
-            .build();
-    }
-
-   //Test cases for Bulk Scan endpoints bulk scan
+    //Test cases for Bulk Scan endpoints bulk scan
    @Test
    @Transactional
    public void testCreatePaymentForBulkScan() throws Exception{
@@ -273,10 +170,27 @@ public class PaymentControllerTest {
              .dateUpdated(LocalDateTime.now())
              .dateCreated(LocalDateTime.now())
              .build();
-
-
-
         return bsEnvelope;
     }
 
+    public static BulkScanPayment createPaymentRequest(String dcnReference) {
+        return BulkScanPayment.createPaymentRequestWith()
+            .dcnReference(dcnReference)
+            .amount(BigDecimal.valueOf(100.00))
+            .bankedDate("2019-10-31")
+            .bankGiroCreditSlipNumber(123)
+            .currency(Currency.valueOf("GBP").toString())
+            .method(PaymentMethod.valueOf("CHEQUE").toString())
+            .build();
+    }
+
+    public BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String dcn[], String responsibleServiceId) {
+        return BulkScanPaymentRequest
+            .createBSPaymentRequestWith()
+            .ccdCaseNumber(ccdCaseNumber)
+            .documentControlNumbers(dcn)
+            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId).toString())
+            .isExceptionRecord(true)
+            .build();
+    }
 }
