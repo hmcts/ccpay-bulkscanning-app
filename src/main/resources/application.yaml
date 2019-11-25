@@ -24,6 +24,8 @@ spring:
   jackson:
     mapper:
       accept-case-insensitive-enums: true
+    deserialization:
+      fail-on-unknown-properties: true
   ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
@@ -50,7 +52,6 @@ spring:
       abandon-when-percentage-full: 0
 security:
   anonymousPaths:
-    - "/"
     - "/health"
     - "/health/liveness"
     - "/actuator/**"
@@ -72,3 +73,6 @@ auth:
     service:
       client:
         baseUrl: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL}
+azure:
+  application-insights:
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}

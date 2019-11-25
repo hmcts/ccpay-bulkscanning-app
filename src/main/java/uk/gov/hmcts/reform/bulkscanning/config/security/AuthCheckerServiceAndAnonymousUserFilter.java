@@ -23,7 +23,8 @@ public class AuthCheckerServiceAndAnonymousUserFilter extends AbstractPreAuthent
     private final RequestAuthorizer<Service> serviceRequestAuthorizer;
     private final RequestAuthorizer<User> userRequestAuthorizer;
     private static final Set<String> anonymousRole = new HashSet<>(Arrays.asList("ROLE_ANONYMOUS"));
-
+    public static final String SERVICE_AUTHORISATION = "ServiceAuthorization";
+    public static final String AUTHORISATION = "Authorization";
 
     public AuthCheckerServiceAndAnonymousUserFilter(RequestAuthorizer<Service> serviceRequestAuthorizer,
                                                     RequestAuthorizer<User> userRequestAuthorizer) {
@@ -55,7 +56,13 @@ public class AuthCheckerServiceAndAnonymousUserFilter extends AbstractPreAuthent
 
     private User authorizeUser(HttpServletRequest request) {
         try {
-            return userRequestAuthorizer.authorise(request);
+            String bearerToken = request.getHeader(AUTHORISATION);
+            if (bearerToken == null) {
+                log.warn("Unsuccessful User authentication because of Bearer Token Null!!!");
+                return null;
+            }else {
+                return userRequestAuthorizer.authorise(request);
+            }
         } catch (BearerTokenMissingException btme) {
             return new User("anonymous", anonymousRole);
         } catch(AuthCheckerException ace) {
@@ -66,7 +73,14 @@ public class AuthCheckerServiceAndAnonymousUserFilter extends AbstractPreAuthent
 
     private Service authorizeService(HttpServletRequest request) {
         try {
-            return serviceRequestAuthorizer.authorise(request);
+            String bearerToken = request.getHeader(SERVICE_AUTHORISATION);
+            if (bearerToken == null) {
+                log.warn("Unsuccessful service authentication because of Bearer Token Null!!!");
+                return null;
+            }else{
+                return serviceRequestAuthorizer.authorise(request);
+            }
+
         } catch (AuthCheckerException e) {
             log.warn("Unsuccessful service authentication", e);
             return null;

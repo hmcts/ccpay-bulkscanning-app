@@ -13,6 +13,13 @@ spring:
   liquibase:
     enabled: ${SPRING_LIQUIBASE_ENABLED:true}
     change-log: classpath:/db/changelog/db.changelog-master.xml
+  jackson.date-format: yyyy-MM-dd
+  flyway.enabled: true
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
+    deserialization:
+      fail-on-unknown-properties: true
 security:
   oauth2:
     resource:
@@ -55,3 +62,6 @@ s2s:
   service:
     name: ${S2S_SERVICE_NAME:cmc}
     secret: ${S2S_SERVICE_SECRET:RD53IBEKQTO4WMQY}
+azure:
+  application-insights:
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}

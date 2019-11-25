@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerFunct
 @SpringBootTest
 @EnableFeignClients
 @ActiveProfiles("test")
-@TestPropertySource(locations="classpath:application-test.yaml")
+@TestPropertySource(locations = "classpath:application-test.yaml")
 public class BulkScanValidatorFunctionalTest {
 
     public static final String RESPONSIBLE_SERVICE_ID_MISSING = "Responsible service id is missing";
@@ -50,17 +50,17 @@ public class BulkScanValidatorFunctionalTest {
 
     @Test()
     @Transactional
-    public void testFieldLevelValidation() throws Exception{
-        String dcn[] = {""};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
-            ,null,"AA08", false);
+    public void testFieldLevelValidation() throws Exception {
+        String[] dcn = {""};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null, null,
+                                                                                     "AA08", false);
 
         Response response = RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .body(bulkScanPaymentRequest)
             .contentType(ContentType.JSON)
             .when()
-            .post("/bulk-scan-payments/");
+            .post("/bulk-scan-payments");
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(response.getStatusCode()));
 

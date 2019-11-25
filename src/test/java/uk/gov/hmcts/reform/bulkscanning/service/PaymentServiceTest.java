@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.reform.bulkscanning.audit.AppInsightsAuditRepository;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
@@ -24,8 +25,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
@@ -34,12 +33,14 @@ import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -57,7 +58,6 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles({"local", "test"})
-//@TestPropertySource(locations="classpath:application-local.yaml")
 public class PaymentServiceTest {
     MockMvc mockMvc;
 
@@ -95,14 +95,15 @@ public class PaymentServiceTest {
 
     private CaseReferenceRequest caseReferenceRequest;
 
-    public static final String CCD_CASE_REFERENCE = "11112222333344441";
-    public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "99998888333344441";
-    public static final String EXCEPTION_RECORD_REFERENCE = "44443333222211111";
-    public static final String DCN_REFERENCE = "DCN1";
+    @Autowired
+    private AppInsightsAuditRepository auditRepository;
 
-    public static final String TEST_DCN_REFERENCE = "123-123";
+    public static final String CCD_CASE_REFERENCE = "1111222233334444";
+    public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "9999888833334444";
+    public static final String EXCEPTION_RECORD_REFERENCE = "4444333322221111";
+    public static final String DCN_REFERENCE = "DCN11111111111111";
 
-
+    public static final String TEST_DCN_REFERENCE = "12312311111111111";
 
     @Before
     public void setUp() {
@@ -115,7 +116,8 @@ public class PaymentServiceTest {
                                                 paymentDtoMapper,
                                                 bsPaymentRequestMapper,
                                                 bulkScanningUtils,
-                                                envelopeCaseRepository);
+                                                envelopeCaseRepository,
+                                                auditRepository);
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
             .id(1).amount(BigDecimal.valueOf(100))
             .dcnReference(TEST_DCN_REFERENCE)
@@ -177,46 +179,6 @@ public class PaymentServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByCCDReference() throws Exception {
-        SearchResponse searchResponse = paymentService.retrieveByCCDReference(TEST_DCN_REFERENCE);
-        assertThat(searchResponse.getCcdReference()).isEqualTo(TEST_DCN_REFERENCE);
-    }
-
-    @Test
-    @Transactional
-    public void testRetrieveByExceptionRecord() throws Exception {
-        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
-        Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
-                                                                    .id(1)
-                                                                    .dcnReference(TEST_DCN_REFERENCE)
-                                                                    .paymentStatus(COMPLETE.toString())
-                                                                    .build());
-        Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
-        Optional<Envelope> envelope = Optional.of(Envelope.envelopeWith().id(1).envelopePayments(payments.get())
-                                                      .paymentStatus(COMPLETE.toString())
-                                                      .build());
-        Optional<EnvelopeCase> envelopeCase = Optional.of(EnvelopeCase.caseWith()
-                                                              .id(1)
-                                                              .envelope(envelope.get())
-                                                              .ccdReference("CCD123")
-                                                              .exceptionRecordReference("EXP123")
-                                                              .build());
-        Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
-        when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
-        when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(cases);
-        SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
-        assertThat(searchResponse.getCcdReference()).isEqualTo("CCD123");
-    }
-
-    @Test
-    @Transactional
-    public void testRetrieveByDcn() throws Exception {
-        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
-        assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
-    }
-
-    @Test
-    @Transactional
     public void testGetPaymentMetadata() throws Exception {
         PaymentMetadata paymentMetadata = paymentService.getPaymentMetadata(TEST_DCN_REFERENCE);
         assertThat(paymentMetadata.getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
@@ -225,10 +187,10 @@ public class PaymentServiceTest {
     private BulkScanPayment createPaymentRequest() {
         return BulkScanPayment.createPaymentRequestWith()
             .amount(BigDecimal.valueOf(100.00))
-            .bankedDate(new Date())
-            .bankGiroCreditSlipNumber("BGC123")
-            .currency(Currency.valueOf("GBP"))
-            .method(PaymentMethod.valueOf("CHEQUE"))
+            .bankedDate("2019-10-31")
+            .bankGiroCreditSlipNumber(123_456)
+            .currency("GBP")
+            .method("CHEQUE")
             .build();
     }
 
@@ -243,8 +205,9 @@ public class PaymentServiceTest {
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
             ,dcn,"AA08", true);
 
-        Envelope envelopeMock = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
-        Assert.assertEquals(1,envelopeMock.getId().intValue());
+        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
+
+        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
     }
 
     @Test(expected = BulkScanCaseAlreadyExistsException.class)
