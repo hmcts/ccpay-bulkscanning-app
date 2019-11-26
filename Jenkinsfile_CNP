@@ -5,7 +5,7 @@ properties(
      pipelineTriggers([[$class: 'GitHubPushTrigger']])]
 )
 
-@Library("Infrastructure@helm2.16.1")
+@Library("Infrastructure")
 
 def type = "java"
 
