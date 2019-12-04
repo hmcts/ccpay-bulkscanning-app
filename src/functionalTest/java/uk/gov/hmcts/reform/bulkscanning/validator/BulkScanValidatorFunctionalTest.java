@@ -27,9 +27,9 @@ import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerFunct
 @TestPropertySource(locations = "classpath:application-test.yaml")
 public class BulkScanValidatorFunctionalTest {
 
-    public static final String RESPONSIBLE_SERVICE_ID_MISSING = "Responsible service id is missing";
-    public static final String CCD_REFERENCE_MISSING = "CCD reference is missing";
-    public static final String PAYMENT_DCN_MISSING = "Payment DCN are missing";
+    public static final String RESPONSIBLE_SERVICE_ID_MISSING = "site_id can't be Blank";
+    public static final String CCD_REFERENCE_MISSING = "ccd_case_number can't be Blank";
+    public static final String PAYMENT_DCN_MISSING = "document_control_numbers can't be Blank";
 
     @Autowired
     private TestConfigProperties testProps;
