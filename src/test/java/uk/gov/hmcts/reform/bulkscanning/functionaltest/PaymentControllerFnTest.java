@@ -363,7 +363,7 @@ public class PaymentControllerFnTest {
             , dcns, "AA08", true);
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);;
+        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
         testRestAction
             .withAuthorizedService("test-invalid")
             .withAuthorizedUser(USER_ID)
@@ -384,7 +384,7 @@ public class PaymentControllerFnTest {
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);;
+        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
         testRestAction
             .withAuthorizedService("")
             .withAuthorizedUser("")

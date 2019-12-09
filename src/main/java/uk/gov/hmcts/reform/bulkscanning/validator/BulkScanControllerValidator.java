@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,9 +39,9 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
     private static final Logger LOG = LoggerFactory.getLogger(BulkScanControllerValidator.class);
 
     public BulkScanControllerValidator(AppInsightsAuditRepository auditRepository) {
+        super();
         this.auditRepository = auditRepository;
     }
-
 
     @ExceptionHandler(BulkScanCaseAlreadyExistsException.class)
     public ResponseEntity bsPaymentAlreadyExists(BulkScanCaseAlreadyExistsException bsAlreadyExistsException) {
@@ -103,7 +102,7 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
         body.put("errors", errors);
         LOG.error("Error_Response : {}", errors);
 
-        Map<String, String> errorMap = new HashMap<>();
+        Map<String, String> errorMap = new ConcurrentHashMap<>();
         errorMap.put("errors", errors.toString());
         auditRepository.trackEvent("Error_Response", errorMap);
 
