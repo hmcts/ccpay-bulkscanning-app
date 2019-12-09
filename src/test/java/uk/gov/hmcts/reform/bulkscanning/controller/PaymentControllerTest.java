@@ -15,9 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
+import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.Currency;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
@@ -31,11 +33,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
 import static uk.gov.hmcts.reform.bulkscanning.service.PaymentServiceTest.CCD_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonString;
 
@@ -58,13 +63,13 @@ public class PaymentControllerTest {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
-    /*@Test
+    @Test
     @Transactional
     public void testCreatePaymentFromExela() throws Exception{
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                       .header("ServiceAuthorization", "service")
-                                                      .content(asJsonString(createPaymentRequest("111222333")))
+                                                      .content(asJsonString(createPaymentRequest("11112222333344441")))
                                                       .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -74,7 +79,7 @@ public class PaymentControllerTest {
 
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
                                                                     .id(1).amount(BigDecimal.valueOf(100))
-                                                                    .dcnReference("111222333")
+                                                                    .dcnReference("11112222333344441")
                                                                     .dateBanked(LocalDateTime.now())
                                                                     .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
                                                                     .build());
@@ -82,7 +87,7 @@ public class PaymentControllerTest {
         when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("111222333")))
+                                                          .content(asJsonString(createPaymentRequest("11112222333344441")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(409), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -94,11 +99,11 @@ public class PaymentControllerTest {
             .thenThrow(new PaymentException("Exception in fetching Metadata"));
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("111222333")))
+                                                          .content(asJsonString(createPaymentRequest("11112222333344441")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(true, resultActions.andReturn().getResponse()
             .getContentAsString().contains("Exception in fetching Metadata"));
-    }*/
+    }
 
     //Test cases for Bulk Scan endpoints bulk scan
    @Test

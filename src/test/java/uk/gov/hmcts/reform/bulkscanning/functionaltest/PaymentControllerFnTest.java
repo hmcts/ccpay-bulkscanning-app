@@ -356,6 +356,48 @@ public class PaymentControllerFnTest {
         Assert.assertEquals(true, resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
     }
 
+    @Test
+    public void testInvalidAuthorisedService() throws Exception {
+        String dcns[] = {"11116666777788882", "11116666777799992"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677775555"
+            , dcns, "AA08", true);
+
+        MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);;
+        testRestAction
+            .withAuthorizedService("test-invalid")
+            .withAuthorizedUser(USER_ID)
+            .withUserId(USER_ID)
+            .withReturnUrl("https://www.gooooogle.com");
+        //Payment Request from Bulk-Scan System
+        ResultActions resultActions = testRestAction.post("/bulk-scan-payments", bulkScanPaymentRequest);
+
+        Assert.assertEquals(403, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
+    public void testInvalidAuthorisedUser() throws Exception {
+        String dcns[] = {"11116666777788882", "11116666777799992"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677775555"
+            , dcns, "AA08", true);
+
+        restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
+
+        MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);;
+        testRestAction
+            .withAuthorizedService("")
+            .withAuthorizedUser("")
+            .withUserId("")
+            .withReturnUrl("https://www.gooooogle.com");
+        //Calling Search API by DCN and validate response
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("document_control_number", "11116666777799992");
+        ResultActions resultActions = testRestAction.get("/cases", params);
+
+        Assert.assertEquals(403, resultActions.andReturn().getResponse().getStatus());
+    }
+
     public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.bulkscanning.validator;
 
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import uk.gov.hmcts.reform.bulkscanning.audit.AppInsightsAuditRepository;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
@@ -19,6 +22,7 @@ import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +35,13 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils.asJsonStr
 
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.bulkscanning.controller")
 public class BulkScanControllerValidator extends ResponseEntityExceptionHandler {
+
+    private final AppInsightsAuditRepository auditRepository;
+    private static final Logger LOG = LoggerFactory.getLogger(BulkScanControllerValidator.class);
+
+    public BulkScanControllerValidator(AppInsightsAuditRepository auditRepository) {
+        this.auditRepository = auditRepository;
+    }
 
 
     @ExceptionHandler(BulkScanCaseAlreadyExistsException.class)
@@ -90,6 +101,11 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
             .collect(Collectors.toList());
 
         body.put("errors", errors);
+        LOG.error("Error_Response : {}", errors);
+
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("errors", errors.toString());
+        auditRepository.trackEvent("Error_Response", errorMap);
 
         return new ResponseEntity<>(body, headers, status);
 
