@@ -79,7 +79,7 @@ public class PaymentControllerFunctionalTest {
     public void setUp() {
         caseReferenceRequest = CaseReferenceRequest
             .createCaseReferenceRequest()
-            .ccdCaseNumber("CCN2")
+            .ccdCaseNumber("9982111111111111")
             .build();
 
         if (!TOKENS_INITIALIZED) {
@@ -91,7 +91,7 @@ public class PaymentControllerFunctionalTest {
 
     @Test
     public void testBulkScanningPaymentRequestFirst() throws Exception {
-        String[] dcn = {"DCN21111111111111"};
+        String[] dcn = {"98721111111111111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555",
                                                                                      dcn, "AA08", true);
 
@@ -124,7 +124,7 @@ public class PaymentControllerFunctionalTest {
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .when()
-            .patch("/bulk-scan-payments/DCN21111111111111/status/PROCESSED");
+            .patch("/bulk-scan-payments/98721111111111111/status/PROCESSED");
 
         Assert.assertNotNull(patchResp.andReturn().asString());
 
@@ -134,7 +134,7 @@ public class PaymentControllerFunctionalTest {
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .when()
-            .patch("/bulk-scan-payments/DCN41111111111111/status/PROCESSED");
+            .patch("/bulk-scan-payments/98741111111111111/status/PROCESSED");
 
         Assert.assertTrue(StringUtils.containsIgnoreCase(
             patchdcnnotexists.andReturn().asString(),
@@ -145,8 +145,8 @@ public class PaymentControllerFunctionalTest {
     @Test
     @Transactional
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
-        String[] dcn = {"DCN51111111111111"};
-        String[] dcn2 = {"DCN61111111111111"};
+        String[] dcn = {"98751111111111111"};
+        String[] dcn2 = {"98761111111111111"};
 
         //Multiple envelopes with same exception record
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444", dcn,
@@ -189,7 +189,7 @@ public class PaymentControllerFunctionalTest {
     @Test
     @Transactional
     public void testMarkPaymentAsProcessed() throws Exception {
-        String[] dcn = {"DCN11111111111111"};
+        String[] dcn = {"98711111111111111"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
                                                               dcn, "AA08", false);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
@@ -199,7 +199,7 @@ public class PaymentControllerFunctionalTest {
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .when()
-            .patch("/bulk-scan-payments/DCN11111111111111/status/PROCESSED");
+            .patch("/bulk-scan-payments/98711111111111111/status/PROCESSED");
 
         //Assert.assertEquals(resultActions.andReturn().getStatusCode(), OK.value());
         Assert.assertNotNull(resultActions.andReturn().asString());
