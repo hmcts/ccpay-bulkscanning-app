@@ -39,7 +39,7 @@ public class UserResolverBackdoor implements SubjectResolver<User>{
     }
 
     public void registerToken(String token, String userId) {
-        User user = tokenToUserMap.values().stream().filter(u -> u.getPrincipal().equals(userId)).findFirst().get();
+        User user = tokenToUserMap.values().stream().filter(u -> u.getPrincipal().equals(userId)).findFirst().orElse(new User("test", ImmutableSet.of("test")));
         tokenToUserMap.put(token, user);
     }
 }

@@ -36,7 +36,7 @@ spring:
 trusted:
   s2s:
     service:
-      names: ccpay_bubble,cmc,bulk_scan_processor
+      names: ccpay_bubble,cmc,bulk_scan_payment_processor,api_gw,probate_frontend,divorce_frontend
 auth:
   provider:
     service:

@@ -36,7 +36,9 @@ import java.util.Date;
 
 import static uk.gov.hmcts.reform.bulkscanning.config.IdamService.CMC_CITIZEN_GROUP;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
-import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
+import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST;
+import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.DCN_NOT_EXISTS;
+import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.EXCEPTION_RECORD_NOT_EXISTS;
 
 
 @RunWith(SpringRunner.class)
@@ -44,7 +46,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 @EnableFeignClients
 @ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles("test")
-@TestPropertySource(locations="classpath:application-test.yaml")
+@TestPropertySource(locations = "classpath:application-test.yaml")
 public class PaymentControllerFunctionalTest {
 
     @Autowired
@@ -77,7 +79,7 @@ public class PaymentControllerFunctionalTest {
     public void setUp() {
         caseReferenceRequest = CaseReferenceRequest
             .createCaseReferenceRequest()
-            .ccdCaseNumber("CCN2")
+            .ccdCaseNumber("9982111111111111")
             .build();
 
         if (!TOKENS_INITIALIZED) {
@@ -88,10 +90,10 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
-    public void testBulkScanningPaymentRequestFirst() throws Exception{
-        String dcn[] = {"DCN21111111111111"};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555"
-            ,dcn,"AA08", true);
+    public void testBulkScanningPaymentRequestFirst() throws Exception {
+        String[] dcn = {"98721111111111111"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555",
+                                                                                     dcn, "AA08", true);
 
         //Post request
         Response response = RestAssured.given()
@@ -122,35 +124,37 @@ public class PaymentControllerFunctionalTest {
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .when()
-            .patch("/bulk-scan-payments/DCN21111111111111/status/PROCESSED");
+            .patch("/bulk-scan-payments/98721111111111111/status/PROCESSED");
 
         Assert.assertNotNull(patchResp.andReturn().asString());
 
         //DCN Not exists Request
-        Response patchDCNNotExists = RestAssured.given()
+        Response patchdcnnotexists = RestAssured.given()
             .header("Authorization", USER_TOKEN)
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .when()
-            .patch("/bulk-scan-payments/DCN41111111111111/status/PROCESSED");
+            .patch("/bulk-scan-payments/98741111111111111/status/PROCESSED");
 
-        Assert.assertTrue(StringUtils.containsIgnoreCase(patchDCNNotExists.andReturn().asString(),
-            DCN_NOT_EXISTS));
+        Assert.assertTrue(StringUtils.containsIgnoreCase(
+            patchdcnnotexists.andReturn().asString(),
+            DCN_NOT_EXISTS
+        ));
     }
 
     @Test
     @Transactional
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
-        String dcn[] = {"DCN51111111111111"};
-        String dcn2[] = {"DCN61111111111111"};
+        String[] dcn = {"98751111111111111"};
+        String[] dcn2 = {"98761111111111111"};
 
         //Multiple envelopes with same exception record
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
-            , dcn, "AA08", true);
+        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444", dcn,
+                                                              "AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
-            , dcn2, "AA08", true);
+        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444", dcn2,
+                                                              "AA08", true);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         Response resultActions = RestAssured.given()
@@ -176,16 +180,18 @@ public class PaymentControllerFunctionalTest {
             .when()
             .put("/bulk-scan-payments/?exception_reference=4444333322221111");
 
-        Assert.assertTrue(StringUtils.containsIgnoreCase(resultActions.andReturn().asString(),
-            EXCEPTION_RECORD_NOT_EXISTS));
+        Assert.assertTrue(StringUtils.containsIgnoreCase(
+            resultActions.andReturn().asString(),
+            EXCEPTION_RECORD_NOT_EXISTS
+        ));
     }
 
     @Test
     @Transactional
     public void testMarkPaymentAsProcessed() throws Exception {
-        String dcn[] = {"DCN11111111111111"};
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
-            , dcn, "AA08", false);
+        String[] dcn = {"98711111111111111"};
+        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
+                                                              dcn, "AA08", false);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         Response resultActions = RestAssured.given()
@@ -193,7 +199,7 @@ public class PaymentControllerFunctionalTest {
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .when()
-            .patch("/bulk-scan-payments/DCN11111111111111/status/PROCESSED");
+            .patch("/bulk-scan-payments/98711111111111111/status/PROCESSED");
 
         //Assert.assertEquals(resultActions.andReturn().getStatusCode(), OK.value());
         Assert.assertNotNull(resultActions.andReturn().asString());
@@ -203,7 +209,7 @@ public class PaymentControllerFunctionalTest {
     public void testMatchingPaymentsFromExcelaBulkScan() throws Exception {
 
         //Request from Exela with one DCN
-        String dcn[] = {"11112222444455551"};
+        String[] dcn = {"11112222444455551"};
         Response exelaResp = RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
@@ -212,8 +218,8 @@ public class PaymentControllerFunctionalTest {
             .post("/bulk-scan-payment");
 
         //Request from bulk scan with one DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
-            , dcn, "AA08", true);
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
+                                                                                     dcn, "AA08", true);
 
         //Post request
         Response bsResp = RestAssured.given()
@@ -238,7 +244,7 @@ public class PaymentControllerFunctionalTest {
     public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception {
 
         //Request from Exela with one DCN
-        String dcn[] = {"11112222333366661", "11112222333377771"};
+        String[] dcn = {"11112222333366661", "11112222333377771"};
         Response exelaResp = RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
@@ -247,8 +253,8 @@ public class PaymentControllerFunctionalTest {
             .post("/bulk-scan-payment");
 
         //Request from bulk scan with two DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
-            , dcn, "AA08", true);
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
+                                                                                     dcn, "AA08", true);
 
         //Post request
         Response bsResp = RestAssured.given()
@@ -273,11 +279,11 @@ public class PaymentControllerFunctionalTest {
     @Test
     public void testMatchingBulkScanFirstThenExela() throws Exception {
         //Request from Bulk Scan with one DCN
-        String dcn[] = {"11112222333388881", "11112222333399991"};
+        String[] dcn = {"11112222333388881", "11112222333399991"};
 
         //Request from bulk scan with two DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
-            , dcn, "AA08", true);
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
+                                                                                     dcn, "AA08", true);
 
         //Post request
         Response bsResp = RestAssured.given()
@@ -306,7 +312,8 @@ public class PaymentControllerFunctionalTest {
 
     }
 
-    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
+    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn,
+                                                                      String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
@@ -319,7 +326,7 @@ public class PaymentControllerFunctionalTest {
     @Test
     public void testGeneratePaymentReport_Unprocessed() throws Exception {
 
-        String dcn[] = {"11112222333344441", "11112222333344442"};
+        String[] dcn = {"11112222333344441", "11112222333344442"};
         String ccd = "1111222233334444";
         createTestReportData(ccd, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -338,7 +345,7 @@ public class PaymentControllerFunctionalTest {
 
     @Test
     public void testGeneratePaymentReport_DataLoss() throws Exception {
-        String dcn[] = {"11112222333355551", "11112222333355552"};
+        String[] dcn = {"11112222333355551", "11112222333355552"};
         String ccd = "1111222233335555";
         createTestReportData(ccd, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -366,8 +373,8 @@ public class PaymentControllerFunctionalTest {
             .post("/bulk-scan-payment");
 
         //Request from bulk scan with one DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd
-            , dcns, "AA08", true);
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd, dcns,
+                                                                                     "AA08", true);
 
         //Post request
         RestAssured.given()

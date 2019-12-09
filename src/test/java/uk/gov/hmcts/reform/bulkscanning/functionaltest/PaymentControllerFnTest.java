@@ -93,7 +93,7 @@ public class PaymentControllerFnTest {
     public void setUp() {
         caseReferenceRequest = CaseReferenceRequest
             .createCaseReferenceRequest()
-            .ccdCaseNumber("CCN21111111111111")
+            .ccdCaseNumber("9982111111111111")
             .build();
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
@@ -108,7 +108,7 @@ public class PaymentControllerFnTest {
 
     @Test
     public void testBulkScanningPaymentRequestFirst() throws Exception{
-        String dcn[] = {"DCN21111111111111"};
+        String dcn[] = {"98721111111111111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555"
             ,dcn,"AA08", true);
 
@@ -126,12 +126,12 @@ public class PaymentControllerFnTest {
         ));
 
         //PATCH Request
-        ResultActions patchRequest = restActions.patch("/bulk-scan-payments/DCN21111111111111/status/PROCESSED");
+        ResultActions patchRequest = restActions.patch("/bulk-scan-payments/98721111111111111/status/PROCESSED");
 
         Assert.assertNotNull(patchRequest.andReturn().getResponse().getContentAsString());
 
         //DCN Not exists Request
-        ResultActions patchDCNNotExists = restActions.patch("/bulk-scan-payments/DCN41111111111111/status/PROCESSED");
+        ResultActions patchDCNNotExists = restActions.patch("/bulk-scan-payments/98741111111111111/status/PROCESSED");
 
         Assert.assertTrue(StringUtils.containsIgnoreCase(patchDCNNotExists.andReturn().getResponse().getContentAsString(),
             DCN_NOT_EXISTS));
@@ -140,8 +140,8 @@ public class PaymentControllerFnTest {
     @Test
     @Transactional
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
-        String dcn[] = {"DCN51111111111111"};
-        String dcn2[] = {"DCN61111111111111"};
+        String dcn[] = {"98751111111111111"};
+        String dcn2[] = {"98761111111111111"};
 
         //Multiple envelopes with same exception record
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
@@ -162,7 +162,7 @@ public class PaymentControllerFnTest {
     @Transactional
     public void testExceptionRecordNotExists() throws Exception {
 
-        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=444433332222111", caseReferenceRequest);
+        ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=4444333322221111", caseReferenceRequest);
 
         Assert.assertTrue(StringUtils.containsIgnoreCase(resultActions.andReturn().getResponse().getContentAsString(),
             EXCEPTION_RECORD_NOT_EXISTS));
@@ -170,16 +170,16 @@ public class PaymentControllerFnTest {
 
     @Test
     public void testMarkPaymentAsProcessed() throws Exception {
-        String dcn[] = {"DCN11111111111111"};
+        String dcn[] = {"98711111111111111"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn, "AA08", false);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
-        ResultActions resultActions = restActions.patch("/bulk-scan-payments/DCN11111111111111/status/PROCESSED");
+        ResultActions resultActions = restActions.patch("/bulk-scan-payments/98711111111111111/status/PROCESSED");
 
         Assert.assertEquals(resultActions.andReturn().getResponse().getStatus(), OK.value());
 
-        EnvelopePayment payment1 = paymentRepository.findByDcnReference("DCN11111111111111").get();
+        EnvelopePayment payment1 = paymentRepository.findByDcnReference("98711111111111111").get();
         Assert.assertEquals(PROCESSED.toString(), payment1.getPaymentStatus());
 
         //Delete Envelope for DCN 1111-2222-3333-4444
@@ -354,6 +354,48 @@ public class PaymentControllerFnTest {
 
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
         Assert.assertEquals(true, resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
+    }
+
+    @Test
+    public void testInvalidAuthorisedService() throws Exception {
+        String dcns[] = {"11116666777788882", "11116666777799992"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677775555"
+            , dcns, "AA08", true);
+
+        MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
+        testRestAction
+            .withAuthorizedService("test-invalid")
+            .withAuthorizedUser(USER_ID)
+            .withUserId(USER_ID)
+            .withReturnUrl("https://www.gooooogle.com");
+        //Payment Request from Bulk-Scan System
+        ResultActions resultActions = testRestAction.post("/bulk-scan-payments", bulkScanPaymentRequest);
+
+        Assert.assertEquals(403, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
+    public void testInvalidAuthorisedUser() throws Exception {
+        String dcns[] = {"11116666777788882", "11116666777799992"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677775555"
+            , dcns, "AA08", true);
+
+        restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
+
+        MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
+        testRestAction
+            .withAuthorizedService("")
+            .withAuthorizedUser("")
+            .withUserId("")
+            .withReturnUrl("https://www.gooooogle.com");
+        //Calling Search API by DCN and validate response
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("document_control_number", "11116666777799992");
+        ResultActions resultActions = testRestAction.get("/cases", params);
+
+        Assert.assertEquals(403, resultActions.andReturn().getResponse().getStatus());
     }
 
     public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
