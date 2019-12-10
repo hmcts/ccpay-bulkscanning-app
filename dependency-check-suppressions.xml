@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
-  <suppress>
+  <!--<suppress>
     <notes>suppress false positives - only relevant if endpoints are exposed</notes>
     <gav regex="true">^org\.codehaus\.jackson:jackson-mapper-asl.*$</gav>
     <cve>CVE-2017-17485</cve>
@@ -13,8 +13,8 @@
     <cve>CVE-2019-14540</cve>
     <cve>CVE-2019-16335</cve>
     <cve>CVE-2019-17267</cve>
-  </suppress>
-    <suppress>
+  </suppress>-->
+    <!--<suppress>
     <notes><![CDATA[
 supress these for now as fix not available   ]]></notes>
     <cve>CVE-2019-14379</cve>
@@ -48,8 +48,8 @@ temporarily supressing it as we are not impacted by it.   ]]></notes>
    ]]></notes>
     <gav regex="true">^javax\.servlet:jstl:.*$</gav>
     <cve>CVE-2015-0254</cve>
-  </suppress>
-  <suppress>
+  </suppress>-->
+  <!--<suppress>
     <notes><![CDATA[
    file name: dom4j-1.6.1.jar
    ]]></notes>
@@ -75,8 +75,8 @@ temporarily supressing it as we are not impacted by it.   ]]></notes>
   </suppress>
   <suppress>
     <cve>CVE-2013-1282</cve>
-  </suppress>
-  <suppress>
+  </suppress>-->
+  <!--<suppress>
     <cve>CVE-2019-10101</cve>
     <cve>CVE-2019-10102</cve>
     <cve>CVE-2019-10103</cve>
@@ -194,5 +194,5 @@ temporarily supressing it as we are not impacted by it.   ]]></notes>
     <cve>CVE-2019-17267</cve>
     <cve>CVE-2019-17531</cve>
     <cve>CVE-2017-7525</cve>
-  </suppress>
+  </suppress>-->
 </suppressions>
