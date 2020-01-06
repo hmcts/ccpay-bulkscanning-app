@@ -73,6 +73,8 @@
     <cve>CVE-2017-14798</cve>
     <cve>CVE-2017-7484</cve>
     <cve>CVE-2018-1115</cve>
+
+    <cpe>cpe:/a:apache_tomcat:apache_tomcat:9.0.21</cpe>
     <cve>CVE-2019-12418</cve>
     <cve>CVE-2019-17563</cve>
   </suppress>
