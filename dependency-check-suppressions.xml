@@ -73,6 +73,8 @@
     <cve>CVE-2017-14798</cve>
     <cve>CVE-2017-7484</cve>
     <cve>CVE-2018-1115</cve>
+    <cve>CVE-2019-12418</cve>
+    <cve>CVE-2019-17563</cve>
   </suppress>
   <suppress>
     <cwe>611</cwe>
