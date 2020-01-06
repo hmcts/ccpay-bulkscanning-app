@@ -165,7 +165,7 @@ configurations.all {
       }
 
       if (details.requested.name == 'jackson-databind') {
-        details.useVersion '2.9.9.3'
+        details.useVersion '2.10.1'
       }
     }
   }
@@ -187,7 +187,7 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   compile group: 'com.querydsl', name: 'querydsl-jpa', version:'4.1.4'
   compile group: 'uk.gov.hmcts.reform', name: 'liquibase-core', version:'3.8.1'
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.9.9.3'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.10.1'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
   compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.6') {
     exclude(module: 'commons-logging')
