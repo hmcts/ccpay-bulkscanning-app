@@ -91,7 +91,7 @@ public class SearchControllerTest {
         when(searchService.retrieveByDcn(any(String.class)))
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "98712311111111111")
+                                                          .param("document_control_number", "987123111111111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -103,7 +103,7 @@ public class SearchControllerTest {
         SearchResponse searchResponse = null;
         when(searchService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "98712311111111111")
+                                                          .param("document_control_number", "987123111111111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
@@ -114,7 +114,7 @@ public class SearchControllerTest {
     public void testSearchPaymentWithDcn_Exception() throws Exception{
         when(searchService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases")
-                                                          .param("document_control_number", "98712311111111111")
+                                                          .param("document_control_number", "987123111111111111111")
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
