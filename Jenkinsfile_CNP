@@ -5,7 +5,7 @@ properties(
      pipelineTriggers([[$class: 'GitHubPushTrigger']])]
 )
 
-@Library('Infrastructure')
+@Library("Infrastructure")
 
 def type = "java"
 
@@ -38,6 +38,7 @@ withPipeline(type, product, app) {
     enableDbMigration('ccpay')
     enableDockerBuild()
     installCharts()
+    //disableLegacyDeployment()
     enableAksStagingDeployment()
     enableSlackNotifications('#cc-payments-tech')
 }
