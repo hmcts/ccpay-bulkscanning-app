@@ -161,7 +161,7 @@ configurations.all {
   resolutionStrategy {
     eachDependency { DependencyResolveDetails details ->
       if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
-        details.useVersion '2.9.9'
+        details.useVersion '2.10.1'
       }
 
       if (details.requested.name == 'jackson-databind') {
@@ -189,7 +189,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'liquibase-core', version:'3.8.1'
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.10.1'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
-  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.6') {
+  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.9') {
     exclude(module: 'commons-logging')
     exclude(module: 'slf4j-simple')
   }
