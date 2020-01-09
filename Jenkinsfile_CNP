@@ -38,7 +38,7 @@ withPipeline(type, product, app) {
     enableDbMigration('ccpay')
     enableDockerBuild()
     installCharts()
-    disableLegacyDeployment()
+    //disableLegacyDeployment()
     enableAksStagingDeployment()
     enableSlackNotifications('#cc-payments-tech')
 }
