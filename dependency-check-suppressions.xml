@@ -34,19 +34,20 @@
     <notes><![CDATA[temporarily supressing it as we are not impacted by it.   ]]></notes>
     <cve>CVE-2016-6497</cve>
   </suppress>
-  <suppress>
+  <!--<suppress>
+    <cve>CVE-2019-16942</cve>
+    <cve>CVE-2019-16943</cve>
+    <cve>CVE-2019-17267</cve>
+    <cve>CVE-2019-17531</cve>
+    <cve>CVE-2019-14540</cve>
+    <cve>CVE-2019-16335</cve>
+    <cve>CVE-2019-12415</cve>
+
     <cve>CVE-2019-16869</cve>
-    <!--<cve>CVE-2019-16942</cve>-->
-    <!--<cve>CVE-2019-16943</cve>-->
-    <!--<cve>CVE-2019-17267</cve>-->
-    <!--<cve>CVE-2019-17531</cve>-->
     <cve>CVE-2019-3795</cve>
     <cve>CVE-2019-12402</cve>
     <cve>CVE-2015-2156</cve>
     <cve>CVE-2018-10237</cve>
-    <!--<cve>CVE-2019-14540</cve>-->
-    <!--<cve>CVE-2019-16335</cve>-->
-    <!--<cve>CVE-2019-12415</cve>-->
     <cve>CVE-2019-10210</cve>
     <cve>CVE-2019-10211</cve>
     <cve>CVE-2015-3167</cve>
@@ -77,7 +78,7 @@
     <cpe>cpe:/a:apache_tomcat:apache_tomcat:9.0.21</cpe>
     <cve>CVE-2019-12418</cve>
     <cve>CVE-2019-17563</cve>
-  </suppress>
+  </suppress>-->
   <suppress>
     <cwe>611</cwe>
   </suppress>
