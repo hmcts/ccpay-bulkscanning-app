@@ -20,6 +20,7 @@ java:
       postgresqlUsername: bspayment
       postgresqlPassword: bspayment
       postgresqlDatabase: bspayment
+      enabled: true
 
-  postgresql:
-    enabled: true
+  #postgresql:
+    #enabled: true
