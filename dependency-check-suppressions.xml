@@ -83,4 +83,8 @@
     <cve>CVE-2019-12418</cve>
     <cve>CVE-2019-17563</cve>
   </suppress>
+  <suppress>
+    <cpe>cpe:/a:apache:sling:0.1.0</cpe>
+    <cve>CVE-2016-5394</cve>
+  </suppress>
 </suppressions>
