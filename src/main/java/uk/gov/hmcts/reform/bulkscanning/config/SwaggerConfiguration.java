@@ -40,7 +40,7 @@ public class SwaggerConfiguration {
             .apiInfo(apiInfo())
             .select()
             .apis(RequestHandlerSelectors.basePackage(BulkScanningApiApplication.class.getPackage()
-                .getName() + ".controller"))
+                                                          .getName() + ".controller"))
             .paths(PathSelectors.any())
             .build();
     }

@@ -19,7 +19,7 @@ public class BulkScanningApiApplicationTest {
 
     @Test
     public void main() {
-        BulkScanningApiApplication.main(new String[] {});
+        BulkScanningApiApplication.main(new String[]{});
         Assert.assertTrue("silly assertion to be compliant with Sonar", true);
     }
 }

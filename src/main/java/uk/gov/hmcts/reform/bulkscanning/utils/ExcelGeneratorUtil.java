@@ -53,7 +53,7 @@ public class ExcelGeneratorUtil {
                 row.createCell(7).setCellValue(reportData.getPaymentMethod());
                 row.createCell(8).setCellValue(reportData.getAmount().toString());
             }
-            for(int i = 0; i < colsUnprocessed.length; i++) {
+            for (int i = 0; i < colsUnprocessed.length; i++) {
                 sheet.autoSizeColumn(i);
             }
         } else if (reportType.equals(DATA_LOSS)) {
@@ -77,7 +77,7 @@ public class ExcelGeneratorUtil {
                     row.createCell(7).setCellValue(reportData.getAmount().toString());
                 }
             }
-            for(int i = 0; i < colsDataLoss.length; i++) {
+            for (int i = 0; i < colsDataLoss.length; i++) {
                 sheet.autoSizeColumn(i);
             }
         }

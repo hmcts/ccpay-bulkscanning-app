@@ -68,7 +68,8 @@ public class SearchController {
                 return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
             } else {
                 LOG.info("Payments Not found for documentControlNumber : {}", documentControlNumber);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for documentControlNumber : " + documentControlNumber);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    "Payments Not found for documentControlNumber : " + documentControlNumber);
             }
         } catch (Exception ex) {
             throw new PaymentException(ex);

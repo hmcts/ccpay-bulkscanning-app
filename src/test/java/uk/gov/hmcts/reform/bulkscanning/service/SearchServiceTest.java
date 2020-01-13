@@ -71,16 +71,18 @@ public class SearchServiceTest {
     @Before
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
-        paymentService = new SearchServiceImpl(paymentRepository,
-                                                paymentMetadataRepository,
-                                                paymentMetadataDtoMapper,
-                                                envelopeCaseRepository);
+        paymentService = new SearchServiceImpl(
+            paymentRepository,
+            paymentMetadataRepository,
+            paymentMetadataDtoMapper,
+            envelopeCaseRepository
+        );
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
-            .id(1).amount(BigDecimal.valueOf(100))
-            .dcnReference(TEST_DCN_REFERENCE)
-            .dateBanked(LocalDateTime.now())
-            .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
-            .build());
+                                                                    .id(1).amount(BigDecimal.valueOf(100))
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .dateBanked(LocalDateTime.now())
+                                                                    .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
+                                                                    .build());
         when(paymentMetadataRepository.save(any(PaymentMetadata.class)))
             .thenReturn(paymentMetadata.get());
 

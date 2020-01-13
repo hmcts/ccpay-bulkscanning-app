@@ -53,7 +53,8 @@ public class BulkScanValidatorFunctionalTest {
     public void testFieldLevelValidation() throws Exception {
         String[] dcn = {""};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null, null,
-                                                                                     "AA08", false);
+                                                                                     "AA08", false
+        );
 
         Response response = RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)

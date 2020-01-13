@@ -60,12 +60,12 @@ public class AuthCheckerServiceAndAnonymousUserFilter extends AbstractPreAuthent
             if (bearerToken == null) {
                 log.warn("Unsuccessful User authentication because of Bearer Token Null!!!");
                 return null;
-            }else {
+            } else {
                 return userRequestAuthorizer.authorise(request);
             }
         } catch (BearerTokenMissingException btme) {
             return new User("anonymous", anonymousRole);
-        } catch(AuthCheckerException ace) {
+        } catch (AuthCheckerException ace) {
             log.debug("Unsuccessful user authentication", ace);
             return null;
         }
@@ -77,7 +77,7 @@ public class AuthCheckerServiceAndAnonymousUserFilter extends AbstractPreAuthent
             if (bearerToken == null) {
                 log.warn("Unsuccessful service authentication because of Bearer Token Null!!!");
                 return null;
-            }else{
+            } else {
                 return serviceRequestAuthorizer.authorise(request);
             }
 

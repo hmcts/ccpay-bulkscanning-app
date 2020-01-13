@@ -93,7 +93,8 @@ public class PaymentControllerFunctionalTest {
     public void testBulkScanningPaymentRequestFirst() throws Exception {
         String[] dcn = {"98721111111111111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555",
-                                                                                     dcn, "AA08", true);
+                                                                                     dcn, "AA08", true
+        );
 
         //Post request
         Response response = RestAssured.given()
@@ -150,11 +151,13 @@ public class PaymentControllerFunctionalTest {
 
         //Multiple envelopes with same exception record
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444", dcn,
-                                                              "AA08", true);
+                                                              "AA08", true
+        );
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444", dcn2,
-                                                              "AA08", true);
+                                                              "AA08", true
+        );
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         Response resultActions = RestAssured.given()
@@ -191,7 +194,8 @@ public class PaymentControllerFunctionalTest {
     public void testMarkPaymentAsProcessed() throws Exception {
         String[] dcn = {"98711111111111111"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
-                                                              dcn, "AA08", false);
+                                                              dcn, "AA08", false
+        );
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
         Response resultActions = RestAssured.given()
@@ -219,7 +223,8 @@ public class PaymentControllerFunctionalTest {
 
         //Request from bulk scan with one DCN
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
-                                                                                     dcn, "AA08", true);
+                                                                                     dcn, "AA08", true
+        );
 
         //Post request
         Response bsResp = RestAssured.given()
@@ -254,7 +259,8 @@ public class PaymentControllerFunctionalTest {
 
         //Request from bulk scan with two DCN
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
-                                                                                     dcn, "AA08", true);
+                                                                                     dcn, "AA08", true
+        );
 
         //Post request
         Response bsResp = RestAssured.given()
@@ -283,7 +289,8 @@ public class PaymentControllerFunctionalTest {
 
         //Request from bulk scan with two DCN
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
-                                                                                     dcn, "AA08", true);
+                                                                                     dcn, "AA08", true
+        );
 
         //Post request
         Response bsResp = RestAssured.given()
@@ -374,7 +381,8 @@ public class PaymentControllerFunctionalTest {
 
         //Request from bulk scan with one DCN
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd, dcns,
-                                                                                     "AA08", true);
+                                                                                     "AA08", true
+        );
 
         //Post request
         RestAssured.given()

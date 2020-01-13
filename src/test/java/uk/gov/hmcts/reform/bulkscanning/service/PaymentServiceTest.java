@@ -108,22 +108,24 @@ public class PaymentServiceTest {
     @Before
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
-        paymentService = new PaymentServiceImpl(paymentRepository,
-                                                paymentMetadataRepository,
-                                                envelopeRepository,
-                                                paymentMetadataDtoMapper,
-                                                envelopeDtoMapper,
-                                                paymentDtoMapper,
-                                                bsPaymentRequestMapper,
-                                                bulkScanningUtils,
-                                                envelopeCaseRepository,
-                                                auditRepository);
+        paymentService = new PaymentServiceImpl(
+            paymentRepository,
+            paymentMetadataRepository,
+            envelopeRepository,
+            paymentMetadataDtoMapper,
+            envelopeDtoMapper,
+            paymentDtoMapper,
+            bsPaymentRequestMapper,
+            bulkScanningUtils,
+            envelopeCaseRepository,
+            auditRepository
+        );
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
-            .id(1).amount(BigDecimal.valueOf(100))
-            .dcnReference(TEST_DCN_REFERENCE)
-            .dateBanked(LocalDateTime.now())
-            .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
-            .build());
+                                                                    .id(1).amount(BigDecimal.valueOf(100))
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .dateBanked(LocalDateTime.now())
+                                                                    .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
+                                                                    .build());
         when(paymentMetadataRepository.save(any(PaymentMetadata.class)))
             .thenReturn(paymentMetadata.get());
 
@@ -153,7 +155,7 @@ public class PaymentServiceTest {
         when(envelopeCaseRepository.findByEnvelopeId(any(Integer.class))).thenReturn(envelopeCase);
         when(paymentMetadataRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(paymentMetadata);
 
-         caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
+        caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber(CCD_CASE_REFERENCE)
             .build();
     }
@@ -203,7 +205,7 @@ public class PaymentServiceTest {
         String dcn[] = {"DCN1"};
         doReturn(Optional.ofNullable(mockBulkScanningEnvelope())).when(envelopeRepository).findById(null);
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
-            ,dcn,"AA08", true);
+            , dcn, "AA08", true);
 
         List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
 
@@ -220,7 +222,12 @@ public class PaymentServiceTest {
         envelopePayment.setEnvelope(mockBulkScanningEnvelope());
         doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference("DCN1");
 
-        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE,dcn,"AA08", true);
+        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(
+            CCD_CASE_REFERENCE,
+            dcn,
+            "AA08",
+            true
+        );
         paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
     }
 
@@ -231,16 +238,18 @@ public class PaymentServiceTest {
         EnvelopeCase envelopeCase = EnvelopeCase.caseWith().exceptionRecordReference(EXCEPTION_RECORD_REFERENCE).id(1).build();
         envelopeCaseList.add(envelopeCase);
 
-        doReturn(Optional.ofNullable(envelopeCaseList)).when(envelopeCaseRepository).findByExceptionRecordReference(EXCEPTION_RECORD_REFERENCE);
+        doReturn(Optional.ofNullable(envelopeCaseList)).when(envelopeCaseRepository).findByExceptionRecordReference(
+            EXCEPTION_RECORD_REFERENCE);
 
         Assert.assertTrue(paymentService.
-            updateCaseReferenceForExceptionRecord(EXCEPTION_RECORD_REFERENCE,caseReferenceRequest).equalsIgnoreCase("1"));
+            updateCaseReferenceForExceptionRecord(EXCEPTION_RECORD_REFERENCE,
+                                                  caseReferenceRequest).equalsIgnoreCase("1"));
     }
 
     @Test(expected = ExceptionRecordNotExistsException.class)
     @Transactional
     public void testExceptionRecordNotExistsException() throws Exception {
-        paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,caseReferenceRequest);
+        paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT, caseReferenceRequest);
     }
 
     @Test()
@@ -252,7 +261,7 @@ public class PaymentServiceTest {
         envelopePayment.setEnvelope(mockBulkScanningEnvelope());
 
         doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference(DCN_REFERENCE);
-        Assert.assertEquals(DCN_REFERENCE,paymentService.updatePaymentStatus(DCN_REFERENCE, PaymentStatus.PROCESSED));
+        Assert.assertEquals(DCN_REFERENCE, paymentService.updatePaymentStatus(DCN_REFERENCE, PaymentStatus.PROCESSED));
     }
 
     @Test(expected = DcnNotExistsException.class)

@@ -60,7 +60,7 @@ public class ReportController {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             List<ReportData> reportDataList = reportService
-                        .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
+                .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 workbook = (HSSFWorkbook) ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
@@ -108,7 +108,7 @@ public class ReportController {
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 return new ResponseEntity<>(reportDataList, HttpStatus.OK);
-            }else {
+            } else {
                 LOG.info("No Data found for ReportType : {}", reportType);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

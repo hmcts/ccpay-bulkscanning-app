@@ -13,13 +13,13 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Exela;
 public class PaymentDtoMapper {
 
     public PaymentDto fromRequest(BulkScanPayment bulkScanPayment, String dcnReference) {
-        if(Optional.ofNullable(bulkScanPayment).isPresent()) {
+        if (Optional.ofNullable(bulkScanPayment).isPresent()) {
             return PaymentDto.paymentDtoWith()
                 .dcnReference(dcnReference)
                 .source(Exela.toString())
                 .paymentStatus(PaymentStatus.INCOMPLETE)
                 .build();
-        }else {
+        } else {
             return null;
         }
     }

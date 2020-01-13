@@ -96,7 +96,7 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
         List<String> errors = ex.getBindingResult()
             .getFieldErrors()
             .stream()
-            .map(FieldError:: getDefaultMessage)
+            .map(FieldError::getDefaultMessage)
             .collect(Collectors.toList());
 
         body.put("errors", errors);
@@ -117,8 +117,7 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
         String exceptionMessage = null;
 
         Throwable rootCause = ex.getRootCause();
-        if(rootCause instanceof UnrecognizedPropertyException)
-        {
+        if (rootCause instanceof UnrecognizedPropertyException) {
             exceptionMessage = "Unknown field: " + ((UnrecognizedPropertyException) rootCause).getPropertyName();
             logger.debug("exceptionMessage: " + exceptionMessage);
         }

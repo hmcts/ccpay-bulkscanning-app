@@ -67,23 +67,28 @@ public class SpringSecurityConfiguration {
                                                        RequestAuthorizer<Service> serviceRequestAuthorizer,
                                                        AuthenticationManager authenticationManager) {
             super();
-            authCheckerFilter = new AuthCheckerServiceAndAnonymousUserFilter(serviceRequestAuthorizer, userRequestAuthorizer);
+            authCheckerFilter = new AuthCheckerServiceAndAnonymousUserFilter(
+                serviceRequestAuthorizer,
+                userRequestAuthorizer
+            );
             authCheckerFilter.setAuthenticationManager(authenticationManager);
         }
 
         @Override
         public void configure(WebSecurity web) {
-            web.ignoring().antMatchers("/swagger-ui.html",
-                                       "/webjars/springfox-swagger-ui/**",
-                                       "/swagger-resources/**",
-                                       "/v2/**",
-                                       "/refdata/**",
-                                       "/health",
-                                       "/health/liveness",
-                                       "/info",
-                                       "/favicon.ico",
-                                       "/mock-api/**",
-                                       "/");
+            web.ignoring().antMatchers(
+                "/swagger-ui.html",
+                "/webjars/springfox-swagger-ui/**",
+                "/swagger-resources/**",
+                "/v2/**",
+                "/refdata/**",
+                "/health",
+                "/health/liveness",
+                "/info",
+                "/favicon.ico",
+                "/mock-api/**",
+                "/"
+            );
         }
 
         @Override

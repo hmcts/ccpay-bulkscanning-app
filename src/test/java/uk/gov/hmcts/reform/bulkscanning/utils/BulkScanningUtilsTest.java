@@ -25,7 +25,7 @@ public class BulkScanningUtilsTest {
         StatusHistory statusHistory = StatusHistory
             .statusHistoryWith().
                 envelope(mockBulkScanningEnvelope()).
-                 id(1).
+                id(1).
                 dateUpdated(LocalDateTime.now()).
                 dateCreated(LocalDateTime.now()).
                 build();

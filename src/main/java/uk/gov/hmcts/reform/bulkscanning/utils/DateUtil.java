@@ -23,12 +23,12 @@ public final class DateUtil {
         return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-    public static String getDateForReportName(Date date){
+    public static String getDateForReportName(Date date) {
         DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("ddMMyy");
         return dateToLocalDateTime(date).format(reportNameDateFormat);
     }
 
-    public static String getDateTimeForReportName(Date date){
+    public static String getDateTimeForReportName(Date date) {
         DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("ddMMyy_HHmmss");
         return dateToLocalDateTime(date).format(reportNameDateFormat);
     }
