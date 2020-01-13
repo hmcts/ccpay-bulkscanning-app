@@ -2,7 +2,7 @@ import java.util.stream.Collectors
 
 plugins {
   id 'application'
-  //id 'checkstyle'
+  id 'checkstyle'
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
@@ -87,12 +87,12 @@ task smoke(type: Test) {
   classpath = sourceSets.smokeTest.runtimeClasspath
 }
 
-/*checkstyle {
+checkstyle {
   maxWarnings = 0
   toolVersion = '8.24'
   // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
   configDir = new File(rootDir, 'config/checkstyle')
-}*/
+}
 
 pmd {
   toolVersion = "6.18.0"
