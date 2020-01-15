@@ -32,7 +32,7 @@ public class BulkScanPayment {
     @NotBlank(message = "document_control_number can't be Blank")
     @JsonProperty("document_control_number")
     @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "document_control_number should be numeric")
-    @Size(min = 17, max = 17, message = "document_control_number length must be 17 digits")
+    @Size(min = 21, max = 21, message = "document_control_number length must be 21 digits")
     private String dcnReference;
     /*
     Payment amount in GBP

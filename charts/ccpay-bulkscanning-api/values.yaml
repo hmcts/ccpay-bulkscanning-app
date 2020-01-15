@@ -1,25 +1,22 @@
 java:
-  image: 'hmctspublic.azurecr.io/payment/ccpay-bulkscanning-api:latest'
+  image: 'hmctspublic.azurecr.io/ccpay/bulkscanning-api:latest'
   applicationPort: 8080
+  ingressHost: ccpay-bulkscanning-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: ccpay
   environment:
-    POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-    POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-    POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-    POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
-    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    AUTH_IDAM_CLIENT_BASEURL: "https://idam-api.aat.platform.hmcts.net"
     POSTGRES_PORT: 5432
-    LOGBACK_REQUIRE_ALERT_LEVEL: 'false'
-    LOGBACK_REQUIRE_ERROR_CODE: 'false'
+    POSTGRES_HOST: ccpay-bulkscanning-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
+    POSTGRES_NAME: bspayment
+    POSTGRES_USERNAME: bspayment@ccpay-bulkscanning-api-postgres-db-{{ .Values.global.environment }}
+    POSTGRES_CONNECTION_OPTIONS: ?sslmode=require
+    SPRING_LIQUIBASE_ENABLED: false
+    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    AUTH_IDAM_CLIENT_BASEURL: "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
     REFORM_SERVICE_NAME: ccpay-bulkscanning
     REFORM_TEAM: ccpay
-    SPRING_LIQUIBASE_ENABLED: true
-    APPINSIGHTS_INSTRUMENTATIONKEY: fake-key
-  postgresql:
-    image:
-      tag: 10.7.0-r68
-    postgresqlUsername: bspayment
-    postgresqlPassword: bspayment
-    postgresqlDatabase: bspayment
-    service:
-      port: 5432
+  keyVaults:
+    "ccpay":
+      resourceGroup: ccpay
+      secrets:
+        - bulkscanning-api-POSTGRES-PASS
+        - AppInsightsInstrumentationKey

@@ -51,10 +51,10 @@ public class BulkScanPaymentRequest {
     }
 
     @JsonIgnore
-    @AssertFalse(message = "document_control_number must be 17 digit numeric")
+    @AssertFalse(message = "document_control_number must be 21 digit numeric")
     public boolean isValidDocumentControlNumbers() {
         return documentControlNumbers != null
-            && (Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> dcn.length() != 17)
+            && (Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> dcn.length() != 21)
             || Arrays.asList(documentControlNumbers).stream().anyMatch(dcn -> ! dcn.matches("-?\\d+(\\.\\d+)?")));
     }
 }

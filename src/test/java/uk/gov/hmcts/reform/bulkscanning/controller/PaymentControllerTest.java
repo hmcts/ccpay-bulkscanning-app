@@ -69,7 +69,7 @@ public class PaymentControllerTest {
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                       .header("ServiceAuthorization", "service")
-                                                      .content(asJsonString(createPaymentRequest("11112222333344441")))
+                                                      .content(asJsonString(createPaymentRequest("111122223333444411111")))
                                                       .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -79,7 +79,7 @@ public class PaymentControllerTest {
 
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
                                                                     .id(1).amount(BigDecimal.valueOf(100))
-                                                                    .dcnReference("11112222333344441")
+                                                                    .dcnReference("111122223333444411111")
                                                                     .dateBanked(LocalDateTime.now())
                                                                     .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
                                                                     .build());
@@ -87,7 +87,7 @@ public class PaymentControllerTest {
         when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("11112222333344441")))
+                                                          .content(asJsonString(createPaymentRequest("111122223333444411111")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(409), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -99,7 +99,7 @@ public class PaymentControllerTest {
             .thenThrow(new PaymentException("Exception in fetching Metadata"));
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("11112222333344441")))
+                                                          .content(asJsonString(createPaymentRequest("111122223333444411111")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(true, resultActions.andReturn().getResponse()
             .getContentAsString().contains("Exception in fetching Metadata"));
@@ -109,7 +109,7 @@ public class PaymentControllerTest {
    @Test
    @Transactional
    public void testCreatePaymentForBulkScan() throws Exception{
-       String dcn[] = {"98711111111111111","98721111111111111"};
+       String dcn[] = {"987111111111111111111","987211111111111111111"};
        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
            ,dcn,"AA08");
 
@@ -142,7 +142,7 @@ public class PaymentControllerTest {
     @Test
     @Transactional
     public void testMarkPaymentAsProcessed() throws Exception{
-        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/98721111111111111/status/PROCESSED")
+        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/987211111111111111111/status/PROCESSED")
           .header("Authorization", "user")
           .header("ServiceAuthorization", "service")
           .contentType(MediaType.APPLICATION_JSON));

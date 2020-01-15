@@ -95,7 +95,7 @@ public class BulkScanValidatorTest {
                                                                                                 "123456",
                                                                                                 "2019-01-01",
                                                                                                 "GBP",
-                                                                                                "11112222333344448",
+                                                                                                "111122223333444481111",
                                                                                                 "CASH",
                                                                                                 "Unknown"));
 

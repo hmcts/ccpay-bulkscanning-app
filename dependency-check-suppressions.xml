@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+  <suppress>
+    <notes>suppress false positives - only relevant if endpoints are exposed</notes>
+    <gav regex="true">^org\.codehaus\.jackson:jackson-mapper-asl.*$</gav>
+    <cve>CVE-2017-17485</cve>
+    <cve>CVE-2018-5968</cve>
+    <cve>CVE-2017-7525</cve>
+    <cve>CVE-2017-15095</cve>
+    <cve>CVE-2018-14718</cve>
+    <cve>CVE-2018-1000873</cve>
+    <cve>CVE-2018-7489</cve>
+    <cve>CVE-2019-14540</cve>
+    <cve>CVE-2019-16335</cve>
+    <cve>CVE-2019-17267</cve>
+  </suppress>
     <suppress>
     <notes><![CDATA[
 supress these for now as fix not available   ]]></notes>
@@ -180,5 +194,10 @@ temporarily supressing it as we are not impacted by it.   ]]></notes>
     <cve>CVE-2019-17267</cve>
     <cve>CVE-2019-17531</cve>
     <cve>CVE-2017-7525</cve>
+  </suppress>
+  <suppress>
+    <cpe>cpe:/a:apache_tomcat:apache_tomcat:9.0.21</cpe>
+    <cve>CVE-2019-12418</cve>
+    <cve>CVE-2019-17563</cve>
   </suppress>
 </suppressions>
