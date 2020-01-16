@@ -218,7 +218,7 @@ public class PaymentControllerFunctionalTest {
 
         //Request from Exela with one DCN
         String[] dcn = {"111122224444555511111"};
-        Response exelaResp = RestAssured.given()
+        RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .body(createPaymentRequest("111122224444555511111"))
@@ -230,7 +230,7 @@ public class PaymentControllerFunctionalTest {
                                                                                      dcn, "AA08", true);
 
         //Post request
-        Response bsResp = RestAssured.given()
+        RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .body(bulkScanPaymentRequest)
@@ -253,7 +253,7 @@ public class PaymentControllerFunctionalTest {
 
         //Request from Exela with one DCN
         String[] dcn = {"111122223333666611111", "111122223333777711111"};
-        Response exelaResp = RestAssured.given()
+        RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .body(createPaymentRequest("111122223333666611111"))
@@ -265,7 +265,7 @@ public class PaymentControllerFunctionalTest {
                                                                                      dcn, "AA08", true);
 
         //Post request
-        Response bsResp = RestAssured.given()
+        RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .body(bulkScanPaymentRequest)
@@ -294,14 +294,14 @@ public class PaymentControllerFunctionalTest {
                                                                                      dcn, "AA08", true);
 
         //Post request
-        Response bsResp = RestAssured.given()
+        RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .body(bulkScanPaymentRequest)
             .when()
             .post("/bulk-scan-payments");
 
-        Response exelaResp = RestAssured.given()
+        RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .body(createPaymentRequest("111122223333888811111"))
