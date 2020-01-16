@@ -214,6 +214,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testMatchingPaymentsFromExcelaBulkScan() throws Exception {
 
         //Request from Exela with one DCN
@@ -249,6 +250,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception {
 
         //Request from Exela with one DCN
@@ -285,6 +287,7 @@ public class PaymentControllerFunctionalTest {
 
 
     @Test
+    @Transactional
     public void testMatchingBulkScanFirstThenExela() throws Exception {
         //Request from Bulk Scan with one DCN
         String[] dcn = {"111122223333888811111", "111122223333999911111"};
@@ -321,6 +324,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testMatchingMultipleEnvelopesFromExelaBulkScan() throws Exception {
         String dcn1 = "000011112222333311111";
         String dcn2 = "000011112222333411111";
@@ -371,6 +375,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testProcessNewPaymentsFromExela() throws Exception {
 
         //Request from Exela with one DCN
@@ -383,6 +388,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testSearchByCCDForProcessed() throws Exception {
         String dcns[] = {"111166667777888811111", "111166667777999911111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677774444"
@@ -445,6 +451,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testGeneratePaymentReport_Unprocessed() throws Exception {
 
         String[] dcn = {"111122223333444411111", "111122223333444421111"};
@@ -465,6 +472,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testGeneratePaymentReport_DataLoss() throws Exception {
         String[] dcn = {"111122223333555511111", "111122223333555521111"};
         String ccd = "1111222233335555";
@@ -484,6 +492,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testGeneratePaymentReportData_Unprocessed() throws Exception {
 
         String[] dcn = {"111122223333444411111", "111122223333444421111"};
@@ -504,6 +513,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @Transactional
     public void testGeneratePaymentReportData_DataLoss() throws Exception {
         String[] dcn = {"111122223333555511111", "111122223333555521111"};
         String ccd = "1111222233335555";
