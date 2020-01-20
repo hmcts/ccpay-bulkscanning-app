@@ -91,15 +91,13 @@ public class BulkScanValidatorTest {
     public void testRequestValidation_AdditionalFields() throws Exception {
 
 
-        ResultActions resultActions = restActions.post("/bulk-scan-payment/", new ExelaPayment(
-            BigDecimal.ONE,
-            "123456",
-            "2019-01-01",
-            "GBP",
-            "11112222333344448",
-            "CASH",
-            "Unknown"
-        ));
+        ResultActions resultActions = restActions.post("/bulk-scan-payment/", new ExelaPayment(BigDecimal.ONE,
+                                                                                                "123456",
+                                                                                                "2019-01-01",
+                                                                                                "GBP",
+                                                                                                "111122223333444481111",
+                                                                                                "CASH",
+                                                                                                "Unknown"));
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
 

@@ -101,9 +101,9 @@ public class PaymentServiceTest {
     public static final String CCD_CASE_REFERENCE = "1111222233334444";
     public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "9999888833334444";
     public static final String EXCEPTION_RECORD_REFERENCE = "4444333322221111";
-    public static final String DCN_REFERENCE = "DCN11111111111111";
+    public static final String DCN_REFERENCE = "DCN111111111111111111";
 
-    public static final String TEST_DCN_REFERENCE = "12312311111111111";
+    public static final String TEST_DCN_REFERENCE = "123123111111111111111";
 
     @Before
     public void setUp() {

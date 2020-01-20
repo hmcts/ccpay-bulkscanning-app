@@ -65,21 +65,21 @@ public class PaymentControllerTest {
 
     @Test
     @Transactional
-    public void testCreatePaymentFromExela() throws Exception {
+    public void testCreatePaymentFromExela() throws Exception{
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("11112222333344441")))
-                                                          .contentType(MediaType.APPLICATION_JSON));
+                                                      .header("ServiceAuthorization", "service")
+                                                      .content(asJsonString(createPaymentRequest("111122223333444411111")))
+                                                      .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     @Test
-    public void testCreatePaymentFromExela_Conflict() throws Exception {
+    public void testCreatePaymentFromExela_Conflict() throws Exception{
 
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
                                                                     .id(1).amount(BigDecimal.valueOf(100))
-                                                                    .dcnReference("11112222333344441")
+                                                                    .dcnReference("111122223333444411111")
                                                                     .dateBanked(LocalDateTime.now())
                                                                     .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
                                                                     .build());
@@ -87,70 +87,70 @@ public class PaymentControllerTest {
         when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("11112222333344441")))
+                                                          .content(asJsonString(createPaymentRequest("111122223333444411111")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(409), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     @Test
-    public void testCreatePaymentFromExela_withException() throws Exception {
+    public void testCreatePaymentFromExela_withException() throws Exception{
 
         when(paymentService.getPaymentMetadata(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Metadata"));
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(createPaymentRequest("11112222333344441")))
+                                                          .content(asJsonString(createPaymentRequest("111122223333444411111")))
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(true, resultActions.andReturn().getResponse()
             .getContentAsString().contains("Exception in fetching Metadata"));
     }
 
     //Test cases for Bulk Scan endpoints bulk scan
+   @Test
+   @Transactional
+   public void testCreatePaymentForBulkScan() throws Exception{
+       String dcn[] = {"987111111111111111111","987211111111111111111"};
+       BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
+           ,dcn,"AA08");
+
+       when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
+           .thenReturn(Arrays.asList(dcn));
+
+       ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
+           .header("ServiceAuthorization", "service")
+           .content(asJsonString(bulkScanPaymentRequest))
+           .contentType(MediaType.APPLICATION_JSON));
+
+       Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+   }
+
     @Test
     @Transactional
-    public void testCreatePaymentForBulkScan() throws Exception {
-        String dcn[] = {"98711111111111111", "98721111111111111"};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
-            , dcn, "AA08");
-
-        when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
-            .thenReturn(Arrays.asList(dcn));
-
-        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(bulkScanPaymentRequest))
-                                                          .contentType(MediaType.APPLICATION_JSON));
-
-        Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
-    }
-
-    @Test
-    @Transactional
-    public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
+    public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
         CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber("9882111111111111")
             .build();
 
         ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111222233334444")
-                                                          .header("Authorization", "user")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .content(asJsonString(caseReferenceRequest))
-                                                          .contentType(MediaType.APPLICATION_JSON));
+            .header("Authorization", "user")
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(caseReferenceRequest))
+            .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     @Test
     @Transactional
-    public void testMarkPaymentAsProcessed() throws Exception {
-        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/98721111111111111/status/PROCESSED")
-                                                          .header("Authorization", "user")
-                                                          .header("ServiceAuthorization", "service")
-                                                          .contentType(MediaType.APPLICATION_JSON));
+    public void testMarkPaymentAsProcessed() throws Exception{
+        ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/987211111111111111111/status/PROCESSED")
+          .header("Authorization", "user")
+          .header("ServiceAuthorization", "service")
+          .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     public static Envelope mockBulkScanningEnvelope() {
-        Envelope bsEnvelope = Envelope.envelopeWith().id(1).dateUpdated(LocalDateTime.now()).dateCreated(LocalDateTime.now()).build();
+        Envelope bsEnvelope =  Envelope.envelopeWith().id(1).dateUpdated(LocalDateTime.now()).dateCreated(LocalDateTime.now()).build();
 
         EnvelopePayment payment1 = EnvelopePayment.paymentWith().id(1).dcnReference("dcn1").envelope(bsEnvelope)
             .dateUpdated(LocalDateTime.now()).dateCreated(LocalDateTime.now()).build();
@@ -167,14 +167,14 @@ public class PaymentControllerTest {
         List<EnvelopeCase> envelopeCasesList = new ArrayList<>();
         envelopeCasesList.add(envelopeCase);
 
-        bsEnvelope = Envelope
+         bsEnvelope =  Envelope
             .envelopeWith()
             .id(1)
             .envelopePayments(envelopePaymentList)
             .envelopeCases(envelopeCasesList)
-            .dateUpdated(LocalDateTime.now())
-            .dateCreated(LocalDateTime.now())
-            .build();
+             .dateUpdated(LocalDateTime.now())
+             .dateCreated(LocalDateTime.now())
+             .build();
         return bsEnvelope;
     }
 

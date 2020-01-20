@@ -33,7 +33,7 @@ public class SearchRequest {
     private String exceptionRecord;
 
     @NotNull(message = "document_control_number can't be Blank")
-    @Size(min = 17, max = 17, message = "document_control_number length must be 17 Characters")
+    @Size(min = 21, max = 21, message = "document_control_number length must be 21 Characters")
     @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "document_control_number should be numeric")
     private String documentControlNumber;
 }
