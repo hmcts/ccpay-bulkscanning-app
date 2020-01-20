@@ -112,7 +112,7 @@ public class PaymentControllerFnTest {
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555"
             ,dcn,"AA08", true);
 
-        //Post request
+        //Post request from Bulk-Scan
         ResultActions resultActions = restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         Assert.assertNotNull(resultActions.andReturn().getResponse().getContentAsString());
@@ -124,6 +124,8 @@ public class PaymentControllerFnTest {
             repeatRequest.andReturn().getResponse().getContentAsString(),
             BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST
         ));
+        //Post Request from Exela
+        restActions.post("/bulk-scan-payment", createPaymentRequest("987211111111111111111"));
 
         //PATCH Request
         ResultActions patchRequest = restActions.patch("/bulk-scan-payments/987211111111111111111/status/PROCESSED");
@@ -173,7 +175,11 @@ public class PaymentControllerFnTest {
         String dcn[] = {"987111111111111111111"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn, "AA08", false);
+        //Post Request from Bulk-Scan
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
+
+        //Post Request from Exela
+        restActions.post("/bulk-scan-payment", createPaymentRequest("987111111111111111111"));
 
         ResultActions resultActions = restActions.patch("/bulk-scan-payments/987111111111111111111/status/PROCESSED");
 
