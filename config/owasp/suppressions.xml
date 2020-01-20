@@ -30,10 +30,10 @@
     <cve>CVE-2018-1271</cve>
     <cve>CVE-2018-1272</cve>
   </suppress>
-  <suppress>
+  <!--<suppress>
     <notes><![CDATA[temporarily supressing it as we are not impacted by it.   ]]></notes>
     <cve>CVE-2016-6497</cve>
-  </suppress>
+  </suppress>-->
   <!--<suppress>
     <notes><![CDATA[ no fix available ]]></notes>
     <gav regex="true">^org\.testcontainers:postgresql:1\.12\.4$</gav>
