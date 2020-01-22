@@ -12,46 +12,28 @@
     ]]></notes>
     <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:.*</gav>
     <cve>CVE-2014-3488</cve>
-    <!--<cve>CVE-2015-2156</cve>-->
-  </suppress>
-  <!--<suppress>
-    <notes><![CDATA[
-   file name: AppleJavaExtensions-1.4.jar  fix in PAY-1438
-   ]]></notes>
-    <gav regex="true">^com\.google\.guava:guava:.*$</gav>
-    <cve>CVE-2018-10237</cve>
-  </suppress>-->
-  <suppress>
-    <notes><![CDATA[
-   file name: feign-form-spring-3.3.0.jar fixes are yet not available.
-   ]]></notes>
-    <gav regex="true">^io\.github\.openfeign\.form:feign-form-spring:.*$</gav>
-    <cve>CVE-2018-1270</cve>
-    <cve>CVE-2018-1271</cve>
-    <cve>CVE-2018-1272</cve>
+    <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by Netty]]></notes>
+    <cve>CVE-2019-16869</cve>
   </suppress>
   <suppress>
     <notes><![CDATA[temporarily supressing it as we are not impacted by it.   ]]></notes>
     <cve>CVE-2016-6497</cve>
-  </suppress>
-  <!--<suppress>
-    <notes><![CDATA[ no fix available ]]></notes>
-    <gav regex="true">^org\.testcontainers:postgresql:1\.12\.4$</gav>
-    <cpe>cpe:/a:postgresql:postgresql</cpe>
-  </suppress>-->
-  <suppress>
-    <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by applicationinsights-core-2.3.1.jar]]></notes>
-    <cve>CVE-2019-16869</cve>
   </suppress>
   <suppress>
     <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by spring-security-test-5.0.4.RELEASE.jar]]></notes>
     <cve>CVE-2019-3795</cve>
   </suppress>
   <suppress>
-  <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by postgresql-1.12.4.jar]]></notes>
+    <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by Apache Commons]]></notes>
     <cve>CVE-2019-12402</cve>
-    <cve>CVE-2015-2156</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by Google Guava]]></notes>
     <cve>CVE-2018-10237</cve>
+  </suppress>
+  <suppress>
+  <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by postgresql-1.12.4.jar]]></notes>
+    <cve>CVE-2015-2156</cve>
     <cve>CVE-2019-10210</cve>
     <cve>CVE-2019-10211</cve>
     <cve>CVE-2015-3167</cve>
