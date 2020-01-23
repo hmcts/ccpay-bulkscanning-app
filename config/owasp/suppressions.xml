@@ -10,6 +10,8 @@
     ]]></notes>
     <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:.*</gav>
     <cve>CVE-2014-3488</cve>
+  </suppress>
+  <suppress>
     <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by Netty]]></notes>
     <cve>CVE-2019-16869</cve>
   </suppress>
