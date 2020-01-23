@@ -173,13 +173,13 @@ temporarily supressing it as we are not impacted by it.   ]]></notes>
     <gav regex="true">^.*org.apache.tomcat.embed.*$</gav>
     <cve>CVE-2019-0221</cve>
   </suppress>
-  <suppress>
+  <!--<suppress>
     <notes><![CDATA[
    file name: postgresql-1.12.0.jar
    ]]></notes>
     <sha1>6d8c31394aa019f4dc6b19de39556cce4bc551c4</sha1>
     <cpe>cpe:/a:postgresql:postgresql</cpe>
-  </suppress>
+  </suppress>-->
   <suppress>
     <cve>CVE-2019-12402</cve>
   </suppress>
