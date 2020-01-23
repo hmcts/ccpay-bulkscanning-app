@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress>
-    <notes>CVE-2018-1258: we do not use Spring Method Security, so this does not affect us. see
-      https://pivotal.io/security/cve-2018-1258
-    </notes>
+    <notes><![CDATA[we do not use Spring Method Security, so this does not affect us. see https://pivotal.io/security/cve-2018-1258]]></notes>
     <cve>CVE-2018-1258</cve>
   </suppress>
   <suppress>
