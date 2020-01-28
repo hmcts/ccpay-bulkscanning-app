@@ -267,6 +267,13 @@ jacocoTestReport {
     csv.enabled false
     html.destination file("${buildDir}/build/jacoco")
   }
+  afterEvaluate {
+    getClassDirectories().from = getClassDirectories().files.collect {
+      fileTree(dir: it, exclude: [
+        'uk/gov/hmcts/reform/bulkscanning/config/**'
+      ])
+    }
+  }
 }
 
 dependencyCheck {
