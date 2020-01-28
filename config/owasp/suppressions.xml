@@ -13,7 +13,7 @@
   </suppress>
   <suppress>
     <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by Netty]]></notes>
-    <cve>CVE-2019-16869</cve>version
+    <cve>CVE-2019-16869</cve>
   </suppress>
   <suppress>
     <notes><![CDATA[temporarily supressing it as we are not impacted by it. Caused by Groovy]]></notes>
