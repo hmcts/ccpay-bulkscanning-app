@@ -206,4 +206,9 @@ temporarily supressing it as we are not impacted by it.   ]]></notes>
     <cve>CVE-2019-12418</cve>
     <cve>CVE-2019-17563</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2020-5398</cve>
+    <cve>CVE-2019-20445</cve>
+    <cve>CVE-2019-20444</cve>
+  </suppress>
 </suppressions>
