@@ -9,7 +9,7 @@ plugins {
   id 'org.springframework.boot' version '2.1.6.RELEASE'
   id 'org.owasp.dependencycheck' version '5.2.2'
   id 'com.github.ben-manes.versions' version '0.21.0'
-  id 'org.sonarqube' version '2.7.1'
+  id "org.sonarqube" version "2.6.2"
   id 'idea'
 }
 
@@ -103,7 +103,7 @@ pmd {
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
-project.tasks['sonarqube'].dependsOn test
+//project.tasks['sonarqube'].dependsOn test
 
 def listFiles(String pattern) {
   return new FileNameFinder()
@@ -113,9 +113,13 @@ def listFiles(String pattern) {
 }
 def sonarExclusions = [
   //'**/bulkscanning/**'
+  '**/model/**',
+  '**/audit/**',
+  '**/config/**'
   ]
 sonarqube {
   properties {
+    property "sonar.projectName", "CCPAY :: Bulkscanning payment"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.dynamicAnalysis", "reuseReports"
     property "sonar.java.coveragePlugin", "jacoco"
