@@ -112,16 +112,15 @@ def listFiles(String pattern) {
     .collect(Collectors.joining(","))
 }
 def sonarExclusions = [
-  '**/bulkscanning/**'
+  //'**/bulkscanning/**'
   ]
 sonarqube {
   properties {
-    property "sonar.projectName", "CCPAY :: Bulkscanning payment"
-    property "sonar.jacoco.reportPath", "${listFiles('**/test.exec')}"
+    property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.dynamicAnalysis", "reuseReports"
     property "sonar.java.coveragePlugin", "jacoco"
+    property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
     property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
-    property "sonar.projectKey", "uk.gov.hmcts.reform:ccpay-bulkscanning-api"
     property "sonar.exclusions", sonarExclusions.join(", ")
     property "sonar.test.exclusions", sonarExclusions.join(", ")
     property "sonar.coverage.exclusions", sonarExclusions.join(", ")
