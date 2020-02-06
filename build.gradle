@@ -103,7 +103,7 @@ pmd {
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
-//project.tasks['sonarqube'].dependsOn test
+project.tasks['sonarqube'].dependsOn test
 
 def listFiles(String pattern) {
   return new FileNameFinder()
@@ -119,7 +119,6 @@ def sonarExclusions = [
   ]
 sonarqube {
   properties {
-    property "sonar.projectName", "CCPAY :: Bulkscanning payment"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.dynamicAnalysis", "reuseReports"
     property "sonar.java.coveragePlugin", "jacoco"
