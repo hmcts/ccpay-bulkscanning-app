@@ -9,7 +9,7 @@ plugins {
   id 'org.springframework.boot' version '2.1.6.RELEASE'
   id 'org.owasp.dependencycheck' version '5.2.2'
   id 'com.github.ben-manes.versions' version '0.21.0'
-  id "org.sonarqube" version "2.6.2"
+  id "org.sonarqube" version "2.7.1"
   id 'idea'
 }
 
@@ -112,9 +112,7 @@ def listFiles(String pattern) {
     .collect(Collectors.joining(","))
 }
 def sonarExclusions = [
-  //'**/bulkscanning/**'
   '**/model/**',
-  '**/audit/**',
   '**/config/**'
   ]
 sonarqube {
