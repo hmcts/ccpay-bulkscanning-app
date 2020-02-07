@@ -14,7 +14,7 @@ import static org.apache.poi.ss.usermodel.IndexedColors.BLACK;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType.DATA_LOSS;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType.UNPROCESSED;
 
-public class ExcelGeneratorUtil {
+public final class ExcelGeneratorUtil {
 
     private ExcelGeneratorUtil() {
         throw new IllegalStateException("Utility class");
