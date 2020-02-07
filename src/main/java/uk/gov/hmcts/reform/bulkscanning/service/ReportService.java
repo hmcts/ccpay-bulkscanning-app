@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.service;
 
+import uk.gov.hmcts.reform.bulkscanning.model.dto.BaseReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
 
@@ -8,5 +9,5 @@ import java.util.List;
 
 public interface ReportService {
     List<ReportData> retrieveByReportType(Date fromDate, Date toDate, ReportType reportType);
-    List<?> retrieveDataByReportType(Date fromDate, Date toDate, ReportType reportType);
+    List<BaseReportData> retrieveDataByReportType(Date fromDate, Date toDate, ReportType reportType);
 }

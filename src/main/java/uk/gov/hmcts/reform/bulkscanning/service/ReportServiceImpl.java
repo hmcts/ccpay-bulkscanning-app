@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.BaseReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportDataDataLoss;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportDataUnprocessed;
@@ -56,7 +57,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public List<?> retrieveDataByReportType(Date fromDate, Date toDate, ReportType reportType) {
+    public List<BaseReportData> retrieveDataByReportType(Date fromDate, Date toDate, ReportType reportType) {
         LOG.info("Retrieving data for Report Type : {}", reportType);
         if (reportType.equals(ReportType.UNPROCESSED)) {
             return buildReportDataUnprocessed(fromDate, toDate);
@@ -67,8 +68,8 @@ public class ReportServiceImpl implements ReportService {
         return null;
     }
 
-    private List<?> buildReportDataDataLoss(Date fromDate, Date toDate) {
-        List<ReportDataDataLoss> reportDataList = new ArrayList<>();
+    private List<BaseReportData> buildReportDataDataLoss(Date fromDate, Date toDate) {
+        List<BaseReportData> reportDataList = new ArrayList<>();
         Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString());
         if (payments.isPresent()) {
             LOG.info("No of Payments found for Report Type : DATA_LOSS : {}", payments.get().size());
@@ -76,16 +77,16 @@ public class ReportServiceImpl implements ReportService {
                 .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
                     && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                 .forEach(payment -> {
-                    ReportDataDataLoss record = populateReportDataDataLoss(payment);
+                    BaseReportData record = populateReportDataDataLoss(payment);
                     reportDataList.add(record);
             });
-            reportDataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
+            //reportDataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
         }
         return reportDataList;
     }
 
-    private List<?> buildReportDataUnprocessed(Date fromDate, Date toDate) {
-        List<ReportDataUnprocessed> reportDataList = new ArrayList<>();
+    private List<BaseReportData> buildReportDataUnprocessed(Date fromDate, Date toDate) {
+        List<BaseReportData> reportDataList = new ArrayList<>();
         Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString());
         if (payments.isPresent()) {
             LOG.info("No of Payments found for Report Type : UNPROCESSED : {}", payments.get().size());
@@ -95,7 +96,7 @@ public class ReportServiceImpl implements ReportService {
                 .forEach(payment -> {
                     reportDataList.add(populateReportDataUnprocessed(payment));
                 });
-            reportDataList.sort(Comparator.comparing(ReportDataUnprocessed::getRespServiceId));
+            //reportDataList.sort(Comparator.comparing(ReportDataUnprocessed::getRespServiceId));
         }
         return reportDataList;
     }

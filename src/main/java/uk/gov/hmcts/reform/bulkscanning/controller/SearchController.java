@@ -33,7 +33,7 @@ public class SearchController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases/{ccd_reference}")
-    public ResponseEntity<?> retrieveByCCD(
+    public ResponseEntity retrieveByCCD(
         @RequestHeader("Authorization") String authorization,
         @PathVariable("ccd_reference") String ccdReference) {
         LOG.info("Retrieving payments for ccdReference {} : ", ccdReference);
@@ -44,7 +44,7 @@ public class SearchController {
                 return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
             } else {
                 LOG.info("Payments Not found for ccdReference : {}", ccdReference);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for ccdReference : " + ccdReference);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for ccdReference");
             }
         } catch (Exception ex) {
             throw new PaymentException(ex);
@@ -57,7 +57,7 @@ public class SearchController {
         @ApiResponse(code = 404, message = "Payments not found")
     })
     @GetMapping("/cases")
-    public ResponseEntity<?> retrieveByDCN(
+    public ResponseEntity retrieveByDCN(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("document_control_number") String documentControlNumber) {
         LOG.info("Retrieving payments for documentControlNumber : {}", documentControlNumber);
@@ -68,7 +68,7 @@ public class SearchController {
                 return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
             } else {
                 LOG.info("Payments Not found for documentControlNumber : {}", documentControlNumber);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for documentControlNumber : " + documentControlNumber);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for documentControlNumber");
             }
         } catch (Exception ex) {
             throw new PaymentException(ex);

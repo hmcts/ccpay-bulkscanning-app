@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.BaseReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
 import uk.gov.hmcts.reform.bulkscanning.service.ReportService;
@@ -48,7 +49,7 @@ public class ReportController {
         @ApiResponse(code = 404, message = "No Data found to generate Report")
     })
     @GetMapping("/report/download")
-    public ResponseEntity<?> retrieveByReportType(
+    public ResponseEntity<byte[]> retrieveByReportType(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
@@ -56,9 +57,11 @@ public class ReportController {
         HttpServletResponse response) {
         LOG.info("Retrieving payments for reportType : {}", reportType);
         byte[] reportBytes = null;
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        HSSFWorkbook workbook = null;
+        ByteArrayOutputStream baos = null;
         try {
+            workbook = new HSSFWorkbook();
+            baos = new ByteArrayOutputStream();
             List<ReportData> reportDataList = reportService
                         .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
@@ -95,7 +98,7 @@ public class ReportController {
         @ApiResponse(code = 404, message = "No Data found to generate Report")
     })
     @GetMapping("/report/data")
-    public ResponseEntity<List<?>> retrieveDataByReportType(
+    public ResponseEntity<List<BaseReportData>> retrieveDataByReportType(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
@@ -103,11 +106,11 @@ public class ReportController {
         LOG.info("Retrieving payments for reportType : {}", reportType);
 
         try {
-            List<?> reportDataList = reportService
+            List<BaseReportData> reportDataList = reportService
                 .retrieveDataByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
-                return new ResponseEntity<>(reportDataList, HttpStatus.OK);
+                return new ResponseEntity<List<BaseReportData>>(reportDataList, HttpStatus.OK);
             }else {
                 LOG.info("No Data found for ReportType : {}", reportType);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

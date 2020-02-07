@@ -34,52 +34,9 @@ public class ExcelGeneratorUtil {
 
         // Header
         if (reportType.equals(UNPROCESSED)) {
-            for (int col = 0; col < colsUnprocessed.length; col++) {
-                Cell cell = headerRow.createCell(col);
-                cell.setCellValue(colsUnprocessed[col]);
-                cell.setCellStyle(headerCellStyle);
-            }
-            int rowIdx = 1;
-            for (ReportData reportData : reportDataList) {
-                Row row = sheet.createRow(rowIdx++);
-
-                row.createCell(0).setCellValue(reportData.getRespServiceId());
-                row.createCell(1).setCellValue(reportData.getRespServiceName());
-                row.createCell(2).setCellValue(reportData.getExceptionRef());
-                row.createCell(3).setCellValue(reportData.getCcdRef());
-                row.createCell(4).setCellValue(reportData.getDateBanked());
-                row.createCell(5).setCellValue(reportData.getBgcBatch());
-                row.createCell(6).setCellValue(reportData.getPaymentAssetDcn());
-                row.createCell(7).setCellValue(reportData.getPaymentMethod());
-                row.createCell(8).setCellValue(reportData.getAmount().toString());
-            }
-            for(int i = 0; i < colsUnprocessed.length; i++) {
-                sheet.autoSizeColumn(i);
-            }
+            buildReportUnprocessed(reportDataList, colsUnprocessed, sheet, headerCellStyle, headerRow);
         } else if (reportType.equals(DATA_LOSS)) {
-            for (int col = 0; col < colsDataLoss.length; col++) {
-                Cell cell = headerRow.createCell(col);
-                cell.setCellValue(colsDataLoss[col]);
-                cell.setCellStyle(headerCellStyle);
-            }
-            int rowIdx = 1;
-            for (ReportData reportData : reportDataList) {
-                Row row = sheet.createRow(rowIdx++);
-
-                row.createCell(0).setCellValue(reportData.getLossResp());
-                row.createCell(1).setCellValue(reportData.getPaymentAssetDcn());
-                row.createCell(2).setCellValue(reportData.getRespServiceId());
-                row.createCell(3).setCellValue(reportData.getRespServiceName());
-                row.createCell(4).setCellValue(reportData.getDateBanked());
-                row.createCell(5).setCellValue(reportData.getBgcBatch());
-                row.createCell(6).setCellValue(reportData.getPaymentMethod());
-                if (Optional.ofNullable(reportData.getAmount()).isPresent()) {
-                    row.createCell(7).setCellValue(reportData.getAmount().toString());
-                }
-            }
-            for(int i = 0; i < colsDataLoss.length; i++) {
-                sheet.autoSizeColumn(i);
-            }
+            buildReportDataLoss(reportDataList, colsDataLoss, sheet, headerCellStyle, headerRow);
         }
 
         // CellStyle for Age
@@ -87,5 +44,56 @@ public class ExcelGeneratorUtil {
         ageCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("#"));
 
         return workbook;
+    }
+
+    private static void buildReportDataLoss(List<ReportData> reportDataList, String[] colsDataLoss, Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
+        for (int col = 0; col < colsDataLoss.length; col++) {
+            Cell cell = headerRow.createCell(col);
+            cell.setCellValue(colsDataLoss[col]);
+            cell.setCellStyle(headerCellStyle);
+        }
+        int rowIdx = 1;
+        for (ReportData reportData : reportDataList) {
+            Row row = sheet.createRow(rowIdx++);
+
+            row.createCell(0).setCellValue(reportData.getLossResp());
+            row.createCell(1).setCellValue(reportData.getPaymentAssetDcn());
+            row.createCell(2).setCellValue(reportData.getRespServiceId());
+            row.createCell(3).setCellValue(reportData.getRespServiceName());
+            row.createCell(4).setCellValue(reportData.getDateBanked());
+            row.createCell(5).setCellValue(reportData.getBgcBatch());
+            row.createCell(6).setCellValue(reportData.getPaymentMethod());
+            if (Optional.ofNullable(reportData.getAmount()).isPresent()) {
+                row.createCell(7).setCellValue(reportData.getAmount().toString());
+            }
+        }
+        for(int i = 0; i < colsDataLoss.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+    }
+
+    private static void buildReportUnprocessed(List<ReportData> reportDataList, String[] colsUnprocessed, Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
+        for (int col = 0; col < colsUnprocessed.length; col++) {
+            Cell cell = headerRow.createCell(col);
+            cell.setCellValue(colsUnprocessed[col]);
+            cell.setCellStyle(headerCellStyle);
+        }
+        int rowIdx = 1;
+        for (ReportData reportData : reportDataList) {
+            Row row = sheet.createRow(rowIdx++);
+
+            row.createCell(0).setCellValue(reportData.getRespServiceId());
+            row.createCell(1).setCellValue(reportData.getRespServiceName());
+            row.createCell(2).setCellValue(reportData.getExceptionRef());
+            row.createCell(3).setCellValue(reportData.getCcdRef());
+            row.createCell(4).setCellValue(reportData.getDateBanked());
+            row.createCell(5).setCellValue(reportData.getBgcBatch());
+            row.createCell(6).setCellValue(reportData.getPaymentAssetDcn());
+            row.createCell(7).setCellValue(reportData.getPaymentMethod());
+            row.createCell(8).setCellValue(reportData.getAmount().toString());
+        }
+        for(int i = 0; i < colsUnprocessed.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
     }
 }
