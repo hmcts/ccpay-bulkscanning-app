@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.bulkscanning.utils;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
 
@@ -14,36 +15,48 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType.DATA_LOSS;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType.UNPROCESSED;
 
 public class ExcelGeneratorUtil {
+
+    private ExcelGeneratorUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static Workbook exportToExcel(ReportType reportType, List<ReportData> reportDataList) throws IOException {
         String[] colsDataLoss = {"Loss_Resp", "Payment_Asset_DCN", "Resp_Service ID", "Resp_Service Name", "Date_Banked", "BGC_Batch", "Payment_Method", "Amount"};
         String[] colsUnprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref", "Date_Banked", "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
-        Workbook workbook = new HSSFWorkbook();
-        CreationHelper createHelper = workbook.getCreationHelper();
+        Workbook workbook = null;
+        try {
+            workbook = new HSSFWorkbook();
+            CreationHelper createHelper = workbook.getCreationHelper();
 
-        Sheet sheet = workbook.createSheet(reportType.toString());
+            Sheet sheet = workbook.createSheet(reportType.toString());
 
-        Font headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerFont.setColor(BLACK.getIndex());
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setColor(BLACK.getIndex());
 
-        CellStyle headerCellStyle = workbook.createCellStyle();
-        headerCellStyle.setFont(headerFont);
+            CellStyle headerCellStyle = workbook.createCellStyle();
+            headerCellStyle.setFont(headerFont);
 
-        // Row for Header
-        Row headerRow = sheet.createRow(0);
+            // Row for Header
+            Row headerRow = sheet.createRow(0);
 
-        // Header
-        if (reportType.equals(UNPROCESSED)) {
-            buildReportUnprocessed(reportDataList, colsUnprocessed, sheet, headerCellStyle, headerRow);
-        } else if (reportType.equals(DATA_LOSS)) {
-            buildReportDataLoss(reportDataList, colsDataLoss, sheet, headerCellStyle, headerRow);
+            // Header
+            if (reportType.equals(UNPROCESSED)) {
+                buildReportUnprocessed(reportDataList, colsUnprocessed, sheet, headerCellStyle, headerRow);
+            } else if (reportType.equals(DATA_LOSS)) {
+                buildReportDataLoss(reportDataList, colsDataLoss, sheet, headerCellStyle, headerRow);
+            }
+
+            // CellStyle for Age
+            CellStyle ageCellStyle = workbook.createCellStyle();
+            ageCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("#"));
+
+            return workbook;
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
+        } finally {
+            workbook.close();
         }
-
-        // CellStyle for Age
-        CellStyle ageCellStyle = workbook.createCellStyle();
-        ageCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("#"));
-
-        return workbook;
     }
 
     private static void buildReportDataLoss(List<ReportData> reportDataList, String[] colsDataLoss, Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
@@ -67,7 +80,7 @@ public class ExcelGeneratorUtil {
                 row.createCell(7).setCellValue(reportData.getAmount().toString());
             }
         }
-        for(int i = 0; i < colsDataLoss.length; i++) {
+        for (int i = 0; i < colsDataLoss.length; i++) {
             sheet.autoSizeColumn(i);
         }
     }
@@ -92,7 +105,7 @@ public class ExcelGeneratorUtil {
             row.createCell(7).setCellValue(reportData.getPaymentMethod());
             row.createCell(8).setCellValue(reportData.getAmount().toString());
         }
-        for(int i = 0; i < colsUnprocessed.length; i++) {
+        for (int i = 0; i < colsUnprocessed.length; i++) {
             sheet.autoSizeColumn(i);
         }
     }
