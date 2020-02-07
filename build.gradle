@@ -103,7 +103,7 @@ pmd {
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
-project.tasks['sonarqube'].dependsOn test
+//project.tasks['sonarqube'].dependsOn test
 
 def listFiles(String pattern) {
   return new FileNameFinder()
