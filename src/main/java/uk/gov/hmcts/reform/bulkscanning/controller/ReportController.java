@@ -54,7 +54,7 @@ public class ReportController {
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
         @RequestParam("report_type") ReportType reportType,
-        HttpServletResponse response) {
+        HttpServletResponse response) throws IOException {
         LOG.info("Retrieving payments for reportType : {}", reportType);
         byte[] reportBytes = null;
         HSSFWorkbook workbook = null;
@@ -82,13 +82,8 @@ public class ReportController {
         } catch (Exception ex) {
             throw new PaymentException(ex);
         } finally {
-            try {
-                baos.close();
-                workbook.close();
-            } catch (IOException e) {
-                LOG.error(e.getMessage());
-            }
-
+            baos.close();
+            workbook.close();
         }
     }
 
