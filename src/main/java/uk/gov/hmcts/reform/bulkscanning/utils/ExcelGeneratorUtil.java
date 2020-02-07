@@ -23,9 +23,7 @@ public final class ExcelGeneratorUtil {
     public static Workbook exportToExcel(ReportType reportType, List<ReportData> reportDataList) throws IOException {
         String[] colsDataLoss = {"Loss_Resp", "Payment_Asset_DCN", "Resp_Service ID", "Resp_Service Name", "Date_Banked", "BGC_Batch", "Payment_Method", "Amount"};
         String[] colsUnprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref", "Date_Banked", "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
-        Workbook workbook = null;
-        try {
-            workbook = new HSSFWorkbook();
+        try (Workbook workbook = new HSSFWorkbook()) {
             CreationHelper createHelper = workbook.getCreationHelper();
 
             Sheet sheet = workbook.createSheet(reportType.toString());
@@ -54,8 +52,6 @@ public final class ExcelGeneratorUtil {
             return workbook;
         } catch (Exception ex) {
             throw new PaymentException(ex);
-        } finally {
-            workbook.close();
         }
     }
 

@@ -58,17 +58,16 @@ public class ReportController {
         LOG.info("Retrieving payments for reportType : {}", reportType);
         byte[] reportBytes = null;
         HSSFWorkbook workbook = null;
-        ByteArrayOutputStream baos = null;
-        try {
-            workbook = new HSSFWorkbook();
-            baos = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             List<ReportData> reportDataList = reportService
-                        .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
+                .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 workbook = (HSSFWorkbook) ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
             }
-            workbook.write(baos);
+            if(workbook != null){
+                workbook.write(baos);
+            }
             reportBytes = baos.toByteArray();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
@@ -81,9 +80,6 @@ public class ReportController {
             return new ResponseEntity<byte[]>(reportBytes, headers, HttpStatus.OK);
         } catch (Exception ex) {
             throw new PaymentException(ex);
-        } finally {
-            baos.close();
-            workbook.close();
         }
     }
 
@@ -106,7 +102,7 @@ public class ReportController {
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 return new ResponseEntity<List<BaseReportData>>(reportDataList, HttpStatus.OK);
-            }else {
+            } else {
                 LOG.info("No Data found for ReportType : {}", reportType);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

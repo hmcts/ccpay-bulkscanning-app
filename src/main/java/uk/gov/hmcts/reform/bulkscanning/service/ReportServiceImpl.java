@@ -52,7 +52,7 @@ public class ReportServiceImpl implements ReportService {
         if (reportType.equals(ReportType.DATA_LOSS)) {
             return buildDataLossReportData(fromDate, toDate, reportDataList);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ReportServiceImpl implements ReportService {
         if (reportType.equals(ReportType.DATA_LOSS)) {
             return buildReportDataDataLoss(fromDate, toDate);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private List<BaseReportData> buildReportDataDataLoss(Date fromDate, Date toDate) {
