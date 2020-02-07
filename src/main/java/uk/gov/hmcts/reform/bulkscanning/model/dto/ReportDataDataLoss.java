@@ -15,10 +15,7 @@ import java.math.BigDecimal;
 public class ReportDataDataLoss extends BaseReportData {
     private String lossResp;
     private String paymentAssetDcn;
-    private String respServiceId;
     private String respServiceName;
-    private String dateBanked;
     private String bgcBatch;
-    private String paymentMethod;
     private BigDecimal amount;
 }

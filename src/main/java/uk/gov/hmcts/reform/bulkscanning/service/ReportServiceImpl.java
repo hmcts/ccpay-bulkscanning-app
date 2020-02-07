@@ -96,7 +96,7 @@ public class ReportServiceImpl implements ReportService {
                 .forEach(payment -> {
                     reportDataList.add(populateReportDataUnprocessed(payment));
                 });
-            //reportDataList.sort(Comparator.comparing(ReportDataUnprocessed::getRespServiceId));
+            reportDataList.sort(Comparator.comparing(BaseReportData::getRespServiceId));
         }
         return reportDataList;
     }
