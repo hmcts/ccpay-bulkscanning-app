@@ -210,7 +210,7 @@ dependencies {
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.0.2.RELEASE'
   compile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
   compile group: 'org.jboss.aerogear', name: 'aerogear-otp-java', version:'1.0.0'
-  compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.3'
+  compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.5'
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
   testCompile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
   testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
