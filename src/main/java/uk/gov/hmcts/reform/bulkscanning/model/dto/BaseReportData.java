@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@Builder(builderMethodName = "recordWith")
+@Builder(builderMethodName = "buildWith")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
