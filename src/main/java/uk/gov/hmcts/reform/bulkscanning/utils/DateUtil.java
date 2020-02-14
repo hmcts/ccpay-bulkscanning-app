@@ -16,19 +16,22 @@ public final class DateUtil {
     }
 
     public static Date localDateTimeToDate(LocalDateTime ldt) {
-        return ldt == null ? null : Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        return ldt == null ? new Date(0) : Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static LocalDateTime dateToLocalDateTime(Date date) {
-        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        return date == null ? LocalDateTime.ofInstant(
+            new Date(0).toInstant(),
+            ZoneId.systemDefault()
+        ) : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-    public static String getDateForReportName(Date date){
+    public static String getDateForReportName(Date date) {
         DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("ddMMyy");
         return dateToLocalDateTime(date).format(reportNameDateFormat);
     }
 
-    public static String getDateTimeForReportName(Date date){
+    public static String getDateTimeForReportName(Date date) {
         DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("ddMMyy_HHmmss");
         return dateToLocalDateTime(date).format(reportNameDateFormat);
     }

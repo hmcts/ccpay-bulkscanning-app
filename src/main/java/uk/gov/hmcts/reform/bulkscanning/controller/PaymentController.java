@@ -128,8 +128,7 @@ public class PaymentController {
         @NotEmpty @PathVariable("dcn") String dcn,
         @NotEmpty @PathVariable("status") PaymentStatus status) {
         LOG.info("Request received to mark payment with DCN : {} , status : {}", dcn, status);
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(paymentService.updatePaymentStatus(dcn, status));
+        paymentService.updatePaymentStatus(dcn, status);
+        return ResponseEntity.status(HttpStatus.OK).body("Updated");
     }
 }

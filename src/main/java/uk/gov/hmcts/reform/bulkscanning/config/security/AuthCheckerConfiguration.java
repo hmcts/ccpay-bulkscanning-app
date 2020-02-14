@@ -31,7 +31,6 @@ public class AuthCheckerConfiguration {
             }else {
                 return Optional.empty();
             }
-            //return Optional.ofNullable(matched ? matcher.group(1) : null);
         };
     }
 

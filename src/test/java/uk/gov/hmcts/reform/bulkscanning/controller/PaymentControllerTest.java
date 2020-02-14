@@ -105,6 +105,17 @@ public class PaymentControllerTest {
             .getContentAsString().contains("Exception in fetching Metadata"));
     }
 
+    @Test
+    @Transactional
+    public void testCreatePaymentFromExela_BadRequest() throws Exception{
+
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .content("{\"amount\":100.0,\"method\":\"CHEQUE\",\"banked_date\":\"2019-10-31\",\"document_control_number\":\"111122223333444411111\",\"bank_giro_credit_slip_number\":123}")
+                                                          .contentType(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
     //Test cases for Bulk Scan endpoints bulk scan
    @Test
    @Transactional

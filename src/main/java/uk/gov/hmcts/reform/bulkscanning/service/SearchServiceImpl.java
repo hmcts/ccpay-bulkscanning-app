@@ -98,8 +98,7 @@ public class SearchServiceImpl implements SearchService {
             if (searchResponse.getAllPaymentsStatus().equals(INCOMPLETE)
                 || searchResponse.getAllPaymentsStatus().equals(COMPLETE)) {
                 List<PaymentMetadata> paymentMetadataList = getPaymentMetadataForEnvelopeCase(envelopeCases);
-                if (Optional.ofNullable(paymentMetadataList).isPresent()
-                    && !paymentMetadataList.isEmpty()) {
+                if (!paymentMetadataList.isEmpty()) {
                     searchResponse.setPayments(paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList));
                 }
             }
@@ -135,14 +134,14 @@ public class SearchServiceImpl implements SearchService {
     private List<EnvelopeCase> getEnvelopeCaseByCcdReference(SearchRequest searchRequest) {
         if (StringUtils.isNotEmpty(searchRequest.getCcdReference())
             && envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).isPresent()) {
-            return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).get();
+            return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(Collections.emptyList());
         } else if (StringUtils.isNotEmpty(searchRequest.getExceptionRecord())
             && envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).isPresent()) {
-            List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).get();
+            List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(Collections.emptyList());
             for (EnvelopeCase envelopeCase : envelopeCases) {
                 if (StringUtils.isNotEmpty(envelopeCase.getCcdReference())
                     && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()) {
-                    return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get();
+                    return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).orElse(Collections.emptyList());
                 }
             }
             return envelopeCases;
@@ -163,6 +162,6 @@ public class SearchServiceImpl implements SearchService {
             }
             return Collections.emptyList();
         }
-        return null;
+        return Collections.emptyList();
     }
 }

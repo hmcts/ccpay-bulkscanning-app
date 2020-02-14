@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.BaseReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
 import uk.gov.hmcts.reform.bulkscanning.service.ReportService;
@@ -48,24 +49,25 @@ public class ReportController {
         @ApiResponse(code = 404, message = "No Data found to generate Report")
     })
     @GetMapping("/report/download")
-    public ResponseEntity<?> retrieveByReportType(
+    public ResponseEntity<byte[]> retrieveByReportType(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
         @RequestParam("report_type") ReportType reportType,
-        HttpServletResponse response) {
+        HttpServletResponse response) throws IOException {
         LOG.info("Retrieving payments for reportType : {}", reportType);
         byte[] reportBytes = null;
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
+        HSSFWorkbook workbook = null;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             List<ReportData> reportDataList = reportService
-                        .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
+                .retrieveByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 workbook = (HSSFWorkbook) ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
             }
-            workbook.write(baos);
+            if(workbook != null){
+                workbook.write(baos);
+            }
             reportBytes = baos.toByteArray();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
@@ -78,14 +80,6 @@ public class ReportController {
             return new ResponseEntity<byte[]>(reportBytes, headers, HttpStatus.OK);
         } catch (Exception ex) {
             throw new PaymentException(ex);
-        } finally {
-            try {
-                baos.close();
-                workbook.close();
-            } catch (IOException e) {
-                LOG.error(e.getMessage());
-            }
-
         }
     }
 
@@ -95,7 +89,7 @@ public class ReportController {
         @ApiResponse(code = 404, message = "No Data found to generate Report")
     })
     @GetMapping("/report/data")
-    public ResponseEntity<List<?>> retrieveDataByReportType(
+    public ResponseEntity<List<BaseReportData>> retrieveDataByReportType(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("date_from") Date fromDate,
         @RequestParam("date_to") Date toDate,
@@ -103,12 +97,12 @@ public class ReportController {
         LOG.info("Retrieving payments for reportType : {}", reportType);
 
         try {
-            List<?> reportDataList = reportService
+            List<BaseReportData> reportDataList = reportService
                 .retrieveDataByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
-                return new ResponseEntity<>(reportDataList, HttpStatus.OK);
-            }else {
+                return new ResponseEntity<List<BaseReportData>>(reportDataList, HttpStatus.OK);
+            } else {
                 LOG.info("No Data found for ReportType : {}", reportType);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

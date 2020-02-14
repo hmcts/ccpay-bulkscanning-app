@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.EnvelopeDto;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.PaymentDto;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
@@ -37,10 +39,7 @@ import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -259,5 +258,25 @@ public class PaymentServiceTest {
     @Transactional
     public void testDcnDoesNotExistExceptionPayment() throws Exception {
         paymentService.updatePaymentStatus(CCD_CASE_REFERENCE_NOT_PRESENT, PaymentStatus.PROCESSED);
+    }
+
+    @Test()
+    public void testEntityMapper() throws Exception {
+        PaymentDto paymentDto = PaymentDto.paymentDtoWith().id(1)
+            .paymentStatus(INCOMPLETE)
+            .dcnReference("111111111111111111")
+            .source("Exela")
+            .dateCreated(new Date())
+            .dateUpdated(new Date()).build();
+        List<PaymentDto> paymentDtos = new ArrayList<>();
+        paymentDtos.add(paymentDto);
+        Envelope envelope = envelopeDtoMapper.toEnvelopeEntity(EnvelopeDto.envelopeDtoWith()
+                                                                   .id(1)
+            .dateCreated(new Date())
+            .dateUpdated(new Date())
+            .payments(paymentDtos)
+            .paymentStatus(INCOMPLETE)
+            .build());
+        Assert.assertEquals("111111111111111111", envelope.getEnvelopePayments().get(0).getDcnReference());
     }
 }
