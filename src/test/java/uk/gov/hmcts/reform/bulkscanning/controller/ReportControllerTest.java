@@ -73,6 +73,24 @@ public class ReportControllerTest {
     }
 
     @Test
+    public void testGetPaymentReportData_DataLoss() throws Exception {
+        String dcn[] = {"111122223333555511111", "111122223333555521111"};
+        String ccd = "1111222233335555";
+        createTestReportData(ccd, dcn);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L)));
+        params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
+        params.add("report_type", "DATA_LOSS");
+        ResultActions resultActions = mockMvc.perform(get("/report/data")
+                                                          .header("Authorization", "user")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .params(params)
+                                                          .accept(MediaType.APPLICATION_JSON));
+
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
     public void testGetPaymentReportData_NoData() throws Exception {
 
         when(reportService.retrieveDataByReportType(any(Date.class), any(Date.class), any(ReportType.class)))
