@@ -229,7 +229,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Envelope updateEnvelopePaymentStatus(Envelope envelope, PaymentStatus paymentStatus) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(Collections.emptyList());
-        if(null != payments && payments.size() > 0) {
+        if(null != payments && !payments.isEmpty()) {
             if (checkAllPaymentsStatus(paymentStatus, payments)) {
                 updateEnvelopeStatus(envelope, paymentStatus);
             } else if (checkAnyPaymentsStatus(INCOMPLETE, payments)) {

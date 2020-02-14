@@ -25,8 +25,6 @@ public class SpringSecurityConfiguration {
     private static final String AUTHORISED_ROLE_PAYMENT = " payments";
     private static final String AUTHORISED_ROLE_CITIZEN = " citizen";
 
-    private SpringSecurityConfiguration() { throw new IllegalStateException("Utility class");}
-
     @Configuration
     @Order(1)
     public static class ExternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
