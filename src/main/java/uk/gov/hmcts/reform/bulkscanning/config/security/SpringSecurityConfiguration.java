@@ -22,8 +22,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SpringSecurityConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpringSecurityConfiguration.class);
-    private static final String AUTHORISED_ROLE_PAYMENT = " payments";
-    private static final String AUTHORISED_ROLE_CITIZEN = " citizen";
+    private static final String AUTHORISED_ROLE_PAYMENT = "payments";
+    private static final String AUTHORISED_ROLE_CITIZEN = "citizen";
 
     @Configuration
     @Order(1)
