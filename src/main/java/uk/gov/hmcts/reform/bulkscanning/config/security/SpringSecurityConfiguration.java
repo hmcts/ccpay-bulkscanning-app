@@ -22,6 +22,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SpringSecurityConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpringSecurityConfiguration.class);
+    private static final String AUTHORISED_ROLE_PAYMENT = "payments";
+    private static final String AUTHORISED_ROLE_CITIZEN = "citizen";
 
     @Configuration
     @Order(1)
@@ -96,11 +98,11 @@ public class SpringSecurityConfiguration {
                     .formLogin().disable()
                     .logout().disable()
                     .authorizeRequests()
-                    .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/*").hasAnyAuthority("payments", "citizen")
-                    .antMatchers(HttpMethod.GET, "/cases").hasAnyAuthority("payments", "citizen")
-                    .antMatchers(HttpMethod.GET, "/cases/*").hasAnyAuthority("payments", "citizen")
-                    .antMatchers(HttpMethod.GET, "/report/data").hasAnyAuthority("payments", "citizen")
-                    .antMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority("payments", "citizen")
+                    .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/*").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                    .antMatchers(HttpMethod.GET, "/cases").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                    .antMatchers(HttpMethod.GET, "/cases/*").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                    .antMatchers(HttpMethod.GET, "/report/data").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                    .antMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
                     .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .anyRequest().authenticated();
             } catch (Exception e) {

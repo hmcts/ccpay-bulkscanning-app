@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -150,17 +151,20 @@ public class PaymentServiceImpl implements PaymentService {
 
                 Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
 
-                List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
-                    Collectors.toList());
+                if(envelope.isPresent()) {
+                    List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
+                        Collectors.toList());
 
-                listOfAllPayments.addAll(paymentDCNList);
+                    listOfAllPayments.addAll(paymentDCNList);
+                }
+
             }
         }
 
         if (Optional.ofNullable(listOfAllPayments).isPresent() && !listOfAllPayments.isEmpty()) {
             return listOfAllPayments;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -224,13 +228,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private Envelope updateEnvelopePaymentStatus(Envelope envelope, PaymentStatus paymentStatus) {
-        List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(null);
-        if (checkAllPaymentsStatus(paymentStatus, payments)) {
-            updateEnvelopeStatus(envelope, paymentStatus);
-        } else if (checkAnyPaymentsStatus(INCOMPLETE, payments)) {
-            updateEnvelopeStatus(envelope, INCOMPLETE);
-        } else if (checkAnyPaymentsStatus(COMPLETE, payments)) {
-            updateEnvelopeStatus(envelope, COMPLETE);
+        List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(Collections.emptyList());
+        if(null != payments && !payments.isEmpty()) {
+            if (checkAllPaymentsStatus(paymentStatus, payments)) {
+                updateEnvelopeStatus(envelope, paymentStatus);
+            } else if (checkAnyPaymentsStatus(INCOMPLETE, payments)) {
+                updateEnvelopeStatus(envelope, INCOMPLETE);
+            } else if (checkAnyPaymentsStatus(COMPLETE, payments)) {
+                updateEnvelopeStatus(envelope, COMPLETE);
+            }
         }
         return envelope;
     }
