@@ -426,7 +426,6 @@ public class PaymentControllerFnTest {
     @Test
     public void testGeneratePaymentReport_DataLoss() throws Exception {
         String dcn[] = {"111122223333555511111", "111122223333555521111"};
-        String ccd = "1111222233335555";
         createTestReportDataLoss(dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 365 * 24 * 60 * 60 * 1000L)));
@@ -440,7 +439,6 @@ public class PaymentControllerFnTest {
     @Test
     public void testGetPaymentReportData_DataLoss() throws Exception {
         String dcn[] = {"111122223333555511111", "111122223333555521111"};
-        String ccd = "1111222233335555";
         createTestReportDataLoss(dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 365 * 24 * 60 * 60 * 1000L)));
