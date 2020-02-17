@@ -70,6 +70,7 @@ public class ReportServiceImpl implements ReportService {
 
     private List<BaseReportData> buildReportDataDataLoss(Date fromDate, Date toDate) {
         List<BaseReportData> reportDataList = new ArrayList<>();
+        List<ReportDataDataLoss> dataList = new ArrayList<>();
         Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString());
         if (payments.isPresent()) {
             LOG.info("No of Payments found for Report Type : DATA_LOSS : {}", payments.get().size());
@@ -77,10 +78,10 @@ public class ReportServiceImpl implements ReportService {
                 .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
                     && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                 .forEach(payment -> {
-                    BaseReportData record = populateReportDataDataLoss(payment);
-                    reportDataList.add(record);
+                    dataList.add(populateReportDataDataLoss(payment));
             });
-            //reportDataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
+            dataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
+            dataList.stream().forEach(data -> reportDataList.add(data));
         }
         return reportDataList;
     }
