@@ -116,6 +116,17 @@ public class PaymentControllerTest {
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
+    private static class ClassThatJacksonCannotSerialize {}
+
+    @Test(expected = PaymentException.class)
+    public void testCreatePaymentFromExela_JsonProcessingException() throws Exception{
+
+        mockMvc.perform(post("/bulk-scan-payment")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .content(asJsonString(new ClassThatJacksonCannotSerialize()))
+                                                          .contentType(MediaType.APPLICATION_JSON));
+    }
+
     //Test cases for Bulk Scan endpoints bulk scan
    @Test
    @Transactional
