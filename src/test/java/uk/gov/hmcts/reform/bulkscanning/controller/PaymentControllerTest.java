@@ -121,7 +121,7 @@ public class PaymentControllerTest {
     @Test(expected = PaymentException.class)
     public void testCreatePaymentFromExela_JsonProcessingException() throws Exception{
 
-        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
+        mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
                                                           .content(asJsonString(new ClassThatJacksonCannotSerialize()))
                                                           .contentType(MediaType.APPLICATION_JSON));
