@@ -36,7 +36,6 @@ withPipeline(type, product, app) {
     //setVaultName('ccpay')
     loadVaultSecrets(secrets)
     enableDbMigration('ccpay')
-    enableDockerBuild()
     installCharts()
     //disableLegacyDeployment()
     enableAksStagingDeployment()
