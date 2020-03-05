@@ -228,7 +228,7 @@ dependencies {
   testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   functionalTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   smokeTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
-  testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.0.4.RELEASE'
+  testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.3.0.RELEASE'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
