@@ -51,6 +51,12 @@ test:
 idam:
   api:
     url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
+  s2s-authorised:
+    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
+  s2s-auth:
+    url: http://localhost:4502
+    totp_secret: AAAAAAAAAAAAAAAC
+    microservice: ccpay_bubble
 
 generated:
   user:
@@ -69,3 +75,4 @@ s2s:
   service:
     name: ${S2S_SERVICE_NAME:cmc}
     secret: ${S2S_SERVICE_SECRET:RD53IBEKQTO4WMQY}
+

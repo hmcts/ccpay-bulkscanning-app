@@ -2,113 +2,63 @@ package uk.gov.hmcts.reform.bulkscanning.config.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
-import uk.gov.hmcts.reform.auth.checker.core.service.Service;
-import uk.gov.hmcts.reform.auth.checker.core.user.User;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnlyFilter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
+
+import javax.inject.Inject;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-@EnableWebSecurity
-public class SpringSecurityConfiguration {
+@EnableWebSecurity (debug = true)
+@Configuration
+public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     private static final Logger LOG = LoggerFactory.getLogger(SpringSecurityConfiguration.class);
-    private static final String AUTHORISED_ROLE_PAYMENT = "payments";
-    private static final String AUTHORISED_ROLE_CITIZEN = "citizen";
+    private final ServiceAuthFilter serviceAuthFilter;
+    private final AnonymousAuthenticationFilter anonymousAuthenticationFilter;
 
-    @Configuration
-    @Order(1)
-    public static class ExternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-        private final AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter;
-
-        @Autowired
-        public ExternalApiSecurityConfigurationAdapter(RequestAuthorizer<Service> serviceRequestAuthorizer,
-                                                       AuthenticationManager authenticationManager) {
+        @Inject
+        public SpringSecurityConfiguration(final ServiceAuthFilter serviceAuthFilter, final AnonymousAuthenticationFilter anonymousAuthenticationFilter) {
             super();
-            authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(serviceRequestAuthorizer);
-            authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
+            this.serviceAuthFilter =  serviceAuthFilter;
+            this.anonymousAuthenticationFilter = anonymousAuthenticationFilter;
         }
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/swagger-ui.html",
+                                   "/webjars/springfox-swagger-ui/**",
+                                   "/swagger-resources/**",
+                                   "/v2/**",
+                                   "/health",
+                                   "/health/liveness",
+                                   "/status/health",
+                                   "/loggers/**",
+                                   "/");
+    }
 
         @Override
         protected void configure(HttpSecurity http) {
             try {
                 http
-                    .requestMatchers()
-                    .antMatchers(HttpMethod.POST, "/bulk-scan-payment")
-                    .antMatchers(HttpMethod.POST, "/bulk-scan-payments")
-                    .antMatchers(HttpMethod.PUT, "/bulk-scan-payments")
-                    .and()
-                    .addFilter(authCheckerServiceOnlyFilter)
-                    .csrf().disable()
-                    .authorizeRequests()
-                    .anyRequest().authenticated();
-            } catch (Exception e) {
-                LOG.info("Error in ExternalApiSecurityConfigurationAdapter: {}", e);
-            }
-        }
-    }
-
-    @Configuration
-    @Order(2)
-    public static class InternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-        private final AuthCheckerServiceAndAnonymousUserFilter authCheckerFilter;
-
-        @Autowired
-        public InternalApiSecurityConfigurationAdapter(RequestAuthorizer<User> userRequestAuthorizer,
-                                                       RequestAuthorizer<Service> serviceRequestAuthorizer,
-                                                       AuthenticationManager authenticationManager) {
-            super();
-            authCheckerFilter = new AuthCheckerServiceAndAnonymousUserFilter(serviceRequestAuthorizer, userRequestAuthorizer);
-            authCheckerFilter.setAuthenticationManager(authenticationManager);
-        }
-
-        @Override
-        public void configure(WebSecurity web) {
-            web.ignoring().antMatchers("/swagger-ui.html",
-                                       "/webjars/springfox-swagger-ui/**",
-                                       "/swagger-resources/**",
-                                       "/v2/**",
-                                       "/refdata/**",
-                                       "/health",
-                                       "/health/liveness",
-                                       "/info",
-                                       "/favicon.ico",
-                                       "/mock-api/**",
-                                       "/");
-        }
-
-        @Override
-        //@SuppressWarnings(value = "SPRING_CSRF_PROTECTION_DISABLED", justification = "It's safe to disable CSRF protection as application is not being hit directly from the browser")
-        protected void configure(HttpSecurity http) {
-            try {
-                http.addFilter(authCheckerFilter)
-                    .sessionManagement().sessionCreationPolicy(STATELESS).and()
-                    .csrf().disable()
-                    .formLogin().disable()
+                .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
+                    .addFilter(new AnonymousAuthenticationFilter("anonymous"))
+                .sessionManagement().sessionCreationPolicy(STATELESS)
+                    .and().cors().and().csrf().disable().formLogin().disable()
                     .logout().disable()
-                    .authorizeRequests()
-                    .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/*").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/cases").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/cases/*").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/report/data").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/api/**").permitAll()
+                    .authorizeRequests().
+                    antMatchers("/*").anonymous()
                     .anyRequest().authenticated();
+
             } catch (Exception e) {
                 LOG.info("Error in ExternalApiSecurityConfigurationAdapter: {}", e);
             }
         }
     }
-
-}

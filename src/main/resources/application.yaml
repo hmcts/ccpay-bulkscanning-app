@@ -76,3 +76,20 @@ auth:
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
+idam:
+  api:
+    url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
+  s2s-authorised:
+    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
+  s2s-auth:
+    url: http://localhost:23443
+    totp_secret: AAAAAAAAAAAAAAAB
+    microservice: ccpay_bubble
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+

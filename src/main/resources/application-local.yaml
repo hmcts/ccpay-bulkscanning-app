@@ -5,6 +5,8 @@ management:
 
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: bulk-scanning
   datasource:
@@ -48,4 +50,14 @@ auth:
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
+
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:23443}
+  s2s-authorised:
+    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
+  s2s-auth:
+    url: http://localhost:23443
+    totp_secret: AAAAAAAAAAAAAAAC
+    microservice: ccpay_bubble
 
