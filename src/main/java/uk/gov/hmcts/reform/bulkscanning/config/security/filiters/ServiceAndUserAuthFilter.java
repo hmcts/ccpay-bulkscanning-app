@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.bulkscanning.config.security.filiters;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -56,6 +55,7 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
                 return;
             }
         }
+        LOG.info("User authentication is successful");
         filterChain.doFilter(request, response);
     }
 

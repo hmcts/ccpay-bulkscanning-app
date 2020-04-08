@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -18,8 +17,6 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.converter.BSJwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserAuthFilter;
@@ -73,8 +70,7 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.PUT, "/bulk-scan-payments")
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/error").permitAll()
-                    .anyRequest().authenticated();
+                    .anyRequest().anonymous().anyRequest().authenticated();
 
             } catch (Exception e) {
                 LOG.info("Error in ExternalApiSecurityConfigurationAdapter: {}", e);
