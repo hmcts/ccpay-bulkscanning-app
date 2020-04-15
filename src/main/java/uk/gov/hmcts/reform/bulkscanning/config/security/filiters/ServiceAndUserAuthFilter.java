@@ -49,13 +49,14 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
         if (securityUtils.isAuthenticated() && (!authorizedRoles.isEmpty() || userIdOptional.isPresent())) {
             try {
                 verifyRoleAndUserId(authorizedRoles, userIdOptional);
+                LOG.info("User authentication is successful");
             } catch (UnauthorizedException ex) {
                 LOG.warn("Unauthorised roles or userId in the request path", ex);
-                response.sendError(HttpStatus.FORBIDDEN.value(), "Access Denied");
+                response.sendError(HttpStatus.FORBIDDEN.value(), "Access Denied" + ex.getMessage());
                 return;
             }
         }
-        LOG.info("User authentication is successful");
+
         filterChain.doFilter(request, response);
     }
 

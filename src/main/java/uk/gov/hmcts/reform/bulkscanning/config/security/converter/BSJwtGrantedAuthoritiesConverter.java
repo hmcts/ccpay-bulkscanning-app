@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.bulkscanning.config.security.converter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
@@ -54,6 +56,11 @@ public class BSJwtGrantedAuthoritiesConverter implements Converter<Jwt, Collecti
      * @return
      */
     private List<GrantedAuthority> extractAuthorityFromClaims(List<String> roles) {
+       //
+        if (!Optional.ofNullable(roles).isPresent()){
+            throw new InsufficientAuthenticationException("No roles can be extracted from user " +
+                                                              "most probably due to insufficient scopes provided");
+        }
         return roles.stream()
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());

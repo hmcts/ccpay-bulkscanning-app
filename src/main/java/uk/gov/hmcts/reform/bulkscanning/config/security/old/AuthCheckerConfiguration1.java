@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.bulkscanning.config.security;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -44,3 +45,4 @@ public class AuthCheckerConfiguration {
         return (any) -> authorizedServices;
     }
 }
+*/

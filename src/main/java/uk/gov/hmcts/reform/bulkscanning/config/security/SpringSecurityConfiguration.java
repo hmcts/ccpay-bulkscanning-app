@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.converter.BSJwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.bulkscanning.config.security.exception.BSAccessDeniedHandler;
+import uk.gov.hmcts.reform.bulkscanning.config.security.exception.BSAuthenticationEntryPoint;
 import uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserAuthFilter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.bulkscanning.config.security.validator.AudienceValidator;
@@ -60,7 +62,7 @@ public class SpringSecurityConfiguration {
             try {
 
                 http.addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
-                    .sessionManagement().sessionCreationPolicy(STATELESS).and()
+                    .sessionManagement().sessionCreationPolicy(STATELESS).and().anonymous().disable()
                     .csrf().disable()
                     .formLogin().disable()
                     .logout().disable()
@@ -70,7 +72,7 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.PUT, "/bulk-scan-payments")
                     .and()
                     .authorizeRequests()
-                    .anyRequest().anonymous().anyRequest().authenticated();
+                    .anyRequest().authenticated();
 
             } catch (Exception e) {
                 LOG.info("Error in ExternalApiSecurityConfigurationAdapter: {}", e);
@@ -97,19 +99,24 @@ public class SpringSecurityConfiguration {
         private final ServiceAuthFilter serviceAuthFilter;
         private ServiceAndUserAuthFilter serviceAndUserAuthFilter;
         private JwtAuthenticationConverter jwtAuthenticationConverter;
+        private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
+        private final BSAccessDeniedHandler bsAccessDeniedHandler;
 
         @Inject
         public InternalApiSecurityConfigurationAdapter(final BSJwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
-                                           final ServiceAuthFilter serviceAuthFilter,
-                                           final Function<HttpServletRequest, Optional<String>> userIdExtractor,
-                                           final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
-                                           final SecurityUtils securityUtils) {
+                                                       final ServiceAuthFilter serviceAuthFilter,
+                                                       final Function<HttpServletRequest, Optional<String>> userIdExtractor,
+                                                       final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
+                                                       final SecurityUtils securityUtils, final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
+                                                       final BSAccessDeniedHandler bsAccessDeniedHandler) {
             super();
             this.serviceAndUserAuthFilter = new ServiceAndUserAuthFilter(
                 userIdExtractor, authorizedRolesExtractor, securityUtils);
             this.serviceAuthFilter = serviceAuthFilter;
             jwtAuthenticationConverter = new JwtAuthenticationConverter();
             jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+            this.bsAuthenticationEntryPoint = bsAuthenticationEntryPoint;
+            this.bsAccessDeniedHandler = bsAccessDeniedHandler;
         }
 
         @Override
@@ -151,7 +158,10 @@ public class SpringSecurityConfiguration {
                     .jwtAuthenticationConverter(jwtAuthenticationConverter)
                     .and()
                     .and()
-                    .oauth2Client();
+                    .oauth2Client()
+                    .and()
+                    .exceptionHandling().accessDeniedHandler(bsAccessDeniedHandler)
+                    .authenticationEntryPoint(bsAuthenticationEntryPoint);
 
             } catch (Exception e) {
                 LOG.info("Error in InternalApiSecurityConfigurationAdapter: {}", e);
@@ -178,4 +188,3 @@ public class SpringSecurityConfiguration {
     }
 
 }
-
