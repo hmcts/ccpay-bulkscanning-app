@@ -50,11 +50,16 @@ public class SpringSecurityConfiguration {
     public static class ExternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         private final ServiceAuthFilter serviceAuthFilter;
+        private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
+        private final BSAccessDeniedHandler bsAccessDeniedHandler;
 
         @Autowired
-        public ExternalApiSecurityConfigurationAdapter(final ServiceAuthFilter serviceAuthFilter) {
+        public ExternalApiSecurityConfigurationAdapter(final ServiceAuthFilter serviceAuthFilter, final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
+                                                       final BSAccessDeniedHandler bsAccessDeniedHandler) {
             super();
             this.serviceAuthFilter = serviceAuthFilter;
+            this.bsAuthenticationEntryPoint = bsAuthenticationEntryPoint;
+            this.bsAccessDeniedHandler = bsAccessDeniedHandler;
         }
 
         @Override
@@ -71,8 +76,8 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.POST, "/bulk-scan-payments")
                     .antMatchers(HttpMethod.PUT, "/bulk-scan-payments")
                     .and()
-                    .authorizeRequests()
-                    .anyRequest().authenticated();
+                    .exceptionHandling().accessDeniedHandler(bsAccessDeniedHandler)
+                    .authenticationEntryPoint(bsAuthenticationEntryPoint);
 
             } catch (Exception e) {
                 LOG.info("Error in ExternalApiSecurityConfigurationAdapter: {}", e);

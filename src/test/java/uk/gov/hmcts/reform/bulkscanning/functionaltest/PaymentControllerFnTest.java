@@ -6,10 +6,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,10 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.bulkscanning.backdoors.RestActions;
-import uk.gov.hmcts.reform.bulkscanning.backdoors.ServiceResolverBackdoor;
-import uk.gov.hmcts.reform.bulkscanning.backdoors.UserResolverBackdoor;
 import uk.gov.hmcts.reform.bulkscanning.config.TestContextConfiguration;
+import uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserAuthFilter;
+import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
@@ -38,9 +44,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+import static uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserAuthFilterTest.getUserInfoBasedOnUID_Roles;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
@@ -49,7 +57,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableFeignClients
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles({"local", "test"})
 //@TestPropertySource(locations="classpath:application-local.yaml")
@@ -77,12 +85,19 @@ public class PaymentControllerFnTest {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    protected ServiceResolverBackdoor serviceRequestAuthorizer;
+    ServiceAuthFilter serviceAuthFilter;
 
-    @Autowired
-    protected UserResolverBackdoor userRequestAuthorizer;
+    @InjectMocks
+    ServiceAndUserAuthFilter serviceAndUserAuthFilter;
 
-    private static final String USER_ID = UserResolverBackdoor.AUTHENTICATED_USER_ID;
+    @MockBean
+    private ClientRegistrationRepository clientRegistrationRepository;
+
+    @MockBean
+    SecurityUtils securityUtils;
+
+    @MockBean
+    private JwtDecoder jwtDecoder;
 
     RestActions restActions;
 
@@ -91,22 +106,24 @@ public class PaymentControllerFnTest {
 
     @Before
     public void setUp() {
+       //OIDC UserInfo Mocking
+        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUID_Roles("UID123","payments"));
+
         caseReferenceRequest = CaseReferenceRequest
             .createCaseReferenceRequest()
             .ccdCaseNumber("9982111111111111")
             .build();
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-        this.restActions = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
+        this.restActions = new RestActions(mvc, objectMapper);
 
         restActions
             .withAuthorizedService("cmc")
-            .withAuthorizedUser(USER_ID)
-            .withUserId(USER_ID)
             .withReturnUrl("https://www.gooooogle.com");
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testBulkScanningPaymentRequestFirst() throws Exception{
         String dcn[] = {"987211111111111111111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555"
@@ -139,6 +156,7 @@ public class PaymentControllerFnTest {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "payments")
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
         String dcn[] = {"987511111111111111111"};
         String dcn2[] = {"987611111111111111111"};
@@ -160,6 +178,7 @@ public class PaymentControllerFnTest {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "payments")
     public void testExceptionRecordNotExists() throws Exception {
 
         ResultActions resultActions = restActions.put("/bulk-scan-payments/?exception_reference=4444333322221111", caseReferenceRequest);
@@ -169,6 +188,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testMarkPaymentAsProcessed() throws Exception {
         String dcn[] = {"987111111111111111111"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
@@ -190,6 +210,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testMatchingPaymentsFromExcelaBulkScan() throws Exception {
 
         //Request from Exela with one DCN
@@ -214,6 +235,7 @@ public class PaymentControllerFnTest {
 
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception {
 
         //Request from Exela with one DCN
@@ -238,6 +260,7 @@ public class PaymentControllerFnTest {
 
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testMatchingBulkScanFirstThenExela() throws Exception {
         //Request from Bulk Scan with one DCN
         String dcn[] = {"111122223333888811111", "111122223333999911111"};
@@ -262,6 +285,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testMatchingMultipleEnvelopesFromExelaBulkScan() throws Exception {
         String dcn1 = "000011112222333311111";
         String dcn2 = "000011112222333411111";
@@ -309,6 +333,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testProcessNewPaymentsFromExela() throws Exception {
 
         //Request from Exela with one DCN
@@ -321,6 +346,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testSearchByCCDForProcessed() throws Exception {
         String dcns[] = {"111166667777888811111", "111166667777999911111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677774444"
@@ -357,17 +383,29 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "UnAuthorisedPaymentRole")
+    public void testUnAuthorisedUserAccessDeniedHandlerTest() throws Exception {
+
+        //Calling Search API by DCN and validate response
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("document_control_number", "DCN12341234123412");
+        ResultActions resultActions = restActions.get("/cases", params);
+
+        Assert.assertEquals(403, resultActions.andReturn().getResponse().getStatus());
+    }
+
+
+    @Test
+    @WithMockUser(authorities = "payments")
     public void testInvalidAuthorisedService() throws Exception {
         String dcns[] = {"111166667777888821111", "111166667777999921111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677775555"
             , dcns, "AA08", true);
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
+        RestActions testRestAction = new RestActions(mvc, objectMapper);
         testRestAction
             .withAuthorizedService("test-invalid")
-            .withAuthorizedUser(USER_ID)
-            .withUserId(USER_ID)
             .withReturnUrl("https://www.gooooogle.com");
         //Payment Request from Bulk-Scan System
         ResultActions resultActions = testRestAction.post("/bulk-scan-payments", bulkScanPaymentRequest);
@@ -376,6 +414,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "UnAuthorisedPaymentRole")
     public void testInvalidAuthorisedUser() throws Exception {
         String dcns[] = {"111166667777888821111", "111166667777999921111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677775555"
@@ -384,12 +423,11 @@ public class PaymentControllerFnTest {
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-        RestActions testRestAction = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
+        RestActions testRestAction = new RestActions(mvc, objectMapper);
         testRestAction
             .withAuthorizedService("")
-            .withAuthorizedUser("")
-            .withUserId("")
             .withReturnUrl("https://www.gooooogle.com");
+
         //Calling Search API by DCN and validate response
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("document_control_number", "111166667777999921111");
@@ -409,6 +447,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testGeneratePaymentReport_Unprocessed() throws Exception {
 
         String dcn[] = {"111122223333444411111", "111122223333444421111"};
@@ -424,6 +463,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testGeneratePaymentReport_DataLoss() throws Exception {
         String dcn[] = {"111122223333555511111", "111122223333555521111"};
         createTestReportDataLoss(dcn);
@@ -437,6 +477,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testGetPaymentReportData_DataLoss() throws Exception {
         String dcn[] = {"111122223333555511111", "111122223333555521111"};
         createTestReportDataLoss(dcn);
@@ -450,6 +491,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
     public void testGetPaymentReportData_Unprocessed() throws Exception {
         String dcn[] = {"111122223333555511111", "111122223333555521111"};
         String ccd = "1111222233335555";

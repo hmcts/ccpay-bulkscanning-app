@@ -52,7 +52,7 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
                 LOG.info("User authentication is successful");
             } catch (UnauthorizedException ex) {
                 LOG.warn("Unauthorised roles or userId in the request path", ex);
-                response.sendError(HttpStatus.FORBIDDEN.value(), "Access Denied" + ex.getMessage());
+                response.sendError(HttpStatus.FORBIDDEN.value(), " Access Denied " + ex.getMessage());
                 return;
             }
         }
