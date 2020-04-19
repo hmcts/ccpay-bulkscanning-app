@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,17 +14,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.bulkscanning.backdoors.RestActions;
-import uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserAuthFilter;
-import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 import java.math.BigDecimal;
@@ -47,16 +42,13 @@ public class BulkScanValidatorTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    ServiceAuthFilter serviceAuthFilter;
+    RestActions restActions;
 
     @MockBean
     private ClientRegistrationRepository clientRegistrationRepository;
 
     @MockBean
     private JwtDecoder jwtDecoder;
-
-    RestActions restActions;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -83,7 +75,7 @@ public class BulkScanValidatorTest {
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
             , null, "AA08", false);
 
-        ResultActions resultActions = restActions.post("/bulk-scan-payments/", bulkScanPaymentRequest);
+        ResultActions resultActions = restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
 
@@ -96,7 +88,7 @@ public class BulkScanValidatorTest {
     public void testRequestValidation_AdditionalFields() throws Exception{
 
 
-        ResultActions resultActions = restActions.post("/bulk-scan-payment/", new ExelaPayment(BigDecimal.ONE,
+        ResultActions resultActions = restActions.post("/bulk-scan-payment", new ExelaPayment(BigDecimal.ONE,
                                                                                                 "123456",
                                                                                                 "2019-01-01",
                                                                                                 "GBP",

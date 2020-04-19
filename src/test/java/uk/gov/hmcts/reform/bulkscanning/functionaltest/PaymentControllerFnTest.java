@@ -119,6 +119,7 @@ public class PaymentControllerFnTest {
 
         restActions
             .withAuthorizedService("cmc")
+            .withAuthorizedUser()
             .withReturnUrl("https://www.gooooogle.com");
     }
 
@@ -190,16 +191,16 @@ public class PaymentControllerFnTest {
     @Test
     @WithMockUser(authorities = "payments")
     public void testMarkPaymentAsProcessed() throws Exception {
-        String dcn[] = {"987111111111111111111"};
+        String dcn[] = {"987111111111111111112"};
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444"
             , dcn, "AA08", false);
         bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
 
-        ResultActions resultActions = restActions.patch("/bulk-scan-payments/987111111111111111111/status/PROCESSED");
+        ResultActions resultActions = restActions.patch("/bulk-scan-payments/987111111111111111112/status/PROCESSED");
 
         Assert.assertEquals(resultActions.andReturn().getResponse().getStatus(), OK.value());
 
-        EnvelopePayment payment1 = paymentRepository.findByDcnReference("987111111111111111111").get();
+        EnvelopePayment payment1 = paymentRepository.findByDcnReference("987111111111111111112").get();
         Assert.assertEquals(PROCESSED.toString(), payment1.getPaymentStatus());
 
         //Delete Envelope for DCN 1111-2222-3333-4444
@@ -383,7 +384,7 @@ public class PaymentControllerFnTest {
     }
 
     @Test
-    @WithMockUser(authorities = "UnAuthorisedPaymentRole")
+    @WithMockUser(authorities = "unauthorizedPaymentsRole")
     public void testUnAuthorisedUserAccessDeniedHandlerTest() throws Exception {
 
         //Calling Search API by DCN and validate response

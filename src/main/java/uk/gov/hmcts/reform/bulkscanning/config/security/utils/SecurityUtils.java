@@ -27,9 +27,6 @@ public class SecurityUtils {
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
 
-    private static final String AUTHORISED_ROLE_PAYMENT = "payments";
-    private static final String AUTHORISED_ROLE_CITIZEN = "citizen";
-
     @Autowired
     public SecurityUtils(final AuthTokenGenerator authTokenGenerator, IdamRepository idamRepository) {
         this.authTokenGenerator = authTokenGenerator;

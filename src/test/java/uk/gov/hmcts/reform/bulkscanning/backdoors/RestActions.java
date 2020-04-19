@@ -6,8 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import uk.gov.hmcts.reform.auth.checker.core.service.ServiceRequestAuthorizer;
-import uk.gov.hmcts.reform.auth.checker.core.user.UserRequestAuthorizer;
 
 import java.util.UUID;
 
@@ -19,6 +17,9 @@ public class RestActions {
     private final MockMvc mvc;
     private final ObjectMapper objectMapper;
 
+    public static final String AUTHORISATION = "Authorization";
+    public static final String SERVICE_AUTHORISATION = "ServiceAuthorization";
+
     public RestActions(MockMvc mvc, ObjectMapper objectMapper) {
         this.mvc = mvc;
         this.objectMapper = objectMapper;
@@ -26,7 +27,7 @@ public class RestActions {
 
     public RestActions withAuthorizedService(String serviceId) {
         String token = "Bearer "+serviceId+ UUID.randomUUID().toString();
-        httpHeaders.add(ServiceRequestAuthorizer.AUTHORISATION, token);
+        httpHeaders.add(SERVICE_AUTHORISATION, token);
         return this;
     }
 
@@ -35,8 +36,9 @@ public class RestActions {
         return this;
     }
 
-    public RestActions withHeader(String header, String value) {
-        httpHeaders.add(header, value);
+    public RestActions withAuthorizedUser() {
+        String token = UUID.randomUUID().toString();
+        httpHeaders.add(AUTHORISATION, token);
         return this;
     }
 

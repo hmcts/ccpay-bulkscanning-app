@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.bulkscanning.config.security.filiters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.exception.UnauthorizedException;
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
@@ -19,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+
 /**
  * Custom filter responsible for User authorisation
  */
@@ -34,6 +35,7 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
     public ServiceAndUserAuthFilter(Function<HttpServletRequest, Optional<String>> userIdExtractor,
                                               Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
                                               SecurityUtils securityUtils) {
+        super();
         this.userIdExtractor = userIdExtractor;
         this.authorizedRolesExtractor = authorizedRolesExtractor;
         this.securityUtils = securityUtils;
@@ -52,7 +54,7 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
                 LOG.info("User authentication is successful");
             } catch (UnauthorizedException ex) {
                 LOG.warn("Unauthorised roles or userId in the request path", ex);
-                response.sendError(HttpStatus.FORBIDDEN.value(), " Access Denied " + ex.getMessage());
+                response.sendError(FORBIDDEN.value(), " Access Denied " + ex.getMessage());
                 return;
             }
         }

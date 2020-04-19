@@ -98,12 +98,10 @@ public class SpringSecurityConfiguration {
         @Value("${oidc.issuer}")
         private String issuerOverride;
 
-
-
         private static final Logger LOG = LoggerFactory.getLogger(SpringSecurityConfiguration.class);
         private final ServiceAuthFilter serviceAuthFilter;
-        private ServiceAndUserAuthFilter serviceAndUserAuthFilter;
-        private JwtAuthenticationConverter jwtAuthenticationConverter;
+        private final ServiceAndUserAuthFilter serviceAndUserAuthFilter;
+        private final JwtAuthenticationConverter jwtAuthenticationConverter;
         private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
         private final BSAccessDeniedHandler bsAccessDeniedHandler;
 
