@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -24,9 +23,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.OK;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServiceAndUserAuthFilterTest {
@@ -61,39 +63,39 @@ public class ServiceAndUserAuthFilterTest {
     public void shouldReturn200ResponseWhenRoleMatches() throws Exception {
         request.setRequestURI("/bulk-scan-payments/");
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJWTAuthenticationTokenBasedOnRoles("payments"));
-        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUID_Roles("user123","payments"));
+        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("user123", "payments"));
 
         filter.doFilterInternal(request, response, filterChain);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getStatus()).isEqualTo(OK.value());
     }
 
     @Test
     public void shouldReturn403ResponseWhenRoleIsInvalid() throws Exception {
         request.setRequestURI("/cases/");
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJWTAuthenticationTokenBasedOnRoles("payments"));
-        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUID_Roles("user123","payments-invalid-role"));
+        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("user123", "payments-invalid-role"));
 
         filter.doFilterInternal(request, response, filterChain);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-        Assert.assertTrue((StringUtils.containsIgnoreCase(((MockHttpServletResponse)response).getErrorMessage(),
-                                                          "Access Denied Current user roles are : [payments-invalid-role]")));
+        assertThat(response.getStatus()).isEqualTo(FORBIDDEN.value());
+        Assert.assertTrue(StringUtils.containsIgnoreCase(((MockHttpServletResponse)response).getErrorMessage(),
+                                                          "Access Denied Current user roles are : [payments-invalid-role]"));
     }
 
     @Test
     public void shouldReturn403RWhenNoRolesPresentForUserInfo() throws Exception {
         request.setRequestURI("/cases/");
         when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJWTAuthenticationTokenBasedOnRoles("payments"));
-        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUID_Roles("user123",null));
+        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("user123", null));
 
         filter.doFilterInternal(request, response, filterChain);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-        Assert.assertTrue((StringUtils.containsIgnoreCase(((MockHttpServletResponse)response).getErrorMessage(),
-                                                          "Access Denied Current user roles are : [null]")));
+        assertThat(response.getStatus()).isEqualTo(FORBIDDEN.value());
+        Assert.assertTrue(StringUtils.containsIgnoreCase(((MockHttpServletResponse)response).getErrorMessage(),
+                                                          "Access Denied Current user roles are : [null]"));
     }
 
-    public static UserInfo getUserInfoBasedOnUID_Roles(String UID, String roles){
+    public static UserInfo getUserInfoBasedOnUidRoles(String uid, String roles){
         return UserInfo.builder()
-            .uid(UID)
+            .uid(uid)
             .roles(Arrays.asList(roles))
             .build();
     }
@@ -103,10 +105,10 @@ public class ServiceAndUserAuthFilterTest {
         List<String> stringGrantedAuthority = new ArrayList();
         stringGrantedAuthority.add(authority);
 
-        Map<String,Object> claimsMap = new HashMap<>();
+        Map<String,Object> claimsMap = new ConcurrentHashMap<>();
         claimsMap.put("roles", stringGrantedAuthority);
 
-        Map<String,Object> headersMap = new HashMap<>();
+        Map<String,Object> headersMap = new ConcurrentHashMap<>();
         headersMap.put("authorisation","test-token");
 
         Jwt jwt = new Jwt("test_token",null,null,headersMap,claimsMap);

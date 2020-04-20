@@ -55,8 +55,7 @@ public class SpringSecurityTestConfiguration {
 
     @Bean
     public IdamRepository idamRepository() {
-        IdamRepository idamRepository = Mockito.mock(IdamRepository.class);
-        return idamRepository;
+        return Mockito.mock(IdamRepository.class);
     }
 
     @Bean
@@ -67,9 +66,7 @@ public class SpringSecurityTestConfiguration {
                 return "testToken";
             }
         };
-
-        SecurityUtils securityUtils = new SecurityUtils(authTokenGenerator, idamRepository());
-        return securityUtils;
+        return new SecurityUtils(authTokenGenerator, idamRepository());
     }
 
     @Bean
