@@ -100,5 +100,9 @@ idam:
     totp_secret: G5XTFNBUW4P6ZP4F
     microservice: ccpay_bubble
 
-
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
 
