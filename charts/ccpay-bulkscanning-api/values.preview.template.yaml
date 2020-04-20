@@ -3,8 +3,6 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   environment:
-    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    AUTH_IDAM_CLIENT_BASEURL: "https://idam-api.aat.platform.hmcts.net"
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
     POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
@@ -13,12 +11,7 @@ java:
     LOGBACK_REQUIRE_ALERT_LEVEL: 'false'
     LOGBACK_REQUIRE_ERROR_CODE: 'false'
     SPRING_LIQUIBASE_ENABLED: true
-    APPINSIGHTS_INSTRUMENTATIONKEY: fake-key
     SPRING_CLOUD_PROPERTIESVOLUME_ENABLED: false
-    postgresql:
-      postgresqlUsername: bspayment
-      postgresqlPassword: bspayment
-      postgresqlDatabase: bspayment
 
   postgresql:
     enabled: true
