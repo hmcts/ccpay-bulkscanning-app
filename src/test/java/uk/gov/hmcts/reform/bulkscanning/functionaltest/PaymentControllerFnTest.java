@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableFeignClients
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc()
 @ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles({"local", "test"})
 //@TestPropertySource(locations="classpath:application-local.yaml")
