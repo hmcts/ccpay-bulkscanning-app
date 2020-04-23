@@ -21,12 +21,10 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class IdamService {
     public static final String CMC_CITIZEN_GROUP = "cmc-private-beta";
-    public static final String CMC_CASE_WORKER_GROUP = "caseworker";
 
     public static final String BEARER = "Bearer ";
-    public static final String AUTHORIZATION_CODE = "authorization_code";
-    public static final String CODE = "code";
-    public static final String BASIC = "Basic ";
+    public static final String GRANT_TYPE = "password";
+    public static final String SCOPES = "openid profile roles";
 
     private final IdamApi idamApi;
     private final TestConfigProperties testConfig;
@@ -48,9 +46,9 @@ public class IdamService {
         CreateUserRequest userRequest = userRequest(email, userGroup, roles);
         LOG.info("idamApi : " + idamApi.toString());
         LOG.info("userRequest : " + userRequest);
-        try{
+        try {
             idamApi.createUser(userRequest);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.info(ex.getMessage());
         }
 
@@ -72,23 +70,19 @@ public class IdamService {
         LOG.info("testConfig.getOauth2().getClientId() : " + testConfig.getOauth2().getClientId());
         LOG.info("testConfig.getOauth2().getRedirectUrl() : " + testConfig.getOauth2().getRedirectUrl());
 
-        try{
-            IdamApi.AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
-                BASIC + base64Authorisation,
-                CODE,
-                testConfig.getOauth2().getClientId(),
-                testConfig.getOauth2().getRedirectUrl());
-
+        try {
             TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
-                authenticateUserResponse.getCode(),
-                AUTHORIZATION_CODE,
+                username,
+                password,
+                SCOPES,
+                GRANT_TYPE,
                 testConfig.getOauth2().getClientId(),
                 testConfig.getOauth2().getClientSecret(),
                 testConfig.getOauth2().getRedirectUrl()
             );
 
             return BEARER + tokenExchangeResponse.getAccessToken();
-        }catch (Exception ex){
+        } catch (Exception ex) {
             LOG.info(ex.getMessage());
         }
         return null;
@@ -100,8 +94,8 @@ public class IdamService {
             .email(email)
             .password(testConfig.getTestUserPassword())
             .roles(Stream.of(roles)
-                .map(Role::new)
-                .collect(toList()))
+                       .map(Role::new)
+                       .collect(toList()))
             .userGroup(new UserGroup(userGroup))
             .build();
     }
@@ -110,3 +104,4 @@ public class IdamService {
         return String.format(testConfig.getGeneratedUserEmailPattern(), UUID.randomUUID().toString());
     }
 }
+
