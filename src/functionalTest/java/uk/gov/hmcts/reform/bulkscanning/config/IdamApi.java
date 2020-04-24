@@ -1,18 +1,13 @@
 package uk.gov.hmcts.reform.bulkscanning.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.util.List;
+import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
+import uk.gov.hmcts.reform.idam.client.models.test.CreateUserRequest;
 
 public interface IdamApi {
 
@@ -32,40 +27,5 @@ public interface IdamApi {
                                        @Param("client_secret") String clientSecret,
                                        @Param("redirect_uri") String redirectUri);
 
-    @Data
-    @AllArgsConstructor
-    @Builder(builderMethodName = "userRequestWith")
-    class CreateUserRequest {
-        private final String email;
-        private final String forename = "John";
-        private final String surname = "Smith";
-        private final UserGroup userGroup;
-        private final List<Role> roles;
-        private final String password;
-    }
-
-    @AllArgsConstructor
-    @Getter
-    class UserGroup {
-        private String code;
-    }
-
-    @AllArgsConstructor
-    @Getter
-    class Role {
-        private String code;
-    }
-
-    @Data
-    class AuthenticateUserResponse {
-        @JsonProperty("code")
-        private String code;
-    }
-
-    @Data
-    class TokenExchangeResponse {
-        @JsonProperty("access_token")
-        private String accessToken;
-    }
 }
 

@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.CreateUserRequest;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.Role;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.TokenExchangeResponse;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.UserGroup;
+import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
+import uk.gov.hmcts.reform.idam.client.models.test.CreateUserRequest;
+import uk.gov.hmcts.reform.idam.client.models.test.UserGroup;
+import uk.gov.hmcts.reform.idam.client.models.test.UserRole;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -90,11 +90,11 @@ public class IdamService {
 
 
     private CreateUserRequest userRequest(String email, String userGroup, String[] roles) {
-        return CreateUserRequest.userRequestWith()
+        return CreateUserRequest.builder()
             .email(email)
             .password(testConfig.getTestUserPassword())
             .roles(Stream.of(roles)
-                       .map(Role::new)
+                       .map(UserRole::new)
                        .collect(toList()))
             .userGroup(new UserGroup(userGroup))
             .build();
