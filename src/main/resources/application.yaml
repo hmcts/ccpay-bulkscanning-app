@@ -25,12 +25,12 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: ${ISSUER_URI:https://idam-web-public.aat.platform.hmcts.net/o}
+            issuer-uri: ${ISSUER_URI}
         # Dummy OIDC client required even we are not going to use
         registration:
           oidc:
-            client-id: ${CLIENT_ID:paybubble}
-            client-secret: ${CLIENT_SECRET:NVYEC2X7XFSRENTU}
+            client-id: ${OIDC_CLIENT_ID}
+            client-secret: ${OIDC_CLIENT_SECRET}
 
   application:
     name: bulk-scanning-payment-api
@@ -85,8 +85,8 @@ auth:
       client:
         baseUrl: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL}
 oidc:
-  audience-list: paybubble,cmc_citizen
-  issuer: ${OIDC_ISSUER:https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts}
+  audience-list: ${OIDC_AUDIENCE_LIST}
+  issuer: ${OIDC_ISSUER}
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
@@ -94,11 +94,11 @@ idam:
   api:
     url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
   s2s-authorised:
-    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
+    services: ${S2S_AUTHORISED_SERVICES}
   s2s-auth:
     url: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL}
-    totp_secret: G5XTFNBUW4P6ZP4F
-    microservice: ccpay_bubble
+    totp_secret: ${OIDC_S2S_SECRET}
+    microservice: ${OIDC_S2S_MICROSERVICE_NAME}
 
 logging:
   level:

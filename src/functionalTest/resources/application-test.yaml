@@ -40,7 +40,7 @@ spring:
         registration:
           oidc:
             client-id: paybubble
-            client-secret: NVYEC2X7XFSRENTU
+            client-secret: ${OIDC_CLIENT_SECRET}
       resource:
         filter-order: 3
 oidc:
