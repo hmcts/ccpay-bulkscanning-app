@@ -21,8 +21,8 @@ def secrets = [
     secret('freg-idam-test-user-password', 'TEST_USER_PASSWORD'),
     secret('gov-pay-keys-cmc', 'GOV_PAY_AUTH_KEY_CMC'),
     secret('paybubble-idam-client-secret', 'OIDC_CLIENT_SECRET'),
-    secret('citizen-oauth-client-secret', 'OAUTH2_CLIENT_SECRET'),
-    secret('cmc-service-secret', 'S2S_SERVICE_SECRET')
+    secret('citizen-oauth-client-secret', 'OAUTH2_CLIENT_SECRET_CMC_CITIZEN'),
+    secret('cmc-service-secret', 'S2S_SERVICE_SECRET_CMC')
   ]
 ]
 
