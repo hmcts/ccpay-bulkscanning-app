@@ -7,3 +7,6 @@ spring:
       aliases:
         bulkscanning-api-POSTGRES-PASS: POSTGRES_PASSWORD
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        paybubble-s2s-secret: OIDC_S2S_SECRET
+        paybubble-idam-client-secret: OIDC_CLIENT_SECRET
+
