@@ -14,6 +14,12 @@ java:
     AUTH_IDAM_CLIENT_BASEURL: "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
     REFORM_SERVICE_NAME: ccpay-bulkscanning
     REFORM_TEAM: ccpay
+    ISSUER_URI: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o"
+    OIDC_CLIENT_ID: "paybubble"
+    OIDC_ISSUER: "https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts"
+    OIDC_S2S_MICROSERVICE_NAME: ccpay_bubble
+    OIDC_AUDIENCE_LIST: paybubble,cmc_citizen
+    S2S_AUTHORISED_SERVICES: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
   keyVaults:
     "ccpay":
       resourceGroup: ccpay
