@@ -18,14 +18,8 @@ variable "env" {
   type = "string"
 }
 
-variable "ilbIp" {}
-
 variable "subscription" {
   type    = "string"
-}
-
-variable "capacity" {
-  default = "1"
 }
 
 variable "common_tags" {
@@ -42,17 +36,8 @@ variable "postgresql_user" {
   default = "bspayment"
 }
 
-variable "idam_api_url" {
-  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
-}
-
 # thumbprint of the SSL certificate for API gateway tests
 variable bulkscanning_api_gateway_certificate_thumbprints {
   type = "list"
   default = []
-}
-
-variable "appinsights_instrumentation_key" {
-  description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
-  default = ""
 }

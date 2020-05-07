@@ -3,9 +3,6 @@ provider "azurerm" {
 }
 
 locals {
-
-  asp_name = "ccpay-${var.env}"
-  sku_size = "${var.env == "prod" || var.env == "sprod" || var.env == "aat" ? "I2" : "I1"}"
   aseName = "core-compute-${var.env}"
 
   local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
@@ -24,34 +21,6 @@ locals {
   api_base_path = "bulk-scanning-payment"
 }
 
-module "bulk-scanning-payment-api" {
-  source = "git@github.com:hmcts/cnp-module-webapp?ref=master"
-  product = "${var.product}-${var.component}"
-  location = "${var.location_app}"
-  env = "${var.env}"
-  ilbIp = "${var.ilbIp}"
-  subscription = "${var.subscription}"
-  capacity = "${var.capacity}"
-  common_tags = "${var.common_tags}"
-  appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
-
-  asp_name = "${local.asp_name}"
-  asp_rg = "${local.asp_name}"
-  instance_size = "${local.sku_size}"
-
-  app_settings = {
-    TEST="true"
-    LOGBACK_REQUIRE_ALERT_LEVEL = "false"
-    LOGBACK_REQUIRE_ERROR_CODE = "false"
-    SPRING_DATASOURCE_USERNAME = "${module.ccpay-bulkscanning-payment-database.user_name}"
-    SPRING_DATASOURCE_PASSWORD = "${module.ccpay-bulkscanning-payment-database.postgresql_password}"
-    SPRING_DATASOURCE_URL = "jdbc:postgresql://${module.ccpay-bulkscanning-payment-database.host_name}:${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}/${module.ccpay-bulkscanning-payment-database.postgresql_database}?sslmode=require"
-    # idam
-    AUTH_IDAM_CLIENT_BASEURL = "${var.idam_api_url}"
-    # service-auth-provider
-    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL = "${local.s2sUrl}"
-  }
-}
 module "ccpay-bulkscanning-payment-database" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
@@ -101,10 +70,6 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
 data "azurerm_key_vault" "payment_key_vault" {
   name = "${local.vaultName}"
   resource_group_name = "ccpay-${var.env}"
-}
-data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
-  name = "AppInsightsInstrumentationKey"
-  vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
 }
 
 # region API (gateway)
