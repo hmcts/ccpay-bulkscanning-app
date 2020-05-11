@@ -41,5 +41,5 @@ withPipeline(type, product, app) {
     //disableLegacyDeployment()
     enableAksStagingDeployment()
     enableSlackNotifications('#cc-payments-tech')
-    disableLegacyDeploymentOnAAT()
+    disableLegacyDeployment()
 }
