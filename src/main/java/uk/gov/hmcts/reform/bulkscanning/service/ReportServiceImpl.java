@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.bulkscanning.utils.DateUtil;
 import java.util.*;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_Scan;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Exela;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Fee_and_Pay;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
@@ -120,7 +120,7 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         String lossResp = payment.getSource().equalsIgnoreCase(Bulk_Scan.toString())
-            ? Exela.toString() : Bulk_Scan.toString();
+            ? Fee_and_Pay.toString() : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
@@ -204,7 +204,7 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         String lossResp = payment.getSource().equalsIgnoreCase(Bulk_Scan.toString())
-            ? Exela.toString() : Bulk_Scan.toString();
+            ? Fee_and_Pay.toString() : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
