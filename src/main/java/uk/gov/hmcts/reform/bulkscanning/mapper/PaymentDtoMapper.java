@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Exela;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Fee_and_Pay;
 
 @Component
 public class PaymentDtoMapper {
