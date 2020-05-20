@@ -87,4 +87,8 @@
     <notes><![CDATA[only affects log appender over SMTP, seriously who does this...]]></notes>
     <cve>CVE-2020-9488</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2020-5408</cve>
+    <cve>CVE-2020-5407</cve>
+  </suppress>
 </suppressions>
