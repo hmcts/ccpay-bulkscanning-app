@@ -87,4 +87,9 @@
     <notes><![CDATA[only affects log appender over SMTP, seriously who does this...]]></notes>
     <cve>CVE-2020-9488</cve>
   </suppress>
+  <suppress>
+    <notes>spring-security-*-5.2.2.RELEASE.jar CVEs 20/05/2020</notes>
+    <cve>CVE-2020-5407</cve>
+    <cve>CVE-2020-5408</cve>
+  </suppress>
 </suppressions>
