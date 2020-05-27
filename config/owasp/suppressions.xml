@@ -82,5 +82,6 @@
     <notes><![CDATA[temporarily suppressing it as we are not impacted by it. Caused by applicationinsights-core-2.3.1.jar/META-INF/maven/io.netty/netty-common/pom.xml]]></notes>
     <cve>CVE-2019-20444</cve>
     <cve>CVE-2019-20445</cve>
+    <cve>CVE-2020-9484</cve>
   </suppress>
 </suppressions>
