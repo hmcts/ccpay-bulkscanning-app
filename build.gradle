@@ -187,7 +187,7 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
   compile group: 'io.springfox', name: 'springfox-swagger-ui', version:'2.9.2'
   compile group: 'io.springfox', name: 'springfox-swagger2', version:'2.9.0'
-  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.2.RELEASE'
+  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.3.RELEASE'
   compile group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.11'
   compile group: 'joda-time', name: 'joda-time', version: '2.10.5'
   compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.9'
