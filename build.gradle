@@ -7,7 +7,8 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
   id 'org.springframework.boot' version '2.2.5.RELEASE'
-  id 'org.owasp.dependencycheck' version '5.3.0'
+  //id 'org.owasp.dependencycheck' version '5.3.0'
+  id "uk.gov.hmcts.java" version '0.8.0'
   id 'com.github.ben-manes.versions' version '0.27.0'
   id 'org.sonarqube' version '2.8'
   id 'idea'
@@ -216,7 +217,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'liquibase-core', version:'3.8.1'
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.10.2'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
-  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.9') {
+  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.13') {
     exclude(module: 'commons-logging')
     exclude(module: 'slf4j-simple')
   }
@@ -235,16 +236,17 @@ dependencies {
 
   compile group: 'commons-io', name: 'commons-io', version: '2.5'
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.1.RELEASE'
-  compile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
+  //compile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
+  //compile group: 'com.netflix.feign', name: 'feign-jackson', version: '9.1.0'
   compile group: 'org.jboss.aerogear', name: 'aerogear-otp-java', version:'1.0.0'
   compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
-  testCompile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
+  //testCompile group: 'com.netflix.feign', name: 'feign-jackson', version: '9.1.0'
   testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
     exclude(module: 'commons-logging')
   }
   compileOnly 'org.projectlombok:lombok:1.18.10'
-  annotationProcessor 'org.projectlombok:lombok:1.18.10'
+
   testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   functionalTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   smokeTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
@@ -258,7 +260,15 @@ dependencies {
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+
   testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.4'
+  //testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.14.2'
+
+  //integrationTestCompile group: 'org.testcontainers', name: 'postgresql', version: '1.14.2'
+
+  //testCompile group: 'org.testcontainers', name: 'testcontainers', version: '1.14.2'
+  //testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.13.0'
+
   testCompile group: 'com.h2database', name: 'h2'
 
   // functional
@@ -299,9 +309,9 @@ jacocoTestReport {
 dependencyCheck {
   // Specifies if the build should be failed if a CVSS score above a specified level is identified.
   // range of 0-10 fails the build, anything greater and it doesn't fail the build
-  failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
+  //failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
   suppressionFile = 'config/owasp/suppressions.xml'
-  format='ALL'
+  //format='ALL'
 }
 
 test {
