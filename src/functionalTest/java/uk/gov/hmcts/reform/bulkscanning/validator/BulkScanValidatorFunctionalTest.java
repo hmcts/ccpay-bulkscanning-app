@@ -67,4 +67,24 @@ public class BulkScanValidatorFunctionalTest {
         Assert.assertTrue(response.andReturn().asString().contains(CCD_REFERENCE_MISSING));
         Assert.assertTrue(response.andReturn().asString().contains(PAYMENT_DCN_MISSING));
     }
+
+    @Test()
+    @Transactional
+    public void testFieldLevelValidationAA09() throws Exception {
+        String[] dcn = {""};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null, null,
+                                                                                     "AA09", false);
+
+        Response response = RestAssured.given()
+            .header("ServiceAuthorization", SERVICE_TOKEN)
+            .body(bulkScanPaymentRequest)
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/bulk-scan-payments");
+
+        Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(response.getStatusCode()));
+
+        Assert.assertTrue(response.andReturn().asString().contains(CCD_REFERENCE_MISSING));
+        Assert.assertTrue(response.andReturn().asString().contains(PAYMENT_DCN_MISSING));
+    }
 }
