@@ -313,7 +313,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn,
-                                                                      String responsibleServiceId, boolean isExceptionRecord) {
+                                        String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)

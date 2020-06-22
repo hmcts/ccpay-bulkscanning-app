@@ -25,7 +25,8 @@ public class TestContextConfiguration {
     public void initialize() {
         RestAssured.config = RestAssured.config()
             .objectMapperConfig(
-                ObjectMapperConfig.objectMapperConfig().jackson2ObjectMapperFactory((cls, charset) -> new ObjectMapper())
+                ObjectMapperConfig
+                    .objectMapperConfig().jackson2ObjectMapperFactory((cls, charset) -> new ObjectMapper())
             )
             .jsonConfig(jsonConfig().numberReturnType(JsonPathConfig.NumberReturnType.BIG_DECIMAL));
         RestAssured.useRelaxedHTTPSValidation();
