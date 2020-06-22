@@ -21,7 +21,7 @@
     <cve>CVE-2019-13509</cve>
     <cve>CVE-2019-16884</cve>
     <cve>CVE-2019-5736</cve>
-    <cve>611</cve>
+    <cwe>611</cwe>
     <cve>CVE-2020-9488</cve>
 
   </suppress>
