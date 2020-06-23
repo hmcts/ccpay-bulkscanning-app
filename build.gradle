@@ -96,10 +96,9 @@ task smoke(type: Test) {
   configDir = new File(rootDir, 'config/checkstyle')
 }*/
 
+
 checkstyleMain.enabled(false)
 checkstyleTest.enabled(false)
-
-
 
 pmd {
   toolVersion = "6.18.0"
@@ -160,6 +159,22 @@ repositories {
 
 }
 
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.boot:spring-boot-dependencies:2.2.5.RELEASE"
+    mavenBom 'org.apache.logging.log4j:log4j-bom:2.13.3'
+  }
+  dependencies {
+    dependencySet(
+      group: 'com.fasterxml.jackson.core',
+      version: '2.10.1'
+    ) {
+      entry 'jackson-core'
+      entry 'jackson-databind'
+    }
+  }
+}
+
 def versions = [
   junit           : '5.5.0',
   reformLogging   : '5.1.1',
@@ -185,6 +200,12 @@ configurations.all {
 }
 
 dependencies {
+
+ // compile group: 'com.google.guava', name: 'guava', version: '24.1.1-jre'
+
+  compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
+
   compile("org.springframework.boot:spring-boot-starter-web")
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -202,7 +223,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'liquibase-core', version:'3.8.1'
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.10.2'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
-  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.9') {
+  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.13') {
     exclude(module: 'commons-logging')
     exclude(module: 'slf4j-simple')
   }
@@ -221,11 +242,14 @@ dependencies {
 
   compile group: 'commons-io', name: 'commons-io', version: '2.5'
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.1.RELEASE'
-  compile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
+ //compile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
+  //compile group: 'com.netflix.feign', name: 'feign-jackson', version: '9.3.1'
+  compile group: 'io.github.openfeign', name: 'feign-jackson', version: '10.1.0'
   compile group: 'org.jboss.aerogear', name: 'aerogear-otp-java', version:'1.0.0'
   compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
-  testCompile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
+  //testCompile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
+  //testCompile group: 'com.netflix.feign', name: 'feign-jackson', version: '9.3.1'
   testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
     exclude(module: 'commons-logging')
   }
@@ -234,7 +258,9 @@ dependencies {
   testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   functionalTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   smokeTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
-  testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.0.4.RELEASE'
+  //testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.0.4.RELEASE'
+  testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.2.1.RELEASE'
+
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
@@ -242,8 +268,19 @@ dependencies {
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+
   testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.4'
+  //testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.14.2'
+
+  //integrationTestCompile group: 'org.testcontainers', name: 'postgresql', version: '1.14.2'
+
+  //testCompile group: 'org.testcontainers', name: 'testcontainers', version: '1.14.2'
+  //testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.13.0'
+
   testCompile group: 'com.h2database', name: 'h2'
+
+
+
 
   // functional
   functionalTestCompile sourceSets.test.runtimeClasspath
