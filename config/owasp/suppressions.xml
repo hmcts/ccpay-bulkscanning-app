@@ -13,6 +13,7 @@
     <notes>We are on latest version , these are coming form mvn:pkg </notes>
     <cve>CVE-2020-10683</cve>
     <cve>CVE-2020-13692</cve>
+    <cve>CVE-2020-11996</cve>
   </suppress>
 
 </suppressions>
