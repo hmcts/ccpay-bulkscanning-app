@@ -236,7 +236,7 @@ dependencies {
   testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
     exclude(module: 'commons-logging')
   }
-  compileOnly 'org.projectlombok:lombok:1.18.10'
+  compileOnly 'org.projectlombok:lombok:1.18.12'
   annotationProcessor 'org.projectlombok:lombok:1.18.10'
   testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
   functionalTestAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
