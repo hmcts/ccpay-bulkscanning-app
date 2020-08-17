@@ -291,7 +291,7 @@ dependencies {
   test {
     finalizedBy jacocoTestReport
     jacoco {
-      append = true
+      //append = true
       destinationFile = file("${project.rootDir}/build/jacoco/test.exec")
     }
   }
