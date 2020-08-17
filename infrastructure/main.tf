@@ -32,6 +32,7 @@ module "ccpay-bulkscanning-payment-database" {
   sku_name = "GP_Gen5_2"
   sku_tier = "GeneralPurpose"
   common_tags = "${var.common_tags}"
+  postgresql_version = "${var.postgresql_version}"
 }
 
 # Populate Vault with DB info
