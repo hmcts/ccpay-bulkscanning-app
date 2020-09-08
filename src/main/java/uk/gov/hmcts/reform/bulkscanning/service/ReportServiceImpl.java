@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.bulkscanning.utils.DateUtil;
 import java.util.*;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_Scan;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Fee_and_Pay;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
@@ -33,6 +32,8 @@ public class ReportServiceImpl implements ReportService {
     private final PaymentMetadataRepository paymentMetadataRepository;
 
     private static final Logger LOG = LoggerFactory.getLogger(ReportServiceImpl.class);
+
+    private static final String FEE_AND_PAY = "Fee and Pay";
 
     @Autowired
     public ReportServiceImpl(PaymentRepository paymentRepository,
@@ -120,7 +121,7 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         String lossResp = payment.getSource().equalsIgnoreCase(Bulk_Scan.toString())
-            ? Fee_and_Pay.toString() : Bulk_Scan.toString();
+            ? FEE_AND_PAY : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
@@ -204,7 +205,7 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         String lossResp = payment.getSource().equalsIgnoreCase(Bulk_Scan.toString())
-            ? Fee_and_Pay.toString() : Bulk_Scan.toString();
+            ? FEE_AND_PAY : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
