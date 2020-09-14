@@ -21,7 +21,7 @@ locals {
   api_base_path = "bulk-scanning-payment"
 }
 
-module "ccpay-bulkscanning-payment-database-V11" {
+module "ccpay-bulkscanning-payment-database-v11" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location_app}"
@@ -39,31 +39,31 @@ module "ccpay-bulkscanning-payment-database-V11" {
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name      = "${var.component}-POSTGRES-USER"
-  value     = "${module.ccpay-bulkscanning-payment-database-V11.user_name}"
+  value     = "${module.ccpay-bulkscanning-payment-database-v11.user_name}"
   key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   name      = "${var.component}-POSTGRES-PASS"
-  value     = "${module.ccpay-bulkscanning-payment-database-V11.postgresql_password}"
+  value     = "${module.ccpay-bulkscanning-payment-database-v11.postgresql_password}"
   key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
   name      = "${var.component}-POSTGRES-HOST"
-  value     = "${module.ccpay-bulkscanning-payment-database-V11.host_name}"
+  value     = "${module.ccpay-bulkscanning-payment-database-v11.host_name}"
   key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
   name      = "${var.component}-POSTGRES-PORT"
-  value     = "${module.ccpay-bulkscanning-payment-database-V11.postgresql_listen_port}"
+  value     = "${module.ccpay-bulkscanning-payment-database-v11.postgresql_listen_port}"
   key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name      = "${var.component}-POSTGRES-DATABASE"
-  value     = "${module.ccpay-bulkscanning-payment-database-V11.postgresql_database}"
+  value     = "${module.ccpay-bulkscanning-payment-database-v11.postgresql_database}"
   key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
 }
 
