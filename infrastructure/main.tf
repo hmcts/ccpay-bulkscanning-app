@@ -21,6 +21,19 @@ locals {
   api_base_path = "bulk-scanning-payment"
 }
 
+module "ccpay-bulkscanning-payment-database" {
+  source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
+  product = "${var.product}-${var.component}-postgres-db"
+  location = "${var.location_app}"
+  subscription = "${var.subscription}"
+  env = "${var.env}"
+  postgresql_user = "${var.postgresql_user}"
+  database_name = "${var.database_name}"
+  sku_name = "GP_Gen5_2"
+  sku_tier = "GeneralPurpose"
+  common_tags = "${var.common_tags}"
+}
+
 module "ccpay-bulkscanning-payment-database-v11" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
