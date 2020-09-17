@@ -76,3 +76,8 @@ auth:
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

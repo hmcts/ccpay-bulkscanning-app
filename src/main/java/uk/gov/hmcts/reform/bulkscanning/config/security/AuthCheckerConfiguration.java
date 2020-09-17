@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.config.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,8 @@ import java.util.regex.Pattern;
 
 @Configuration
 public class AuthCheckerConfiguration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AuthCheckerConfiguration.class);
 
     @Value("#{'${trusted.s2s.service.names}'.split(',')}")
     private List<String> authorizedServices;
@@ -41,6 +45,7 @@ public class AuthCheckerConfiguration {
 
     @Bean
     public Function<HttpServletRequest, Collection<String>> authorizedServicesExtractor() {
+        LOG.info("List of Authorised services - " + authorizedServices);
         return (any) -> authorizedServices;
     }
 }

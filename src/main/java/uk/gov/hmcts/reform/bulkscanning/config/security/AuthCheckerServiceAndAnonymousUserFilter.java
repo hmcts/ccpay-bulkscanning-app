@@ -74,6 +74,8 @@ public class AuthCheckerServiceAndAnonymousUserFilter extends AbstractPreAuthent
     private Service authorizeService(HttpServletRequest request) {
         try {
             String bearerToken = request.getHeader(SERVICE_AUTHORISATION);
+            log.info("Service token received from payment app : " +bearerToken);
+
             if (bearerToken == null) {
                 log.warn("Unsuccessful service authentication because of Bearer Token Null!!!");
                 return null;
