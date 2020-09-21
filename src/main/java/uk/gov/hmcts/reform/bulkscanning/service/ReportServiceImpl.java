@@ -33,7 +33,7 @@ public class ReportServiceImpl implements ReportService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReportServiceImpl.class);
 
-    private static final String FEE_AND_PAY = "Fee and Pay";
+    private static final String FEE_PAY = "Fee_Pay";
 
     @Autowired
     public ReportServiceImpl(PaymentRepository paymentRepository,
@@ -121,7 +121,7 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         String lossResp = payment.getSource().equalsIgnoreCase(Bulk_Scan.toString())
-            ? FEE_AND_PAY : Bulk_Scan.toString();
+            ? FEE_PAY : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
@@ -205,7 +205,7 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         String lossResp = payment.getSource().equalsIgnoreCase(Bulk_Scan.toString())
-            ? FEE_AND_PAY : Bulk_Scan.toString();
+            ? FEE_PAY : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
