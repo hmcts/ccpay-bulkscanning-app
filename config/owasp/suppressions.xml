@@ -21,8 +21,6 @@
     <cve>CVE-2019-14900</cve>
     <cve>CVE-2020-13934</cve>
     <cve>CVE-2020-13935</cve>
-    <cve>CVE-2020-8022</cve>
-    <cve>CVE-2017-18640</cve>
   </suppress>
 
   <!--Added on 20th May 2020-->
