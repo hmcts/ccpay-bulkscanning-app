@@ -1,5 +1,6 @@
 provider "azurerm" {
-  version = "1.22.1"
+  version = "=2.20.0"
+  features {}
 }
 
 locals {
@@ -22,65 +23,65 @@ locals {
 }
 
 module "ccpay-bulkscanning-payment-database" {
-  source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
+  source = "git@github.com:hmcts/cnp-module-postgres?ref=azurermv2"
   product = "${var.product}-${var.component}-postgres-db"
-  location = "${var.location_app}"
-  subscription = "${var.subscription}"
-  env = "${var.env}"
-  postgresql_user = "${var.postgresql_user}"
-  database_name = "${var.database_name}"
+  location = var.location_app
+  subscription = var.subscription
+  env = var.env
+  postgresql_user = var.postgresql_user
+  database_name = var.database_name
   sku_name = "GP_Gen5_2"
   sku_tier = "GeneralPurpose"
-  common_tags = "${var.common_tags}"
+  common_tags = var.common_tags
+}
+
+data "azurerm_key_vault" "payment_key_vault" {
+  name = local.vaultName
+  resource_group_name = "ccpay-${var.env}"
 }
 
 # Populate Vault with DB info
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name      = "${var.component}-POSTGRES-USER"
-  value     = "${module.ccpay-bulkscanning-payment-database.user_name}"
-  key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
+  value     = module.ccpay-bulkscanning-payment-database.user_name
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   name      = "${var.component}-POSTGRES-PASS"
-  value     = "${module.ccpay-bulkscanning-payment-database.postgresql_password}"
-  key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
+  value     = module.ccpay-bulkscanning-payment-database.postgresql_password
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
   name      = "${var.component}-POSTGRES-HOST"
-  value     = "${module.ccpay-bulkscanning-payment-database.host_name}"
-  key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
+  value     =  module.ccpay-bulkscanning-payment-database.host_name
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
   name      = "${var.component}-POSTGRES-PORT"
-  value     = "${module.ccpay-bulkscanning-payment-database.postgresql_listen_port}"
-  key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
+  value     =  module.ccpay-bulkscanning-payment-database.postgresql_listen_port
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name      = "${var.component}-POSTGRES-DATABASE"
-  value     = "${module.ccpay-bulkscanning-payment-database.postgresql_database}"
-  key_vault_id = "${data.azurerm_key_vault.payment_key_vault.id}"
+  value     =  module.ccpay-bulkscanning-payment-database.postgresql_database
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
-
-data "azurerm_key_vault" "payment_key_vault" {
-  name = "${local.vaultName}"
-  resource_group_name = "ccpay-${var.env}"
-}
 
 # region API (gateway)
 data "azurerm_key_vault_secret" "s2s_client_secret" {
   name = "gateway-s2s-client-secret"
-  vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 data "azurerm_key_vault_secret" "s2s_client_id" {
   name = "gateway-s2s-client-id"
-  vault_uri = "${data.azurerm_key_vault.payment_key_vault.vault_uri}"
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 data "template_file" "api_template" {
@@ -110,7 +111,7 @@ resource "azurerm_template_deployment" "bulk-scanning-payment" {
     apiName                   = "bulk-scanning-payment-api"
     apiProductName            = "bulk-scanning-payment"
     serviceUrl                = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
-    apiBasePath               = "${local.api_base_path}"
-    policy                    = "${data.template_file.policy_template.rendered}"
+    apiBasePath               = local.api_base_path
+    policy                    = data.template_file.policy_template.rendered
   }
 }

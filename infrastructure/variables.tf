@@ -1,38 +1,31 @@
 variable "product" {
-  type    = "string"
   default = "ccpay"
 }
 
 variable "component" {
-  type    = "string"
   default = "bulkscanning-api"
 
 }
 
 variable "location_app" {
-  type    = "string"
   default = "UK South"
 }
 
 variable "env" {
-  type = "string"
 }
 
 variable "subscription" {
-  type    = "string"
 }
 
 variable "common_tags" {
-  type = "map"
+  type = map(string)
 }
 
 variable "database_name" {
-  type    = "string"
   default = "bspayment"
 }
 
 variable "postgresql_user" {
-  type    = "string"
   default = "bspayment"
 }
 
