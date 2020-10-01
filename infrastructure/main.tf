@@ -91,7 +91,7 @@ data "template_file" "api_template" {
 data "template_file" "policy_template" {
   template = "${file("${path.module}/template/api-policy.xml")}"
 
-  vars {
+  vars = {
     allowed_certificate_thumbprints = "${local.thumbprints_in_quotes_str}"
     s2s_client_id = "${data.azurerm_key_vault_secret.s2s_client_id.value}"
     s2s_client_secret = "${data.azurerm_key_vault_secret.s2s_client_secret.value}"
