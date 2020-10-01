@@ -1,5 +1,5 @@
 variable "product" {
-  default = ccpay
+  default = "ccpay"
 }
 
 variable "component" {
