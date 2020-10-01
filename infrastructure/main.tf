@@ -23,7 +23,7 @@ locals {
 }
 
 module "ccpay-bulkscanning-payment-database" {
-  source = "git@github.com:hmcts/cnp-module-postgres?ref=azurermv2"
+  source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = var.location_app
   subscription = var.subscription
