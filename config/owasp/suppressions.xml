@@ -25,4 +25,10 @@
     <cve>CVE-2017-18640</cve>
     <cve>CVE-2020-5421</cve>
   </suppress>
+
+  <!--Added on 20th May 2020-->
+  <suppress>
+    <cve>CVE-2020-5408</cve>
+    <cve>CVE-2020-5407</cve>
+  </suppress>
 </suppressions>
