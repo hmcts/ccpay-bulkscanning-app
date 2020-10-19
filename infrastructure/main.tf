@@ -33,6 +33,7 @@ module "ccpay-bulkscanning-payment-database" {
   sku_name = "GP_Gen5_2"
   sku_tier = "GeneralPurpose"
   common_tags = var.common_tags
+  postgresql_version = var.postgresql_version
 }
 
 data "azurerm_key_vault" "payment_key_vault" {
