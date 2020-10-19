@@ -37,7 +37,6 @@ variable "postgresql_user" {
 }
 
 variable "postgresql_version" {
-  type    = string
   default = "11"
 }
 
