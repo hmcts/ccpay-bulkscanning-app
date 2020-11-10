@@ -41,3 +41,7 @@ variable bulkscanning_api_gateway_certificate_thumbprints {
   type = list(string)
   default = []
 }
+
+variable "postgresql_version" {
+  default = "11"
+}
