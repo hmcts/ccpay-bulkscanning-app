@@ -157,7 +157,7 @@ checkstyleTest.enabled(false)
 
   dependencyManagement {
     imports {
-      mavenBom "org.springframework.boot:spring-boot-dependencies:2.2.5.RELEASE"
+      mavenBom "org.springframework.boot:spring-boot-dependencies:2.4.0"
       mavenBom 'org.apache.logging.log4j:log4j-bom:2.13.3'
     }
     dependencies {
