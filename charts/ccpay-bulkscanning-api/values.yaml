@@ -1,6 +1,7 @@
 java:
   image: 'hmctspublic.azurecr.io/ccpay/bulkscanning-api:latest'
   applicationPort: 8080
+  readinessPath: '/health/readiness'
   ingressHost: ccpay-bulkscanning-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: ccpay
   environment:
