@@ -44,8 +44,8 @@ services:
       - POSTGRES_DB=bspayment
     ports:
       - 5182:5432
-#    volumes:
-#      - ccpay-bulkscanning-db-data:/var/lib/postgresql/data
+    volumes:
+      - ccpay-bulkscanning-db-data:/var/lib/postgresql/data
 
   service-auth-provider-api:
     image: hmctspublic.azurecr.io/rpe/service-auth-provider
@@ -131,5 +131,5 @@ services:
       - JAVA_OPTS=-Xms128m -Xms512m
       - STRATEGIC_SERVICE_URL=http://idam-api:5000
       - STRATEGIC_PUBLIC_URL=http://idam-web-public:9002
-  #volumes:
-  #  ccpay-bulkscanning-db-data:
+volumes:
+  ccpay-bulkscanning-db-data:
