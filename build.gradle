@@ -258,7 +258,8 @@ dependencies {
   functionalTestCompile sourceSets.test.runtimeClasspath
   smokeTestCompile sourceSets.test.runtimeClasspath
 
-  implementation 'org.springframework.boot:spring-boot-starter-validation'
+ // implementation 'org.springframework.boot:spring-boot-starter-validation'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.3.0.RELEASE'
 
   mainClassName = 'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication'
   def jarName = 'bulk-scanning-payment-api.jar'

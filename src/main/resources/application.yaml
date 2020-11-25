@@ -8,6 +8,9 @@ management:
   endpoint:
     health:
       show-details: "always"
+
+      probes:
+        enabled: "true"
 spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
