@@ -202,7 +202,9 @@ dependencies {
   compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
   compile("org.springframework.boot:spring-boot-starter-web")
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+  compile (group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'){
+    exclude(module:"micrometer-core")
+  }
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
