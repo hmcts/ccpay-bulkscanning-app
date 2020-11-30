@@ -9,7 +9,7 @@ spring:
     name: bulk-scanning
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:9.6://localhost/features
+    url: jdbc:tc:postgresql:11.0://localhost/features
   liquibase:
     enabled: ${SPRING_LIQUIBASE_ENABLED:true}
     change-log: classpath:/db/changelog/db.changelog-master.xml
