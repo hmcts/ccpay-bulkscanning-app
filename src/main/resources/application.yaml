@@ -11,7 +11,11 @@ management:
 
       probes:
         enabled: "true"
+server:
+  shutdown: ${SERVER_SHUTDOWN_STRATEGY}
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: ${TIMEOUT_SERVER_SHUTDOWN_PHASE}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
@@ -80,3 +84,4 @@ auth:
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
+
