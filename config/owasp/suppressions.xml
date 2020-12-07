@@ -53,14 +53,13 @@
   </suppress>
 
   <suppress>
-    <notes>This CVE is because of HttpClient versions prior to version 4.5.13 and will be fixed when version is upgraded </notes>
-    <cve>CVE-2020-13956</cve>
+    <notes>Hibernate core 5.4.12 related issue, its transitive dependency coming from spring boot starter JPA</notes>
+    <cve>CVE-2020-25638</cve>
   </suppress>
 
   <suppress>
-    <notes><![CDATA[file name: hibernate-core-5.4.12.Final.jar]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.hibernate/hibernate\-core@.*$</packageUrl>
-    <cve>CVE-2020-25638</cve>
+    <notes>HTTP Client 4.5.11 suppression, root cause and fix needs to be carried out separately</notes>
+    <cve>CVE-2020-13956</cve>
   </suppress>
 
 </suppressions>
