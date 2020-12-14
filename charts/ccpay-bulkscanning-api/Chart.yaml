@@ -8,5 +8,5 @@ maintainers:
   - name: HMCTS Fees and Pay team
 dependencies:
   - name: java
-    version: ~3.0.0-beta
+    version: 3.4.4
     repository: '@hmctspublic'
