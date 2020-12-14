@@ -179,8 +179,12 @@ checkstyleTest.enabled(false)
           details.useVersion '2.12.0'
         }
 
-        if (details.requested.name == 'jackson-databind') {
-          details.useVersion '2.12.0'
+        if (details.requested.name == 'tomcat-embed-core') {
+          details.useVersion '9.0.41'
+        }
+
+        if (details.requested.name == 'tomcat-embed-websocket') {
+            details.useVersion '9.0.41'
         }
       }
     }

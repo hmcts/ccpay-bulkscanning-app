@@ -42,11 +42,6 @@
   </suppress>
 
   <suppress>
-    <notes>This is transitive dependency coming from spring boot starter, CVE is for tomcat-embed-core/Websocket jar. Latest version also have same CVE issues so expiry date cant be mentioned</notes>
-    <cve>CVE-2020-17527</cve>
-  </suppress>
-
-  <suppress>
     <notes>file name: junit-4.13.1.jar Awaiting patch for Junit : https://deb.freexian.com/extended-lts/tracker/CVE-2020-15250</notes>
     <packageUrl regex="true">^pkg:maven/junit/junit@.*$</packageUrl>
     <cve>CVE-2020-15250</cve>
