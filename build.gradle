@@ -160,15 +160,6 @@ checkstyleTest.enabled(false)
       mavenBom "org.springframework.boot:spring-boot-dependencies:2.3.6.RELEASE"
       mavenBom 'org.apache.logging.log4j:log4j-bom:2.13.3'
     }
-    dependencies {
-      dependencySet(
-        group: 'com.fasterxml.jackson.core',
-        version: '2.10.1'
-      ) {
-        entry 'jackson-core'
-        entry 'jackson-databind'
-      }
-    }
   }
 
   def versions = [
@@ -185,7 +176,7 @@ checkstyleTest.enabled(false)
     resolutionStrategy {
       eachDependency { DependencyResolveDetails details ->
         if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
-          details.useVersion '2.10.1'
+          details.useVersion '2.12.0'
         }
 
         if (details.requested.name == 'jackson-databind') {
@@ -216,7 +207,6 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   compile group: 'com.querydsl', name: 'querydsl-jpa', version:'4.2.2'
   compile group: 'uk.gov.hmcts.reform', name: 'liquibase-core', version:'3.8.1'
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.10.2'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
   compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.13') {
     exclude(module: 'commons-logging')
