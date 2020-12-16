@@ -188,7 +188,7 @@ configurations.all {
       }
 
       if (det.requested.name == 'guava') {
-        det.useVersion '30.1-jre'
+        det.useVersion '30.0-jre'
       }
     }
 
