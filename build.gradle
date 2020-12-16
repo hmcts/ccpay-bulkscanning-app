@@ -186,10 +186,7 @@ configurations.all {
       if (det.requested.group == 'com.fasterxml.jackson.core') {
         det.useVersion '2.12.0'
       }
-
-      if (det.requested.name == 'guava') {
-        det.useVersion '30.0-jre'
-      }
+      
     }
 
   }
