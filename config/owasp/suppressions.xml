@@ -42,14 +42,19 @@
   </suppress>
 
   <suppress>
-    <notes>This is transitive dependency coming for spring boot, CVE is for tomcat-embed-core-9.0.31.jar and tomcat-embed-websocket-9.0.31.jar</notes>
-    <cve>CVE-2020-13943</cve>
-  </suppress>
-
-  <suppress>
     <notes>file name: junit-4.13.1.jar Awaiting patch for Junit : https://deb.freexian.com/extended-lts/tracker/CVE-2020-15250</notes>
     <packageUrl regex="true">^pkg:maven/junit/junit@.*$</packageUrl>
     <cve>CVE-2020-15250</cve>
   </suppress>
-  
+
+  <suppress>
+    <notes>Hibernate core 5.4.12 related issue, its transitive dependency coming from spring boot starter JPA</notes>
+    <cve>CVE-2020-25638</cve>
+  </suppress>
+
+  <suppress>
+    <notes>HTTP Client 4.5.11 suppression, root cause and fix needs to be carried out separately</notes>
+    <cve>CVE-2020-13956</cve>
+  </suppress>
+
 </suppressions>
