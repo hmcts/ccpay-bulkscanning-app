@@ -187,6 +187,7 @@ checkstyleTest.enabled(false)
         if (details.requested.name == 'jackson-databind') {
           details.useVersion '2.11.2'
         }
+        
         if (details.requested.name == 'tomcat-embed-core') {
           details.useVersion '9.0.41'
         }
