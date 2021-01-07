@@ -36,7 +36,9 @@ module "ccpay-bulkscanning-payment-database" {
 
 module "ccpay-bulkscanning-payment-database-v11" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product = "${var.product}-${var.component}-postgres-db-v11"
+  product = var.product
+  component = var.component
+  name = "${var.product}-${var.component}-postgres-db-v11"
   location = var.location_app
   subscription = var.subscription
   env = var.env
