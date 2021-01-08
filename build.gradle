@@ -195,8 +195,8 @@ configurations.all {
       if (det.requested.group == 'com.fasterxml.jackson.core') {
         det.useVersion '2.12.0'
       }
-      if (details.requested.name == 'jackson-databind') {
-        details.useVersion '2.11.2'
+      if (det.requested.name == 'jackson-databind') {
+        det.useVersion '2.11.2'
       }
     }
 
