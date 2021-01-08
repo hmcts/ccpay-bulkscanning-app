@@ -8,7 +8,6 @@ management:
   endpoint:
     health:
       show-details: "always"
-
       probes:
         enabled: "true"
 server:
@@ -84,4 +83,3 @@ auth:
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
-
