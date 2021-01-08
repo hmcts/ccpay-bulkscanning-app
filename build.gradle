@@ -204,6 +204,19 @@ checkstyleTest.enabled(false)
           details.useVersion '4.5.13'
         }
 
+        if(details.requested.name == 'snakeyaml'){
+          details.useVersion '1.27'
+        }
+
+        if (details.requested.name == 'junit' && details.requested.group == 'junit') {
+          details.useVersion '4.13.1'
+        }
+
+        if(details.requested.name == 'spring-security-config' || details.requested.name == 'spring-security-core' || details.requested.name == 'spring-security-crypto'
+          ||details.requested.name == 'spring-security-web'){
+          details.useVersion '5.4.2'
+        }
+
 
       }
     }
