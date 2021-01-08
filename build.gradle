@@ -160,6 +160,15 @@ checkstyleTest.enabled(false)
       mavenBom "org.springframework.boot:spring-boot-dependencies:2.3.6.RELEASE"
       mavenBom 'org.apache.logging.log4j:log4j-bom:2.13.3'
     }
+    dependencies {
+      dependencySet(
+        group: 'com.fasterxml.jackson.core',
+        version: '2.10.1'
+      ) {
+        entry 'jackson-core'
+        entry 'jackson-databind'
+      }
+    }
   }
 
   def versions = [
@@ -185,6 +194,9 @@ configurations.all {
 
       if (det.requested.group == 'com.fasterxml.jackson.core') {
         det.useVersion '2.12.0'
+      }
+      if (details.requested.name == 'jackson-databind') {
+        details.useVersion '2.11.2'
       }
     }
 
