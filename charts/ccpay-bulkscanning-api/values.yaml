@@ -20,6 +20,8 @@ java:
     OIDC_S2S_MICROSERVICE_NAME: ccpay_bubble
     OIDC_AUDIENCE_LIST: paybubble,cmc_citizen,ccd_gateway
     S2S_AUTHORISED_SERVICES: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
+    SERVER_SHUTDOWN_STRATEGY: graceful
+    TIMEOUT_SERVER_SHUTDOWN_PHASE: 30s
   keyVaults:
     "ccpay":
       resourceGroup: ccpay
