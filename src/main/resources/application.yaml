@@ -8,7 +8,13 @@ management:
   endpoint:
     health:
       show-details: "always"
+      probes:
+        enabled: "true"
+server:
+  shutdown: ${SERVER_SHUTDOWN_STRATEGY}
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: ${TIMEOUT_SERVER_SHUTDOWN_PHASE}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
@@ -54,6 +60,7 @@ security:
   anonymousPaths:
     - "/health"
     - "/health/liveness"
+    - "/health/readiness"
     - "/actuator/**"
     - "/loggers/**"
     - "/swagger-ui.html"
