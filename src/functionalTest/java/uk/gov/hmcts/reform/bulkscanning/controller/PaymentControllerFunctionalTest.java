@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.bulkscanning.config.IdamService;
 import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
 import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
 import uk.gov.hmcts.reform.bulkscanning.config.TestContextConfiguration;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
@@ -229,13 +228,6 @@ public class PaymentControllerFunctionalTest {
             .when()
             .post("/bulk-scan-payments");
 
-        /*//Complete payment
-        EnvelopePayment payment = paymentRepository.findByDcnReference("1111-2222-4444-5555").get();
-        Assert.assertEquals(COMPLETE.toString(), payment.getPaymentStatus());
-
-        //Complete envelope
-        Envelope finalEnvelope = envelopeRepository.findById(payment.getEnvelope().getId()).get();
-        Assert.assertEquals(COMPLETE.toString(), finalEnvelope.getPaymentStatus());*/
         Assert.assertNotNull(exelaResp.andReturn().asString());
         Assert.assertNotNull(bsResp.andReturn().asString());
     }
@@ -264,13 +256,6 @@ public class PaymentControllerFunctionalTest {
             .when()
             .post("/bulk-scan-payments");
 
-        /*//Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-6666").get().getPaymentStatus()
-            , COMPLETE.toString());
-
-        //Non Complete Payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-7777").get().getPaymentStatus()
-            , INCOMPLETE.toString());*/
         Assert.assertNotNull(exelaResp.andReturn().asString());
         Assert.assertNotNull(bsResp.andReturn().asString());
     }
@@ -300,13 +285,6 @@ public class PaymentControllerFunctionalTest {
             .when()
             .post("/bulk-scan-payment");
 
-        /*//Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-8888").get().getPaymentStatus()
-            , COMPLETE.toString());
-
-        //Non Complete Payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-9999").get().getPaymentStatus()
-            , INCOMPLETE.toString());*/
         Assert.assertNotNull(bsResp.andReturn().asString());
         Assert.assertNotNull(exelaResp.andReturn().asString());
 
@@ -318,7 +296,6 @@ public class PaymentControllerFunctionalTest {
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
             .documentControlNumbers(dcn)
-            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId).toString())
             .isExceptionRecord(isExceptionRecord)
             .build();
     }

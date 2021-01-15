@@ -54,7 +54,6 @@ public class BulkScanValidatorTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public static final String RESPONSIBLE_SERVICE_ID_MISSING = "site_id can't be Blank";
     public static final String CCD_REFERENCE_MISSING = "ccd_case_number can't be Blank";
     public static final String PAYMENT_DCN_MISSING = "document_control_numbers can't be Blank";
     public static final String UNKNOWN_FIELD = "Unknown field";
