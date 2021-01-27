@@ -14,5 +14,5 @@
     <notes>Transitive dependency of spring boot version</notes>
     <cve>CVE-2020-5421</cve>
   </suppress>
-  <!-- Supression Group ends here -->
+  <!-- Supression group ends here -->
 </suppressions>
