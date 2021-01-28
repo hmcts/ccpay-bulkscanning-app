@@ -57,4 +57,9 @@
     <cve>CVE-2020-13956</cve>
   </suppress>
 
+  <suppress>
+    <notes>spring-security-web</notes>
+    <cve>CVE-2018-1258</cve>
+  </suppress>
+
 </suppressions>
