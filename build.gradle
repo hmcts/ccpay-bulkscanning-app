@@ -181,27 +181,8 @@ checkstyleTest.enabled(false)
     sonarPitest : '0.5'
   ]
 
-configurations.all {
-  resolutionStrategy {
-    eachDependency { DependencyResolveDetails det ->
-      if (det.requested.name == 'tomcat-embed-core') {
-        det.useVersion '9.0.41'
-      }
+  apply from: "${rootDir}/cve-resolution-strategy.gradle"
 
-      if (det.requested.name == 'tomcat-embed-websocket') {
-        det.useVersion '9.0.41'
-      }
-
-      if (det.requested.group == 'com.fasterxml.jackson.core') {
-        det.useVersion '2.12.0'
-      }
-      if (det.requested.name == 'jackson-databind') {
-        det.useVersion '2.11.2'
-      }
-    }
-
-  }
-}
 
 dependencies {
   compile ('com.sun.xml.bind:jaxb-osgi:2.3.1')
@@ -260,7 +241,7 @@ dependencies {
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-  testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.14.2'
+  testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.15.1'
   testCompile group: 'com.h2database', name: 'h2'
   functionalTestCompile sourceSets.test.runtimeClasspath
   smokeTestCompile sourceSets.test.runtimeClasspath
