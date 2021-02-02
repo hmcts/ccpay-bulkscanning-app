@@ -18,7 +18,8 @@ public interface IdamApi {
 
     @RequestLine("POST /o/token")
     @Headers("Content-Type: application/x-www-form-urlencoded")
-    @Body("username={username}&password={password}&scope={scope}&grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}")
+    @Body("username={username}&password={password}&scope={scope}&grant_type={grant_type}&client_id="
+        + "{client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}")
     TokenExchangeResponse exchangeCode(@Param("username") String username,
                                        @Param("password") String password,
                                        @Param("scope") String scope,
