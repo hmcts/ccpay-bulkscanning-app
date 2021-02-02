@@ -131,6 +131,7 @@ public class SpringSecurityConfiguration {
                                        "/refdata/**",
                                        "/health",
                                        "/health/liveness",
+                                       "/health/readiness",
                                        "/info",
                                        "/favicon.ico",
                                        "/mock-api/**",

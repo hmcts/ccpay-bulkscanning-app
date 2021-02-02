@@ -2,9 +2,12 @@ management:
   endpoints:
     web:
       base-path: /
-
+server:
+  shutdown: graceful
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   main:
     allow-bean-definition-overriding: true
   application:

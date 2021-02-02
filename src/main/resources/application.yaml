@@ -8,7 +8,13 @@ management:
   endpoint:
     health:
       show-details: "always"
+      probes:
+        enabled: "true"
+server:
+  shutdown: ${SERVER_SHUTDOWN_STRATEGY}
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: ${TIMEOUT_SERVER_SHUTDOWN_PHASE}
   main:
     allow-bean-definition-overriding: true
   jpa:
@@ -69,6 +75,7 @@ security:
   anonymousPaths:
     - "/health"
     - "/health/liveness"
+    - "/health/readiness"
     - "/actuator/**"
     - "/loggers/**"
     - "/swagger-ui.html"
@@ -76,6 +83,10 @@ security:
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
     - "/search/**"
+trusted:
+  s2s:
+    service:
+      names: ccpay_bubble,cmc,bulk_scan_payment_processor,api_gw,probate_frontend,divorce_frontend,ccd_gw,payment_app
 auth:
   idam:
     client:
