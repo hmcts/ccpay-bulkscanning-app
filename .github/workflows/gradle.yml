@@ -34,10 +34,11 @@ jobs:
       - name: Publish report to Codecov
         run: bash <(curl -s https://codecov.io/bash)
       - name: Sonarqube Integration Test
-        run: ./gradlew sonarqube -i
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube -i
+#        args: -Dsonar.login=${{ secrets.SONAR_TOKEN }}
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
