@@ -20,22 +20,22 @@ jobs:
         run: chmod +x gradlew
       - name: Cache Gradle packages
         uses: actions/cache@v2
-          with:
-            path: |
-              ~/.gradle/caches
-              ~/.gradle/wrapper
-            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-            restore-keys: |
-              ${{ runner.os }}-gradle-
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: Gradle test
         run: ./gradlew test
+      - name: Generate Jacoco report
+        run: ./gradlew jacocoTestReport
+      - name: Publish report to Codecov
+        run: bash <(curl -s https://codecov.io/bash)
+      - name: Sonarqube Integration
+        run: ./gradlew sonarqube -i
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -fr ~/.gradle/caches/modules-2/*/plugin-resolution/
-      - name: Jacoco test report
-        run: ./gradlew jacocoTestReport
-      - name: Codecov report
-        run: bash <(curl -s https://codecov.io/bash)
-      - name: Sonarqube Integration
-        run: ./gradlew sonarqube -i
