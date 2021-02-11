@@ -35,6 +35,8 @@ jobs:
         run: bash <(curl -s https://codecov.io/bash)
       - name: Sonarqube Integration
         run: ./gradlew sonarqube -i
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
