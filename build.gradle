@@ -131,7 +131,7 @@ checkstyleTest.enabled(false)
       property "sonar.pitest.reportsDirectory", "build/reports/pitest"
       property "sonar.projectName", "CCPAY :: Bulkscanning payment"
       property "sonar.projectKey", "uk.gov.hmcts.reform:ccpay-bulkscanning-api"
-      property "sonar.organization", "default-organization"
+      property "sonar.organization", "hmcts"
     }
   }
 
