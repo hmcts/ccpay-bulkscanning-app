@@ -40,6 +40,6 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         #        args: -Dsonar.login=${{ secrets.SONAR_TOKEN }}
       - name: Cleanup Gradle Cache
-          run: |
-            rm -f ~/.gradle/caches/modules-2/modules-2.lock
-            rm -fr ~/.gradle/caches/modules-2/*/plugin-resolution/
+        run: |
+          rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          rm -fr ~/.gradle/caches/modules-2/*/plugin-resolution/
