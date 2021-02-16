@@ -1,6 +1,5 @@
 # This workflow will have a CI flow for Bulkscan Java(Gradle) project
 name: ccpay bulkscan - CI
-
 on:
   push:
     branches: [ master ]
@@ -32,17 +31,12 @@ jobs:
       - name: Generate Jacoco report
         run: ./gradlew jacocoTestReport
       - name: Publish report to Codecov
-        run: bash <(curl -s https://codecov.io/bash)
+        run: bash <(curl -s https://codecov.io/bash) -t "${{ secrets.CODECOV_TOKEN }}"
       - name: Sonarqube Integration Test
         run: ./gradlew sonarqube -i
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        args: -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-#      - uses: sonarsource/sonarcloud-github-action@master
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
