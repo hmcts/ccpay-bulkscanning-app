@@ -77,14 +77,14 @@ public class PaymentControllerTest {
     @Test
     public void testCreatePaymentFromExela_Conflict() throws Exception{
 
-        Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
+        PaymentMetadata paymentMetadata = PaymentMetadata.paymentMetadataWith()
                                                                     .id(1).amount(BigDecimal.valueOf(100))
                                                                     .dcnReference("111122223333444411111")
                                                                     .dateBanked(LocalDateTime.now())
                                                                     .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
-                                                                    .build());
+                                                                    .build();
 
-        when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata.get());
+        when(paymentService.getPaymentMetadata(any(String.class))).thenReturn(paymentMetadata);
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
                                                           .content(asJsonString(createPaymentRequest("111122223333444411111")))

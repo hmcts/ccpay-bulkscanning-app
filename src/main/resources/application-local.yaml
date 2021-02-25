@@ -12,13 +12,13 @@ spring:
     name: bulk-scanning
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bulk-scan
-    username: postgres
-    password: admin
+    url: jdbc:postgresql://localhost:5432/bspayment
+    username: bspayment
+    password: bspayment
     properties:
       charSet: UTF-8
   jpa:
-    properties:
+    properties:c
       hibernate:
         show_sql: true
         format_sql: true
