@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -32,11 +32,6 @@ jobs:
         run: ./gradlew jacocoTestReport
       - name: Publish report to Codecov
         run: bash <(curl -s https://codecov.io/bash) -t "${{ secrets.CODECOV_TOKEN }}"
-      - name: Sonarqube Integration Test
-        run: ./gradlew sonarqube -i
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
