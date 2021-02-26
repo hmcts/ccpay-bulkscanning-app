@@ -12,10 +12,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class PaymentMetadataDtoMapperTest {
 
@@ -53,6 +56,12 @@ public class PaymentMetadataDtoMapperTest {
     }
 
     @Test
+    public void testToPaymentEntity_WithNull(){
+        PaymentMetadata actualPaymentMetaData = paymentMetadataDtoMapper.toPaymentEntity(null);
+        assertNull(actualPaymentMetaData,"Response should be NULL");
+    }
+
+    @Test
     public void testFromRequest() throws ParseException {
         SimpleDateFormat textFormat = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
 
@@ -71,6 +80,12 @@ public class PaymentMetadataDtoMapperTest {
                                                 .amount(BigDecimal.valueOf(100)).currency("GBP").bankGiroCreditSlipNumber(2134).build();
         PaymentMetadataDto actualPaymentMetaData = paymentMetadataDtoMapper.fromRequest(bulkScanPayment,"dcn-reference");
         assertThat(expectedPaymentMetadataDto).isEqualToComparingFieldByField(actualPaymentMetaData);
+    }
+
+    @Test
+    public void testFromRequest_WithNull() {
+        PaymentMetadataDto actualPaymentMetaData = paymentMetadataDtoMapper.fromRequest(null,"dcn-reference");
+        assertNull(actualPaymentMetaData,"response should be NULL");
     }
 
     @Test
@@ -100,6 +115,40 @@ public class PaymentMetadataDtoMapperTest {
 
         PaymentMetadataDto actualPaymentMetaDataDto = paymentMetadataDtoMapper.fromEntity(requestPaymentMetaData);
         assertThat(expectedPaymentMetadataDto).isEqualToComparingFieldByField(actualPaymentMetaDataDto);
+    }
+
+    @Test
+    public void testFromPaymentMetadataEntities() throws ParseException {
+        SimpleDateFormat textFormat = new SimpleDateFormat("dd-MM-yyyy",Locale.ENGLISH);
+        PaymentMetadata requestPaymentMetaData = PaymentMetadata.paymentMetadataWith()
+            .amount(BigDecimal.valueOf(100))
+            .bgcReference("bgc-reference")
+            .dcnReference("dcn-reference")
+            .currency("GBP")
+            .paymentMethod("CASH")
+            .amount(BigDecimal.valueOf(100.00))
+            .dateCreated(dateToLocalDateTime(textFormat.parse("01-01-2020")))
+            .dateUpdated(dateToLocalDateTime(textFormat.parse("02-01-2020")))
+            .dateBanked(dateToLocalDateTime(textFormat.parse("05-01-2020")))
+            .build();
+        List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
+        paymentMetadataList.add(requestPaymentMetaData);
+
+        PaymentMetadataDto expectedPaymentMetadataDto = PaymentMetadataDto.paymentMetadataDtoWith()
+            .bgcReference("bgc-reference")
+            .dcnReference("dcn-reference")
+            .paymentMethod(PaymentMethod.CASH)
+            .amount(BigDecimal.valueOf(100.00))
+            .currency(Currency.GBP)
+            .dateCreated(textFormat.parse("01-01-2020"))
+            .dateUpdated(textFormat.parse("02-01-2020"))
+            .dateBanked(textFormat.parse("05-01-2020"))
+            .build();
+        List<PaymentMetadataDto> paymentMetadataDtoList = new ArrayList<>();
+        paymentMetadataDtoList.add(expectedPaymentMetadataDto);
+
+        List<PaymentMetadataDto> actualPaymentMetaDto = paymentMetadataDtoMapper.fromPaymentMetadataEntities(paymentMetadataList);
+        assertThat(paymentMetadataDtoList.get(0)).isEqualToComparingFieldByField(actualPaymentMetaDto.get(0));
     }
 
 }

@@ -55,4 +55,9 @@ public class EnvelopeDtoMapperTest {
         assertEquals("dcn-reference",envelopePaymentList.get(0).getDcnReference(),"DCN reference is invalid");
     }
 
+    @Test
+    public void testToPaymentEntities_WithNull(){
+        EnvelopePayment envelopePayment = envelopeDtoMapper.toPaymentEntity(null);
+        assertNull(envelopePayment,"Response should be NULL");
+    }
 }
