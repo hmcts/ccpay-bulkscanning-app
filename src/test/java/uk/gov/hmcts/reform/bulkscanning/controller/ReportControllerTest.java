@@ -157,7 +157,7 @@ public class ReportControllerTest {
         ReportData mockReportData = ReportData.recordWith()
             .amount(BigDecimal.valueOf(100))
             .build();
-        List<ReportData> reportDataList = new ArrayList<ReportData>();
+        List<ReportData> reportDataList = new ArrayList<>();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("date_from", getReportDate(new Date(System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000L)));
         params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 30 * 60 * 60 * 1000L)));

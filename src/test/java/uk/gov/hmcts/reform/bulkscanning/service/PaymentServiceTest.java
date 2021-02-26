@@ -251,7 +251,7 @@ public class PaymentServiceTest {
         envelopePayment.setEnvelope(mockBulkScanningEnvelope());
 
         doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference(DCN_REFERENCE);
-        Assert.assertEquals(DCN_REFERENCE,paymentService.updatePaymentStatus(DCN_REFERENCE, PaymentStatus.PROCESSED));
+        assertThat(paymentService.updatePaymentStatus(DCN_REFERENCE, PaymentStatus.PROCESSED)).isEqualTo(DCN_REFERENCE);
     }
 
     @Test(expected = DcnNotExistsException.class)
@@ -277,6 +277,6 @@ public class PaymentServiceTest {
             .payments(paymentDtos)
             .paymentStatus(INCOMPLETE)
             .build());
-        Assert.assertEquals("111111111111111111", envelope.getEnvelopePayments().get(0).getDcnReference());
+        assertThat( envelope.getEnvelopePayments().get(0).getDcnReference()).isEqualTo("111111111111111111");
     }
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.bulkscanning.utils;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @RunWith(SpringRunner.class)
@@ -44,6 +44,6 @@ public class BulkScanningUtilsTest {
         bsEnvelope.setDateCreated(LocalDateTime.now());
 
         Envelope envelope = bulkScanningUtils.insertStatusHistoryAudit(bsEnvelope);
-        Assert.assertEquals(1, envelope.getEnvelopePayments().size());
+        assertThat( envelope.getEnvelopePayments().size()).isEqualTo(1);
     }
 }

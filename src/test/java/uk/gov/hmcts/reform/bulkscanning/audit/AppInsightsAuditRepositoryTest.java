@@ -4,24 +4,14 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMapOf;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,14 +21,14 @@ public class AppInsightsAuditRepositoryTest {
     AppInsightsAuditRepository appInsightsAuditRepository;
 
     @Before
-    public void setup(){
+    public void setUp(){
         telemetry = spy(TelemetryClient.class);
         appInsightsAuditRepository = new AppInsightsAuditRepository("key",telemetry);
     }
 
     @Test
     public void testTrackEvent(){
-        Map<String, String> properties = new HashMap<>();
+        Map<String, String> properties = new ConcurrentHashMap<>();
         properties.put("key","value");
         appInsightsAuditRepository.trackEvent("name",properties);
         Mockito.verify(telemetry).trackEvent("name",properties,null);
@@ -46,11 +36,10 @@ public class AppInsightsAuditRepositoryTest {
 
     @Test
     public  void testTrackPaymentEvent(){
-        Map<String, String> properties = new ImmutableMap.Builder<String, String>()
-            .put("dcnReference", "reference")
-            .put("paymentStatus", "status")
-            .put("source", "source")
-            .build();
+        Map<String, String> properties = new ConcurrentHashMap<>();
+        properties.put("dcnReference", "reference");
+        properties.put("paymentStatus", "status");
+        properties.put("source", "source");
         Envelope envelope = Envelope.envelopeWith()
                                 .paymentStatus("payment-status")
                                 .build();

@@ -16,12 +16,12 @@ public class PaymentDtoMapperTest {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                             .build();
         PaymentDto paymentDto = paymentDtoMapper.fromRequest(bulkScanPayment,"dcn-reference");
-        assertEquals("Exela",paymentDto.getSource());
+        assertEquals("Exela",paymentDto.getSource(),"Source should be Exela");
     }
 
     @Test
     public void  testFromRequest_WithNullPayment(){
         PaymentDto paymentDto = paymentDtoMapper.fromRequest(null,"dcn-reference");
-        assertNull(paymentDto);
+        assertNull(paymentDto,"Response should be NULL");
     }
 }

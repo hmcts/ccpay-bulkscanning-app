@@ -12,8 +12,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,8 +30,7 @@ public class PaymentMetadataDtoMapperTest {
 
     @Test
     public void testToPaymentEntity() throws ParseException {
-        SimpleDateFormat textFormat = new SimpleDateFormat("dd-MM-yyyy");
-
+        SimpleDateFormat textFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
         PaymentMetadataDto paymentMetadataDto = PaymentMetadataDto.paymentMetadataDtoWith()
                                                     .bgcReference("bgc-reference")
                                                     .dcnReference("dcn-reference")
@@ -44,8 +43,8 @@ public class PaymentMetadataDtoMapperTest {
                                                     .amount(BigDecimal.valueOf(100))
                                                     .bgcReference("bgc-reference")
                                                     .dcnReference("dcn-reference")
-                                                    .currency(Currency.GBP.name())
-                                                    .paymentMethod(PaymentMethod.CASH.toString())
+                                                    .currency("GBP")
+                                                    .paymentMethod("CASH")
                                                     .amount(BigDecimal.valueOf(100.00))
                                                     .dateBanked(dateToLocalDateTime(textFormat.parse("01-01-2020")))
                                                     .build();
@@ -55,7 +54,7 @@ public class PaymentMetadataDtoMapperTest {
 
     @Test
     public void testFromRequest() throws ParseException {
-        SimpleDateFormat textFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat textFormat = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
 
         PaymentMetadataDto expectedPaymentMetadataDto = PaymentMetadataDto.paymentMetadataDtoWith()
             .bgcReference("2134")
@@ -76,13 +75,13 @@ public class PaymentMetadataDtoMapperTest {
 
     @Test
     public void testFromEntity() throws ParseException {
-        SimpleDateFormat textFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat textFormat = new SimpleDateFormat("dd-MM-yyyy",Locale.ENGLISH);
         PaymentMetadata requestPaymentMetaData = PaymentMetadata.paymentMetadataWith()
             .amount(BigDecimal.valueOf(100))
             .bgcReference("bgc-reference")
             .dcnReference("dcn-reference")
-            .currency(Currency.GBP.name())
-            .paymentMethod(PaymentMethod.CASH.toString())
+            .currency("GBP")
+            .paymentMethod("CASH")
             .amount(BigDecimal.valueOf(100.00))
             .dateCreated(dateToLocalDateTime(textFormat.parse("01-01-2020")))
             .dateUpdated(dateToLocalDateTime(textFormat.parse("02-01-2020")))

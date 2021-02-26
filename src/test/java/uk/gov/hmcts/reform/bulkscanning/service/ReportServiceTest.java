@@ -2,10 +2,7 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Tag;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,12 +19,10 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_Scan;
@@ -47,7 +42,7 @@ public class ReportServiceTest {
     ReportServiceImpl reportService;
 
     @Before
-    public void setup(){
+    public void setUp(){
         reportService = new ReportServiceImpl(paymentRepository,paymentMetadataRepository);
     }
 
@@ -75,7 +70,7 @@ public class ReportServiceTest {
         Date startDate = format.parse(startString);
         Date endDate = format.parse(endString);
         List<ReportData> reportList = reportService.retrieveByReportType(startDate, endDate, ReportType.UNPROCESSED);
-        assertEquals("100.0",reportList.get(0).getAmount().toString());
+        assertThat(reportList.get(0).getAmount().toString()).isEqualTo("100.0");
     }
 
     @Test
@@ -100,7 +95,7 @@ public class ReportServiceTest {
         Date startDate = format.parse(startString);
         Date endDate = format.parse(endString);
         List<ReportData> reportList = reportService.retrieveByReportType(startDate, endDate, ReportType.DATA_LOSS);
-        assertEquals("100.0",reportList.get(0).getAmount().toString());
+        assertThat(reportList.get(0).getAmount().toString()).isEqualTo("100.0");
     }
 
 }

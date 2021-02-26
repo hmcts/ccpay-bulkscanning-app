@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.exceptions.AuthCheckerException;
 import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenMissingException;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserPair;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +40,7 @@ public class AuthCheckerServiceAndAnonymousUserFilterTest {
     MockHttpServletRequest request;
 
     @Before
-    public void setup() {
+    public void setUp() {
         filter = new AuthCheckerServiceAndAnonymousUserFilter(serviceRequestAuthorizer, userRequestAuthorizer);
         request = new MockHttpServletRequest();
         request.setServerName("www.example.com");
@@ -67,15 +65,13 @@ public class AuthCheckerServiceAndAnonymousUserFilterTest {
     public void testGetPreAuthenticatedPrincipal_WithServiceNull() {
         when(serviceRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(null);
         Object actualResponse = filter.getPreAuthenticatedPrincipal(request);
-        assertNull(actualResponse);
+        assertNull(actualResponse,"Response should be null");
     }
 
     @Test
     public void testGetPreAuthenticatedPrincipal_WithUserNull() {
-        Service mockService = new Service("principalId");
-        User mockUser = new User("principalId", null);
         Object actualResponse = filter.getPreAuthenticatedPrincipal(request);
-        assertNull(actualResponse);
+        assertNull(actualResponse,"Response should be null");
     }
 
     @Test
@@ -96,17 +92,14 @@ public class AuthCheckerServiceAndAnonymousUserFilterTest {
         Service mockService = new Service("principalId");
         when(serviceRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(mockService);
         when(userRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenThrow(AuthCheckerException.class);
-        Set<String> anonymousRole = new HashSet<>(Arrays.asList("ROLE_ANONYMOUS"));
-        User mockUser = new User("anonymous", anonymousRole);
-        ServiceAndUserPair expectedResponse = new ServiceAndUserPair(mockService, mockUser);
         Object actualResponseObject = filter.getPreAuthenticatedPrincipal(request);
-        assertNull(actualResponseObject);
+        assertNull(actualResponseObject,"Response should be null");
     }
 
 
     @Test
     public void testGetPreAuthenticatedCredentials() {
         Object result = filter.getPreAuthenticatedCredentials(request);
-        assertEquals("dummyAuthKey", result.toString());
+        assertEquals("dummyAuthKey", result.toString(),"Credentials are invalid");
     }
 }

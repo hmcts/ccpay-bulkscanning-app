@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DateUtilTest {
     Date date;
 
     @Before
-    public void setup() throws ParseException{
+    public void setUp() throws ParseException{
         String startString = "January 10, 2021";
         DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
         date = format.parse(startString);
@@ -25,25 +25,25 @@ public class DateUtilTest {
     @Test
     public void testLocalDateTimeToDate()  {
         LocalDateTime localDateTime = DateUtil.dateToLocalDateTime(date);
-        assertEquals("2021-01-10T00:00",localDateTime.toString());
+        assertThat(localDateTime.toString()).isEqualTo("2021-01-10T00:00");
     }
 
     @Test
     public void testGetDateForReportName(){
         String reportName = DateUtil.getDateForReportName(date);
-        assertEquals("100121",reportName);
+        assertThat(reportName).isEqualTo("100121");
     }
 
     @Test
     public void testGetDateTimeForReportName(){
         String reportName = DateUtil.getDateTimeForReportName(date);
-        assertEquals("100121_000000",reportName);
+        assertThat(reportName).isEqualTo("100121_000000");
     }
 
     @Test
     public void testAtStartOfDay(){
         Date startOfDay = DateUtil.atStartOfDay(date);
-        assertEquals("Sun Jan 10 00:00:00 GMT 2021",startOfDay.toString());
+        assertThat(startOfDay.toString()).isEqualTo("Sun Jan 10 00:00:00 GMT 2021");
     }
 
 

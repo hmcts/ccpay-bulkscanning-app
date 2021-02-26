@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.bulkscanning.config.security;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,6 +13,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -33,10 +33,10 @@ public class AuthCheckerConfigurationTest {
     public void testUserIdExtractor(){
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setServerName("www.example.com");
-        request.setRequestURI("/users/");
+        request.setRequestURI("/users/test/test1");
         request.setQueryString("param1=value1&param");
         Optional<String> value = userIdExtractor.apply(request);
-        assertTrue(value.isEmpty());
+        assertThat(value.get()).isEqualTo("test");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AuthCheckerConfigurationTest {
         request.setRequestURI("/users/test1/");
         request.setQueryString("param1=value1&param");
         Collection<String> value = authorizedRolesExtractor.apply(request);
-        assertTrue(value.isEmpty());
+        assertTrue(value.isEmpty(),"Function doesnt return an empty list");
     }
 
     @Test
@@ -56,7 +56,7 @@ public class AuthCheckerConfigurationTest {
         request.setRequestURI("/users/test1/");
         request.setQueryString("param1=value1&param");
         Collection<String> value = authorizedServicesExtractor.apply(request);
-        System.out.println(value);
+        assertFalse(value.isEmpty(),"Services are empty");
     }
 
 }
