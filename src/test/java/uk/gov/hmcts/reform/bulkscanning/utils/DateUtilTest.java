@@ -40,11 +40,4 @@ public class DateUtilTest {
         assertThat(reportName).isEqualTo("100121_000000");
     }
 
-    @Test
-    public void testAtStartOfDay(){
-        Date startOfDay = DateUtil.atStartOfDay(date);
-        assertThat(startOfDay.toString()).isEqualTo("Sun Jan 10 00:00:00 GMT 2021");
-    }
-
-
 }
