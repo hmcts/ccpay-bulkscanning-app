@@ -1,5 +1,5 @@
 # This workflow will have a CI flow for Bulkscan Java(Gradle) project
-name: ccpay bulkscan - CI
+name: bulkscan - CI
 on:
   push:
     branches: [ master ]
