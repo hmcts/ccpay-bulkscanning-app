@@ -311,6 +311,10 @@ dependencies {
     }
   }
 
+serenity {
+  reports = ["single-page-html"]
+}
+
   jacocoTestReport {
     executionData(test)
     reports {
