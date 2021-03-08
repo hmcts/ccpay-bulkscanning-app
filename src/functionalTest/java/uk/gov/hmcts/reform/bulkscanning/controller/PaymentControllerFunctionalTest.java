@@ -15,7 +15,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -72,9 +71,9 @@ public class PaymentControllerFunctionalTest {
     @Autowired
     private S2sTokenService s2sTokenService;
 
-    private static String USER_TOKEN="eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiMWVyMFdSd2dJT1RBRm9qRTRyQy9mYmVLdTNJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJraXNoYW5raUBnbWFpbC5jb20iLCJjdHMiOiJPQVVUSDJfU1RBVEVMRVNTX0dSQU5UIiwiYXV0aF9sZXZlbCI6MCwiYXVkaXRUcmFja2luZ0lkIjoiNDFmNjNkMmEtNjFlNS00YTVmLThhZjgtMTUwNTE0NDBhODY4LTU4Mjc1NjIiLCJpc3MiOiJodHRwczovL2Zvcmdlcm9jay1hbS5zZXJ2aWNlLmNvcmUtY29tcHV0ZS1pZGFtLWFhdDIuaW50ZXJuYWw6ODQ0My9vcGVuYW0vb2F1dGgyL3JlYWxtcy9yb290L3JlYWxtcy9obWN0cyIsInRva2VuTmFtZSI6ImFjY2Vzc190b2tlbiIsInRva2VuX3R5cGUiOiJCZWFyZXIiLCJhdXRoR3JhbnRJZCI6IkVmM1BMY0k3Y0swOHdFN0xXUDgzR2JpaWhNTSIsImF1ZCI6InBheWJ1YmJsZSIsIm5iZiI6MTYxNDc5OTU1OSwiZ3JhbnRfdHlwZSI6ImF1dGhvcml6YXRpb25fY29kZSIsInNjb3BlIjpbIm9wZW5pZCIsInByb2ZpbGUiLCJyb2xlcyJdLCJhdXRoX3RpbWUiOjE2MTQ3OTk1NTgsInJlYWxtIjoiL2htY3RzIiwiZXhwIjoxNjE0ODI4MzU5LCJpYXQiOjE2MTQ3OTk1NTksImV4cGlyZXNfaW4iOjI4ODAwLCJqdGkiOiJOTXdRVHRLRjlsS2czWkg0cWJsb1labjVISmcifQ.GIo0hzvA2do_zNi8litkATIpSFIVgp2-EiFn_W9YonMlXT_ASjJ-HBUlPzeklomvwJOWg-aC_5dqRW1z_omeY7gB_5i2_Piycaj21yBe-fsSIIP7hq3VI70A34BPNUiD-J6MtJG0qxwBRSwWeI1LgtnpYPQ3-QRArvZGTbso0-bzqgttrpav1OMhVV-CPXra5PJTQsiOuAEFU_lw8pxdZdZgPngZJe9OXYUYVnszzTEk_FDnH1uesmjoKDAQKl5pK8JEk26q_QRXERfKW6QW6biYZks9FKs0LBI1Za-Vc9Hd0gpfl4qVnjlNA2dqfZ1OsNLVrsG_isRwSa9Q2R94yA";
-    private static String SERVICE_TOKEN="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhcGlfZ3ciLCJleHAiOjE2MTQ4MTM5ODJ9.n2iyFWqpamn8FJTDS1kXGvEvCBw3n8KYt1tFR0JG7Y2YxkZ8_iLN0UiFcsX0oS9n8AjSe733WB358rp0MrhiEQ";
-    private static boolean TOKENS_INITIALIZED = true;
+    private static String USER_TOKEN;
+    private static String SERVICE_TOKEN;
+    private static boolean TOKENS_INITIALIZED;
 
     @Before
     public void setUp() {
@@ -83,11 +82,11 @@ public class PaymentControllerFunctionalTest {
             .ccdCaseNumber("9982111111111111")
             .build();
 
-//        if (!TOKENS_INITIALIZED) {
-//            USER_TOKEN = idamService.createUserWith(CMC_CITIZEN_GROUP, "citizen").getAuthorisationToken();
-//            SERVICE_TOKEN = s2sTokenService.getS2sToken(testProps.s2sServiceName, testProps.s2sServiceSecret);
-//            TOKENS_INITIALIZED = true;
-//        }
+        if (!TOKENS_INITIALIZED) {
+            USER_TOKEN = idamService.createUserWith(CMC_CITIZEN_GROUP, "citizen").getAuthorisationToken();
+            SERVICE_TOKEN = s2sTokenService.getS2sToken(testProps.s2sServiceName, testProps.s2sServiceSecret);
+            TOKENS_INITIALIZED = true;
+        }
     }
 
     @Test
