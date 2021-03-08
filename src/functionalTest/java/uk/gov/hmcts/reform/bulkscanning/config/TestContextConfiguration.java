@@ -18,7 +18,7 @@ import static io.restassured.config.JsonConfig.jsonConfig;
 @TestPropertySource(locations = "classpath:application-test.yaml")
 public class TestContextConfiguration {
 
-    @Value("${test.url:http://localhost:8080}")
+    @Value("${test.url:http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal}")
     private String baseurl;
 
     @PostConstruct
