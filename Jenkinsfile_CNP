@@ -42,7 +42,7 @@ withPipeline(type, product, app) {
 
 
 
-  after('functionalTest:aat') {
+  after('functional:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     publishHTML target: [
       reportDir            : "target/site/serenity/",
@@ -53,7 +53,7 @@ withPipeline(type, product, app) {
 
   }
 
-  after('functionalTest:preview') {
+  after('functional:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     publishHTML target: [
       reportDir            : "target/site/serenity/",
