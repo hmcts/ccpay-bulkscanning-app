@@ -14,7 +14,7 @@
     <cve>CVE-2007-1652</cve>
   </suppress>
 
-  <suppress until="2021-03-02">
+  <suppress until="2021-05-05">
     <notes><![CDATA[
             This CVE is related to file type tag parsing. However, the associated CVE seems to be a false positive on the lang-tag jar.
         ]]></notes>
