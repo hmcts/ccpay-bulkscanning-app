@@ -128,7 +128,7 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
         body.put("status", status.value());
         body.put("error", exceptionMessage);
 
-        return new ResponseEntity<>(body, new HttpHeaders(), status);
+        return new ResponseEntity<Object>(body, new HttpHeaders(), status);
     }
 
 
