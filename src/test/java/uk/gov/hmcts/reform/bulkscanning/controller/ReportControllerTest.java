@@ -19,15 +19,19 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
+import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.service.ReportService;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -136,6 +140,7 @@ public class ReportControllerTest {
         Assert.assertEquals(400, resultActions.andReturn().getResponse().getStatus());
     }
 
+
     @Test
     public void testGetPaymentReport_PaymentException() throws Exception {
 
@@ -154,6 +159,28 @@ public class ReportControllerTest {
 
         Assert.assertEquals(400, resultActions.andReturn().getResponse().getStatus());
     }
+
+    @Test
+    public void testGetPaymentReport() throws Exception{
+        ReportData mockReportData = ReportData.recordWith()
+            .amount(BigDecimal.valueOf(100))
+            .build();
+        List<ReportData> reportDataList = new ArrayList<>();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("date_from", getReportDate(new Date(System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000L)));
+        params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 30 * 60 * 60 * 1000L)));
+        params.add("report_type", "UNPROCESSED");
+        reportDataList.add(mockReportData);
+        when(reportService.retrieveByReportType(any(Date.class), any(Date.class), any(ReportType.class)))
+            .thenReturn(reportDataList);
+        ResultActions resultActions = mockMvc.perform(get("/report/download")
+                                                          .header("Authorization", "user")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .params(params)
+                                                          .accept(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
+    }
+
 
     private void createTestReportData(String ccd, String... dcns) throws Exception {
         //Request from Exela with one DCN
