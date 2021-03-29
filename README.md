@@ -114,11 +114,11 @@ To build the project execute the following command:
 
 1. Add spring_profiles_active=local in the BulkscanningApiApplication configuration settings
 2. Enable annotation processing under settings/compiler in development environment
-3. Setup a postgre database called 'bspayment' and create login group for it. Set the username and password as 'bspayment'. Enable 'can login' under login group/privileges
+3. Setup a postgre database called 'bspayment' and create login group for it. Enable 'can login' under login group/privileges
 4. Edit the application-local.yaml file, add the following details if not present already:
    url: jdbc:postgresql://localhost:5432/bspayment
-   username: bspayment
-   password: bspayment
+   username: DBusername
+   password: DBpassword
 5. Ensure that bar-idam-mock is already running and run the application:
    https://github.com/hmcts/bar-idam-mock
 
