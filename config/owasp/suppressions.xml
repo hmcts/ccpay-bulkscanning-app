@@ -6,8 +6,8 @@
       and hence it is suppressed (https://github.com/jeremylong/DependencyCheck/issues/2952)
     </notes>
     <cve>CVE-2018-1258</cve>
-    <cve>CVE-2021-22112</cve>
   </suppress>
+
   <suppress>
     <notes> False positive reported at https://github.com/jeremylong/DependencyCheck/issues/1658 </notes>
     <cve>CVE-2007-1651</cve>
