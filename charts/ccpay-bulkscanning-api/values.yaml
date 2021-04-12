@@ -22,6 +22,7 @@ java:
     S2S_AUTHORISED_SERVICES: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
     SERVER_SHUTDOWN_STRATEGY: graceful
     TIMEOUT_SERVER_SHUTDOWN_PHASE: 30s
+    IDAM_API_URL: "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
   keyVaults:
     "ccpay":
       resourceGroup: ccpay
