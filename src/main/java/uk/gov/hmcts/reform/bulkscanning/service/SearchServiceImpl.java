@@ -162,6 +162,6 @@ public class SearchServiceImpl implements SearchService {
             }
             return Collections.emptyList();
         }
-        return Collections.emptyList();
+        return null;
     }
 }
