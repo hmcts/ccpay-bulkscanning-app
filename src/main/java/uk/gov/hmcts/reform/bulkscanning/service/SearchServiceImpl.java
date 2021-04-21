@@ -171,10 +171,6 @@ public class SearchServiceImpl implements SearchService {
     //Check if DCN exists in payment envelope
     private boolean paymentEnvelopeCheck(SearchRequest searchRequest){
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
-        if (payment.isPresent()){
-            return true;
-        } else{
-            return false;
-        }
+        return payment.isPresent();
     }
 }
