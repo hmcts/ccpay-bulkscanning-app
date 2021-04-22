@@ -63,7 +63,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     @Transactional
     public SearchResponse retrieveByDcn(String documentControlNumber) {
-        if(paymentEnvelopeCheck(SearchRequest.searchRequestWith().documentControlNumber(documentControlNumber).build())) {
+        if(isEnvelopePaymentPresent(SearchRequest.searchRequestWith().documentControlNumber(documentControlNumber).build())) {
 
             List<EnvelopeCase> envelopeCases = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
                                                                         .documentControlNumber(
@@ -169,7 +169,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     //Check if DCN exists in payment envelope
-    private boolean paymentEnvelopeCheck(SearchRequest searchRequest){
+    private boolean isEnvelopePaymentPresent(SearchRequest searchRequest){
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
         return payment.isPresent();
     }

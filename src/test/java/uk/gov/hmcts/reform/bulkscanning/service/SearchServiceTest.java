@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -45,7 +47,9 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLET
 public class SearchServiceTest {
     MockMvc mockMvc;
 
-    private SearchService paymentService;
+    @InjectMocks
+    private SearchServiceImpl paymentService;
+
 
     @MockBean
     private PaymentRepository paymentRepository;
@@ -149,5 +153,33 @@ public class SearchServiceTest {
     public void testRetrieveByDcn() throws Exception {
         SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
         assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
+    }
+
+    @Test
+    @Transactional
+    public void testRetrieveByDcnWithEmptyEnvelopeCase() throws Exception {
+        Optional<EnvelopePayment> payment = Optional.of(EnvelopePayment.paymentWith()
+                                                                    .id(1)
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .paymentStatus(INCOMPLETE.toString())
+                                                                    .build());
+
+        Optional<EnvelopeCase> envelopeCase = Optional.of(EnvelopeCase.caseWith()
+                                                              .build());
+
+
+        when(paymentRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(payment);
+        when(envelopeCaseRepository.findByEnvelopeId(payment.get().getId())).thenReturn(envelopeCase);
+        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
+        assertThat(searchResponse.getAllPaymentsStatus()).isEqualTo(INCOMPLETE);
+    }
+
+    @Test
+    @Transactional
+    public void testRetrieveByIncorrectDcn() throws Exception {
+        Optional<EnvelopePayment> payment = Optional.empty();
+        when(paymentRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(payment);
+        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
+        assertThat(searchResponse).isEqualTo(null);
     }
 }
