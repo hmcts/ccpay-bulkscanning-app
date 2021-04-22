@@ -47,9 +47,10 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
 public class SearchServiceTest {
     MockMvc mockMvc;
 
-    @InjectMocks
-    private SearchServiceImpl paymentService;
+    private SearchService paymentService;
 
+    @InjectMocks
+    private SearchServiceImpl paymentServiceImpl;
 
     @MockBean
     private PaymentRepository paymentRepository;
