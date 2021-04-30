@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
-
+//DUMMY CHANGE
 
 @Service
 public class SearchServiceImpl implements SearchService {
