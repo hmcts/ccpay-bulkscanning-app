@@ -340,7 +340,7 @@ public class PaymentControllerFunctionalTest {
             .params(params)
             .when()
             .get("/report/download");
-        //Assert.assertEquals(200, response.andReturn().getStatusCode());
+        Assert.assertEquals(200, response.andReturn().getStatusCode());
     }
 
     @Test
@@ -359,7 +359,7 @@ public class PaymentControllerFunctionalTest {
             .params(params)
             .when()
             .get("/report/download");
-        //Assert.assertEquals(200, response.andReturn().getStatusCode());
+        Assert.assertEquals(200, response.andReturn().getStatusCode());
     }
 
     private void createTestReportData(String ccd, String... dcns) throws Exception {
