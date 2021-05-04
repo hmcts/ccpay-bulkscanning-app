@@ -8,4 +8,4 @@ COPY build/libs/bulk-scanning-payment-api.jar /opt/app/
 
 EXPOSE 4211
 
-CMD [ "bulk-scanning-payment-api.jar" ]
+CMD [ "bulk-scanning-payment-api.jar","-Djava.awt.headless=true" ]
