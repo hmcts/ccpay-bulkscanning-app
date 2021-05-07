@@ -23,15 +23,12 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
-import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.bulkscanning.config.IdamService.CMC_CITIZEN_GROUP;
-import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @SpringBootTest
@@ -68,13 +65,13 @@ public class SearchControllerFunctionalTest {
 
     @Test
     public void test_positive_look_up_of_bulk_scanning_payment_request() throws Exception {
-        final String randomDCN = generateRandom(21);
-        final String[] dcn = {randomDCN};
+        final String randomDcn = generateRandom(21);
+        final String[] dcn = {randomDcn};
         //Given
         final String ccdReference = generateRandom(16);
         createBulkScanPayment(dcn, ccdReference,"AA08", false);
         //When
-        Response response = performSearchPaymentByDCN(randomDCN);
+        Response response = performSearchPaymentByDcn(randomDcn);
         //Then
         System.out.println("The status of the Reference " + response.getBody().prettyPrint());
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
@@ -85,13 +82,13 @@ public class SearchControllerFunctionalTest {
 
     @Test
     public void test_positive_look_up_of_exella_payment_request() throws Exception {
-        final String randomDCN = generateRandom(21);
-        BulkScanPayment bulkScanPayment = createExellaPaymentRequest(randomDCN,100.00,
+        final String randomDcn = generateRandom(21);
+        BulkScanPayment bulkScanPayment = createExellaPaymentRequest(randomDcn,100.00,
                                    "2019-10-31",
                                    123, "GBP","CHEQUE");
         createExellaPayment(bulkScanPayment);
         //When
-        Response response = performSearchPaymentByDCN(randomDCN);
+        Response response = performSearchPaymentByDcn(randomDcn);
         //Then
         System.out.println("The status of the Reference " + response.getBody().prettyPrint());
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
@@ -101,7 +98,7 @@ public class SearchControllerFunctionalTest {
     @Test
     public void test_bulk_scan_payment_look_up_not_found() throws Exception {
         //Given, When
-        Response response = performSearchPaymentByDCN("XXXX11111111111111120");
+        Response response = performSearchPaymentByDcn("XXXX11111111111111120");
         //Then
         assertEquals(404, response.getStatusCode());
         System.out.println("The value of the Body " + response.getBody().asString());
@@ -124,7 +121,7 @@ public class SearchControllerFunctionalTest {
         assertEquals(201, response.getStatusCode());
     }
 
-    private Response performSearchPaymentByDCN(String randomDCN) {
+    private Response performSearchPaymentByDcn(String randomDCN) {
         return RestAssured.given()
             .header("Authorization", USER_TOKEN)
             .header("ServiceAuthorization", SERVICE_TOKEN)
