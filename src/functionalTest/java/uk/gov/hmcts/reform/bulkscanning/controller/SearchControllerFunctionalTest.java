@@ -121,11 +121,11 @@ public class SearchControllerFunctionalTest {
         assertEquals(201, response.getStatusCode());
     }
 
-    private Response performSearchPaymentByDcn(String randomDCN) {
+    private Response performSearchPaymentByDcn(String randomDcn) {
         return RestAssured.given()
             .header("Authorization", USER_TOKEN)
             .header("ServiceAuthorization", SERVICE_TOKEN)
-            .queryParam("document_control_number", randomDCN)
+            .queryParam("document_control_number", randomDcn)
             .contentType(ContentType.JSON)
             .when()
             .get("/cases");
