@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.SearchService;
 
@@ -87,6 +88,7 @@ public class SearchControllerTest {
     public void testSearchPaymentWithDcn() throws Exception{
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
             .ccdReference("9881231111111111")
+            .allPaymentsStatus(PaymentStatus.COMPLETE)
             .build();
         when(searchService.retrieveByDcn(any(String.class)))
             .thenReturn(searchResponse);
@@ -101,6 +103,18 @@ public class SearchControllerTest {
     @Test
     public void testSearchPaymentWithDcn_PaymentNotFound() throws Exception{
         SearchResponse searchResponse = null;
+        when(searchService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
+        ResultActions resultActions = mockMvc.perform(get("/cases")
+                                                          .param("document_control_number", "987123111111111111111")
+                                                          .header("Authorization", "user")
+                                                          .header("ServiceAuthorization", "service")
+                                                          .accept(MediaType.APPLICATION_JSON));
+        Assert.assertEquals(Integer.valueOf(404), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testSearchPaymentWithDcn_PaymentNotFound_with_EmptyResponse() throws Exception{
+        SearchResponse searchResponse = SearchResponse.searchResponseWith().build();
         when(searchService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
                                                           .param("document_control_number", "987123111111111111111")

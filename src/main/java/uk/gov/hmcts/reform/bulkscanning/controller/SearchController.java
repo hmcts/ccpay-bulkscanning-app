@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.SearchService;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -63,7 +64,8 @@ public class SearchController {
         LOG.info("Retrieving payments for documentControlNumber : {}", documentControlNumber);
         try {
             SearchResponse searchResponse = searchService.retrieveByDcn(documentControlNumber);
-            if (Optional.ofNullable(searchResponse).isPresent()) {
+            if (Optional.ofNullable(searchResponse).isPresent()
+                    && Objects.nonNull(searchResponse.getAllPaymentsStatus())) {
                 LOG.info("SearchResponse : {}", searchResponse);
                 return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
             } else {

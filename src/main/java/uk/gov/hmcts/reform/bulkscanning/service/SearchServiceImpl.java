@@ -79,7 +79,7 @@ public class SearchServiceImpl implements SearchService {
         } else {
             // No Payment exists for the searched DCN
             LOG.info("Payment Not exists for the searched DCN !!!");
-            return null;
+            return SearchResponse.searchResponseWith().build();
         }
     }
 
