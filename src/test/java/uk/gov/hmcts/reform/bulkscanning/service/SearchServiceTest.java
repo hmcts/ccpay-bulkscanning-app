@@ -178,6 +178,6 @@ public class SearchServiceTest {
         Optional<EnvelopePayment> payment = Optional.empty();
         when(paymentRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(payment);
         SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
-        assertThat(searchResponse).isEqualTo(null);
+        assertThat(searchResponse.getAllPaymentsStatus()).isEqualTo(null);
     }
 }
