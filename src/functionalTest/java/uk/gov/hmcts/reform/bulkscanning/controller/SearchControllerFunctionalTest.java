@@ -68,11 +68,10 @@ public class SearchControllerFunctionalTest {
         final String[] dcn = {randomDcn};
         //Given
         final String ccdReference = generateRandom(16);
-        createBulkScanPayment(dcn, ccdReference,"AA08", false);
+        createBulkScanPayment(dcn, ccdReference, "AA08", false);
         //When
         Response response = performSearchPaymentByDcn(randomDcn);
         //Then
-        System.out.println("The status of the Reference " + response.getBody().prettyPrint());
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
         assertEquals(ccdReference, response.getBody().jsonPath().getString("ccd_reference"));
         assertEquals("AA08", response.getBody().jsonPath().getString("responsible_service_id"));
@@ -82,14 +81,14 @@ public class SearchControllerFunctionalTest {
     @Test
     public void test_positive_look_up_of_exella_payment_request() throws Exception {
         final String randomDcn = generateRandom(21);
-        BulkScanPayment bulkScanPayment = createExellaPaymentRequest(randomDcn,100.00,
-                                   "2019-10-31",
-                                   123, "GBP","CHEQUE");
+        BulkScanPayment bulkScanPayment = createExellaPaymentRequest(randomDcn, 100.00,
+                                                                     "2019-10-31",
+                                                                     123, "GBP", "CHEQUE"
+        );
         createExellaPayment(bulkScanPayment);
         //When
         Response response = performSearchPaymentByDcn(randomDcn);
         //Then
-        System.out.println("The status of the Reference " + response.getBody().prettyPrint());
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
         assertEquals("INCOMPLETE", response.getBody().jsonPath().getString("all_payments_status"));
     }
@@ -99,8 +98,7 @@ public class SearchControllerFunctionalTest {
         //Given, When
         Response response = performSearchPaymentByDcn("XXXX11111111111111120");
         //Then
-        assertEquals(404, response.getStatusCode());
-        System.out.println("The value of the Body " + response.getBody().asString());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCode());
     }
 
     private void createBulkScanPayment(String[] dcn, String ccdReference,
@@ -108,7 +106,8 @@ public class SearchControllerFunctionalTest {
 
         BulkScanPaymentRequest bulkScanPaymentRequest
             = createBulkScanPaymentRequest(ccdReference,
-                                           dcn, responsibleServiceId, isExceptionRecord);
+                                           dcn, responsibleServiceId, isExceptionRecord
+        );
         //Post request
         Response response = RestAssured.given()
             .header("Authorization", USER_TOKEN)
@@ -131,7 +130,7 @@ public class SearchControllerFunctionalTest {
     }
 
     private void createExellaPayment(BulkScanPayment bulkScanPayment) {
-        Response exelaResp = RestAssured.given()
+        RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
             .contentType(ContentType.JSON)
             .body(bulkScanPayment)
@@ -154,11 +153,11 @@ public class SearchControllerFunctionalTest {
     }
 
     public static BulkScanPayment createExellaPaymentRequest(final String dcnReference,
-                                                       final double amount,
-                                                       final String bankedDate,
-                                                       final int slipNumber,
-                                                       final String currencyCode,
-                                                       final String paymentMethod) {
+                                                             final double amount,
+                                                             final String bankedDate,
+                                                             final int slipNumber,
+                                                             final String currencyCode,
+                                                             final String paymentMethod) {
         return BulkScanPayment.createPaymentRequestWith()
             .dcnReference(dcnReference)
             .amount(BigDecimal.valueOf(amount))
@@ -178,6 +177,4 @@ public class SearchControllerFunctionalTest {
         }
         return new String(digits);
     }
-
-
 }

@@ -115,6 +115,7 @@ checkstyleTest.enabled(false)
 
   pmd {
     toolVersion = "6.18.0"
+    ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSets = []
