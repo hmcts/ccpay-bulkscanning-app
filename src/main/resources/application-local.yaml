@@ -74,7 +74,5 @@ idam:
     url: http://localhost:8489
     totp_secret: AAAAAAAAAAAAAAAA
     microservice: internal
-server:
-  port: 8000
 
 
