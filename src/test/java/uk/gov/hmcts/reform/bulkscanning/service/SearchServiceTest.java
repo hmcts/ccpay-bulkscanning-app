@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,6 +37,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -48,6 +47,7 @@ public class SearchServiceTest {
     MockMvc mockMvc;
 
     private SearchService paymentService;
+
 
     @MockBean
     private PaymentRepository paymentRepository;
@@ -67,12 +67,6 @@ public class SearchServiceTest {
     @Autowired
     private PaymentMetadataDtoMapper paymentMetadataDtoMapper;
 
-    @MockBean
-    private ClientRegistrationRepository clientRegistrationRepository;
-
-    @MockBean
-    private JwtDecoder jwtDecoder;
-
     public static final String CCD_CASE_REFERENCE = "11112222333344441";
     public static final String TEST_DCN_REFERENCE = "123-123";
 
@@ -80,15 +74,15 @@ public class SearchServiceTest {
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
         paymentService = new SearchServiceImpl(paymentRepository,
-                                                paymentMetadataRepository,
-                                                paymentMetadataDtoMapper,
-                                                envelopeCaseRepository);
+                                               paymentMetadataRepository,
+                                               paymentMetadataDtoMapper,
+                                               envelopeCaseRepository);
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
-            .id(1).amount(BigDecimal.valueOf(100))
-            .dcnReference(TEST_DCN_REFERENCE)
-            .dateBanked(LocalDateTime.now())
-            .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
-            .build());
+                                                                    .id(1).amount(BigDecimal.valueOf(100))
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .dateBanked(LocalDateTime.now())
+                                                                    .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
+                                                                    .build());
         when(paymentMetadataRepository.save(any(PaymentMetadata.class)))
             .thenReturn(paymentMetadata.get());
 
@@ -157,5 +151,33 @@ public class SearchServiceTest {
     public void testRetrieveByDcn() throws Exception {
         SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
         assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
+    }
+
+    @Test
+    @Transactional
+    public void testRetrieveByDcnWithEmptyEnvelopeCase() throws Exception {
+        Optional<EnvelopePayment> payment = Optional.of(EnvelopePayment.paymentWith()
+                                                            .id(1)
+                                                            .dcnReference(TEST_DCN_REFERENCE)
+                                                            .paymentStatus(INCOMPLETE.toString())
+                                                            .build());
+
+        Optional<EnvelopeCase> envelopeCase = Optional.of(EnvelopeCase.caseWith()
+                                                              .build());
+
+
+        when(paymentRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(payment);
+        when(envelopeCaseRepository.findByEnvelopeId(payment.get().getId())).thenReturn(envelopeCase);
+        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
+        assertThat(searchResponse.getAllPaymentsStatus()).isEqualTo(INCOMPLETE);
+    }
+
+    @Test
+    @Transactional
+    public void testRetrieveByIncorrectDcn() throws Exception {
+        Optional<EnvelopePayment> payment = Optional.empty();
+        when(paymentRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(payment);
+        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
+        assertThat(searchResponse.getAllPaymentsStatus()).isEqualTo(null);
     }
 }
