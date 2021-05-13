@@ -14,7 +14,7 @@
     <cve>CVE-2007-1652</cve>
   </suppress>
 
-  <suppress until="2021-05-05">
+  <suppress until="2021-07-07">
     <notes><![CDATA[
             This CVE is related to file type tag parsing. However, the associated CVE seems to be a false positive on the lang-tag jar.
         ]]></notes>
@@ -24,7 +24,8 @@
     <cve>CVE-2020-29245</cve>
   </suppress>
 
-  <suppress><notes><![CDATA[file name: bcprov-jdk15on-1.56.jar]]></notes>
+  <suppress  until="2021-07-07">
+    <notes><![CDATA[file name: bcprov-jdk15on-1.56.jar]]></notes>
     <gav regex="true">^org\.bouncycastle:bcprov-jdk15on:.*$</gav>
     <cve>CVE-2020-26939</cve>
   </suppress>
