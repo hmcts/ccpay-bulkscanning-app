@@ -95,7 +95,7 @@ Located in `./bin/init.sh`. Simply run and follow the explanation how to execute
 
 Since Spring Boot 2.1 bean overriding is disabled. If you want to enable it you will need to set `spring.main.allow-bean-definition-overriding` to `true`.
 
-JUnit 5 is now enabled by default in the project. Please refrain from using JUnit4 and use the next generation
+JUnit 5 is now enabled by default in the project. Please refrain from using JUnit4 and use the next generation.
 
 ## Building and deploying the application
 
