@@ -4,6 +4,7 @@ management:
       base-path: /
 server:
   shutdown: graceful
+  port: 8081
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:
   lifecycle:
@@ -14,9 +15,9 @@ spring:
     name: bulk-scanning
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bulk-scan
-    username: postgres
-    password: admin
+    url: jdbc:postgresql://localhost:5432/bspayment
+    username: bspayment
+    password: bspayment
     properties:
       charSet: UTF-8
   jpa:
@@ -58,10 +59,10 @@ auth:
   provider:
     service:
       client:
-        baseUrl: http://localhost:8489
+        baseUrl: http://localhost:8085
   idam:
     client:
-      baseUrl: http://localhost:8489
+      baseUrl: http://localhost:8085
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
@@ -69,11 +70,11 @@ idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
   s2s-authorised:
-    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw,internal
+    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw,internal,divorce,payment_app
   s2s-auth:
-    url: http://localhost:8489
-    totp_secret: AAAAAAAAAAAAAAAA
-    microservice: internal
+    url: http://localhost:8085
+    totp_secret: AAAAAAAAAAAAAAAB
+    microservice: payment_app
 
 
 
