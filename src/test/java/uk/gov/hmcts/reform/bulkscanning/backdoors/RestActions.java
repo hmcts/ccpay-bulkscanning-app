@@ -6,8 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import uk.gov.hmcts.reform.auth.checker.core.service.ServiceRequestAuthorizer;
-import uk.gov.hmcts.reform.auth.checker.core.user.UserRequestAuthorizer;
 
 import java.util.UUID;
 
@@ -17,26 +15,19 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class RestActions {
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final MockMvc mvc;
-    private final ServiceResolverBackdoor serviceRequestAuthorizer;
-    private final UserResolverBackdoor userRequestAuthorizer;
     private final ObjectMapper objectMapper;
 
-    public RestActions(MockMvc mvc, ServiceResolverBackdoor serviceRequestAuthorizer, UserResolverBackdoor userRequestAuthorizer, ObjectMapper objectMapper) {
+    public static final String AUTHORISATION = "Authorization";
+    public static final String SERVICE_AUTHORISATION = "ServiceAuthorization";
+
+    public RestActions(MockMvc mvc, ObjectMapper objectMapper) {
         this.mvc = mvc;
-        this.serviceRequestAuthorizer = serviceRequestAuthorizer;
-        this.userRequestAuthorizer = userRequestAuthorizer;
         this.objectMapper = objectMapper;
     }
 
     public RestActions withAuthorizedService(String serviceId) {
-        String token = UUID.randomUUID().toString();
-        serviceRequestAuthorizer.registerToken(token, serviceId);
-        httpHeaders.add(ServiceRequestAuthorizer.AUTHORISATION, token);
-        return this;
-    }
-
-    public RestActions withUserId(String userId) {
-        httpHeaders.add("user-id", userId);
+        String token = "Bearer "+serviceId+ UUID.randomUUID().toString();
+        httpHeaders.add(SERVICE_AUTHORISATION, token);
         return this;
     }
 
@@ -45,15 +36,9 @@ public class RestActions {
         return this;
     }
 
-    public RestActions withHeader(String header, String value) {
-        httpHeaders.add(header, value);
-        return this;
-    }
-
-    public RestActions withAuthorizedUser(String userId) {
+    public RestActions withAuthorizedUser() {
         String token = UUID.randomUUID().toString();
-        userRequestAuthorizer.registerToken(token, userId);
-        httpHeaders.add(UserRequestAuthorizer.AUTHORISATION, token);
+        httpHeaders.add(AUTHORISATION, token);
         return this;
     }
 

@@ -10,7 +10,12 @@
     <exclude name="GuardLogStatement"/>
     <exclude name="JUnitTestContainsTooManyAsserts"/>
     <exclude name="UseVarargs"/>
+    <!-- excluded for time being due to test classes-->
+    <exclude name="UnusedPrivateField"/>
+    <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+
   </rule>
+
   <rule ref="category/java/codestyle.xml">
     <exclude name="AtLeastOneConstructor"/>
     <exclude name="LocalVariableCouldBeFinal"/>
@@ -62,7 +67,12 @@
   </rule>
   <rule ref="category/java/design.xml/TooManyMethods">
     <properties>
-      <property name="maxmethods" value="20" />
+      <property name="maxmethods" value="25" />
+    </properties>
+  </rule>
+  <rule ref="category/java/design.xml/TooManyFields">
+    <properties>
+      <property name="maxfields" value="20" />
     </properties>
   </rule>
   <rule ref="category/java/design.xml/AvoidDeeplyNestedIfStmts">
@@ -102,5 +112,4 @@
   <rule ref="category/java/multithreading.xml"/>
   <rule ref="category/java/performance.xml"/>
   <rule ref="category/java/security.xml"/>
-
 </ruleset>

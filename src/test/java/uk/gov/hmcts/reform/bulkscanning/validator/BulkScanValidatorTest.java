@@ -10,7 +10,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,8 +21,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.bulkscanning.backdoors.RestActions;
-import uk.gov.hmcts.reform.bulkscanning.backdoors.ServiceResolverBackdoor;
-import uk.gov.hmcts.reform.bulkscanning.backdoors.UserResolverBackdoor;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 import java.math.BigDecimal;
@@ -41,15 +42,13 @@ public class BulkScanValidatorTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    protected ServiceResolverBackdoor serviceRequestAuthorizer;
-
-    @Autowired
-    protected UserResolverBackdoor userRequestAuthorizer;
-
-    private static final String USER_ID = UserResolverBackdoor.AUTHENTICATED_USER_ID;
-
     RestActions restActions;
+
+    @MockBean
+    private ClientRegistrationRepository clientRegistrationRepository;
+
+    @MockBean
+    private JwtDecoder jwtDecoder;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -62,12 +61,10 @@ public class BulkScanValidatorTest {
     @Before
     public void setUp() {
         MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-        this.restActions = new RestActions(mvc, serviceRequestAuthorizer, userRequestAuthorizer, objectMapper);
+        this.restActions = new RestActions(mvc, objectMapper);
 
         restActions
             .withAuthorizedService("cmc")
-            .withAuthorizedUser(USER_ID)
-            .withUserId(USER_ID)
             .withReturnUrl("https://www.gooooogle.com");
     }
 
@@ -78,7 +75,7 @@ public class BulkScanValidatorTest {
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
             , null, "AA08", false);
 
-        ResultActions resultActions = restActions.post("/bulk-scan-payments/", bulkScanPaymentRequest);
+        ResultActions resultActions = restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
 
@@ -91,7 +88,7 @@ public class BulkScanValidatorTest {
     public void testRequestValidation_AdditionalFields() throws Exception{
 
 
-        ResultActions resultActions = restActions.post("/bulk-scan-payment/", new ExelaPayment(BigDecimal.ONE,
+        ResultActions resultActions = restActions.post("/bulk-scan-payment", new ExelaPayment(BigDecimal.ONE,
                                                                                                 "123456",
                                                                                                 "2019-01-01",
                                                                                                 "GBP",

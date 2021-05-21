@@ -63,21 +63,24 @@ public class SearchServiceImpl implements SearchService {
     @Override
     @Transactional
     public SearchResponse retrieveByDcn(String documentControlNumber) {
-        List<EnvelopeCase> envelopeCases = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
-                                                                    .documentControlNumber(
-                                                                        documentControlNumber)
-                                                                    .build());
-        if (envelopeCases == null) {
+        if(isEnvelopePaymentPresent(SearchRequest.searchRequestWith().documentControlNumber(documentControlNumber).build())) {
+
+            List<EnvelopeCase> envelopeCases = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
+                                                                        .documentControlNumber(
+                                                                            documentControlNumber)
+                                                                        .build());
+
+            if (envelopeCases.isEmpty()) {
+                return SearchResponse.searchResponseWith()
+                    .allPaymentsStatus(INCOMPLETE)
+                    .build();
+            }
+            return searchForEnvelopeCasePayments(envelopeCases);
+        } else {
             // No Payment exists for the searched DCN
             LOG.info("Payment Not exists for the searched DCN !!!");
-            return null;
+            return SearchResponse.searchResponseWith().build();
         }
-        if (envelopeCases.isEmpty()) {
-            return SearchResponse.searchResponseWith()
-                .allPaymentsStatus(INCOMPLETE)
-                .build();
-        }
-        return searchForEnvelopeCasePayments(envelopeCases);
     }
 
     public PaymentMetadata getPaymentMetadata(String dcnReference) {
@@ -163,5 +166,11 @@ public class SearchServiceImpl implements SearchService {
             return Collections.emptyList();
         }
         return Collections.emptyList();
+    }
+
+    //Check if DCN exists in payment envelope
+    private boolean isEnvelopePaymentPresent(SearchRequest searchRequest){
+        Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
+        return payment.isPresent();
     }
 }

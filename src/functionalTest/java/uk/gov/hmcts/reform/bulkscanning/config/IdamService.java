@@ -7,11 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.AuthenticateUserResponse;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.CreateUserRequest;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.Role;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.TokenExchangeResponse;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamApi.UserGroup;
+import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
+import uk.gov.hmcts.reform.idam.client.models.test.CreateUserRequest;
+import uk.gov.hmcts.reform.idam.client.models.test.UserGroup;
+import uk.gov.hmcts.reform.idam.client.models.test.UserRole;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -22,12 +21,10 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class IdamService {
     public static final String CMC_CITIZEN_GROUP = "cmc-private-beta";
-    public static final String CMC_CASE_WORKER_GROUP = "caseworker";
 
     public static final String BEARER = "Bearer ";
-    public static final String AUTHORIZATION_CODE = "authorization_code";
-    public static final String CODE = "code";
-    public static final String BASIC = "Basic ";
+    public static final String GRANT_TYPE = "password";
+    public static final String SCOPES = "openid profile roles";
 
     private final IdamApi idamApi;
     private final TestConfigProperties testConfig;
@@ -74,16 +71,11 @@ public class IdamService {
         LOG.info("testConfig.getOauth2().getRedirectUrl() : " + testConfig.getOauth2().getRedirectUrl());
 
         try {
-            AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
-                BASIC + base64Authorisation,
-                CODE,
-                testConfig.getOauth2().getClientId(),
-                testConfig.getOauth2().getRedirectUrl()
-            );
-
             TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
-                authenticateUserResponse.getCode(),
-                AUTHORIZATION_CODE,
+                username,
+                password,
+                SCOPES,
+                GRANT_TYPE,
                 testConfig.getOauth2().getClientId(),
                 testConfig.getOauth2().getClientSecret(),
                 testConfig.getOauth2().getRedirectUrl()
@@ -98,11 +90,11 @@ public class IdamService {
 
 
     private CreateUserRequest userRequest(String email, String userGroup, String[] roles) {
-        return CreateUserRequest.userRequestWith()
+        return CreateUserRequest.builder()
             .email(email)
             .password(testConfig.getTestUserPassword())
             .roles(Stream.of(roles)
-                       .map(Role::new)
+                       .map(UserRole::new)
                        .collect(toList()))
             .userGroup(new UserGroup(userGroup))
             .build();
@@ -112,3 +104,4 @@ public class IdamService {
         return String.format(testConfig.getGeneratedUserEmailPattern(), UUID.randomUUID().toString());
     }
 }
+
