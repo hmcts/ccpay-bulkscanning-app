@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.bulkscanning.validator;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
 import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerFunctionalTest.createBulkScanPaymentRequest;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringIntegrationSerenityRunner.class)
 @SpringBootTest
 @EnableFeignClients
 @ActiveProfiles("test")
