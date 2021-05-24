@@ -53,7 +53,7 @@ public class PaymentController {
                                         .build(), HttpStatus.CREATED);
     }
 
-    
+
     @ApiOperation("Provide meta information about the payments contained\n" +
         "in the envelope. This operation will be called after the banking process\n" +
         "has been done and payments have been allocated to a BGC slip / batch")
