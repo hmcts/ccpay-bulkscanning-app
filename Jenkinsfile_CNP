@@ -13,6 +13,9 @@ def product = "ccpay"
 
 def app = "bulkscanning-api"
 
+// Configure branches to sync with master branch
+def branchesToSync = ['demo', 'ithc', 'perftest']
+
 def secrets = [
   'ccpay-${env}': [
     secret('cmc-service-secret', 'S2S_SERVICE_SECRET'),
@@ -39,6 +42,9 @@ withPipeline(type, product, app) {
     //installCharts()
     //disableLegacyDeployment()
     enableAksStagingDeployment()
+
+    // Sync demo,perftest and ithc with master branch
+    syncBranchesWithMaster(branchesToSync)
 
 
 
