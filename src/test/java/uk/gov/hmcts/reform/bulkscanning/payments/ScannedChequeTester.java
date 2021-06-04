@@ -14,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles({"local", "test"})
-//@TestPropertySource(locations="classpath:application-local.yaml")
 public class ScannedChequeTester {
     @MockBean
     private ClientRegistrationRepository clientRegistrationRepository;

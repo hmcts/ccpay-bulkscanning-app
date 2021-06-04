@@ -4,14 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
@@ -35,17 +33,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles({"local", "test"})
 public class SearchServiceTest {
-    MockMvc mockMvc;
 
     private SearchService paymentService;
 
@@ -78,7 +73,6 @@ public class SearchServiceTest {
 
     @Before
     public void setUp() {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
         paymentService = new SearchServiceImpl(paymentRepository,
                                                 paymentMetadataRepository,
                                                 paymentMetadataDtoMapper,
