@@ -467,7 +467,7 @@ public class PaymentControllerFnTest {
     @WithMockUser(authorities = "payments")
     public void testGeneratePaymentReport_DataLoss() throws Exception {
         String dcn[] = {"111122223333555511111", "111122223333555521111"};
-        createTestReportDataLoss(dcn);
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn[0]));
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 365 * 24 * 60 * 60 * 1000L)));
         params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
@@ -481,7 +481,7 @@ public class PaymentControllerFnTest {
     @WithMockUser(authorities = "payments")
     public void testGetPaymentReportData_DataLoss() throws Exception {
         String dcn[] = {"111122223333555511111", "111122223333555521111"};
-        createTestReportDataLoss(dcn);
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn[0]));
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 365 * 24 * 60 * 60 * 1000L)));
         params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
@@ -519,18 +519,10 @@ public class PaymentControllerFnTest {
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
     }
 
-    private void createTestReportDataLoss(String... dcns) throws Exception {
-        //Request from Exela with one DCN
-
-        restActions.post("/bulk-scan-payment", createPaymentRequest(dcns[0]));
-    }
-
     private String getReportDate(Date date) {
         DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        return dateToLocalDateTime(date).format(reportNameDateFormat);
+        LocalDateTime localDateTime = date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        return localDateTime.format(reportNameDateFormat);
     }
 
-    private LocalDateTime dateToLocalDateTime(Date date) {
-        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    }
 }
