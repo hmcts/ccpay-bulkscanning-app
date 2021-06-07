@@ -65,7 +65,7 @@ idam:
     services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
   s2s-auth:
     url: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    totp_secret: G5XTFNBUW4P6ZP4F
+    totp_secret: dummy
     microservice: ccpay_bubble
 
 generated:
