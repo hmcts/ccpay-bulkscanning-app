@@ -37,7 +37,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 /**
  * Spring security configuration for s2s authorisation and user authentication
  */
-@EnableWebSecurity (debug = true)
+@EnableWebSecurity
 @Configuration
 public class SpringSecurityConfiguration {
 

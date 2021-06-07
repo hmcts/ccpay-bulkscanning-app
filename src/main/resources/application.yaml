@@ -110,10 +110,3 @@ idam:
     url: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL}
     totp_secret: ${OIDC_S2S_SECRET}
     microservice: ${OIDC_S2S_MICROSERVICE_NAME}
-
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
-

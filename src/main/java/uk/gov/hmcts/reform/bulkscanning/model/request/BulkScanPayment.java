@@ -106,4 +106,6 @@ public class BulkScanPayment {
         String[] validCurrencys = {"GBP"};
         return currency != null && ! Arrays.asList(validCurrencys).stream().anyMatch(vm -> vm.equalsIgnoreCase(currency));
     }
+
+
 }
