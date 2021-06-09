@@ -7,6 +7,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import uk.gov.hmcts.reform.bulkscanning.config.security.authcheckerconfiguration.AuthCheckerConfiguration;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -46,7 +48,7 @@ public class AuthCheckerConfigurationTest {
         request.setRequestURI("/users/test1/");
         request.setQueryString("param1=value1&param");
         Collection<String> value = authorizedRolesExtractor.apply(request);
-        assertTrue(value.isEmpty(),"Function doesnt return an empty list");
+        assertFalse(value.isEmpty(),"Function return an empty list");
     }
 
     @Test

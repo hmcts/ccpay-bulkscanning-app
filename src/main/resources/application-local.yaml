@@ -8,6 +8,8 @@ server:
 spring:
   lifecycle:
     timeout-per-shutdown-phase: 30s
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: bulk-scanning
   datasource:
@@ -36,19 +38,39 @@ spring:
       accept-case-insensitive-enums: true
     deserialization:
       fail-on-unknown-properties: true
-trusted:
-  s2s:
-    service:
-      names: ccpay_bubble,cmc,bulk_scan_payment_processor,api_gw,probate_frontend,divorce_frontend
+  # open id
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: http://localhost:5000/o
+        # Dummy OIDC client required even we are not going to use
+        registration:
+          oidc:
+            client-id: internal
+            client-secret: internal
+oidc:
+  audience-list: internal,paybubble
+  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
+
 auth:
   provider:
     service:
       client:
-        baseUrl: http://localhost:23443
+        baseUrl: http://localhost:8489
   idam:
     client:
-      baseUrl: http://localhost:23443
+      baseUrl: http://localhost:8489
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
-
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+  s2s-authorised:
+    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw,internal
+  s2s-auth:
+    url: http://localhost:8489
+    totp_secret: AAAAAAAAAAAAAAAA
+    microservice: internal

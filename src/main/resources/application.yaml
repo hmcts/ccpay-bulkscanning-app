@@ -13,6 +13,8 @@ management:
 server:
   shutdown: ${SERVER_SHUTDOWN_STRATEGY}
 spring:
+  main:
+    allow-bean-definition-overriding: true
   lifecycle:
     timeout-per-shutdown-phase: ${TIMEOUT_SERVER_SHUTDOWN_PHASE}
   jpa:
@@ -23,6 +25,19 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+  # open id
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${ISSUER_URI}
+        # Dummy OIDC client required even we are not going to use
+        registration:
+          oidc:
+            client-id: ${OIDC_CLIENT_ID}
+            client-secret: ${OIDC_CLIENT_SECRET}
+
   application:
     name: bulk-scanning-payment-api
   jackson.date-format: yyyy-MM-dd
@@ -80,6 +95,18 @@ auth:
     service:
       client:
         baseUrl: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL}
+oidc:
+  audience-list: ${OIDC_AUDIENCE_LIST}
+  issuer: ${OIDC_ISSUER}
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
+idam:
+  api:
+    url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
+  s2s-authorised:
+    services: ${S2S_AUTHORISED_SERVICES}
+  s2s-auth:
+    url: ${AUTH_PROVIDER_SERVICE_CLIENT_BASEURL}
+    totp_secret: ${OIDC_S2S_SECRET}
+    microservice: ${OIDC_S2S_MICROSERVICE_NAME}

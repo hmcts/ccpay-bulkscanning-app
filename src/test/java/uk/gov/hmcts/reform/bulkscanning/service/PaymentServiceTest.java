@@ -5,12 +5,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.bulkscanning.audit.AppInsightsAuditRepository;
@@ -45,7 +45,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.mockBulkScanningEnvelope;
 import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerFnTest.createBulkScanPaymentRequest;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
@@ -55,11 +54,8 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPL
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles({"local", "test"})
 public class PaymentServiceTest {
-    MockMvc mockMvc;
-
     private PaymentService paymentService;
 
     @MockBean
@@ -97,6 +93,12 @@ public class PaymentServiceTest {
     @Autowired
     private AppInsightsAuditRepository auditRepository;
 
+    @MockBean
+    private ClientRegistrationRepository clientRegistrationRepository;
+
+    @MockBean
+    private JwtDecoder jwtDecoder;
+
     public static final String CCD_CASE_REFERENCE = "1111222233334444";
     public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "9999888833334444";
     public static final String EXCEPTION_RECORD_REFERENCE = "4444333322221111";
@@ -106,7 +108,6 @@ public class PaymentServiceTest {
 
     @Before
     public void setUp() {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
         paymentService = new PaymentServiceImpl(paymentRepository,
                                                 paymentMetadataRepository,
                                                 envelopeRepository,
@@ -158,7 +159,6 @@ public class PaymentServiceTest {
     }
 
     @Test
-    @Transactional
     public void testProcessPaymentFromExela() throws Exception {
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)

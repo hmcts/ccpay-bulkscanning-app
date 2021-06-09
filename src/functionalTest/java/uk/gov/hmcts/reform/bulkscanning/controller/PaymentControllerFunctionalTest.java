@@ -387,10 +387,7 @@ public class PaymentControllerFunctionalTest {
 
     private String getReportDate(Date date) {
         DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        return dateToLocalDateTime(date).format(reportNameDateFormat);
+        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).format(reportNameDateFormat);
     }
 
-    private LocalDateTime dateToLocalDateTime(Date date) {
-        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    }
 }

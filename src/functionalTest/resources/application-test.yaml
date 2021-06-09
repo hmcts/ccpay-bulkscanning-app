@@ -5,6 +5,8 @@ management:
 
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: bulk-scanning
   datasource:
@@ -27,14 +29,24 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
-security:
-  oauth2:
-    resource:
-      filter-order: 3
-trusted:
-  s2s:
-    service:
-      names: ccpay_bubble,cmc,bulk_scan_payment_processor,api_gw,probate_frontend,divorce_frontend
+  # open id
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: https://idam-web-public.aat.platform.hmcts.net/o
+        # Dummy OIDC client required even we are not going to use
+        registration:
+          oidc:
+            client-id: paybubble
+            client-secret: ${OIDC_CLIENT_SECRET}
+      resource:
+        filter-order: 3
+oidc:
+  audience-list: paybubble,cmc_citizen
+  issuer: ${OIDC_ISSUER:https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts}
+
 auth:
   provider:
     service:
@@ -62,13 +74,13 @@ oauth2:
     uri: ${OAUTH2_REDIRECT_URI:https://moneyclaims.aat.platform.hmcts.net}
   client:
     id: ${OAUTH2_CLIENT_ID:cmc_citizen}
-    secret: ${OAUTH2_CLIENT_SECRET:wrubu7ruprupAq6trexe3enay4memej7}
+    secret: ${OAUTH2_CLIENT_SECRET_CMC_CITIZEN}
 
 s2s:
   url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   service:
     name: ${S2S_SERVICE_NAME:cmc}
-    secret: ${S2S_SERVICE_SECRET:RD53IBEKQTO4WMQY}
+    secret: ${S2S_SERVICE_SECRET_CMC}
 
 azure:
   application-insights:

@@ -3,11 +3,15 @@ package uk.gov.hmcts.reform.bulkscanning.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
@@ -29,12 +33,21 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_S
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles({"local", "test"})
 public class ReportServiceTest {
 
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
     @MockBean
     PaymentRepository paymentRepository;
+
+    @MockBean
+    private ClientRegistrationRepository clientRegistrationRepository;
+
+    @MockBean
+    private JwtDecoder jwtDecoder;
+
 
     @MockBean
     PaymentMetadataRepository paymentMetadataRepository;
@@ -74,6 +87,7 @@ public class ReportServiceTest {
     }
 
     @Test
+    @Transactional
     public void testRetrieveByReportTypeDataLoss() throws ParseException{
         List<EnvelopePayment> envelopePayments = new ArrayList<>();
         EnvelopePayment envelopePayment = EnvelopePayment.paymentWith()
