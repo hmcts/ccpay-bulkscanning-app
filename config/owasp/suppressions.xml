@@ -7,9 +7,4 @@
     </notes>
     <cve>CVE-2018-1258</cve>
   </suppress>
-<!--  <suppress>-->
-<!--    <notes>check</notes>-->
-<!--    <cve>CVE-2021-22118</cve>-->
-<!--  </suppress>-->
- <!-- Supression Group ends here -->
 </suppressions>
