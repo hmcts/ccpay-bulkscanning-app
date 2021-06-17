@@ -226,7 +226,7 @@ dependencies {
   compile group: 'com.querydsl', name: 'querydsl-jpa', version:'4.2.2'
   implementation 'com.github.hmcts.liquibase:liquibase-core:3.8.2'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
-  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.13') {
+  compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.22') {
     exclude(module: 'commons-logging')
     exclude(module: 'slf4j-simple')
   }
