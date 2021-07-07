@@ -14,7 +14,6 @@ public class BulkScanPaymentRequestMapperTest {
                                                         .ccdCaseNumber("ccd-number")
                                                         .isExceptionRecord(false)
                                                         .documentControlNumbers(new String[]{"dcn-number"})
-                                                        .responsibleServiceId("AA07")
                                                         .build();
         BulkScanPaymentRequestMapper mapper = new BulkScanPaymentRequestMapper();
         Envelope  response = mapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);
@@ -27,7 +26,6 @@ public class BulkScanPaymentRequestMapperTest {
             .ccdCaseNumber("ccd-number")
             .isExceptionRecord(true)
             .documentControlNumbers(new String[]{"dcn-number"})
-            .responsibleServiceId("AA07")
             .build();
         BulkScanPaymentRequestMapper mapper = new BulkScanPaymentRequestMapper();
         Envelope  response = mapper.mapEnvelopeFromBulkScanPaymentRequest(bsPaymentRequest);

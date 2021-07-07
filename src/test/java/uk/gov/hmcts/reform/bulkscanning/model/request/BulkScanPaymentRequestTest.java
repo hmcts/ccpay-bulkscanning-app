@@ -33,7 +33,7 @@ public class BulkScanPaymentRequestTest {
         BulkScanPaymentRequest bulkScanPaymentRequest = BulkScanPaymentRequest.createBSPaymentRequestWith()
                                                             .ccdCaseNumber("1231231231231231").isExceptionRecord(false)
                                                             .documentControlNumbers(new String[] {"123123123123123123123132"})
-                                                            .responsibleServiceId("AA099").build();
+                                                            .build();
 
         Set<ConstraintViolation<BulkScanPaymentRequest>> violations = validator.validate(bulkScanPaymentRequest);
         if(violations.isEmpty()){

@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserA
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
@@ -442,7 +441,6 @@ public class PaymentControllerFnTest {
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)
             .documentControlNumbers(dcn)
-            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId).toString())
             .isExceptionRecord(isExceptionRecord)
             .build();
     }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.model.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -21,12 +22,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @NoArgsConstructor
 @Data
 @JsonInclude(NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BulkScanPaymentRequest {
-
-    @JsonProperty("site_id")
-    @NotBlank(message = "site_id can't be Blank")
-    @Size(min = 4, max = 4, message = "site_id length must be 4 Characters")
-    private String responsibleServiceId;
 
     @JsonProperty("ccd_case_number")
     @NotBlank(message = "ccd_case_number can't be Blank")
@@ -41,14 +38,6 @@ public class BulkScanPaymentRequest {
     @JsonProperty("document_control_numbers")
     @NotEmpty(message = "document_control_numbers can't be Blank")
     private String[] documentControlNumbers;
-
-    @JsonIgnore
-    @AssertFalse(message = "Invalid site_id. Accepted values are AA08 or AA07 or AA09")
-    public boolean isValidResponsibleServiceId() {
-        String[] validResponsibleServiceIds = {"AA08", "AA07", "AA09"};
-        return responsibleServiceId != null && !Arrays.asList(validResponsibleServiceIds).stream().anyMatch(vm -> vm.equalsIgnoreCase(
-            responsibleServiceId));
-    }
 
     @JsonIgnore
     @AssertFalse(message = "document_control_number must be 21 digit numeric")
