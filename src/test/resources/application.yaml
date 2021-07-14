@@ -57,7 +57,7 @@ auth:
 test:
   url: ${TEST_URL:http://localhost:8000}
   user:
-    password: ${TEST_USER_PASSWORD:LevelAt12}
+    password: ${TEST_USER_PASSWORD:dummy}
 idam:
   api:
     url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
