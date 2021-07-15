@@ -52,7 +52,7 @@ spring:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:bspayment}${POSTGRES_CONNECTION_OPTIONS:}
     username: ${POSTGRES_USERNAME:bspayment}
-    password: ${POSTGRES_PASSWORD:bspayment}
+    password: ${POSTGRES_PASSWORD:dummy}
     properties:
       charSet: UTF-8
     tomcat:
