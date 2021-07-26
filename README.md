@@ -159,6 +159,24 @@ You should get a response similar to this:
 ```
   {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
 ```
+### Running the application using docker-compose
+
+Add the below variables and its values to .env file in below format
+Key = Value
+
+1. POSTGRES_USER -  bspayment
+2. POSTGRES_PASSWORD  - bspayment
+3. POSTGRES_DB - bspayment
+4. OPENID_SPRING_DATASOURCE_PASSWORD - openidm
+5. IDAM_SPI_FORGEROCK_AM_PASSWORD - Pa55word11
+6. IDAM_SPI_FORGEROCK_IDM_PASSWORD - openidm-admin
+7. IDAM_SPI_FORGEROCK_IDM_PIN_DEFAULTPASSWORD - BlaBlaBlackSh33p
+8. SECURITY_OAUTH2_CLIENT_CLIENTSECRET - password
+
+The docker compose file picks up the values from .env file when the below command is executed:
+```bash
+docker-compose up
+```
 
 ### Alternative script to run application
 
