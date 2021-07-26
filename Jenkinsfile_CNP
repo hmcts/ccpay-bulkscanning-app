@@ -65,9 +65,13 @@ withPipeline(type, product, app) {
       alwaysLinkToLastBuild: true
     ]
   }
-
+    enableFortifyScan()
     enableSlackNotifications('#cc-payments-tech')
     disableLegacyDeployment()
+
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  }
 
   //Sync demo,ithc and perftest with master branch
   syncBranchesWithMaster(branchesToSync)
