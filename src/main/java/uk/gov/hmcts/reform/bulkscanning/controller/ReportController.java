@@ -1,6 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +25,18 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
 import uk.gov.hmcts.reform.bulkscanning.service.ReportService;
 import uk.gov.hmcts.reform.bulkscanning.utils.ExcelGeneratorUtil;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.servlet.http.HttpServletResponse;
 
-import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.*;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.atEndOfDay;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.atStartOfDay;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateForReportName;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateTimeForReportName;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment Report API"})
@@ -65,7 +74,7 @@ public class ReportController {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 workbook = (HSSFWorkbook) ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
             }
-            if(workbook != null){
+            if (workbook != null) {
                 workbook.write(baos);
             }
             reportBytes = baos.toByteArray();
