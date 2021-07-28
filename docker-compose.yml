@@ -26,8 +26,10 @@ services:
       - auth.idam.client.baseUrl=http://idam-api:5000
       - idam.s2s-auth.url=http://service-auth-provider-api:8489
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ccpay-bulkscanning-db:5432/bspayment
-      - SPRING_DATASOURCE_USERNAME=bspayment
-      - SPRING_DATASOURCE_PASSWORD=bspayment
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SERVER_SHUTDOWN_STRATEGY=graceful
+      - TIMEOUT_SERVER_SHUTDOWN_PHASE=30s
       - SPRING_LIQUIBASE_ENABLED=true
     ports:
       - 8081:8080
@@ -39,9 +41,9 @@ services:
     container_name: ccpay-bulkscanning-db
     image: postgres:11-alpine
     environment:
-      - POSTGRES_USER=bspayment
-      - POSTGRES_PASSWORD=bspayment
-      - POSTGRES_DB=bspayment
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - 5182:5432
     volumes:
@@ -98,19 +100,19 @@ services:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_DATASOURCE_URL=jdbc:postgresql://shared-db:5432/openidm?currentSchema=fridam
       - SPRING_DATASOURCE_USERNAME=openidm
-      - SPRING_DATASOURCE_PASSWORD=openidm
-      - SECURITY_OAUTH2_CLIENT_CLIENTSECRET=password
+      - SPRING_DATASOURCE_PASSWORD=${OPENID_SPRING_DATASOURCE_PASSWORD}
+      - SECURITY_OAUTH2_CLIENT_CLIENTSECRET=${SECURITY_OAUTH2_CLIENT_CLIENTSECRET}
       - SECURITY_OAUTH2_CLIENT_PRE_ESTABLISHED_REDIRECT_URI=http://idam-web-public:9002/login
       - SECURITY_OAUTH2_CLIENT_REGISTERED_REDIRECT_URI=http://idam-web-public:9002/login
       - IDAM_SPI_FORGEROCK_AM_ROOT=http://fr-am:8080/openam
       - IDAM_SPI_FORGEROCK_AM_TOPLEVELHOST=fr-am
       - IDAM_SPI_FORGEROCK_AM_USERNAME=amadmin
-      - IDAM_SPI_FORGEROCK_AM_PASSWORD=Pa55word11
+      - IDAM_SPI_FORGEROCK_AM_PASSWORD=${IDAM_SPI_FORGEROCK_AM_PASSWORD}
       - IDAM_SPI_FORGEROCK_AM_JWKSURIFOROAUTH2CLIENTS=http://fr-am:8080/openam/oauth2/hmcts/connect/jwk_uri
       - IDAM_SPI_FORGEROCK_IDM_ROOT=http://fr-idm:18080/openidm
       - IDAM_SPI_FORGEROCK_IDM_USERNAME=openidm-admin
-      - IDAM_SPI_FORGEROCK_IDM_PASSWORD=openidm-admin
-      - IDAM_SPI_FORGEROCK_IDM_PIN_DEFAULTPASSWORD=BlaBlaBlackSh33p
+      - IDAM_SPI_FORGEROCK_IDM_PASSWORD=${IDAM_SPI_FORGEROCK_IDM_PASSWORD}
+      - IDAM_SPI_FORGEROCK_IDM_PIN_DEFAULTPASSWORD=${IDAM_SPI_FORGEROCK_IDM_PIN_DEFAULTPASSWORD}
       - APPSETTING_NODE_PATH=/opt/app
   idam-web-public:
     image: hmctspublic.azurecr.io/idam/web-public:stable
