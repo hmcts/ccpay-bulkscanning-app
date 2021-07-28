@@ -1,8 +1,8 @@
 #!groovy
 
 properties(
-  [[$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/ccpay-bulkscanning-app.git'],
-   pipelineTriggers([[$class: 'GitHubPushTrigger']])]
+    [[$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/ccpay-bulkscanning-app.git'],
+     pipelineTriggers([[$class: 'GitHubPushTrigger']])]
 )
 
 @Library("Infrastructure")
@@ -36,12 +36,12 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, app) {
-  //setVaultName('ccpay')
-  loadVaultSecrets(secrets)
-  enableDbMigration('ccpay')
-  //installCharts()
-  //disableLegacyDeployment()
-  enableAksStagingDeployment()
+    //setVaultName('ccpay')
+    loadVaultSecrets(secrets)
+    enableDbMigration('ccpay')
+    //installCharts()
+    //disableLegacyDeployment()
+    enableAksStagingDeployment()
 
 
 
@@ -66,19 +66,8 @@ withPipeline(type, product, app) {
     ]
   }
 
-  enableSlackNotifications('#cc-payments-tech')
-  disableLegacyDeployment()
-
-  onMaster() {
-    enablePactAs([
-      AppPipelineDsl.PactRoles.PROVIDER,
-    ])
-  }
-  onPR() {
-    enablePactAs([
-      AppPipelineDsl.PactRoles.PROVIDER,
-    ])
-  }
+    enableSlackNotifications('#cc-payments-tech')
+    disableLegacyDeployment()
 
   //Sync demo,ithc and perftest with master branch
   syncBranchesWithMaster(branchesToSync)
