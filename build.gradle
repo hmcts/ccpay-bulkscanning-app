@@ -18,6 +18,7 @@ plugins {
   id 'org.sonarqube' version '3.0'
   id 'idea'
   id "info.solidsoft.pitest" version '1.5.1'
+  id "au.com.dius.pact" version "4.1.7"
 }
 
 
@@ -86,8 +87,6 @@ idea {
     options.compilerArgs << "-Xlint:unchecked" << "-Werror"
   }
 
-
-
   task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
@@ -151,6 +150,51 @@ checkstyleTest.enabled(false)
       property "sonar.organization", "hmcts"
     }
   }
+
+project.ext {
+  pactVersion = getCheckedOutGitCommitHash()
+}
+def getCheckedOutGitCommitHash() {
+  'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
+def pactBrokerUrl = System.getenv("PACT_BROKER_URL")
+
+pact {
+  serviceProviders {
+    'feeRegister_lookUp' {
+      protocol = 'http'
+      host = 'bulkscanner-api-aat.service.core-compute-aat.internal'
+      port = 80
+      if (pactBrokerUrl) hasPactsFromPactBroker(pactBrokerUrl)
+      publish {
+        if (pactBrokerUrl) pactBrokerUrl = pactBrokerUrl
+        pactBrokerUrl = System.getProperty("PACT_BROKER_URL") ?: 'http://localhost:80'
+        tags = ['master']
+      }
+      project.version = pactVersion.toString();
+    }
+  }
+  reports {
+    defaultReports()
+    markdown
+
+  }
+}
+
+task runAndPublishConsumerPactTests(type: Test){
+  logger.lifecycle("Running Pact consumer verification Tests")
+  systemProperty 'pact.verifier.publishResults',System.getProperty("pact.verifier.publishResults")
+}
+
+runAndPublishConsumerPactTests.finalizedBy pactVerify
+
+task runProviderPactVerification(type: Test){
+  logger.lifecycle("Running Pact provider verification Tests")
+  systemProperty 'pact.verifier.publishResults',System.getProperty("pact.verifier.publishResults")
+}
+
+runProviderPactVerification.finalizedBy pactVerify
 
   dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
