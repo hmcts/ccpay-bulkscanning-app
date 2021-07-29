@@ -21,6 +21,36 @@ plugins {
   id "au.com.dius.pact" version "4.1.7"
 }
 
+allprojects {
+  apply plugin: 'maven'
+  apply plugin: 'io.spring.dependency-management'
+  apply plugin: 'au.com.dius.pact'
+
+  group = 'uk.gov.hmcts.reform.bulkscanning'
+  ext {
+    buildNumber = System.getenv("BUILD_NUMBER") ?: '0'
+  }
+  version = rootProject.file('version.txt').text.trim() + ".${buildNumber}"
+
+  sourceCompatibility = versions.javaVersion
+  targetCompatibility = versions.javaVersion
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+  }
+
+  apply from: "${rootDir}/cve-resolution-strategy.gradle"
+
+  dependencyManagement {
+    imports {
+      mavenBom "org.springframework.boot:spring-boot-dependencies:2.3.11.RELEASE"
+      mavenBom 'org.apache.logging.log4j:log4j-bom:2.13.3'
+    }
+  }
+}
 
 apply plugin: 'net.serenity-bdd.aggregator'
 apply from: 'liquibase.gradle'

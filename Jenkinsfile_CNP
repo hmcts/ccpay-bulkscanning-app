@@ -71,11 +71,11 @@ withPipeline(type, product, app) {
     enableSlackNotifications('#cc-payments-tech')
     disableLegacyDeployment()
 
-  onPR() {
-    enablePactAs([
-      AppPipelineDsl.PactRoles.PROVIDER,
-    ])
-  }
+//  onPR() {
+//    enablePactAs([
+//      AppPipelineDsl.PactRoles.PROVIDER,
+//    ])
+//  }
 
   //Sync demo,ithc and perftest with master branch
   syncBranchesWithMaster(branchesToSync)
