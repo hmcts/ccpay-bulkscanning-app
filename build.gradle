@@ -189,12 +189,12 @@ pact {
 //
 //runAndPublishConsumerPactTests.finalizedBy pactVerify
 
-task runProviderPactVerification(type: Test){
-  logger.lifecycle("Running Pact provider verification Tests")
-  systemProperty 'pact.verifier.publishResults',System.getProperty("pact.verifier.publishResults")
-}
-
-runProviderPactVerification.finalizedBy pactVerify
+//task runProviderPactVerification(type: Test){
+//  logger.lifecycle("Running Pact provider verification Tests")
+//  systemProperty 'pact.verifier.publishResults',System.getProperty("pact.verifier.publishResults")
+//}
+//
+//runProviderPactVerification.finalizedBy pactVerify
 
   dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
