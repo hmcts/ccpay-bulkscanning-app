@@ -151,14 +151,14 @@ checkstyleTest.enabled(false)
     }
   }
 
-project.ext {
-  pactVersion = getCheckedOutGitCommitHash()
-}
-def getCheckedOutGitCommitHash() {
-  'git rev-parse --verify --short HEAD'.execute().text.trim()
-}
-
-def pactBrokerUrl = System.getenv("PACT_BROKER_URL")
+//project.ext {
+//  pactVersion = getCheckedOutGitCommitHash()
+//}
+//def getCheckedOutGitCommitHash() {
+//  'git rev-parse --verify --short HEAD'.execute().text.trim()
+//}
+//
+//def pactBrokerUrl = System.getenv("PACT_BROKER_URL")
 
 //pact {
 //  serviceProviders {
