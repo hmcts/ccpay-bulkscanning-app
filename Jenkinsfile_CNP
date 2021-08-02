@@ -16,6 +16,8 @@ def app = "bulkscanning-api"
 // Configure branches to sync with master branch
 def branchesToSync = ['demo', 'ithc', 'perftest']
 
+env.PACT_BROKER_URL = 'https://pact-broker.platform.hmcts.net'
+
 def secrets = [
   'ccpay-${env}': [
     secret('cmc-service-secret', 'S2S_SERVICE_SECRET_CMC'),
