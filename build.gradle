@@ -26,7 +26,7 @@ allprojects {
   apply plugin: 'io.spring.dependency-management'
   apply plugin: 'au.com.dius.pact'
 
-  group = 'uk.gov.hmcts.reform.bulkscanning'
+  group = 'uk.gov.hmcts.reform.ccpay-bulkscanning'
   ext {
     buildNumber = System.getenv("BUILD_NUMBER") ?: '0'
   }
@@ -194,7 +194,7 @@ pact {
   serviceProviders {
     'bulkscanning_lookUp' {
       protocol = 'http'
-      host = 'bulkscanning-api-aat.service.core-compute-aat.internal'
+      host = 'ccpay-bulkscanning-api-aat.service.core-compute-aat.internal'
       port = 80
       if (pactBrokerUrl) hasPactsFromPactBroker(pactBrokerUrl)
       publish {
