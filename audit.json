@@ -41,6 +41,7 @@
   "90033_Loosely Scoped Cookie_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/bulk-scan-payments?exception_reference=exception_reference_PUT":"ignore",
   "10054_Cookie Without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/report/download?date_from=date_from\u0026date_to=date_to\u0026report_type=DATA_LOSS_GET":"ignore",
   "10054_Cookie Without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/v2/api-docs_GET":"ignore",
+  "10054_Cookie Without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/report/data?date_from=date_from\u0026date_to=date_to\u0026report_type=DATA_LOSS_GET":"ignore",
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/cases?document_control_number=document_control_number_GET":"ignore",
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/v2/api-docs_GET":"ignore",
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/bulk-scan-payments/dcn/status/COMPLETE_PATCH":"ignore",
