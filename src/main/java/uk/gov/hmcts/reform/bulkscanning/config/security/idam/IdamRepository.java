@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 /**
- * Repository class to connect to idam api
+ * Repository class to connect to idam api.
  */
 @Component
 public class IdamRepository {

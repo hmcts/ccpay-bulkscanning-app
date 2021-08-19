@@ -1,6 +1,12 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +22,11 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.PaymentResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
+import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.Optional;
+
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -53,9 +60,9 @@ public class PaymentController {
                                         .build(), HttpStatus.CREATED);
     }
 
-    @ApiOperation("Provide meta information about the payments contained\n" +
-        "in the envelope. This operation will be called after the banking process\n" +
-        "has been done and payments have been allocated to a BGC slip / batch")
+    @ApiOperation("Provide meta information about the payments contained\n"
+        + "in the envelope. This operation will be called after the banking process\n"
+        + "has been done and payments have been allocated to a BGC slip / batch")
     @ApiResponses({
         @ApiResponse(code = 201, message = "Bulk Scanning Data retrieved"),
         @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),

@@ -63,7 +63,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     @Transactional
     public SearchResponse retrieveByDcn(String documentControlNumber) {
-        List<EnvelopeCase> envelopeCases = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
+        List<EnvelopeCase> envelopeCases = getEnvelopeCaseByDcn(SearchRequest.searchRequestWith()
                                                                     .documentControlNumber(
                                                                         documentControlNumber)
                                                                     .build());
@@ -137,7 +137,8 @@ public class SearchServiceImpl implements SearchService {
             return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(Collections.emptyList());
         } else if (StringUtils.isNotEmpty(searchRequest.getExceptionRecord())
             && envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).isPresent()) {
-            List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(Collections.emptyList());
+            List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord())
+                .orElse(Collections.emptyList());
             for (EnvelopeCase envelopeCase : envelopeCases) {
                 if (StringUtils.isNotEmpty(envelopeCase.getCcdReference())
                     && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()) {
@@ -149,7 +150,7 @@ public class SearchServiceImpl implements SearchService {
         return Collections.emptyList();
     }
 
-    private List<EnvelopeCase> getEnvelopeCaseByDCN(SearchRequest searchRequest) {
+    private List<EnvelopeCase> getEnvelopeCaseByDcn(SearchRequest searchRequest) {
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
         if (payment.isPresent()
             && Optional.ofNullable(payment.get().getEnvelope()).isPresent()) {

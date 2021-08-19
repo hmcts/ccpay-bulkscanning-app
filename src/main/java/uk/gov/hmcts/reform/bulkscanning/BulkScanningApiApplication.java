@@ -13,13 +13,13 @@ public class BulkScanningApiApplication {
     private static final Logger LOG = LoggerFactory.getLogger(BulkScanningApiApplication.class);
 
     public static void main(final String[] args) {
-        try{
+        try {
             //Setting Liquibase DB Lock property before Spring starts up.
             LiquibaseConfiguration.getInstance()
                 .getConfiguration(GlobalConfiguration.class)
                 .setUseDbLock(true);
             SpringApplication.run(BulkScanningApiApplication.class, args);
-        }catch (RuntimeException re) {
+        } catch (RuntimeException re) {
             LOG.error("Application crashed with error message: ", re);
         }
 

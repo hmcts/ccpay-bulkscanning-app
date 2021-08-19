@@ -35,9 +35,9 @@ public class AppInsightsAuditRepository implements AuditRepository {
 
     @Override
     public void trackPaymentEvent(String name, EnvelopePayment payment) {
-        if(Optional.ofNullable(payment.getSource()).isPresent()
+        if (Optional.ofNullable(payment.getSource()).isPresent()
                 && Optional.ofNullable(payment.getPaymentStatus()).isPresent()
-                && Optional.ofNullable(payment.getDcnReference()).isPresent()){
+                && Optional.ofNullable(payment.getDcnReference()).isPresent()) {
             Map<String, String> properties = new ConcurrentHashMap<>();
             properties.put("dcnReference", payment.getDcnReference());
             properties.put("paymentStatus", payment.getPaymentStatus());

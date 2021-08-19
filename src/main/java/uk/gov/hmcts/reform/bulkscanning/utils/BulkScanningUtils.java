@@ -54,10 +54,10 @@ public class BulkScanningUtils {
 
         if (Optional.ofNullable(listOfExistingPayment).isPresent() && !listOfExistingPayment.isEmpty()) {
             //Existing envelopeList
-            existingEnvelopeList = listOfExistingPayment.stream().
-                map(envelopePayment -> listOfExistingEnvelope(envelopePayment)).
-                filter(envelope1 -> Optional.ofNullable(envelope1.getId()).isPresent()).
-                collect(Collectors.toList());
+            existingEnvelopeList = listOfExistingPayment.stream()
+                .map(envelopePayment -> listOfExistingEnvelope(envelopePayment))
+                .filter(envelope1 -> Optional.ofNullable(envelope1.getId()).isPresent())
+                .collect(Collectors.toList());
         } else {
             //New Envelope
             existingEnvelopeList.add(envelope);
@@ -73,8 +73,8 @@ public class BulkScanningUtils {
              existingEnvelope = envelopePayment.getEnvelope();
 
             //check if existing cases are present
-            if (Optional.ofNullable(existingEnvelope).isPresent() &&
-                Optional.ofNullable(existingEnvelope.getEnvelopeCases()).isPresent()
+            if (Optional.ofNullable(existingEnvelope).isPresent()
+                && Optional.ofNullable(existingEnvelope.getEnvelopeCases()).isPresent()
                 && !existingEnvelope.getEnvelopeCases().isEmpty()) {
                 throw new BulkScanCaseAlreadyExistsException(BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST);
             }
@@ -90,7 +90,7 @@ public class BulkScanningUtils {
 
     public Envelope handlePaymentStatus(Envelope envelopeDB, Envelope envelopeNew) {
 
-        processAllTheDCNPayments(envelopeDB,envelopeNew);
+        processAllTheDcnPayments(envelopeDB, envelopeNew);
         completeTheEnvelopeStatus(envelopeDB);
         mergeTheCaseDetailsFromBulkScan(envelopeDB,envelopeNew);
 
@@ -106,7 +106,7 @@ public class BulkScanningUtils {
         envelopeDB.getEnvelopeCases().stream().forEach(envelopeCase -> envelopeCase.setEnvelope(envelopeDB));
     }
 
-    public void processAllTheDCNPayments(Envelope envelopeDB, Envelope envelopeNew) {
+    public void processAllTheDcnPayments(Envelope envelopeDB, Envelope envelopeNew) {
 
         //List of existing DCN
         List<String> listOfExistingDCN = envelopeNew.getEnvelopePayments().stream().filter(envelopePayment ->

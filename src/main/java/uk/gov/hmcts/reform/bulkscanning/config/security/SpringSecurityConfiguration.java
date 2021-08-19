@@ -14,28 +14,32 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
-import uk.gov.hmcts.reform.bulkscanning.config.security.converter.BSJwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.bulkscanning.config.security.exception.BSAccessDeniedHandler;
-import uk.gov.hmcts.reform.bulkscanning.config.security.exception.BSAuthenticationEntryPoint;
+import uk.gov.hmcts.reform.bulkscanning.config.security.converter.BsJwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.bulkscanning.config.security.exception.BsAccessDeniedHandler;
+import uk.gov.hmcts.reform.bulkscanning.config.security.exception.BsAuthenticationEntryPoint;
 import uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserAuthFilter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.bulkscanning.config.security.validator.AudienceValidator;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 /**
- * Spring security configuration for s2s authorisation and user authentication
+ * Spring security configuration for s2s authorisation and user authentication.
  */
 @EnableWebSecurity
 @Configuration
@@ -47,15 +51,17 @@ public class SpringSecurityConfiguration {
 
     @Configuration
     @Order(1)
-    public static class ExternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    public static class ExternalApiSecurityConfigurationAdapter
+                        extends WebSecurityConfigurerAdapter {
 
         private final ServiceAuthFilter serviceAuthFilter;
-        private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
-        private final BSAccessDeniedHandler bsAccessDeniedHandler;
+        private final BsAuthenticationEntryPoint bsAuthenticationEntryPoint;
+        private final BsAccessDeniedHandler bsAccessDeniedHandler;
 
         @Autowired
-        public ExternalApiSecurityConfigurationAdapter(final ServiceAuthFilter serviceAuthFilter, final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
-                                                       final BSAccessDeniedHandler bsAccessDeniedHandler) {
+        public ExternalApiSecurityConfigurationAdapter(final ServiceAuthFilter serviceAuthFilter,
+                                                       final BsAuthenticationEntryPoint bsAuthenticationEntryPoint,
+                                                       final BsAccessDeniedHandler bsAccessDeniedHandler) {
             super();
             this.serviceAuthFilter = serviceAuthFilter;
             this.bsAuthenticationEntryPoint = bsAuthenticationEntryPoint;
@@ -102,16 +108,16 @@ public class SpringSecurityConfiguration {
         private final ServiceAuthFilter serviceAuthFilter;
         private final ServiceAndUserAuthFilter serviceAndUserAuthFilter;
         private final JwtAuthenticationConverter jwtAuthenticationConverter;
-        private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
-        private final BSAccessDeniedHandler bsAccessDeniedHandler;
+        private final BsAuthenticationEntryPoint bsAuthenticationEntryPoint;
+        private final BsAccessDeniedHandler bsAccessDeniedHandler;
 
         @Inject
-        public InternalApiSecurityConfigurationAdapter(final BSJwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
+        public InternalApiSecurityConfigurationAdapter(final BsJwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
                                                        final ServiceAuthFilter serviceAuthFilter,
                                                        final Function<HttpServletRequest, Optional<String>> userIdExtractor,
                                                        final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
-                                                       final SecurityUtils securityUtils, final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
-                                                       final BSAccessDeniedHandler bsAccessDeniedHandler) {
+                                                       final SecurityUtils securityUtils, final BsAuthenticationEntryPoint bsAuthenticationEntryPoint,
+                                                       final BsAccessDeniedHandler bsAccessDeniedHandler) {
             super();
             this.serviceAndUserAuthFilter = new ServiceAndUserAuthFilter(
                 userIdExtractor, authorizedRolesExtractor, securityUtils);
@@ -181,8 +187,8 @@ public class SpringSecurityConfiguration {
 
             OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
 
-            // Commented issuer validation as confirmed by IDAM
-           /* OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);*/
+            /*  Commented issuer validation as confirmed by IDAM
+                OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride); */
             OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withTimestamp,
                                                                                           audienceValidator);
             jwtDecoder.setJwtValidator(withAudience);

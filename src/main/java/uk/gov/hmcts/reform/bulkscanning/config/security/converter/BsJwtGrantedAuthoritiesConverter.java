@@ -19,25 +19,25 @@ import java.util.stream.Collectors;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
 
 /**
- * Class is designed to fetch authorities from access token
+ * Class is designed to fetch authorities from access token.
  */
 
 @Component
-public class BSJwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+public class BsJwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     public static final String TOKEN_NAME = "tokenName";
 
     private final IdamRepository idamRepository;
 
     @Autowired
-    public BSJwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
+    public BsJwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
         this.idamRepository = idamRepository;
     }
 
     /**
-     * Method responsible to extract authorities from access token received
-     * @param jwt
-     * @return
+     * Method responsible to extract authorities from access token received.
+     * @param jwt jwt
+     * @return List of GrantedAuthority
      */
 
     @Override
@@ -51,15 +51,14 @@ public class BSJwtGrantedAuthoritiesConverter implements Converter<Jwt, Collecti
     }
 
     /**
-     * Method responsible to get stream of authorities based on claims
-     * @param roles
-     * @return
+     * Method responsible to get stream of authorities based on claims.
+     * @param roles list of roles
+     * @return list of GrantedAuthority
      */
     private List<GrantedAuthority> extractAuthorityFromClaims(List<String> roles) {
-       //
-        if (!Optional.ofNullable(roles).isPresent()){
-            throw new InsufficientAuthenticationException("No roles can be extracted from user " +
-                                                              "most probably due to insufficient scopes provided");
+        if (!Optional.ofNullable(roles).isPresent()) {
+            throw new InsufficientAuthenticationException("No roles can be extracted from user "
+                                                               + "most probably due to insufficient scopes provided");
         }
         return roles.stream()
             .map(SimpleGrantedAuthority::new)

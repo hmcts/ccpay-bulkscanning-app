@@ -25,7 +25,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
     @Mock
     private IdamRepository idamRepository;
     @InjectMocks
-    private BSJwtGrantedAuthoritiesConverter converter;
+    private BsJwtGrantedAuthoritiesConverter converter;
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);

@@ -132,30 +132,31 @@ public class PaymentServiceImpl implements PaymentService {
         List<Envelope> listOfExistingEnvelope = bulkScanningUtils.returnExistingEnvelopeList(envelopeNew);
 
         if (Optional.ofNullable(listOfExistingEnvelope).isPresent() && !listOfExistingEnvelope.isEmpty()) {
-            for (Envelope envelopeDB : listOfExistingEnvelope) {
+            for (Envelope envelopeDb : listOfExistingEnvelope) {
                 //if we have envelope already in BS
-                if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
+                if (Optional.ofNullable(envelopeDb).isPresent() && Optional.ofNullable(envelopeDb.getId()).isPresent()) {
                     LOG.info("Existing envelope found for Bulk Scan request");
-                    bulkScanningUtils.handlePaymentStatus(envelopeDB, envelopeNew);
+                    bulkScanningUtils.handlePaymentStatus(envelopeDb, envelopeNew);
                 }
 
-                bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
-                envelopeRepository.save(envelopeDB);
+                bulkScanningUtils.insertStatusHistoryAudit(envelopeDb);
+                envelopeRepository.save(envelopeDb);
 
-                if (Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
-                    && !envelopeDB.getEnvelopePayments().isEmpty()) {
-                    envelopeDB.getEnvelopePayments().stream().forEach(payment -> {
+                if (Optional.ofNullable(envelopeDb.getEnvelopePayments()).isPresent()
+                    && !envelopeDb.getEnvelopePayments().isEmpty()) {
+                    envelopeDb.getEnvelopePayments().stream().forEach(payment -> {
                         auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment);
                     });
                 }
 
-                Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
+                Optional<Envelope> envelope = envelopeRepository.findById(envelopeDb.getId());
 
-                if(envelope.isPresent()) {
-                    List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
-                        Collectors.toList());
-
-                    listOfAllPayments.addAll(paymentDCNList);
+                if (envelope.isPresent()) {
+                    List<String> paymentDcNList = envelope.get().getEnvelopePayments()
+                                                  .stream()
+                                                  .map(envelopePayment -> envelopePayment.getDcnReference())
+                                                   .collect(Collectors.toList());
+                    listOfAllPayments.addAll(paymentDcNList);
                 }
 
             }
@@ -170,9 +171,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public String updateCaseReferenceForExceptionRecord(String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest) {
-        List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(
-            exceptionRecordReference).
-            orElseThrow(ExceptionRecordNotExistsException::new);
+        List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(exceptionRecordReference)
+            .orElseThrow(ExceptionRecordNotExistsException::new);
 
         if (Optional.ofNullable(caseReferenceRequest).isPresent()
             && StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())
@@ -229,7 +229,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Envelope updateEnvelopePaymentStatus(Envelope envelope, PaymentStatus paymentStatus) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(Collections.emptyList());
-        if(null != payments && !payments.isEmpty()) {
+        if (null != payments && !payments.isEmpty()) {
             if (checkAllPaymentsStatus(paymentStatus, payments)) {
                 updateEnvelopeStatus(envelope, paymentStatus);
             } else if (checkAnyPaymentsStatus(INCOMPLETE, payments)) {
