@@ -21,13 +21,13 @@ public class AppInsightsAuditRepositoryTest {
     AppInsightsAuditRepository appInsightsAuditRepository;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         telemetry = spy(TelemetryClient.class);
         appInsightsAuditRepository = new AppInsightsAuditRepository("key",telemetry);
     }
 
     @Test
-    public void testTrackEvent(){
+    public void testTrackEvent() {
         Map<String, String> properties = new ConcurrentHashMap<>();
         properties.put("key","value");
         appInsightsAuditRepository.trackEvent("name",properties);
@@ -35,7 +35,7 @@ public class AppInsightsAuditRepositoryTest {
     }
 
     @Test
-    public  void testTrackPaymentEvent(){
+    public  void testTrackPaymentEvent() {
         Map<String, String> properties = new ConcurrentHashMap<>();
         properties.put("dcnReference", "reference");
         properties.put("paymentStatus", "status");

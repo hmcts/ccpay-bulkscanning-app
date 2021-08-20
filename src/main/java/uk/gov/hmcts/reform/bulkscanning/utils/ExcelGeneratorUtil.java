@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.bulkscanning.utils;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
@@ -24,19 +30,18 @@ public final class ExcelGeneratorUtil {
         String[] colsDataLoss = {"Loss_Resp", "Payment_Asset_DCN", "Resp_Service ID", "Resp_Service Name",
             "Date_Banked", "BGC_Batch", "Payment_Method", "Amount"};
         String[] colsUnprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref",
-                "Date_Banked", "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
+            "Date_Banked", "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
         try (Workbook workbook = new HSSFWorkbook()) {
-            CreationHelper createHelper = workbook.getCreationHelper();
             Sheet sheet = workbook.createSheet(reportType.toString());
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
             headerFont.setColor(BLACK.getIndex());
 
-            CellStyle headerCellStyle = workbook.createCellStyle();
-            headerCellStyle.setFont(headerFont);
-
             // Row for Header
             Row headerRow = sheet.createRow(0);
+
+            CellStyle headerCellStyle = workbook.createCellStyle();
+            headerCellStyle.setFont(headerFont);
 
             // Header
             if (reportType.equals(UNPROCESSED)) {
@@ -45,6 +50,7 @@ public final class ExcelGeneratorUtil {
                 buildReportDataLoss(reportDataList, colsDataLoss, sheet, headerCellStyle, headerRow);
             }
 
+            CreationHelper createHelper = workbook.getCreationHelper();
             // CellStyle for Age
             CellStyle ageCellStyle = workbook.createCellStyle();
             ageCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("#"));

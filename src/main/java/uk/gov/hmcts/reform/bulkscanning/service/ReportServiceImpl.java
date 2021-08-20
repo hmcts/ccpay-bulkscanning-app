@@ -18,7 +18,12 @@ import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataReposito
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.utils.DateUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_Scan;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
@@ -80,7 +85,7 @@ public class ReportServiceImpl implements ReportService {
                     && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                 .forEach(payment -> {
                     dataList.add(populateReportDataDataLoss(payment));
-            });
+                });
             dataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
             dataList.stream().forEach(data -> reportDataList.add(data));
         }

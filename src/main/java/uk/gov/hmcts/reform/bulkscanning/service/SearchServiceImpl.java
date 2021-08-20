@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESSED;
 
 
 @Service
@@ -51,7 +53,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     @Transactional
-    public SearchResponse retrieveByCCDReference(String ccdReference) {
+    public SearchResponse retrieveByCcDReference(String ccdReference) {
 
         List<EnvelopeCase> envelopeCases = getEnvelopeCaseByCcdReference(SearchRequest.searchRequestWith()
                                                                              .ccdReference(ccdReference)

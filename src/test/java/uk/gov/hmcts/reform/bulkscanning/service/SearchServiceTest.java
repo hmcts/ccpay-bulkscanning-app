@@ -116,7 +116,7 @@ public class SearchServiceTest {
     @Test
     @Transactional
     public void testRetrieveByCCDReference() throws Exception {
-        SearchResponse searchResponse = paymentService.retrieveByCCDReference(TEST_DCN_REFERENCE);
+        SearchResponse searchResponse = paymentService.retrieveByCcDReference(TEST_DCN_REFERENCE);
         assertThat(searchResponse.getCcdReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
 
@@ -142,7 +142,7 @@ public class SearchServiceTest {
         Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
         when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
         when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(cases);
-        SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
+        SearchResponse searchResponse = paymentService.retrieveByCcDReference("EXP123");
         assertThat(searchResponse.getCcdReference()).isEqualTo("CCD123");
     }
 

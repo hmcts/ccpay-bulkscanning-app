@@ -47,7 +47,7 @@ public class SearchController {
         @PathVariable("ccd_reference") String ccdReference) {
         LOG.info("Retrieving payments for ccdReference {} : ", ccdReference);
         try {
-            SearchResponse searchResponse = searchService.retrieveByCCDReference(ccdReference);
+            SearchResponse searchResponse = searchService.retrieveByCcDReference(ccdReference);
             if (Optional.ofNullable(searchResponse).isPresent()) {
                 LOG.info("SearchResponse : {}", searchResponse);
                 return ResponseEntity.status(HttpStatus.OK).body(searchResponse);

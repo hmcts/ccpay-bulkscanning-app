@@ -57,7 +57,7 @@ public class SearchControllerTest {
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
             .ccdReference("9881231111111111")
             .build();
-        when(searchService.retrieveByCCDReference(any(String.class)))
+        when(searchService.retrieveByCcDReference(any(String.class)))
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
                                                           .header("Authorization", "user")
@@ -69,7 +69,7 @@ public class SearchControllerTest {
     @Test
     public void testSearchPaymentWithCCD_PaymentNotFound() throws Exception{
         SearchResponse searchResponse = null;
-        when(searchService.retrieveByCCDReference(any(String.class)))
+        when(searchService.retrieveByCcDReference(any(String.class)))
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
                                                           .header("Authorization", "user")
@@ -80,7 +80,7 @@ public class SearchControllerTest {
 
     @Test
     public void testSearchPaymentWithCCD_Exception() throws Exception{
-        when(searchService.retrieveByCCDReference(any(String.class)))
+        when(searchService.retrieveByCcDReference(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
                                                           .header("Authorization", "user")
