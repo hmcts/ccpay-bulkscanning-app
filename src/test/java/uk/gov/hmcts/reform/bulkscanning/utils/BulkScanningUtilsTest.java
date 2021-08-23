@@ -53,6 +53,6 @@ public class BulkScanningUtilsTest {
         bsEnvelope.setDateCreated(LocalDateTime.now());
 
         Envelope envelope = bulkScanningUtils.insertStatusHistoryAudit(bsEnvelope);
-        assertThat( envelope.getEnvelopePayments().size()).isEqualTo(1);
+        assertThat(envelope.getEnvelopePayments().size()).isEqualTo(1);
     }
 }

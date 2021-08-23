@@ -18,7 +18,7 @@ public class EnvelopeDtoMapperTest {
     EnvelopeDtoMapper  envelopeDtoMapper = new EnvelopeDtoMapper();
 
     @Test
-    public void testToEnvelopeEntity(){
+    public void testToEnvelopeEntity() {
         PaymentDto paymentDto = PaymentDto.paymentDtoWith()
                                     .id(1)
                                     .dcnReference("dcn-reference")
@@ -36,13 +36,13 @@ public class EnvelopeDtoMapperTest {
     }
 
     @Test
-    public void testToEnvelopeEntity_WithNull(){
+    public void testToEnvelopeEntity_WithNull() {
         Envelope envelope = envelopeDtoMapper.toEnvelopeEntity(null);
         assertNull(envelope,"Response should be NULL");
     }
 
     @Test
-    public void testToPaymentEntities(){
+    public void testToPaymentEntities() {
         PaymentDto paymentDto = PaymentDto.paymentDtoWith()
             .id(1)
             .dcnReference("dcn-reference")
@@ -56,7 +56,7 @@ public class EnvelopeDtoMapperTest {
     }
 
     @Test
-    public void testToPaymentEntities_WithNull(){
+    public void testToPaymentEntities_WithNull() {
         EnvelopePayment envelopePayment = envelopeDtoMapper.toPaymentEntity(null);
         assertNull(envelopePayment,"Response should be NULL");
     }

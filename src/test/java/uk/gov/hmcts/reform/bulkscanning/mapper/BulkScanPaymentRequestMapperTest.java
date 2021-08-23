@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BulkScanPaymentRequestMapperTest {
 
     @Test
-    public void testMapEnvelopeFromBulkScanPaymentRequest_WithExceptionFalse(){
+    public void testMapEnvelopeFromBulkScanPaymentRequest_WithExceptionFalse() {
         BulkScanPaymentRequest bsPaymentRequest = BulkScanPaymentRequest.createBSPaymentRequestWith()
                                                         .ccdCaseNumber("ccd-number")
                                                         .isExceptionRecord(false)
@@ -22,7 +22,7 @@ public class BulkScanPaymentRequestMapperTest {
     }
 
     @Test
-    public void testMapEnvelopeFromBulkScanPaymentRequest_WithExceptionTrue(){
+    public void testMapEnvelopeFromBulkScanPaymentRequest_WithExceptionTrue() {
         BulkScanPaymentRequest bsPaymentRequest = BulkScanPaymentRequest.createBSPaymentRequestWith()
             .ccdCaseNumber("ccd-number")
             .isExceptionRecord(true)

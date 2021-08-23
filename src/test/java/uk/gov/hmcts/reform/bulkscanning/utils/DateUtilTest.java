@@ -16,7 +16,7 @@ public class DateUtilTest {
     Date date;
 
     @Before
-    public void setUp() throws ParseException{
+    public void setUp() throws ParseException {
         String startString = "January 10, 2021";
         DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
         date = format.parse(startString);
@@ -29,13 +29,13 @@ public class DateUtilTest {
     }
 
     @Test
-    public void testGetDateForReportName(){
+    public void testGetDateForReportName() {
         String reportName = DateUtil.getDateForReportName(date);
         assertThat(reportName).isEqualTo("100121");
     }
 
     @Test
-    public void testGetDateTimeForReportName(){
+    public void testGetDateTimeForReportName() {
         String reportName = DateUtil.getDateTimeForReportName(date);
         assertThat(reportName).isEqualTo("100121_000000");
     }

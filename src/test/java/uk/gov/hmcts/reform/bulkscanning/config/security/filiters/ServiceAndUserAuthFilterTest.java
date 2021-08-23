@@ -20,10 +20,13 @@ import uk.gov.hmcts.reform.bulkscanning.config.security.authcheckerconfiguration
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
@@ -62,7 +65,7 @@ public class ServiceAndUserAuthFilterTest {
     @Test
     public void shouldReturn200ResponseWhenRoleMatches() throws Exception {
         request.setRequestURI("/bulk-scan-payments/");
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJWTAuthenticationTokenBasedOnRoles("payments"));
+        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJwtAuthenticationTokenBasedOnRoles("payments"));
         when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("user123", "payments"));
 
         filter.doFilterInternal(request, response, filterChain);
@@ -72,7 +75,7 @@ public class ServiceAndUserAuthFilterTest {
     @Test
     public void shouldReturn403ResponseWhenRoleIsInvalid() throws Exception {
         request.setRequestURI("/cases/");
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJWTAuthenticationTokenBasedOnRoles("payments"));
+        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJwtAuthenticationTokenBasedOnRoles("payments"));
         when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("user123", "payments-invalid-role"));
 
         filter.doFilterInternal(request, response, filterChain);
@@ -84,7 +87,7 @@ public class ServiceAndUserAuthFilterTest {
     @Test
     public void shouldReturn403RWhenNoRolesPresentForUserInfo() throws Exception {
         request.setRequestURI("/cases/");
-        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJWTAuthenticationTokenBasedOnRoles("payments"));
+        when(SecurityContextHolder.getContext().getAuthentication()).thenReturn(getJwtAuthenticationTokenBasedOnRoles("payments"));
         when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("user123", null));
 
         filter.doFilterInternal(request, response, filterChain);
@@ -93,7 +96,7 @@ public class ServiceAndUserAuthFilterTest {
                                                           "Access Denied Current user roles are : [null]"));
     }
 
-    public static UserInfo getUserInfoBasedOnUidRoles(String uid, String roles){
+    public static UserInfo getUserInfoBasedOnUidRoles(String uid, String roles) {
         return UserInfo.builder()
             .uid(uid)
             .roles(Arrays.asList(roles))
@@ -101,7 +104,7 @@ public class ServiceAndUserAuthFilterTest {
     }
 
     @SuppressWarnings("unchecked")
-    private JwtAuthenticationToken getJWTAuthenticationTokenBasedOnRoles(String authority) {
+    private JwtAuthenticationToken getJwtAuthenticationTokenBasedOnRoles(String authority) {
         List<String> stringGrantedAuthority = new ArrayList();
         stringGrantedAuthority.add(authority);
 

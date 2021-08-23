@@ -53,7 +53,7 @@ public class SearchControllerTest {
 
     @Test
     @Transactional
-    public void testSearchPaymentWithCCD() throws Exception{
+    public void testSearchPaymentWithCcd() throws Exception {
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
             .ccdReference("9881231111111111")
             .build();
@@ -67,7 +67,7 @@ public class SearchControllerTest {
     }
 
     @Test
-    public void testSearchPaymentWithCCD_PaymentNotFound() throws Exception{
+    public void testSearchPaymentWithCcd_PaymentNotFound() throws Exception {
         SearchResponse searchResponse = null;
         when(searchService.retrieveByCcDReference(any(String.class)))
             .thenReturn(searchResponse);
@@ -79,7 +79,7 @@ public class SearchControllerTest {
     }
 
     @Test
-    public void testSearchPaymentWithCCD_Exception() throws Exception{
+    public void testSearchPaymentWithCcd_Exception() throws Exception {
         when(searchService.retrieveByCcDReference(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases/9881231111111111")
@@ -92,7 +92,7 @@ public class SearchControllerTest {
 
     @Test
     @Transactional
-    public void testSearchPaymentWithDcn() throws Exception{
+    public void testSearchPaymentWithDcn() throws Exception {
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
             .ccdReference("9881231111111111")
             .build();
@@ -107,7 +107,7 @@ public class SearchControllerTest {
     }
 
     @Test
-    public void testSearchPaymentWithDcn_PaymentNotFound() throws Exception{
+    public void testSearchPaymentWithDcn_PaymentNotFound() throws Exception {
         SearchResponse searchResponse = null;
         when(searchService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
@@ -119,7 +119,7 @@ public class SearchControllerTest {
     }
 
     @Test
-    public void testSearchPaymentWithDcn_Exception() throws Exception{
+    public void testSearchPaymentWithDcn_Exception() throws Exception {
         when(searchService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases")
                                                           .param("document_control_number", "987123111111111111111")

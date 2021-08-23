@@ -21,15 +21,17 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BSJwtGrantedAuthoritiesConverterTest {
+public class BsJwtGrantedAuthoritiesConverterTest {
     @Mock
     private IdamRepository idamRepository;
     @InjectMocks
     private BsJwtGrantedAuthoritiesConverter converter;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
+
     @Test
     public void shouldReturnEmptyAuthorities() {
         Jwt jwt = Mockito.mock(Jwt.class);
@@ -37,6 +39,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
     }
+
     @Test
     public void shouldReturnEmptyAuthoritiesWhenClaimNotAvailable() {
         Jwt jwt = Mockito.mock(Jwt.class);
@@ -45,6 +48,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
     }
+
     @Test
     public void shouldReturnEmptyAuthoritiesWhenClaimValueNotEquals() {
         Jwt jwt = Mockito.mock(Jwt.class);
@@ -54,6 +58,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
     }
+
     @SuppressWarnings("unchecked")
     @Test
     public void shouldReturnEmptyAuthoritiesWhenIdamReturnsNoUsers() {
@@ -69,6 +74,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
     }
+
     @SuppressWarnings("unchecked")
     @Test
     public void shouldReturnAuthoritiesWhenIdamReturnsUserRoles() {

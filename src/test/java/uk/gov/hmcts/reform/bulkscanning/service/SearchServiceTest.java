@@ -115,7 +115,7 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByCCDReference() throws Exception {
+    public void testRetrieveByCcdReference() throws Exception {
         SearchResponse searchResponse = paymentService.retrieveByCcDReference(TEST_DCN_REFERENCE);
         assertThat(searchResponse.getCcdReference()).isEqualTo(TEST_DCN_REFERENCE);
     }

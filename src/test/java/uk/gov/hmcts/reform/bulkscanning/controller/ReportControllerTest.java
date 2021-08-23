@@ -68,7 +68,7 @@ public class ReportControllerTest {
 
     @Test
     public void testGetPaymentReportData_Unprocessed() throws Exception {
-        String dcn[] = {"111122223333555511111", "111122223333555521111"};
+        String[] dcn = {"111122223333555511111", "111122223333555521111"};
         String ccd = "1111222233335555";
         createTestReportData(ccd, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -86,7 +86,7 @@ public class ReportControllerTest {
 
     @Test
     public void testGetPaymentReportData_DataLoss() throws Exception {
-        String dcn[] = {"111122223333555511111", "111122223333555521111"};
+        String[] dcn = {"111122223333555511111", "111122223333555521111"};
         String ccd = "1111222233335555";
         createTestReportData(ccd, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -161,16 +161,16 @@ public class ReportControllerTest {
     }
 
     @Test
-    public void testGetPaymentReport() throws Exception{
+    public void testGetPaymentReport() throws Exception {
         ReportData mockReportData = ReportData.recordWith()
             .amount(BigDecimal.valueOf(100))
             .build();
         List<ReportData> reportDataList = new ArrayList<>();
+        reportDataList.add(mockReportData);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("date_from", getReportDate(new Date(System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000L)));
         params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 30 * 60 * 60 * 1000L)));
         params.add("report_type", "UNPROCESSED");
-        reportDataList.add(mockReportData);
         when(reportService.retrieveByReportType(any(Date.class), any(Date.class), any(ReportType.class)))
             .thenReturn(reportDataList);
         ResultActions resultActions = mockMvc.perform(get("/report/download")
@@ -191,8 +191,8 @@ public class ReportControllerTest {
                                                           .contentType(MediaType.APPLICATION_JSON));
 
         //Request from bulk scan with one DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd
-            , dcns, "AA08", true);
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd,
+                                                                                     dcns, "AA08", true);
 
         //Post request
         mockMvc.perform(post("/bulk-scan-payment")
@@ -210,7 +210,8 @@ public class ReportControllerTest {
         return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
+    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId,
+                                                                      boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)

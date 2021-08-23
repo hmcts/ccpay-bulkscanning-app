@@ -15,10 +15,10 @@ import java.util.function.Function;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader= AnnotationConfigContextLoader.class,classes = AuthCheckerConfiguration.class)
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class,classes = AuthCheckerConfiguration.class)
 public class AuthCheckerConfigurationTest {
 
     @Autowired
@@ -31,7 +31,7 @@ public class AuthCheckerConfigurationTest {
     Function<HttpServletRequest, Collection<String>> authorizedServicesExtractor;
 
     @Test
-    public void testUserIdExtractor(){
+    public void testUserIdExtractor() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setServerName("www.example.com");
         request.setRequestURI("/users/test/test1");
@@ -41,7 +41,7 @@ public class AuthCheckerConfigurationTest {
     }
 
     @Test
-    public void testAuthorizedRolesExtractor(){
+    public void testAuthorizedRolesExtractor() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setServerName("www.example.com");
         request.setRequestURI("/users/test1/");
@@ -51,7 +51,7 @@ public class AuthCheckerConfigurationTest {
     }
 
     @Test
-    public void testAuthorizedServicesExtractor(){
+    public void testAuthorizedServicesExtractor() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setServerName("www.example.com");
         request.setRequestURI("/users/test1/");

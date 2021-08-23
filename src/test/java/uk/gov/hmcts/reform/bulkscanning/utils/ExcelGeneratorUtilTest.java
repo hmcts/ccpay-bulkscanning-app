@@ -24,7 +24,7 @@ public class ExcelGeneratorUtilTest {
     }
 
     @Test
-    public  void  testUtilityClassConstructorToBeInaccessible(){
+    public  void  testUtilityClassConstructorToBeInaccessible() {
         Constructor[] constructors = ExcelGeneratorUtil.class.getDeclaredConstructors();
         assertFalse("Utility class constructor should be inaccessible",
                     constructors[0].isAccessible());
@@ -47,7 +47,7 @@ public class ExcelGeneratorUtilTest {
         reportDataList.add(reportData);
         Workbook actual = ExcelGeneratorUtil.exportToExcel(ReportType.UNPROCESSED,reportDataList);
         String actualResp = actual.getSheet("UNPROCESSED").getRow(1).getCell(0).getStringCellValue();
-        String actualResServName= actual.getSheet("UNPROCESSED").getRow(1).getCell(1).getStringCellValue();
+        String actualResServName = actual.getSheet("UNPROCESSED").getRow(1).getCell(1).getStringCellValue();
         assertEquals("should be equal to resp-serv-id","resp-serv-id",actualResp);
         assertEquals("should be equal to resp-serv-name","resp-serv-name",actualResServName);
     }
