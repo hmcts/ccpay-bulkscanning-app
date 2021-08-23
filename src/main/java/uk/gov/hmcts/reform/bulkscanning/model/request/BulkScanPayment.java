@@ -38,10 +38,10 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @JsonInclude(NON_NULL)
 public class BulkScanPayment {
 
-    @NotBlank(message = "dcnReference can't be Blank")
-    @JsonProperty("dcnReference")
-    @Pattern(regexp = "-?\\d+(\\.\\d+)?", message = "dcnReference should be numeric")
-    @Size(min = 21, max = 21, message = "dcnReference length must be 21 digits")
+    @NotBlank(message = "document_control_number can't be Blank")
+    @JsonProperty("document_control_number")
+    @Pattern(regexp = "-?\\d+(\\.\\d+)?", message = "document_control_number should be numeric")
+    @Size(min = 21, max = 21, message = "document_control_number length must be 21 digits")
     private String dcnReference;
     /*
     Payment amount in GBP
@@ -66,22 +66,22 @@ public class BulkScanPayment {
     /*
     Number of the credit slip containing the payment
      */
-    @NotNull(message = "bankGiroCreditSlipNumber can't be Blank")
-    @JsonProperty("bankGiroCreditSlipNumber")
-    @Min(value = 0, message = "bankGiroCreditSlipNumber must be Positive")
+    @NotNull(message = "bank_giro_credit_slip_number can't be Blank")
+    @JsonProperty("bank_giro_credit_slip_number")
+    @Min(value = 0, message = "bank_giro_credit_slip_number must be Positive")
     @Digits(integer = 6, fraction = 0,
-        message = "bankGiroCreditSlipNumber length must not be greater than 6 digits")
+        message = "bank_giro_credit_slip_number length must not be greater than 6 digits")
     private Integer bankGiroCreditSlipNumber;
 
     /*
     Date the payment was sent for banking.
      */
-    @NotBlank(message = "bankedDate can't be Blank")
+    @NotBlank(message = "banked_date can't be Blank")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private String bankedDate;
 
     @JsonIgnore
-    @AssertFalse(message = "Invalid bankedDate. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")
+    @AssertFalse(message = "Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")
     public boolean isValidBankedDateFormat() {
         if (bankedDate != null) {
             if (! bankedDate.matches("\\d{4}-\\d{2}-\\d{2}")) {

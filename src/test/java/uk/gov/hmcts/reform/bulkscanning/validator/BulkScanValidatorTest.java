@@ -105,11 +105,11 @@ public class BulkScanValidatorTest {
     @Getter
     class ExelaPayment {
         private BigDecimal amount;
-        private String bankGiroCreditSlipNumber;
-        private String bankedDate;
+        private String bank_giro_credit_slip_number;
+        private String banked_date;
         private String currency;
-        private String dcnReference;
+        private String document_control_number;
         private String method;
-        private String additionalField;
+        private String additional_field;
     }
 }
