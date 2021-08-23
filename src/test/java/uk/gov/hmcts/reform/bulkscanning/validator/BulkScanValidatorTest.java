@@ -70,10 +70,10 @@ public class BulkScanValidatorTest {
 
     @Test()
     @Transactional
-    public void testFieldLevelValidation() throws Exception{
-        String dcn[] = {""};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
-            , null, "AA08", false);
+    public void testFieldLevelValidation() throws Exception {
+        String[] dcn = {""};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null,
+                                                                                     null, "AA08", false);
 
         ResultActions resultActions = restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
@@ -85,7 +85,7 @@ public class BulkScanValidatorTest {
 
     @Test()
     @Transactional
-    public void testRequestValidation_AdditionalFields() throws Exception{
+    public void testRequestValidation_AdditionalFields() throws Exception {
 
 
         ResultActions resultActions = restActions.post("/bulk-scan-payment", new ExelaPayment(BigDecimal.ONE,
@@ -105,11 +105,11 @@ public class BulkScanValidatorTest {
     @Getter
     class ExelaPayment {
         private BigDecimal amount;
-        private String bank_giro_credit_slip_number;
-        private String banked_date;
+        private String bankGiroCreditSlipNumber;
+        private String bankedDate;
         private String currency;
-        private String document_control_number;
+        private String dcnReference;
         private String method;
-        private String additional_field;
+        private String additionalField;
     }
 }
