@@ -31,7 +31,7 @@ public class BulkScanPayment {
 
     @NotBlank(message = "document_control_number can't be Blank")
     @JsonProperty("document_control_number")
-    @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "document_control_number should be numeric")
+    @Pattern(regexp = "-?\\d+(\\.\\d+)?", message = "document_control_number should be numeric")
     @Size(min = 21, max = 21, message = "document_control_number length must be 21 digits")
     private String dcnReference;
     /*
@@ -75,7 +75,7 @@ public class BulkScanPayment {
     @AssertFalse(message = "Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")
     public boolean isValidBankedDateFormat() {
         if (bankedDate != null) {
-            if(! bankedDate.matches("\\d{4}-\\d{2}-\\d{2}")){
+            if (! bankedDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
                 return true;
             }
             SimpleDateFormat sdfrmt = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);

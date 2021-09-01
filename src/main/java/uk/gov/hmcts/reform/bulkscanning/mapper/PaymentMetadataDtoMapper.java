@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.localDateTimeToDat
 public class PaymentMetadataDtoMapper {
 
     public PaymentMetadata toPaymentEntity(PaymentMetadataDto paymentMetadataDto) {
-        if(Optional.ofNullable(paymentMetadataDto).isPresent()) {
+        if (Optional.ofNullable(paymentMetadataDto).isPresent()) {
             return PaymentMetadata.paymentMetadataWith()
                 .bgcReference(paymentMetadataDto.getBgcReference())
                 .dcnReference(paymentMetadataDto.getDcnReference())
@@ -31,13 +31,13 @@ public class PaymentMetadataDtoMapper {
                 .currency(paymentMetadataDto.getCurrency().toString())
                 .dateBanked(dateToLocalDateTime(paymentMetadataDto.getDateBanked()))
                 .build();
-        }else {
+        } else {
             return null;
         }
     }
 
     public PaymentMetadataDto fromRequest(BulkScanPayment bulkScanPayment, String dcnReference) {
-        if(Optional.ofNullable(bulkScanPayment).isPresent()) {
+        if (Optional.ofNullable(bulkScanPayment).isPresent()) {
             String paymentMethod = bulkScanPayment.getMethod().equalsIgnoreCase("PostalOrder")
                 ? POSTAL_ORDER.toString()
                 : bulkScanPayment.getMethod().toUpperCase(Locale.UK);
@@ -49,7 +49,7 @@ public class PaymentMetadataDtoMapper {
                 .paymentMethod(PaymentMethod.valueOf(paymentMethod))
                 .dateBanked(DateTime.parse(bulkScanPayment.getBankedDate()).withZone(DateTimeZone.UTC).toDate())
                 .build();
-        }else {
+        } else {
             return null;
         }
     }

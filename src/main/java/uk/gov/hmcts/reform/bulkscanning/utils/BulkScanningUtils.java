@@ -98,7 +98,7 @@ public class BulkScanningUtils {
 
     }
 
-    public void mergeTheCaseDetailsFromBulkScan(Envelope envelopeDB, Envelope envelopeNew){
+    public void mergeTheCaseDetailsFromBulkScan(Envelope envelopeDB, Envelope envelopeNew) {
         envelopeDB.setResponsibleServiceId(envelopeNew.getResponsibleServiceId());
         List<EnvelopeCase> envelopeCaseList = new ArrayList<>(envelopeNew.getEnvelopeCases());
 

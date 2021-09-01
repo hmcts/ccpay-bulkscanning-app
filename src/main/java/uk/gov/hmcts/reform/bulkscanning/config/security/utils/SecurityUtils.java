@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Utility class for security related operations
+ * Utility class for security related operations.
  */
 @Service
 public class SecurityUtils {
@@ -50,7 +50,7 @@ public class SecurityUtils {
         Collection<? extends GrantedAuthority> authorities;
         //added condition for claims
         if (authentication instanceof JwtAuthenticationToken &&
-            ((JwtAuthenticationToken) authentication).getToken().getClaims().containsKey("roles")){
+            ((JwtAuthenticationToken) authentication).getToken().getClaims().containsKey("roles")) {
             authorities = extractAuthorityFromClaims(((JwtAuthenticationToken) authentication).getToken().getClaims());
         } else {
             authorities = authentication.getAuthorities();
@@ -61,7 +61,7 @@ public class SecurityUtils {
 
     @SuppressWarnings("unchecked")
     public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
-        if (!Optional.ofNullable(claims).isPresent() && !Optional.ofNullable(claims.get("roles")).isPresent()){
+        if (!Optional.ofNullable(claims).isPresent() && !Optional.ofNullable(claims.get("roles")).isPresent()) {
             throw new InsufficientAuthenticationException("No roles can be extracted from claims " +
                                                               "most probably due to insufficient scopes provided");
         }

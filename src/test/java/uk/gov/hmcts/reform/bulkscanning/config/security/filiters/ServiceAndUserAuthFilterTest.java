@@ -93,7 +93,7 @@ public class ServiceAndUserAuthFilterTest {
                                                           "Access Denied Current user roles are : [null]"));
     }
 
-    public static UserInfo getUserInfoBasedOnUidRoles(String uid, String roles){
+    public static UserInfo getUserInfoBasedOnUidRoles(String uid, String roles) {
         return UserInfo.builder()
             .uid(uid)
             .roles(Arrays.asList(roles))

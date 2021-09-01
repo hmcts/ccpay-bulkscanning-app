@@ -106,7 +106,7 @@ public class PaymentControllerFnTest {
 
     @Before
     public void setUp() {
-       //OIDC UserInfo Mocking
+        //OIDC UserInfo Mocking
         when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("UID123", "payments"));
 
         caseReferenceRequest = CaseReferenceRequest
@@ -125,7 +125,7 @@ public class PaymentControllerFnTest {
 
     @Test
     @WithMockUser(authorities = "payments")
-    public void testBulkScanningPaymentRequestFirst() throws Exception{
+    public void testBulkScanningPaymentRequestFirst() throws Exception {
         String dcn[] = {"987211111111111111111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555"
             ,dcn,"AA08", true);
@@ -308,7 +308,7 @@ public class PaymentControllerFnTest {
         //Post request
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
-       //Complete payment for DCN dcn1
+        //Complete payment for DCN dcn1
         EnvelopePayment payment = paymentRepository.findByDcnReference(dcn1).get();
         Assert.assertEquals(COMPLETE.toString(), payment.getPaymentStatus());
 
@@ -437,7 +437,8 @@ public class PaymentControllerFnTest {
         Assert.assertEquals(403, resultActions.andReturn().getResponse().getStatus());
     }
 
-    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
+    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber,
+                                                                      String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)

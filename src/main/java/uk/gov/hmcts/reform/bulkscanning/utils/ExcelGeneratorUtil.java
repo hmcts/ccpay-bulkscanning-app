@@ -21,8 +21,10 @@ public final class ExcelGeneratorUtil {
     }
 
     public static Workbook exportToExcel(ReportType reportType, List<ReportData> reportDataList) throws IOException {
-        String[] colsDataLoss = {"Loss_Resp", "Payment_Asset_DCN", "Resp_Service ID", "Resp_Service Name", "Date_Banked", "BGC_Batch", "Payment_Method", "Amount"};
-        String[] colsUnprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref", "Date_Banked", "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
+        String[] colsDataLoss = {"Loss_Resp", "Payment_Asset_DCN", "Resp_Service ID", "Resp_Service Name", "Date_Banked",
+            "BGC_Batch", "Payment_Method", "Amount"};
+        String[] colsUnprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref", "Date_Banked",
+            "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
         try (Workbook workbook = new HSSFWorkbook()) {
             CreationHelper createHelper = workbook.getCreationHelper();
 
@@ -55,7 +57,8 @@ public final class ExcelGeneratorUtil {
         }
     }
 
-    private static void buildReportDataLoss(List<ReportData> reportDataList, String[] colsDataLoss, Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
+    private static void buildReportDataLoss(List<ReportData> reportDataList, String[] colsDataLoss,
+                                            Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
         for (int col = 0; col < colsDataLoss.length; col++) {
             Cell cell = headerRow.createCell(col);
             cell.setCellValue(colsDataLoss[col]);
@@ -81,7 +84,8 @@ public final class ExcelGeneratorUtil {
         }
     }
 
-    private static void buildReportUnprocessed(List<ReportData> reportDataList, String[] colsUnprocessed, Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
+    private static void buildReportUnprocessed(List<ReportData> reportDataList, String[] colsUnprocessed,
+                                               Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
         for (int col = 0; col < colsUnprocessed.length; col++) {
             Cell cell = headerRow.createCell(col);
             cell.setCellValue(colsUnprocessed[col]);

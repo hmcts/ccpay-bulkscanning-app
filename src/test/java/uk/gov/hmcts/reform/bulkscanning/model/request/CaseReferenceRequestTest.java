@@ -29,15 +29,15 @@ public class CaseReferenceRequestTest {
     }
 
     @Test
-    public void testBlankCcdCaseNumber(){
+    public void testBlankCcdCaseNumber() {
         CaseReferenceRequest caseReferenceRequest  = CaseReferenceRequest.createCaseReferenceRequest()
                                                         .ccdCaseNumber("").build();
         Set<ConstraintViolation<CaseReferenceRequest>> violations = validator.validate(caseReferenceRequest);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on ccd_case_number");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number can't be Blank")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("ccd_case_number can't be Blank")) {
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number can't be Blank");
                 }
             });
@@ -45,15 +45,15 @@ public class CaseReferenceRequestTest {
     }
 
     @Test
-    public void testNonNumericCcdCaseNumber(){
+    public void testNonNumericCcdCaseNumber() {
         CaseReferenceRequest caseReferenceRequest  = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber("ewrwerewre").build();
         Set<ConstraintViolation<CaseReferenceRequest>> violations = validator.validate(caseReferenceRequest);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on ccd_case_number");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number should be numeric")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("ccd_case_number should be numeric")) {
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number should be numeric");
                 }
             });
@@ -61,15 +61,15 @@ public class CaseReferenceRequestTest {
     }
 
     @Test
-    public void testCcdCaseNumberWithLargerDigits(){
+    public void testCcdCaseNumberWithLargerDigits() {
         CaseReferenceRequest caseReferenceRequest  = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber("2312312321312342122").build();
         Set<ConstraintViolation<CaseReferenceRequest>> violations = validator.validate(caseReferenceRequest);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on ccd_case_number");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number length must be 16 Characters")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("ccd_case_number length must be 16 Characters")) {
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number length must be 16 Characters");
                 }
             });

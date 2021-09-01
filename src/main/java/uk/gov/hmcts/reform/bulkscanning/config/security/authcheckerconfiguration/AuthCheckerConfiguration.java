@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Feign client to fetch s2s apis
+ * Feign client to fetch s2s apis.
  */
 @Configuration
 @Lazy
@@ -30,10 +30,10 @@ import java.util.stream.Stream;
 public class AuthCheckerConfiguration {
 
     /**
-     * Auth token generator for s2s api
-     * @param secret
-     * @param microService
-     * @param serviceAuthorisationApi
+     * Auth token generator for s2s api.
+     * @param secret secret
+     * @param microService microService
+     * @param serviceAuthorisationApi serviceAuthorisationApi
      * @return
      */
 
@@ -52,7 +52,7 @@ public class AuthCheckerConfiguration {
     }
 
     /**
-     * Extracts and validates user id from request uri if required
+     * Extracts and validates user id from request uri if required.
      * @return
      */
 
@@ -63,17 +63,17 @@ public class AuthCheckerConfiguration {
         return (request) -> {
             Matcher matcher = pattern.matcher(request.getRequestURI());
             boolean matched = matcher.find();
-            if(matched){
+            if (matched) {
                 return Optional.of(matcher.group(1));
-            }else {
+            } else {
                 return Optional.empty();
             }
         };
     }
 
     /**
-     * Bean to specify authorised roles for Fees&Pay
-     * @return
+     * Bean to specify authorised roles for Fees&Pay.
+     * @return function HttpServletRequest
      */
     @Bean
     public Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor() {

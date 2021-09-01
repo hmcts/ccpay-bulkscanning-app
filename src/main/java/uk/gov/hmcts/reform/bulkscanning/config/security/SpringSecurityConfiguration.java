@@ -35,7 +35,7 @@ import java.util.function.Function;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 /**
- * Spring security configuration for s2s authorisation and user authentication
+ * Spring security configuration for s2s authorisation and user authentication.
  */
 @EnableWebSecurity
 @Configuration
@@ -54,7 +54,8 @@ public class SpringSecurityConfiguration {
         private final BSAccessDeniedHandler bsAccessDeniedHandler;
 
         @Autowired
-        public ExternalApiSecurityConfigurationAdapter(final ServiceAuthFilter serviceAuthFilter, final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
+        public ExternalApiSecurityConfigurationAdapter(final ServiceAuthFilter serviceAuthFilter,
+                                                       final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
                                                        final BSAccessDeniedHandler bsAccessDeniedHandler) {
             super();
             this.serviceAuthFilter = serviceAuthFilter;
@@ -182,7 +183,7 @@ public class SpringSecurityConfiguration {
             OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
 
             // Commented issuer validation as confirmed by IDAM
-           /* OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);*/
+            /* OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);*/
             OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withTimestamp,
                                                                                           audienceValidator);
             jwtDecoder.setJwtValidator(withAudience);

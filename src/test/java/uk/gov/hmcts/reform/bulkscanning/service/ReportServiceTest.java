@@ -55,7 +55,7 @@ public class ReportServiceTest {
     ReportServiceImpl reportService;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         reportService = new ReportServiceImpl(paymentRepository,paymentMetadataRepository);
     }
 
@@ -88,7 +88,7 @@ public class ReportServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByReportTypeDataLoss() throws ParseException{
+    public void testRetrieveByReportTypeDataLoss() throws ParseException {
         List<EnvelopePayment> envelopePayments = new ArrayList<>();
         EnvelopePayment envelopePayment = EnvelopePayment.paymentWith()
             .dcnReference("dcnReference").source(Bulk_Scan.toString())

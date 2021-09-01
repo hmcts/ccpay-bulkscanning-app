@@ -21,7 +21,7 @@ import java.util.function.Function;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 /**
- * Custom filter responsible for User authorisation
+ * Custom filter responsible for User authorisation.
  */
 
 public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
@@ -68,11 +68,11 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
 
             Optional<List<String>> currentRolesOptional = Optional.ofNullable(userInfo.getRoles());
             List<String> currentRoles = null;
-            if (currentRolesOptional.isPresent() && !currentRolesOptional.get().isEmpty()){
+            if (currentRolesOptional.isPresent() && !currentRolesOptional.get().isEmpty()) {
                 currentRoles = currentRolesOptional.get();
             }
             throw new UnauthorizedException("Current user roles are : " + currentRoles +
-                                                " While Authorised roles are only : " +authorizedRoles);
+                                                " While Authorised roles are only : " + authorizedRoles);
         }
 
         userIdOptional.ifPresent(resourceUserId -> {

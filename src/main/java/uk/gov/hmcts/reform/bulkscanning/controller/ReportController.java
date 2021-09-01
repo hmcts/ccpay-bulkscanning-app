@@ -65,7 +65,7 @@ public class ReportController {
                 LOG.info("No of Records exists : {}", reportDataList.size());
                 workbook = (HSSFWorkbook) ExcelGeneratorUtil.exportToExcel(reportType, reportDataList);
             }
-            if(workbook != null){
+            if (workbook != null) {
                 workbook.write(baos);
             }
             reportBytes = baos.toByteArray();

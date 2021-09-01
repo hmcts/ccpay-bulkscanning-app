@@ -161,7 +161,7 @@ public class ReportControllerTest {
     }
 
     @Test
-    public void testGetPaymentReport() throws Exception{
+    public void testGetPaymentReport() throws Exception {
         ReportData mockReportData = ReportData.recordWith()
             .amount(BigDecimal.valueOf(100))
             .build();
@@ -210,7 +210,8 @@ public class ReportControllerTest {
         return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
+    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn,
+                                                                      String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)

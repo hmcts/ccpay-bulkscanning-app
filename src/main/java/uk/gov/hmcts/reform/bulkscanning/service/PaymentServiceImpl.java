@@ -151,8 +151,9 @@ public class PaymentServiceImpl implements PaymentService {
 
                 Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
 
-                if(envelope.isPresent()) {
-                    List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
+                if (envelope.isPresent()) {
+                    List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream()
+                        .map(envelopePayment -> envelopePayment.getDcnReference()).collect(
                         Collectors.toList());
 
                     listOfAllPayments.addAll(paymentDCNList);
@@ -229,7 +230,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Envelope updateEnvelopePaymentStatus(Envelope envelope, PaymentStatus paymentStatus) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(Collections.emptyList());
-        if(null != payments && !payments.isEmpty()) {
+        if (null != payments && !payments.isEmpty()) {
             if (checkAllPaymentsStatus(paymentStatus, payments)) {
                 updateEnvelopeStatus(envelope, paymentStatus);
             } else if (checkAnyPaymentsStatus(INCOMPLETE, payments)) {

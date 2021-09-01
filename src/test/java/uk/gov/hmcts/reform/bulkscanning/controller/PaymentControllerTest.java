@@ -72,7 +72,7 @@ public class PaymentControllerTest {
 
     @Test
     @Transactional
-    public void testCreatePaymentFromExela() throws Exception{
+    public void testCreatePaymentFromExela() throws Exception {
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                       .header("ServiceAuthorization", "service")
@@ -82,7 +82,7 @@ public class PaymentControllerTest {
     }
 
     @Test
-    public void testCreatePaymentFromExela_Conflict() throws Exception{
+    public void testCreatePaymentFromExela_Conflict() throws Exception {
 
         PaymentMetadata paymentMetadata = PaymentMetadata.paymentMetadataWith()
                                                                     .id(1).amount(BigDecimal.valueOf(100))
@@ -100,7 +100,7 @@ public class PaymentControllerTest {
     }
 
     @Test
-    public void testCreatePaymentFromExela_withException() throws Exception{
+    public void testCreatePaymentFromExela_withException() throws Exception {
 
         when(paymentService.getPaymentMetadata(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Metadata"));
@@ -114,11 +114,13 @@ public class PaymentControllerTest {
 
     @Test
     @Transactional
-    public void testCreatePaymentFromExela_BadRequest() throws Exception{
+    public void testCreatePaymentFromExela_BadRequest() throws Exception {
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content("{\"amount\":100.0,\"method\":\"CHEQUE\",\"banked_date\":\"2019-10-31\",\"document_control_number\":\"111122223333444411111\",\"bank_giro_credit_slip_number\":123}")
+                                                          .content("{\"amount\":100.0,\"method\":\"CHEQUE\",\"banked_date\":" +
+                                                                       "\"2019-10-31\",\"document_control_number\":\"111122223333444411111\"," +
+                                                                       "\"bank_giro_credit_slip_number\":123}")
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -126,7 +128,7 @@ public class PaymentControllerTest {
     private static class ClassThatJacksonCannotSerialize {}
 
     @Test(expected = PaymentException.class)
-    public void testCreatePaymentFromExela_JsonProcessingException() throws Exception{
+    public void testCreatePaymentFromExela_JsonProcessingException() throws Exception {
 
         mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
@@ -134,10 +136,10 @@ public class PaymentControllerTest {
                                                           .contentType(MediaType.APPLICATION_JSON));
     }
 
-    //Test cases for Bulk Scan endpoints bulk scan
+   //Test cases for Bulk Scan endpoints bulk scan
    @Test
    @Transactional
-   public void testCreatePaymentForBulkScan() throws Exception{
+   public void testCreatePaymentForBulkScan() throws Exception {
        String dcn[] = {"987111111111111111111","987211111111111111111"};
        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
            ,dcn,"AA08");
@@ -155,7 +157,7 @@ public class PaymentControllerTest {
 
     @Test
     @Transactional
-    public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
+    public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
         CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber("9882111111111111")
             .build();
@@ -170,7 +172,7 @@ public class PaymentControllerTest {
 
     @Test
     @Transactional
-    public void testMarkPaymentAsProcessed() throws Exception{
+    public void testMarkPaymentAsProcessed() throws Exception {
         ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/987211111111111111111/status/PROCESSED")
           .header("Authorization", "user")
           .header("ServiceAuthorization", "service")

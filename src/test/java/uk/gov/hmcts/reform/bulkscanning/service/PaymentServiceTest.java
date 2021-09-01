@@ -277,6 +277,6 @@ public class PaymentServiceTest {
             .payments(paymentDtos)
             .paymentStatus(INCOMPLETE)
             .build());
-        assertThat( envelope.getEnvelopePayments().get(0).getDcnReference()).isEqualTo("111111111111111111");
+        assertThat(envelope.getEnvelopePayments().get(0).getDcnReference()).isEqualTo("111111111111111111");
     }
 }

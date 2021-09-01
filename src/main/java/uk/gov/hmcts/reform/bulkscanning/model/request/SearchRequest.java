@@ -24,16 +24,16 @@ public class SearchRequest {
 
     @NotNull(message = "ccd_reference can't be Blank")
     @Size(min = 16, max = 16, message = "ccd_reference length must be 16 Characters")
-    @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "ccd_reference should be numeric")
+    @Pattern(regexp = "-?\\d+(\\.\\d+)?", message = "ccd_reference should be numeric")
     private String ccdReference;
 
     @NotNull(message = "exception_record can't be Blank")
     @Size(min = 16, max = 16, message = "exception_record length must be 16 Characters")
-    @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "exception_record should be numeric")
+    @Pattern(regexp = "-?\\d+(\\.\\d+)?", message = "exception_record should be numeric")
     private String exceptionRecord;
 
     @NotNull(message = "document_control_number can't be Blank")
     @Size(min = 21, max = 21, message = "document_control_number length must be 21 Characters")
-    @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "document_control_number should be numeric")
+    @Pattern(regexp = "-?\\d+(\\.\\d+)?", message = "document_control_number should be numeric")
     private String documentControlNumber;
 }

@@ -115,8 +115,8 @@ public class ReportServiceImpl implements ReportService {
         }
         if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
             record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+            if (Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()) {
                 record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
             }
         }
@@ -138,8 +138,8 @@ public class ReportServiceImpl implements ReportService {
         }
         if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
             record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+            if (Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()) {
                 record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
             }
             if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()
@@ -199,8 +199,8 @@ public class ReportServiceImpl implements ReportService {
         }
         if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
             record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+            if (Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()) {
                 record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
             }
         }
@@ -222,8 +222,8 @@ public class ReportServiceImpl implements ReportService {
         }
         if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
             record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+            if (Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()) {
                 record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
             }
             if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()

@@ -25,7 +25,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class CaseReferenceRequest {
     @JsonProperty("ccd_case_number")
     @NotBlank(message = "ccd_case_number can't be Blank")
-    @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "ccd_case_number should be numeric")
+    @Pattern(regexp = "-?\\d+(\\.\\d+)?", message = "ccd_case_number should be numeric")
     @Size(min = 16, max = 16, message = "ccd_case_number length must be 16 Characters")
     String ccdCaseNumber;
 }
