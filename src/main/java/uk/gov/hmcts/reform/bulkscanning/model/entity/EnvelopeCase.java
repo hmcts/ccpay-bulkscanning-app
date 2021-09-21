@@ -28,6 +28,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Table(name = "envelope_case")
 public class EnvelopeCase {
+    //
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
