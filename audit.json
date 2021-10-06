@@ -57,6 +57,7 @@
   "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/bulk-scan-payments_POST" : "ignore",
   "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/cases?document_control_number=document_control_number_GET":"ignore",
   "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/cases/ccd_reference_GET" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/bulk-scan-payments/dcn/status/COMPLETE_PATCH" : "ignore"
+  "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/bulk-scan-payments/dcn/status/COMPLETE_PATCH" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/report/data?date_from=date_from\u0026date_to=date_to\u0026report_type=DATA_LOSS_GET" : "ignore"
 
 }
