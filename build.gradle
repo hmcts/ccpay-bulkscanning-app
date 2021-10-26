@@ -325,7 +325,7 @@ dependencies {
   functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
   functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
   functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
-
+  testCompile 'com.github.hmcts:fortify-client:1.2.1:all'
   smokeTestCompile sourceSets.test.runtimeClasspath
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   mainClassName = 'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication'
@@ -368,6 +368,12 @@ test {
     destinationFile = file("${project.rootDir}/build/jacoco/test.exec")
   }
 }
+
+  task fortifyScan(type: JavaExec)  {
+    main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+    classpath += sourceSets.test.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+  }
 
 serenity {
   reports = ["single-page-html"]
