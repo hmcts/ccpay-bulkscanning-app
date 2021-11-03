@@ -7,21 +7,21 @@ import uk.gov.hmcts.reform.bulkscanning.config.security.exception.UnauthorizedEx
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 /**
- * Custom filter responsible for User authorisation
+ * Custom filter responsible for User authorisation.
  */
 
 public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
@@ -68,11 +68,11 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
 
             Optional<List<String>> currentRolesOptional = Optional.ofNullable(userInfo.getRoles());
             List<String> currentRoles = null;
-            if (currentRolesOptional.isPresent() && !currentRolesOptional.get().isEmpty()){
+            if (currentRolesOptional.isPresent() && !currentRolesOptional.get().isEmpty()) {
                 currentRoles = currentRolesOptional.get();
             }
-            throw new UnauthorizedException("Current user roles are : " + currentRoles +
-                                                " While Authorised roles are only : " +authorizedRoles);
+            throw new UnauthorizedException("Current user roles are : " + currentRoles
+                                                + " While Authorised roles are only : " + authorizedRoles);
         }
 
         userIdOptional.ifPresent(resourceUserId -> {

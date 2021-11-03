@@ -35,7 +35,7 @@ public class ReportData {
     @Builder.Default
     private String paymentMethod = StringUtils.EMPTY;
     @Builder.Default
-    private String paymentAssetDcn = StringUtils.EMPTY;
+    private String paymentAssetdcn = StringUtils.EMPTY;
     @Builder.Default
     private BigDecimal amount = BigDecimal.ZERO;
     @Builder.Default

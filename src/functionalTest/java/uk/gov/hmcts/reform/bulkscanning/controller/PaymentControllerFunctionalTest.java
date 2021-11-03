@@ -128,7 +128,7 @@ public class PaymentControllerFunctionalTest {
 
         Assert.assertNotNull(patchResp.andReturn().asString());
 
-        //DCN Not exists Request
+        //dcn Not exists Request
         Response patchdcnnotexists = RestAssured.given()
             .header("Authorization", USER_TOKEN)
             .header("ServiceAuthorization", SERVICE_TOKEN)
@@ -208,7 +208,7 @@ public class PaymentControllerFunctionalTest {
     @Test
     public void testMatchingPaymentsFromExcelaBulkScan() throws Exception {
 
-        //Request from Exela with one DCN
+        //Request from Exela with one dcn
         String[] dcn = {"111122224444555511111"};
         Response exelaResp = RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
@@ -217,7 +217,7 @@ public class PaymentControllerFunctionalTest {
             .when()
             .post("/bulk-scan-payment");
 
-        //Request from bulk scan with one DCN
+        //Request from bulk scan with one dcn
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
                                                                                      dcn, "AA08", true);
 
@@ -243,7 +243,7 @@ public class PaymentControllerFunctionalTest {
     @Test
     public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception {
 
-        //Request from Exela with one DCN
+        //Request from Exela with one dcn
         String[] dcn = {"111122223333666611111", "111122223333777711111"};
         Response exelaResp = RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
@@ -252,7 +252,7 @@ public class PaymentControllerFunctionalTest {
             .when()
             .post("/bulk-scan-payment");
 
-        //Request from bulk scan with two DCN
+        //Request from bulk scan with two dcn
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
                                                                                      dcn, "AA08", true);
 
@@ -278,10 +278,10 @@ public class PaymentControllerFunctionalTest {
 
     @Test
     public void testMatchingBulkScanFirstThenExela() throws Exception {
-        //Request from Bulk Scan with one DCN
+        //Request from Bulk Scan with one dcn
         String[] dcn = {"111122223333888811111", "111122223333999911111"};
 
-        //Request from bulk scan with two DCN
+        //Request from bulk scan with two dcn
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
                                                                                      dcn, "AA08", true);
 
@@ -363,7 +363,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     private void createTestReportData(String ccd, String... dcns) throws Exception {
-        //Request from Exela with one DCN
+        //Request from Exela with one dcn
 
         RestAssured.given()
             .header("ServiceAuthorization", SERVICE_TOKEN)
@@ -372,7 +372,7 @@ public class PaymentControllerFunctionalTest {
             .when()
             .post("/bulk-scan-payment");
 
-        //Request from bulk scan with one DCN
+        //Request from bulk scan with one dcn
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd, dcns,
                                                                                      "AA08", true);
 

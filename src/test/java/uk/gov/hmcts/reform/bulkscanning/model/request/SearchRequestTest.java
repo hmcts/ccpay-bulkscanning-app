@@ -64,7 +64,7 @@ public class SearchRequestTest {
     }
 
     @Test
-    public void testEmptyExceptionRecordAndDCN(){
+    public void testEmptyExceptionRecordAnddcn(){
         SearchRequest searchRequest = SearchRequest.searchRequestWith()
             .exceptionRecord("")
             .documentControlNumber("")

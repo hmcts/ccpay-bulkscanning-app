@@ -18,7 +18,12 @@ import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataReposito
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.utils.DateUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_Scan;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
@@ -80,7 +85,7 @@ public class ReportServiceImpl implements ReportService {
                     && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
                 .forEach(payment -> {
                     dataList.add(populateReportDataDataLoss(payment));
-            });
+                });
             dataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
             dataList.stream().forEach(data -> reportDataList.add(data));
         }
@@ -105,7 +110,7 @@ public class ReportServiceImpl implements ReportService {
 
     private ReportDataDataLoss populateReportDataDataLoss(EnvelopePayment payment) {
         ReportDataDataLoss record = ReportDataDataLoss.recordWith().build();
-        record.setPaymentAssetDcn(payment.getDcnReference());
+        record.setPaymentAssetdcn(payment.getDcnReference());
         Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
         if (paymentMetadata.isPresent()) {
             record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
@@ -115,8 +120,8 @@ public class ReportServiceImpl implements ReportService {
         }
         if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
             record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+            if (Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()) {
                 record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
             }
         }
@@ -128,7 +133,7 @@ public class ReportServiceImpl implements ReportService {
 
     private ReportDataUnprocessed populateReportDataUnprocessed(EnvelopePayment payment) {
         ReportDataUnprocessed record = ReportDataUnprocessed.recordWith().build();
-        record.setPaymentAssetDcn(payment.getDcnReference());
+        record.setPaymentAssetdcn(payment.getDcnReference());
         Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
         if (paymentMetadata.isPresent()) {
             record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
@@ -138,8 +143,8 @@ public class ReportServiceImpl implements ReportService {
         }
         if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
             record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+            if (Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()) {
                 record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
             }
             if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()
@@ -189,7 +194,7 @@ public class ReportServiceImpl implements ReportService {
 
     private ReportData populateDataLossReportData(EnvelopePayment payment) {
         ReportData record = ReportData.recordWith().build();
-        record.setPaymentAssetDcn(payment.getDcnReference());
+        record.setPaymentAssetdcn(payment.getDcnReference());
         Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
         if (paymentMetadata.isPresent()) {
             record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
@@ -199,8 +204,8 @@ public class ReportServiceImpl implements ReportService {
         }
         if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
             record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+            if (Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()) {
                 record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
             }
         }
@@ -212,7 +217,7 @@ public class ReportServiceImpl implements ReportService {
 
     private ReportData populateUnprocessedReportData(EnvelopePayment payment) {
         ReportData record = ReportData.recordWith().build();
-        record.setPaymentAssetDcn(payment.getDcnReference());
+        record.setPaymentAssetdcn(payment.getDcnReference());
         Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
         if (paymentMetadata.isPresent()) {
             record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
@@ -222,8 +227,8 @@ public class ReportServiceImpl implements ReportService {
         }
         if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
             record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
+            if (Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
+                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()) {
                 record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
             }
             if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()

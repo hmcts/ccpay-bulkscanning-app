@@ -10,8 +10,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.*;
 import java.util.Arrays;
+import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -30,7 +35,7 @@ public class BulkScanPaymentRequest {
 
     @JsonProperty("ccd_case_number")
     @NotBlank(message = "ccd_case_number can't be Blank")
-    @Pattern(regexp="-?\\d+(\\.\\d+)?", message = "ccd_case_number should be numeric")
+    @Pattern(regexp = "-?\\d+(\\.\\d+)?", message = "ccd_case_number should be numeric")
     @Size(min = 16, max = 16, message = "ccd_case_number length must be 16 digits")
     private String ccdCaseNumber;
 

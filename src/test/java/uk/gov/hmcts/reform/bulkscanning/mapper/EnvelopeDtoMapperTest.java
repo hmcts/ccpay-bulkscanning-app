@@ -52,7 +52,7 @@ public class EnvelopeDtoMapperTest {
         List<PaymentDto> paymentList = new ArrayList<>();
         paymentList.add(paymentDto);
         List<EnvelopePayment> envelopePaymentList = envelopeDtoMapper.toPaymentEntities(paymentList);
-        assertEquals("dcn-reference",envelopePaymentList.get(0).getDcnReference(),"DCN reference is invalid");
+        assertEquals("dcn-reference",envelopePaymentList.get(0).getDcnReference(),"dcn reference is invalid");
     }
 
     @Test

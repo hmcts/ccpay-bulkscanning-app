@@ -183,14 +183,14 @@ public class ReportControllerTest {
 
 
     private void createTestReportData(String ccd, String... dcns) throws Exception {
-        //Request from Exela with one DCN
+        //Request from Exela with one dcn
 
         mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
                                                           .content(asJsonString(createPaymentRequest(dcns[0])))
                                                           .contentType(MediaType.APPLICATION_JSON));
 
-        //Request from bulk scan with one DCN
+        //Request from bulk scan with one dcn
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd
             , dcns, "AA08", true);
 

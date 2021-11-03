@@ -20,5 +20,5 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @NoArgsConstructor
 @Data
 public class PaymentResponse implements Serializable {
-    private List<String> paymentDcns;
+    private List<String> paymentdcns;
 }

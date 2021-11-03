@@ -36,7 +36,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Both;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESSED;
 
 
 @Service
@@ -93,8 +95,8 @@ public class PaymentServiceImpl implements PaymentService {
         LOG.info("Insert Payment metadata in Bulk Scan Payment DB");
         createPaymentMetadata(paymentMetadataDtoMapper.fromRequest(bulkScanPayment, dcnReference));
 
-        LOG.info("Check for existing DCN in Payment Table Bulk Scan Pay DB");
-        EnvelopePayment payment = getPaymentByDcnReference(dcnReference);
+        LOG.info("Check for existing dcn in Payment Table Bulk Scan Pay DB");
+        EnvelopePayment payment = getPaymentBydcnReference(dcnReference);
 
         if (null == payment) {
             LOG.info("Create new payment in BSP DB as envelope doesn't exists");
@@ -132,30 +134,31 @@ public class PaymentServiceImpl implements PaymentService {
         List<Envelope> listOfExistingEnvelope = bulkScanningUtils.returnExistingEnvelopeList(envelopeNew);
 
         if (Optional.ofNullable(listOfExistingEnvelope).isPresent() && !listOfExistingEnvelope.isEmpty()) {
-            for (Envelope envelopeDB : listOfExistingEnvelope) {
+            for (Envelope envelopeDatabase : listOfExistingEnvelope) {
                 //if we have envelope already in BS
-                if (Optional.ofNullable(envelopeDB).isPresent() && Optional.ofNullable(envelopeDB.getId()).isPresent()) {
+                if (Optional.ofNullable(envelopeDatabase).isPresent() && Optional.ofNullable(envelopeDatabase.getId()).isPresent()) {
                     LOG.info("Existing envelope found for Bulk Scan request");
-                    bulkScanningUtils.handlePaymentStatus(envelopeDB, envelopeNew);
+                    bulkScanningUtils.handlePaymentStatus(envelopeDatabase, envelopeNew);
                 }
 
-                bulkScanningUtils.insertStatusHistoryAudit(envelopeDB);
-                envelopeRepository.save(envelopeDB);
+                bulkScanningUtils.insertStatusHistoryAudit(envelopeDatabase);
+                envelopeRepository.save(envelopeDatabase);
 
-                if (Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
-                    && !envelopeDB.getEnvelopePayments().isEmpty()) {
-                    envelopeDB.getEnvelopePayments().stream().forEach(payment -> {
+                if (Optional.ofNullable(envelopeDatabase.getEnvelopePayments()).isPresent()
+                    && !envelopeDatabase.getEnvelopePayments().isEmpty()) {
+                    envelopeDatabase.getEnvelopePayments().stream().forEach(payment -> {
                         auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment);
                     });
                 }
 
-                Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
+                Optional<Envelope> envelope = envelopeRepository.findById(envelopeDatabase.getId());
 
-                if(envelope.isPresent()) {
-                    List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
+                if (envelope.isPresent()) {
+                    List<String> paymentdcnList = envelope.get().getEnvelopePayments().stream()
+                        .map(envelopePayment -> envelopePayment.getDcnReference()).collect(
                         Collectors.toList());
 
-                    listOfAllPayments.addAll(paymentDCNList);
+                    listOfAllPayments.addAll(paymentdcnList);
                 }
 
             }
@@ -171,8 +174,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public String updateCaseReferenceForExceptionRecord(String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest) {
         List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(
-            exceptionRecordReference).
-            orElseThrow(ExceptionRecordNotExistsException::new);
+            exceptionRecordReference)
+            .orElseThrow(ExceptionRecordNotExistsException::new);
 
         if (Optional.ofNullable(caseReferenceRequest).isPresent()
             && StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())
@@ -214,7 +217,7 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentMetadataRepository.findByDcnReference(dcnReference).orElse(null);
     }
 
-    private EnvelopePayment getPaymentByDcnReference(String dcnReference) {
+    private EnvelopePayment getPaymentBydcnReference(String dcnReference) {
         return paymentRepository.findByDcnReference(dcnReference).orElse(null);
     }
 
@@ -229,7 +232,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Envelope updateEnvelopePaymentStatus(Envelope envelope, PaymentStatus paymentStatus) {
         List<EnvelopePayment> payments = paymentRepository.findByEnvelopeId(envelope.getId()).orElse(Collections.emptyList());
-        if(null != payments && !payments.isEmpty()) {
+        if (null != payments && !payments.isEmpty()) {
             if (checkAllPaymentsStatus(paymentStatus, payments)) {
                 updateEnvelopeStatus(envelope, paymentStatus);
             } else if (checkAnyPaymentsStatus(INCOMPLETE, payments)) {

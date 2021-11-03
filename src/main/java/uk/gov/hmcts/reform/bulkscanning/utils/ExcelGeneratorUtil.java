@@ -1,7 +1,14 @@
 package uk.gov.hmcts.reform.bulkscanning.utils;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.dto.ReportData;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
@@ -21,12 +28,14 @@ public final class ExcelGeneratorUtil {
     }
 
     public static Workbook exportToExcel(ReportType reportType, List<ReportData> reportDataList) throws IOException {
-        String[] colsDataLoss = {"Loss_Resp", "Payment_Asset_DCN", "Resp_Service ID", "Resp_Service Name", "Date_Banked", "BGC_Batch", "Payment_Method", "Amount"};
-        String[] colsUnprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref", "Date_Banked", "BGC_Batch", "Payment_Asset_DCN", "Payment_Method", "Amount"};
+        String[] colsDataLoss = {"Loss_Resp", "Payment_Asset_dcn", "Resp_Service ID", "Resp_Service Name",
+            "Date_Banked", "BGC_Batch", "Payment_Method", "Amount"};
+        String[] colsUnprocessed = {"Resp_Service ID", "Resp_Service Name", "Exception_Ref", "CCD_Ref",
+            "Date_Banked", "BGC_Batch", "Payment_Asset_dcn", "Payment_Method", "Amount"};
         try (Workbook workbook = new HSSFWorkbook()) {
-            CreationHelper createHelper = workbook.getCreationHelper();
+            final CreationHelper createHelper = workbook.getCreationHelper();
 
-            Sheet sheet = workbook.createSheet(reportType.toString());
+            final Sheet sheet = workbook.createSheet(reportType.toString());
 
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
@@ -55,7 +64,8 @@ public final class ExcelGeneratorUtil {
         }
     }
 
-    private static void buildReportDataLoss(List<ReportData> reportDataList, String[] colsDataLoss, Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
+    private static void buildReportDataLoss(List<ReportData> reportDataList, String[] colsDataLoss, Sheet sheet,
+                                            CellStyle headerCellStyle, Row headerRow) {
         for (int col = 0; col < colsDataLoss.length; col++) {
             Cell cell = headerRow.createCell(col);
             cell.setCellValue(colsDataLoss[col]);
@@ -66,7 +76,7 @@ public final class ExcelGeneratorUtil {
             Row row = sheet.createRow(rowIdx++);
 
             row.createCell(0).setCellValue(reportData.getLossResp());
-            row.createCell(1).setCellValue(reportData.getPaymentAssetDcn());
+            row.createCell(1).setCellValue(reportData.getPaymentAssetdcn());
             row.createCell(2).setCellValue(reportData.getRespServiceId());
             row.createCell(3).setCellValue(reportData.getRespServiceName());
             row.createCell(4).setCellValue(reportData.getDateBanked());
@@ -81,7 +91,8 @@ public final class ExcelGeneratorUtil {
         }
     }
 
-    private static void buildReportUnprocessed(List<ReportData> reportDataList, String[] colsUnprocessed, Sheet sheet, CellStyle headerCellStyle, Row headerRow) {
+    private static void buildReportUnprocessed(List<ReportData> reportDataList, String[] colsUnprocessed, Sheet sheet,
+                                               CellStyle headerCellStyle, Row headerRow) {
         for (int col = 0; col < colsUnprocessed.length; col++) {
             Cell cell = headerRow.createCell(col);
             cell.setCellValue(colsUnprocessed[col]);
@@ -97,7 +108,7 @@ public final class ExcelGeneratorUtil {
             row.createCell(3).setCellValue(reportData.getCcdRef());
             row.createCell(4).setCellValue(reportData.getDateBanked());
             row.createCell(5).setCellValue(reportData.getBgcBatch());
-            row.createCell(6).setCellValue(reportData.getPaymentAssetDcn());
+            row.createCell(6).setCellValue(reportData.getPaymentAssetdcn());
             row.createCell(7).setCellValue(reportData.getPaymentMethod());
             row.createCell(8).setCellValue(reportData.getAmount().toString());
         }

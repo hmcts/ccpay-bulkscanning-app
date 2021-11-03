@@ -22,8 +22,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
-
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESSED;
 
 @Service
 public class SearchServiceImpl implements SearchService {
@@ -51,7 +52,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     @Transactional
-    public SearchResponse retrieveByCCDReference(String ccdReference) {
+    public SearchResponse retrieveByCcdReference(String ccdReference) {
 
         List<EnvelopeCase> envelopeCases = getEnvelopeCaseByCcdReference(SearchRequest.searchRequestWith()
                                                                              .ccdReference(ccdReference)
@@ -62,14 +63,14 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     @Transactional
-    public SearchResponse retrieveByDcn(String documentControlNumber) {
-        List<EnvelopeCase> envelopeCases = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
+    public SearchResponse retrieveBydcn(String documentControlNumber) {
+        List<EnvelopeCase> envelopeCases = getEnvelopeCaseBydcn(SearchRequest.searchRequestWith()
                                                                     .documentControlNumber(
                                                                         documentControlNumber)
                                                                     .build());
         if (envelopeCases == null) {
-            // No Payment exists for the searched DCN
-            LOG.info("Payment Not exists for the searched DCN !!!");
+            // No Payment exists for the searched dcn
+            LOG.info("Payment Not exists for the searched dcn !!!");
             return null;
         }
         if (envelopeCases.isEmpty()) {
@@ -137,7 +138,8 @@ public class SearchServiceImpl implements SearchService {
             return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(Collections.emptyList());
         } else if (StringUtils.isNotEmpty(searchRequest.getExceptionRecord())
             && envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).isPresent()) {
-            List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(Collections.emptyList());
+            List<EnvelopeCase> envelopeCases = envelopeCaseRepository
+                .findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(Collections.emptyList());
             for (EnvelopeCase envelopeCase : envelopeCases) {
                 if (StringUtils.isNotEmpty(envelopeCase.getCcdReference())
                     && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()) {
@@ -149,7 +151,7 @@ public class SearchServiceImpl implements SearchService {
         return Collections.emptyList();
     }
 
-    private List<EnvelopeCase> getEnvelopeCaseByDCN(SearchRequest searchRequest) {
+    private List<EnvelopeCase> getEnvelopeCaseBydcn(SearchRequest searchRequest) {
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
         if (payment.isPresent()
             && Optional.ofNullable(payment.get().getEnvelope()).isPresent()) {

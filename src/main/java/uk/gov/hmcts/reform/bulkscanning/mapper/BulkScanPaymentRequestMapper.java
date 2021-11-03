@@ -23,7 +23,7 @@ public class BulkScanPaymentRequestMapper {
 
         List<EnvelopePayment> envelopePaymentList = new ArrayList<>();
         String[] dcnForPayments = bsPaymentRequest.getDocumentControlNumbers();
-        //Set the DCNs from list
+        //Set the dcns from list
         Arrays.asList(dcnForPayments).stream().forEach(dcn -> envelopePaymentList.add(EnvelopePayment
                                                                                           .paymentWith()
                                                                                           .dcnReference(dcn)

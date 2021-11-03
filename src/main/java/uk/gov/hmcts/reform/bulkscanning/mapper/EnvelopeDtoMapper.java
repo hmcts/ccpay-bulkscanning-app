@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
 public class EnvelopeDtoMapper {
 
     public Envelope toEnvelopeEntity(EnvelopeDto envelopeDto) {
-        if(Optional.ofNullable(envelopeDto).isPresent()) {
+        if (Optional.ofNullable(envelopeDto).isPresent()) {
             return Envelope.envelopeWith()
                 .paymentStatus(envelopeDto.getPaymentStatus().toString())
                 .envelopePayments(toPaymentEntities(envelopeDto.getPayments()))
                 .build();
-        }else {
+        } else {
             return null;
         }
     }
@@ -29,13 +29,13 @@ public class EnvelopeDtoMapper {
     }
 
     public EnvelopePayment toPaymentEntity(PaymentDto payment) {
-        if(Optional.ofNullable(payment).isPresent()) {
+        if (Optional.ofNullable(payment).isPresent()) {
             return EnvelopePayment.paymentWith()
                 .dcnReference(payment.getDcnReference())
                 .source(payment.getSource())
                 .paymentStatus(payment.getPaymentStatus().toString())
                 .build();
-        }else {
+        } else {
             return null;
         }
     }

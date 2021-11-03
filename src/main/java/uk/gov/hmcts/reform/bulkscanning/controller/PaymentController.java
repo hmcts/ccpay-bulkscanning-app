@@ -1,13 +1,25 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
@@ -16,10 +28,10 @@ import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.response.PaymentResponse;
 import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
+import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.Optional;
 
 @RestController
 @Api(tags = {"Bulk Scanning Payment API"})
@@ -43,25 +55,25 @@ public class PaymentController {
         @ApiResponse(code = 400, message = "Bad request"),
         @ApiResponse(code = 401, message = "Failed authentication"),
         @ApiResponse(code = 403, message = "Failed authorization"),
-        @ApiResponse(code = 409, message = "Payment DCN already exists")
+        @ApiResponse(code = 409, message = "Payment dcn already exists")
     })
     @PostMapping("/bulk-scan-payments")
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
         LOG.info("Request received from Bulk Scan Payment : {}", bsPaymentRequest);
         return new ResponseEntity<>(PaymentResponse.paymentResponseWith()
-                                        .paymentDcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest))
+                                        .paymentdcns(paymentService.saveInitialMetadataFromBs(bsPaymentRequest))
                                         .build(), HttpStatus.CREATED);
     }
 
-    @ApiOperation("Provide meta information about the payments contained\n" +
-        "in the envelope. This operation will be called after the banking process\n" +
-        "has been done and payments have been allocated to a BGC slip / batch")
+    @ApiOperation("Provide meta information about the payments contained\n"
+        + "in the envelope. This operation will be called after the banking process\n"
+        + "has been done and payments have been allocated to a BGC slip / batch")
     @ApiResponses({
         @ApiResponse(code = 201, message = "Bulk Scanning Data retrieved"),
         @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
         @ApiResponse(code = 401, message = "Failed authentication"),
         @ApiResponse(code = 403, message = "Failed authorization"),
-        @ApiResponse(code = 409, message = "Payment DCN already exists")
+        @ApiResponse(code = 409, message = "Payment dcn already exists")
     })
     @PostMapping("/bulk-scan-payment")
     public ResponseEntity<String> processPaymentFromExela(
@@ -70,10 +82,10 @@ public class PaymentController {
         try {
             LOG.info("Check in Payment metadata for already existing payment from Exela");
             if (Optional.ofNullable(paymentService.getPaymentMetadata(bulkScanPayment.getDcnReference())).isPresent()) {
-                LOG.info("Payment already exists for DCN: {}", bulkScanPayment.getDcnReference());
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Payment DCN already exists");
+                LOG.info("Payment already exists for dcn: {}", bulkScanPayment.getDcnReference());
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Payment dcn already exists");
             } else {
-                LOG.info("Processing Payment for DCN: {}", bulkScanPayment.getDcnReference());
+                LOG.info("Processing Payment for dcn: {}", bulkScanPayment.getDcnReference());
                 paymentService.processPaymentFromExela(bulkScanPayment, bulkScanPayment.getDcnReference());
             }
             return ResponseEntity.status(HttpStatus.CREATED).body("Created");
@@ -120,14 +132,14 @@ public class PaymentController {
         @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
         @ApiResponse(code = 401, message = "Failed authentication"),
         @ApiResponse(code = 403, message = "Failed authorisation"),
-        @ApiResponse(code = 404, message = "No record exists for provided DCN"),
+        @ApiResponse(code = 404, message = "No record exists for provided dcn"),
     })
     @PatchMapping("/bulk-scan-payments/{dcn}/status/{status}")
     public ResponseEntity markPaymentAsProcessed(
         @RequestHeader("Authorization") String authorization,
         @NotEmpty @PathVariable("dcn") String dcn,
         @NotEmpty @PathVariable("status") PaymentStatus status) {
-        LOG.info("Request received to mark payment with DCN : {} , status : {}", dcn, status);
+        LOG.info("Request received to mark payment with dcn : {} , status : {}", dcn, status);
         paymentService.updatePaymentStatus(dcn, status);
         return ResponseEntity.status(HttpStatus.OK).body("Updated");
     }

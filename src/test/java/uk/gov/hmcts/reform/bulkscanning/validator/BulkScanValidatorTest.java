@@ -55,7 +55,7 @@ public class BulkScanValidatorTest {
 
     public static final String RESPONSIBLE_SERVICE_ID_MISSING = "site_id can't be Blank";
     public static final String CCD_REFERENCE_MISSING = "ccd_case_number can't be Blank";
-    public static final String PAYMENT_DCN_MISSING = "document_control_numbers can't be Blank";
+    public static final String PAYMENT_dcn_MISSING = "document_control_numbers can't be Blank";
     public static final String UNKNOWN_FIELD = "Unknown field";
 
     @Before
@@ -80,7 +80,7 @@ public class BulkScanValidatorTest {
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
 
         Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(CCD_REFERENCE_MISSING));
-        Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(PAYMENT_DCN_MISSING));
+        Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(PAYMENT_dcn_MISSING));
     }
 
     @Test()

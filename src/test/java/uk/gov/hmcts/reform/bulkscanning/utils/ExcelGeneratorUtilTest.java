@@ -35,7 +35,7 @@ public class ExcelGeneratorUtilTest {
         List<ReportData> reportDataList = new ArrayList<>();
         ReportData reportData = ReportData.recordWith()
                                     .lossResp("loss-resp")
-                                     .paymentAssetDcn("payment-asset-dcn")
+                                     .paymentAssetdcn("payment-asset-dcn")
                                     .respServiceId("resp-serv-id")
                                     .respServiceName("resp-serv-name")
                                     .dateBanked("2020-01-02")
@@ -57,7 +57,7 @@ public class ExcelGeneratorUtilTest {
         List<ReportData> reportDataList = new ArrayList<>();
         ReportData reportData = ReportData.recordWith()
             .lossResp("loss-resp")
-            .paymentAssetDcn("payment-asset-dcn")
+            .paymentAssetdcn("payment-asset-dcn")
             .respServiceId("resp-serv-id")
             .respServiceName("resp-serv-name")
             .dateBanked("2020-01-02")
@@ -69,9 +69,9 @@ public class ExcelGeneratorUtilTest {
         reportDataList.add(reportData);
         Workbook actual = ExcelGeneratorUtil.exportToExcel(ReportType.DATA_LOSS,reportDataList);
         String actuallossResp = actual.getSheet("DATA_LOSS").getRow(1).getCell(0).getStringCellValue();
-        String actualPaymentAssetDcn = actual.getSheet("DATA_LOSS").getRow(1).getCell(1).getStringCellValue();
+        String actualPaymentAssetdcn = actual.getSheet("DATA_LOSS").getRow(1).getCell(1).getStringCellValue();
         assertEquals("should be equal to loss-resp","loss-resp",actuallossResp);
-        assertEquals("should be equal to payment-asset-dcn","payment-asset-dcn",actualPaymentAssetDcn);
+        assertEquals("should be equal to payment-asset-dcn","payment-asset-dcn",actualPaymentAssetdcn);
     }
 
 

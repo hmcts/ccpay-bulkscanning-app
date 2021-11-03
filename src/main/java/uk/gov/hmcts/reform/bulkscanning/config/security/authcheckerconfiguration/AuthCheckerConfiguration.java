@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 import uk.gov.hmcts.reform.authorisation.validators.ServiceAuthTokenValidator;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
@@ -20,9 +19,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Feign client to fetch s2s apis
+ * Feign client to fetch s2s apis.
  */
 @Configuration
 @Lazy
@@ -30,11 +30,11 @@ import java.util.stream.Stream;
 public class AuthCheckerConfiguration {
 
     /**
-     * Auth token generator for s2s api
-     * @param secret
-     * @param microService
-     * @param serviceAuthorisationApi
-     * @return
+     * Auth token generator for s2s api.
+     * @param secret param
+     * @param microService microService
+     * @param serviceAuthorisationApi serviceAuthorisationApi
+     * @return return
      */
 
     @Bean
@@ -52,8 +52,8 @@ public class AuthCheckerConfiguration {
     }
 
     /**
-     * Extracts and validates user id from request uri if required
-     * @return
+     * Extracts and validates user id from request uri if required.
+     * @return return
      */
 
     @Bean
@@ -63,17 +63,17 @@ public class AuthCheckerConfiguration {
         return (request) -> {
             Matcher matcher = pattern.matcher(request.getRequestURI());
             boolean matched = matcher.find();
-            if(matched){
+            if (matched) {
                 return Optional.of(matcher.group(1));
-            }else {
+            } else {
                 return Optional.empty();
             }
         };
     }
 
     /**
-     * Bean to specify authorised roles for Fees&Pay
-     * @return
+     * Bean to specify authorised roles for Fees&Pay.
+     * @return return
      */
     @Bean
     public Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor() {

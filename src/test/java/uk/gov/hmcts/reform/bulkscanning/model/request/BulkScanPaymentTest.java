@@ -30,7 +30,7 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testSizeOfDCNRefernce(){
+    public void testSizeOfdcnRefernce(){
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                             .dcnReference("34323423324234342343243423").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);

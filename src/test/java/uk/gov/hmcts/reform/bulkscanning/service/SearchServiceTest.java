@@ -69,7 +69,7 @@ public class SearchServiceTest {
     private JwtDecoder jwtDecoder;
 
     public static final String CCD_CASE_REFERENCE = "11112222333344441";
-    public static final String TEST_DCN_REFERENCE = "123-123";
+    public static final String TEST_dcn_REFERENCE = "123-123";
 
     @Before
     public void setUp() {
@@ -79,7 +79,7 @@ public class SearchServiceTest {
                                                 envelopeCaseRepository);
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
             .id(1).amount(BigDecimal.valueOf(100))
-            .dcnReference(TEST_DCN_REFERENCE)
+            .dcnReference(TEST_dcn_REFERENCE)
             .dateBanked(LocalDateTime.now())
             .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
             .build());
@@ -88,7 +88,7 @@ public class SearchServiceTest {
 
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
-                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .dcnReference(TEST_dcn_REFERENCE)
                                                                     .paymentStatus(COMPLETE.toString())
                                                                     .build());
         Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
@@ -98,26 +98,26 @@ public class SearchServiceTest {
         Optional<EnvelopeCase> envelopeCase = Optional.of(EnvelopeCase.caseWith()
                                                               .id(1)
                                                               .envelope(envelope.get())
-                                                              .ccdReference(TEST_DCN_REFERENCE)
+                                                              .ccdReference(TEST_dcn_REFERENCE)
                                                               .exceptionRecordReference("ex123-123")
                                                               .build());
         Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
         envelopePayment.get().setEnvelope(envelope.get());
-        doReturn(envelopePayment).when(paymentRepository).findByDcnReference(TEST_DCN_REFERENCE);
+        doReturn(envelopePayment).when(paymentRepository).findByDcnReference(TEST_dcn_REFERENCE);
         when(paymentRepository.save(any(EnvelopePayment.class))).thenReturn(envelopePayment.get());
         when(paymentRepository.findByEnvelopeId(any(Integer.class))).thenReturn(payments);
         when(envelopeRepository.save(any(Envelope.class))).thenReturn(envelope.get());
         when(envelopeCaseRepository.findByCcdReference(any(String.class))).thenReturn(cases);
-        when(envelopeCaseRepository.findByExceptionRecordReference(TEST_DCN_REFERENCE)).thenReturn(cases);
+        when(envelopeCaseRepository.findByExceptionRecordReference(TEST_dcn_REFERENCE)).thenReturn(cases);
         when(envelopeCaseRepository.findByEnvelopeId(any(Integer.class))).thenReturn(envelopeCase);
-        when(paymentMetadataRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(paymentMetadata);
+        when(paymentMetadataRepository.findByDcnReference(TEST_dcn_REFERENCE)).thenReturn(paymentMetadata);
     }
 
     @Test
     @Transactional
-    public void testRetrieveByCCDReference() throws Exception {
-        SearchResponse searchResponse = paymentService.retrieveByCCDReference(TEST_DCN_REFERENCE);
-        assertThat(searchResponse.getCcdReference()).isEqualTo(TEST_DCN_REFERENCE);
+    public void testretrieveByCcdReference() throws Exception {
+        SearchResponse searchResponse = paymentService.retrieveByCcdReference(TEST_dcn_REFERENCE);
+        assertThat(searchResponse.getCcdReference()).isEqualTo(TEST_dcn_REFERENCE);
     }
 
     @Test
@@ -126,7 +126,7 @@ public class SearchServiceTest {
         when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
-                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .dcnReference(TEST_dcn_REFERENCE)
                                                                     .paymentStatus(COMPLETE.toString())
                                                                     .build());
         Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
@@ -142,14 +142,14 @@ public class SearchServiceTest {
         Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
         when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
         when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(cases);
-        SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
+        SearchResponse searchResponse = paymentService.retrieveByCcdReference("EXP123");
         assertThat(searchResponse.getCcdReference()).isEqualTo("CCD123");
     }
 
     @Test
     @Transactional
-    public void testRetrieveByDcn() throws Exception {
-        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
-        assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
+    public void testRetrieveBydcn() throws Exception {
+        SearchResponse searchResponse = paymentService.retrieveBydcn(TEST_dcn_REFERENCE);
+        assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_dcn_REFERENCE);
     }
 }
