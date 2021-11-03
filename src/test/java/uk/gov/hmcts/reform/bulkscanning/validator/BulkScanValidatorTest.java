@@ -71,7 +71,7 @@ public class BulkScanValidatorTest {
     @Test()
     @Transactional
     public void testFieldLevelValidation() throws Exception{
-        String dcn[] = {""};
+        String[] dcn = {""};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
             , null, "AA08", false);
 

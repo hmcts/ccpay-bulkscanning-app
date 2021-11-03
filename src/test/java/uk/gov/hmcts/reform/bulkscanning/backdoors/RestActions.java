@@ -26,7 +26,7 @@ public class RestActions {
     }
 
     public RestActions withAuthorizedService(String serviceId) {
-        String token = "Bearer "+serviceId+ UUID.randomUUID().toString();
+        String token = "Bearer "+ serviceId +  UUID.randomUUID().toString();
         httpHeaders.add(SERVICE_AUTHORISATION, token);
         return this;
     }

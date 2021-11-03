@@ -24,7 +24,7 @@ public class ExcelGeneratorUtilTest {
     }
 
     @Test
-    public  void  testUtilityClassConstructorToBeInaccessible(){
+    public  void  testUtilityClassConstructorToBeInaccessible() {
         Constructor[] constructors = ExcelGeneratorUtil.class.getDeclaredConstructors();
         assertFalse("Utility class constructor should be inaccessible",
                     constructors[0].isAccessible());

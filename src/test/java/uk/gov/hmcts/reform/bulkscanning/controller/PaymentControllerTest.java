@@ -72,7 +72,7 @@ public class PaymentControllerTest {
 
     @Test
     @Transactional
-    public void testCreatePaymentFromExela() throws Exception{
+    public void testCreatePaymentFromExela() throws Exception {
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                       .header("ServiceAuthorization", "service")
@@ -82,7 +82,7 @@ public class PaymentControllerTest {
     }
 
     @Test
-    public void testCreatePaymentFromExela_Conflict() throws Exception{
+    public void testCreatePaymentFromExela_Conflict() throws Exception {
 
         PaymentMetadata paymentMetadata = PaymentMetadata.paymentMetadataWith()
                                                                     .id(1).amount(BigDecimal.valueOf(100))
@@ -100,7 +100,7 @@ public class PaymentControllerTest {
     }
 
     @Test
-    public void testCreatePaymentFromExela_withException() throws Exception{
+    public void testCreatePaymentFromExela_withException() throws Exception {
 
         when(paymentService.getPaymentMetadata(any(String.class)))
             .thenThrow(new PaymentException("Exception in fetching Metadata"));
@@ -114,7 +114,7 @@ public class PaymentControllerTest {
 
     @Test
     @Transactional
-    public void testCreatePaymentFromExela_BadRequest() throws Exception{
+    public void testCreatePaymentFromExela_BadRequest() throws Exception {
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
@@ -138,19 +138,19 @@ public class PaymentControllerTest {
    @Test
    @Transactional
    public void testCreatePaymentForBulkScan() throws Exception{
-       String dcn[] = {"987111111111111111111","987211111111111111111"};
-       BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
-           ,dcn,"AA08");
+        String[] dcn = {"987111111111111111111","987211111111111111111"};
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
+           ,dcn ,"AA08");
 
-       when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
+        when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
            .thenReturn(Arrays.asList(dcn));
 
-       ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
+        ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
            .header("ServiceAuthorization", "service")
            .content(asJsonString(bulkScanPaymentRequest))
            .contentType(MediaType.APPLICATION_JSON));
 
-       Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+        Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
    }
 
     @Test
@@ -218,7 +218,7 @@ public class PaymentControllerTest {
             .build();
     }
 
-    public BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String dcn[], String responsibleServiceId) {
+    public BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)

@@ -29,7 +29,7 @@ public class BulkScanValidatorFunctionalTest {
 
     public static final String RESPONSIBLE_SERVICE_ID_MISSING = "site_id can't be Blank";
     public static final String CCD_REFERENCE_MISSING = "ccd_case_number can't be Blank";
-    public static final String PAYMENT_dcn_MISSING = "document_control_numbers can't be Blank";
+    public static final String PAYMENT_DCN_MISSING = "document_control_numbers can't be Blank";
 
     @Autowired
     private TestConfigProperties testProps;
@@ -65,7 +65,7 @@ public class BulkScanValidatorFunctionalTest {
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(response.getStatusCode()));
 
         Assert.assertTrue(response.andReturn().asString().contains(CCD_REFERENCE_MISSING));
-        Assert.assertTrue(response.andReturn().asString().contains(PAYMENT_dcn_MISSING));
+        Assert.assertTrue(response.andReturn().asString().contains(PAYMENT_DCN_MISSING));
     }
 
     @Test()
@@ -85,6 +85,6 @@ public class BulkScanValidatorFunctionalTest {
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(response.getStatusCode()));
 
         Assert.assertTrue(response.andReturn().asString().contains(CCD_REFERENCE_MISSING));
-        Assert.assertTrue(response.andReturn().asString().contains(PAYMENT_dcn_MISSING));
+        Assert.assertTrue(response.andReturn().asString().contains(PAYMENT_DCN_MISSING));
     }
 }

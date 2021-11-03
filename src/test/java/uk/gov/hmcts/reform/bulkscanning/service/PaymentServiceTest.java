@@ -102,9 +102,9 @@ public class PaymentServiceTest {
     public static final String CCD_CASE_REFERENCE = "1111222233334444";
     public static final String CCD_CASE_REFERENCE_NOT_PRESENT = "9999888833334444";
     public static final String EXCEPTION_RECORD_REFERENCE = "4444333322221111";
-    public static final String dcn_REFERENCE = "dcn111111111111111111";
+    public static final String DCN_REFERENCE = "dcn111111111111111111";
 
-    public static final String TEST_dcn_REFERENCE = "123123111111111111111";
+    public static final String TEST_DCN_REFERENCE = "123123111111111111111";
 
     @Before
     public void setUp() {
@@ -120,7 +120,7 @@ public class PaymentServiceTest {
                                                 auditRepository);
         Optional<PaymentMetadata> paymentMetadata = Optional.of(PaymentMetadata.paymentMetadataWith()
             .id(1).amount(BigDecimal.valueOf(100))
-            .dcnReference(TEST_dcn_REFERENCE)
+            .dcnReference(TEST_DCN_REFERENCE)
             .dateBanked(LocalDateTime.now())
             .paymentMethod(CHEQUE.toString()).currency(GBP.toString())
             .build());
@@ -129,7 +129,7 @@ public class PaymentServiceTest {
 
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
-                                                                    .dcnReference(TEST_dcn_REFERENCE)
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
                                                                     .paymentStatus(COMPLETE.toString())
                                                                     .build());
         Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
@@ -139,19 +139,19 @@ public class PaymentServiceTest {
         Optional<EnvelopeCase> envelopeCase = Optional.of(EnvelopeCase.caseWith()
                                                               .id(1)
                                                               .envelope(envelope.get())
-                                                              .ccdReference(TEST_dcn_REFERENCE)
+                                                              .ccdReference(TEST_DCN_REFERENCE)
                                                               .exceptionRecordReference("ex123-123")
                                                               .build());
         Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
         envelopePayment.get().setEnvelope(envelope.get());
-        doReturn(envelopePayment).when(paymentRepository).findByDcnReference(TEST_dcn_REFERENCE);
+        doReturn(envelopePayment).when(paymentRepository).findByDcnReference(TEST_DCN_REFERENCE);
         when(paymentRepository.save(any(EnvelopePayment.class))).thenReturn(envelopePayment.get());
         when(paymentRepository.findByEnvelopeId(any(Integer.class))).thenReturn(payments);
         when(envelopeRepository.save(any(Envelope.class))).thenReturn(envelope.get());
         when(envelopeCaseRepository.findByCcdReference(any(String.class))).thenReturn(cases);
-        when(envelopeCaseRepository.findByExceptionRecordReference(TEST_dcn_REFERENCE)).thenReturn(cases);
+        when(envelopeCaseRepository.findByExceptionRecordReference(TEST_DCN_REFERENCE)).thenReturn(cases);
         when(envelopeCaseRepository.findByEnvelopeId(any(Integer.class))).thenReturn(envelopeCase);
-        when(paymentMetadataRepository.findByDcnReference(TEST_dcn_REFERENCE)).thenReturn(paymentMetadata);
+        when(paymentMetadataRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(paymentMetadata);
 
          caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber(CCD_CASE_REFERENCE)
@@ -162,7 +162,7 @@ public class PaymentServiceTest {
     public void testProcessPaymentFromExela() throws Exception {
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
-                                                                    .dcnReference(TEST_dcn_REFERENCE)
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
                                                                     .paymentStatus(COMPLETE.toString())
                                                                     .build());
         Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
@@ -172,15 +172,15 @@ public class PaymentServiceTest {
         envelopePayment.get().setEnvelope(envelope.get());
         doReturn(envelopePayment).when(paymentRepository).findByDcnReference(any(String.class));
 
-        Envelope envelopeMock = paymentService.processPaymentFromExela(createPaymentRequest(), TEST_dcn_REFERENCE);
-        assertThat(envelopeMock.getEnvelopePayments().get(0).getDcnReference()).isEqualTo(TEST_dcn_REFERENCE);
+        Envelope envelopeMock = paymentService.processPaymentFromExela(createPaymentRequest(), TEST_DCN_REFERENCE);
+        assertThat(envelopeMock.getEnvelopePayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
 
     @Test
     @Transactional
     public void testGetPaymentMetadata() throws Exception {
-        PaymentMetadata paymentMetadata = paymentService.getPaymentMetadata(TEST_dcn_REFERENCE);
-        assertThat(paymentMetadata.getDcnReference()).isEqualTo(TEST_dcn_REFERENCE);
+        PaymentMetadata paymentMetadata = paymentService.getPaymentMetadata(TEST_DCN_REFERENCE);
+        assertThat(paymentMetadata.getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
 
     private BulkScanPayment createPaymentRequest() {
@@ -199,7 +199,7 @@ public class PaymentServiceTest {
     @Test
     @Transactional
     public void testProcessPaymentFromBulkScan() throws Exception {
-        String dcn[] = {"dcn1"};
+        String[] dcn = {"dcn1"};
         doReturn(Optional.ofNullable(mockBulkScanningEnvelope())).when(envelopeRepository).findById(null);
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
             ,dcn,"AA08", true);
@@ -212,7 +212,7 @@ public class PaymentServiceTest {
     @Test(expected = BulkScanCaseAlreadyExistsException.class)
     @Transactional
     public void testProcessExistingPaymentFromBulkScan() throws Exception {
-        String dcn[] = {"dcn1"};
+        String[] dcn = {"dcn1"};
         EnvelopePayment envelopePayment = mockBulkScanningEnvelope().getEnvelopePayments().get(0);
 
         //setting mockBulkScanningEnvelope
@@ -250,8 +250,8 @@ public class PaymentServiceTest {
         //setting mockBulkScanningEnvelope
         envelopePayment.setEnvelope(mockBulkScanningEnvelope());
 
-        doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference(dcn_REFERENCE);
-        assertThat(paymentService.updatePaymentStatus(dcn_REFERENCE, PaymentStatus.PROCESSED)).isEqualTo(dcn_REFERENCE);
+        doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference(DCN_REFERENCE);
+        assertThat(paymentService.updatePaymentStatus(DCN_REFERENCE, PaymentStatus.PROCESSED)).isEqualTo(DCN_REFERENCE);
     }
 
     @Test(expected = DcnNotExistsException.class)

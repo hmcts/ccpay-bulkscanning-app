@@ -30,15 +30,15 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testSizeOfdcnRefernce(){
+    public void testSizeOfdcnRefernce() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                             .dcnReference("34323423324234342343243423").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on document_control_number");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("document_control_number length must be 21 digits.")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("document_control_number length must be 21 digits.")) {
                     assertThat(v.getMessage()).isEqualTo("document_control_number length must be 21 digits.");
                 }
             });
@@ -46,32 +46,31 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testDecimalsOfAmount(){
+    public void testDecimalsOfAmount() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                             .amount(BigDecimal.valueOf(100.0232)).build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on amount");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("amount cannot have more than 2 decimal places")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("amount cannot have more than 2 decimal places")) {
                     assertThat(v.getMessage()).isEqualTo("amount cannot have more than 2 decimal places");
                 }
             });
         }
-
     }
 
     @Test
-    public void testEmptyAmount(){
+    public void testEmptyAmount() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
             .amount(BigDecimal.valueOf(0)).build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on amount");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("amount must be greater than or equal to 0.01")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("amount must be greater than or equal to 0.01")) {
                     assertThat(v.getMessage()).isEqualTo("amount must be greater than or equal to 0.01");
                 }
             });
@@ -79,15 +78,15 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testEmptyCurrency(){
+    public void testEmptyCurrency() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
             .currency("").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on Currency");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("currency can't be Blank")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("currency can't be Blank")) {
                     assertThat(v.getMessage()).isEqualTo("currency can't be Blank");
                 }
             });
@@ -96,15 +95,15 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testBankGiroCreditSlipNumber(){
+    public void testBankGiroCreditSlipNumber() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
             .bankGiroCreditSlipNumber(213).build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on bank_giro_credit_slip_number");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("bank_giro_credit_slip_number can't be Blank")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("bank_giro_credit_slip_number can't be Blank")) {
                     assertThat(v.getMessage()).isEqualTo("bank_giro_credit_slip_number can't be Blank");
                 }
             });
@@ -112,15 +111,15 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testPositiveBankGiroCreditSlipNumber(){
+    public void testPositiveBankGiroCreditSlipNumber() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
             .bankGiroCreditSlipNumber(-1).build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on bank_giro_credit_slip_number");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("bank_giro_credit_slip_number must be Positive")){
+        }else  {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("bank_giro_credit_slip_number must be Positive")) {
                     assertThat(v.getMessage()).isEqualTo("bank_giro_credit_slip_number must be Positive");
                 }
             });
@@ -128,15 +127,15 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testLengthOfBankGiroCreditSlipNumber(){
+    public void testLengthOfBankGiroCreditSlipNumber() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                                 .bankGiroCreditSlipNumber(-1).build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on bank_giro_credit_slip_number");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("bank_giro_credit_slip_number length must not be greater than 6 digits")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("bank_giro_credit_slip_number length must not be greater than 6 digits")){
                     assertThat(v.getMessage()).isEqualTo("bank_giro_credit_slip_number length must not be greater than 6 digits");
                 }
             });
@@ -144,15 +143,15 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testBankedDate(){
+    public void testBankedDate() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                                 .bankedDate("").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on banked_date");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("banked_date can't be Blank")){
+        } else {
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("banked_date can't be Blank")) {
                     assertThat(v.getMessage()).isEqualTo("banked_date can't be Blank");
                 }
             });
@@ -161,15 +160,15 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testFutureBankDate(){
+    public void testFutureBankDate() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                             .bankedDate("2021-11-01").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()){
             fail("should have thrown an Error Message on banked_date");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")){
+        } else {
+            violations.stream().forEach(v ->{
+                if (v.getMessage().equals("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")){
                     assertThat(v.getMessage()).isEqualTo("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date");
                 }
             });
@@ -181,11 +180,11 @@ public class BulkScanPaymentTest {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
             .method("invalid-method").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()){
             fail("should have thrown an Error Message on Cash/Cheque/PostalOrder");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("Invalid method. Accepted value Cash/Cheque/PostalOrder")){
+        } else {
+            violations.stream().forEach(v ->{
+                if (v.getMessage().equals("Invalid method. Accepted value Cash/Cheque/PostalOrder")){
                     assertThat(v.getMessage()).isEqualTo("Invalid method. Accepted value Cash/Cheque/PostalOrder");
                 }
             });
@@ -197,11 +196,11 @@ public class BulkScanPaymentTest {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
             .currency("GBP").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if(violations.isEmpty()){
+        if (violations.isEmpty()){
             fail("should have thrown an Error Message on Invalid currency");
-        }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("Invalid currency. Accepted value GBP")){
+        } else {
+            violations.stream().forEach(v ->{
+                if (v.getMessage().equals("Invalid currency. Accepted value GBP")){
                     assertThat(v.getMessage()).isEqualTo("Invalid currency. Accepted value GBP");
                 }
             });

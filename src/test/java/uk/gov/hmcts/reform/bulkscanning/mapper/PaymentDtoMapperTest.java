@@ -12,7 +12,7 @@ public class PaymentDtoMapperTest {
     PaymentDtoMapper paymentDtoMapper = new PaymentDtoMapper();
 
     @Test
-    public void testFromRequest(){
+    public void testFromRequest() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                             .build();
         PaymentDto paymentDto = paymentDtoMapper.fromRequest(bulkScanPayment,"dcn-reference");
@@ -20,7 +20,7 @@ public class PaymentDtoMapperTest {
     }
 
     @Test
-    public void  testFromRequest_WithNullPayment(){
+    public void  testFromRequest_WithNullPayment() {
         PaymentDto paymentDto = paymentDtoMapper.fromRequest(null,"dcn-reference");
         assertNull(paymentDto,"Response should be NULL");
     }

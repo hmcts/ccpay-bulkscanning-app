@@ -68,7 +68,7 @@ public class ReportControllerTest {
 
     @Test
     public void testGetPaymentReportData_Unprocessed() throws Exception {
-        String dcn[] = {"111122223333555511111", "111122223333555521111"};
+        String[] dcn = {"111122223333555511111", "111122223333555521111"};
         String ccd = "1111222233335555";
         createTestReportData(ccd, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -86,7 +86,7 @@ public class ReportControllerTest {
 
     @Test
     public void testGetPaymentReportData_DataLoss() throws Exception {
-        String dcn[] = {"111122223333555511111", "111122223333555521111"};
+        String[] dcn = {"111122223333555511111", "111122223333555521111"};
         String ccd = "1111222233335555";
         createTestReportData(ccd, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
