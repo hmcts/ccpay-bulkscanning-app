@@ -38,7 +38,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
@@ -118,7 +120,9 @@ public class PaymentControllerTest {
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
-                                                          .content("{\"amount\":100.0,\"method\":\"CHEQUE\",\"banked_date\":\"2019-10-31\",\"document_control_number\":\"111122223333444411111\",\"bank_giro_credit_slip_number\":123}")
+                                                          .content("{\"amount\":100.0,\"method\":\"CHEQUE\",\"banked_date\":\"2019-10-31\","
+                                                                       + "\"document_control_number\":\"111122223333444411111\","
+                                                                       + "\"bank_giro_credit_slip_number\":123}")
                                                           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
@@ -126,7 +130,7 @@ public class PaymentControllerTest {
     private static class ClassThatJacksonCannotSerialize {}
 
     @Test(expected = PaymentException.class)
-    public void testCreatePaymentFromExela_JsonProcessingException() throws Exception{
+    public void testCreatePaymentFromExela_JsonProcessingException() throws Exception {
 
         mockMvc.perform(post("/bulk-scan-payment")
                                                           .header("ServiceAuthorization", "service")
@@ -135,27 +139,27 @@ public class PaymentControllerTest {
     }
 
     //Test cases for Bulk Scan endpoints bulk scan
-   @Test
-   @Transactional
-   public void testCreatePaymentForBulkScan() throws Exception{
+    @Test
+    @Transactional
+    public void testCreatePaymentForBulkScan() throws Exception {
         String[] dcn = {"987111111111111111111","987211111111111111111"};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
-           ,dcn ,"AA08");
+        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE,
+                                                                                     dcn,"AA08");
 
         when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
-           .thenReturn(Arrays.asList(dcn));
+            .thenReturn(Arrays.asList(dcn));
 
         ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
-           .header("ServiceAuthorization", "service")
-           .content(asJsonString(bulkScanPaymentRequest))
-           .contentType(MediaType.APPLICATION_JSON));
+            .header("ServiceAuthorization", "service")
+            .content(asJsonString(bulkScanPaymentRequest))
+            .contentType(MediaType.APPLICATION_JSON));
 
         Assert.assertEquals(Integer.valueOf(201), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
-   }
+    }
 
     @Test
     @Transactional
-    public void testUpdateCaseReferenceForExceptionRecord() throws Exception{
+    public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
         CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber("9882111111111111")
             .build();
@@ -170,11 +174,11 @@ public class PaymentControllerTest {
 
     @Test
     @Transactional
-    public void testMarkPaymentAsProcessed() throws Exception{
+    public void testMarkPaymentAsProcessed() throws Exception {
         ResultActions resultActions = mockMvc.perform(patch("/bulk-scan-payments/987211111111111111111/status/PROCESSED")
-          .header("Authorization", "user")
-          .header("ServiceAuthorization", "service")
-          .contentType(MediaType.APPLICATION_JSON));
+            .header("Authorization", "user")
+            .header("ServiceAuthorization", "service")
+            .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
@@ -196,7 +200,7 @@ public class PaymentControllerTest {
         List<EnvelopeCase> envelopeCasesList = new ArrayList<>();
         envelopeCasesList.add(envelopeCase);
 
-         bsEnvelope =  Envelope
+        bsEnvelope =  Envelope
             .envelopeWith()
             .id(1)
             .envelopePayments(envelopePaymentList)

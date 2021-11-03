@@ -39,7 +39,11 @@ import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -153,7 +157,7 @@ public class PaymentServiceTest {
         when(envelopeCaseRepository.findByEnvelopeId(any(Integer.class))).thenReturn(envelopeCase);
         when(paymentMetadataRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(paymentMetadata);
 
-         caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
+        caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest()
             .ccdCaseNumber(CCD_CASE_REFERENCE)
             .build();
     }
@@ -201,8 +205,8 @@ public class PaymentServiceTest {
     public void testProcessPaymentFromBulkScan() throws Exception {
         String[] dcn = {"dcn1"};
         doReturn(Optional.ofNullable(mockBulkScanningEnvelope())).when(envelopeRepository).findById(null);
-        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
-            ,dcn,"AA08", true);
+        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE,
+                                                                                         dcn,"AA08", true);
 
         List<String> listdcn = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
 
@@ -232,8 +236,9 @@ public class PaymentServiceTest {
 
         doReturn(Optional.ofNullable(envelopeCaseList)).when(envelopeCaseRepository).findByExceptionRecordReference(EXCEPTION_RECORD_REFERENCE);
 
-        Assert.assertTrue(paymentService.
-            updateCaseReferenceForExceptionRecord(EXCEPTION_RECORD_REFERENCE,caseReferenceRequest).equalsIgnoreCase("1"));
+        Assert.assertTrue(paymentService
+                              .updateCaseReferenceForExceptionRecord(EXCEPTION_RECORD_REFERENCE,
+                                                                     caseReferenceRequest).equalsIgnoreCase("1"));
     }
 
     @Test(expected = ExceptionRecordNotExistsException.class)
@@ -277,6 +282,6 @@ public class PaymentServiceTest {
             .payments(paymentDtos)
             .paymentStatus(INCOMPLETE)
             .build());
-        assertThat( envelope.getEnvelopePayments().get(0).getDcnReference()).isEqualTo("111111111111111111");
+        assertThat(envelope.getEnvelopePayments().get(0).getDcnReference()).isEqualTo("111111111111111111");
     }
 }

@@ -56,7 +56,7 @@ public class PaymentMetadataDtoMapperTest {
     }
 
     @Test
-    public void testToPaymentEntity_WithNull(){
+    public void testToPaymentEntity_WithNull() {
         PaymentMetadata actualPaymentMetaData = paymentMetadataDtoMapper.toPaymentEntity(null);
         assertNull(actualPaymentMetaData,"Response should be NULL");
     }

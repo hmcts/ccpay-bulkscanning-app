@@ -50,8 +50,13 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserAuthFilterTest.getUserInfoBasedOnUidRoles;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
-import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESSED;
+
+import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST;
+import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.DCN_NOT_EXISTS;
+import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.EXCEPTION_RECORD_NOT_EXISTS;
 
 
 @RunWith(SpringRunner.class)
@@ -106,7 +111,7 @@ public class PaymentControllerFnTest {
 
     @Before
     public void setUp() {
-       //OIDC UserInfo Mocking
+        //OIDC UserInfo Mocking
         when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("UID123", "payments"));
 
         caseReferenceRequest = CaseReferenceRequest
@@ -125,7 +130,7 @@ public class PaymentControllerFnTest {
 
     @Test
     @WithMockUser(authorities = "payments")
-    public void testBulkScanningPaymentRequestFirst() throws Exception{
+    public void testBulkScanningPaymentRequestFirst() throws Exception {
         String[] dcn = {"987211111111111111111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555",
                                                                                      dcn,"AA08", true);
@@ -160,7 +165,7 @@ public class PaymentControllerFnTest {
     @WithMockUser(authorities = "payments")
     public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
         String[] dcn = {"987511111111111111111"};
-        String dcn2[] = {"987611111111111111111"};
+        String[] dcn2 = {"987611111111111111111"};
 
         //Multiple envelopes with same exception record
         bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
@@ -251,12 +256,12 @@ public class PaymentControllerFnTest {
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
         //Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333666611111").get().getPaymentStatus()
-            , COMPLETE.toString());
+        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333666611111").get().getPaymentStatus(),
+                            COMPLETE.toString());
 
         //Non Complete Payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333777711111").get().getPaymentStatus()
-            , INCOMPLETE.toString());
+        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333777711111").get().getPaymentStatus(),
+                            INCOMPLETE.toString());
     }
 
 
@@ -276,12 +281,12 @@ public class PaymentControllerFnTest {
         restActions.post("/bulk-scan-payment", createPaymentRequest("111122223333888811111"));
 
         //Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333888811111").get().getPaymentStatus()
-            , COMPLETE.toString());
+        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333888811111").get().getPaymentStatus(),
+                            COMPLETE.toString());
 
         //Non Complete Payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333999911111").get().getPaymentStatus()
-            , INCOMPLETE.toString());
+        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333999911111").get().getPaymentStatus(),
+                            INCOMPLETE.toString());
 
     }
 
@@ -308,7 +313,7 @@ public class PaymentControllerFnTest {
         //Post request
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);
 
-       //Complete payment for dcn dcn1
+        //Complete payment for dcn dcn1
         EnvelopePayment payment = paymentRepository.findByDcnReference(dcn1).get();
         Assert.assertEquals(COMPLETE.toString(), payment.getPaymentStatus());
 
@@ -342,14 +347,14 @@ public class PaymentControllerFnTest {
                          createPaymentRequest("111122223333123451111"));
 
         //New payment should be saved with Incomplete status
-        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333123451111").get().getPaymentStatus()
-            , INCOMPLETE.toString());
+        Assert.assertEquals(paymentRepository.findByDcnReference("111122223333123451111").get().getPaymentStatus(),
+                            INCOMPLETE.toString());
     }
 
     @Test
     @WithMockUser(authorities = "payments")
-    public void testSearchByCCDForProcessed() throws Exception {
-        String dcns[] = {"111166667777888811111", "111166667777999911111"};
+    public void testSearchByCcdForProcessed() throws Exception {
+        String[] dcns = {"111166667777888811111", "111166667777999911111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677774444",
                                                                                      dcns, "AA08", true);
 
@@ -399,7 +404,7 @@ public class PaymentControllerFnTest {
     @Test
     @WithMockUser(authorities = "payments")
     public void testInvalidAuthorisedService() throws Exception {
-        String dcns[] = {"111166667777888821111", "111166667777999921111"};
+        String[] dcns = {"111166667777888821111", "111166667777999921111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677775555",
                                                                                      dcns, "AA08", true);
 
@@ -417,7 +422,7 @@ public class PaymentControllerFnTest {
     @Test
     @WithMockUser(authorities = "UnAuthorisedPaymentRole")
     public void testInvalidAuthorisedUser() throws Exception {
-        String dcns[] = {"111166667777888821111", "111166667777999921111"};
+        String[] dcns = {"111166667777888821111", "111166667777999921111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677775555",
                                                                                      dcns, "AA08", true);
 
@@ -437,7 +442,8 @@ public class PaymentControllerFnTest {
         Assert.assertEquals(403, resultActions.andReturn().getResponse().getStatus());
     }
 
-    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId, boolean isExceptionRecord) {
+    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn,
+                                                                      String responsibleServiceId, boolean isExceptionRecord) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)

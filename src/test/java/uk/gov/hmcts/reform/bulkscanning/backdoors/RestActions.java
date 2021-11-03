@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.backdoors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.util.MultiValueMap;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.MultiValueMap;
 
 import java.util.UUID;
 
@@ -26,7 +26,7 @@ public class RestActions {
     }
 
     public RestActions withAuthorizedService(String serviceId) {
-        String token = "Bearer "+ serviceId +  UUID.randomUUID().toString();
+        String token = "Bearer " + serviceId +  UUID.randomUUID().toString();
         httpHeaders.add(SERVICE_AUTHORISATION, token);
         return this;
     }

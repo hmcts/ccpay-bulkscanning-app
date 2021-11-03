@@ -5,11 +5,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.util.Set;
 
 import static org.junit.Assert.fail;
 
@@ -40,7 +40,7 @@ public class BulkScanPaymentRequestTest  {
             fail("should have thrown an Error Message on Invalid Site Id");
         } else {
             violations.stream().forEach(v -> {
-                if (v.getMessage().equals("Invalid site_id. Accepted values are AA08 or AA07 or AA09")){
+                if (v.getMessage().equals("Invalid site_id. Accepted values are AA08 or AA07 or AA09")) {
                     Assertions.assertThat(v.getMessage()).isEqualTo("Invalid site_id. Accepted values are AA08 or AA07 or AA09");
                 }
             });
@@ -51,11 +51,11 @@ public class BulkScanPaymentRequestTest  {
     @Test
     public void testInvalidCcdCaseNumber() {
         BulkScanPaymentRequest bulkScanPaymentRequest = BulkScanPaymentRequest.createBSPaymentRequestWith()
-           .ccdCaseNumber("ccd-number").build();
+            .ccdCaseNumber("ccd-number").build();
         Set<ConstraintViolation<BulkScanPaymentRequest>> violations = validator.validate(bulkScanPaymentRequest);
         if (violations.isEmpty()) {
             fail("should have thrown an Error Message on ccd_case_number");
-        }else  {
+        } else {
             violations.stream().forEach(v -> {
                 if (v.getMessage().equals("ccd_case_number should be numeric")) {
                     Assertions.assertThat(v.getMessage()).isEqualTo("ccd_case_number should be numeric");

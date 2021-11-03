@@ -4,12 +4,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.math.BigDecimal;
+import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.math.BigDecimal;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -117,7 +117,7 @@ public class BulkScanPaymentTest {
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
         if (violations.isEmpty()) {
             fail("should have thrown an Error Message on bank_giro_credit_slip_number");
-        }else  {
+        } else {
             violations.stream().forEach(v -> {
                 if (v.getMessage().equals("bank_giro_credit_slip_number must be Positive")) {
                     assertThat(v.getMessage()).isEqualTo("bank_giro_credit_slip_number must be Positive");
@@ -135,7 +135,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on bank_giro_credit_slip_number");
         } else {
             violations.stream().forEach(v -> {
-                if (v.getMessage().equals("bank_giro_credit_slip_number length must not be greater than 6 digits")){
+                if (v.getMessage().equals("bank_giro_credit_slip_number length must not be greater than 6 digits")) {
                     assertThat(v.getMessage()).isEqualTo("bank_giro_credit_slip_number length must not be greater than 6 digits");
                 }
             });
@@ -164,27 +164,28 @@ public class BulkScanPaymentTest {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
                                             .bankedDate("2021-11-01").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if (violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on banked_date");
         } else {
-            violations.stream().forEach(v ->{
-                if (v.getMessage().equals("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")){
-                    assertThat(v.getMessage()).isEqualTo("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date");
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")) {
+                    assertThat(v.getMessage())
+                        .isEqualTo("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date");
                 }
             });
         }
     }
 
     @Test
-    public void testInvalidCashMethod(){
+    public void testInvalidCashMethod() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
             .method("invalid-method").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if (violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on Cash/Cheque/PostalOrder");
         } else {
-            violations.stream().forEach(v ->{
-                if (v.getMessage().equals("Invalid method. Accepted value Cash/Cheque/PostalOrder")){
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("Invalid method. Accepted value Cash/Cheque/PostalOrder")) {
                     assertThat(v.getMessage()).isEqualTo("Invalid method. Accepted value Cash/Cheque/PostalOrder");
                 }
             });
@@ -192,15 +193,15 @@ public class BulkScanPaymentTest {
     }
 
     @Test
-    public void testValidCurrency(){
+    public void testValidCurrency() {
         BulkScanPayment bulkScanPayment = BulkScanPayment.createPaymentRequestWith()
             .currency("GBP").build();
         Set<ConstraintViolation<BulkScanPayment>> violations = validator.validate(bulkScanPayment);
-        if (violations.isEmpty()){
+        if (violations.isEmpty()) {
             fail("should have thrown an Error Message on Invalid currency");
         } else {
-            violations.stream().forEach(v ->{
-                if (v.getMessage().equals("Invalid currency. Accepted value GBP")){
+            violations.stream().forEach(v -> {
+                if (v.getMessage().equals("Invalid currency. Accepted value GBP")) {
                     assertThat(v.getMessage()).isEqualTo("Invalid currency. Accepted value GBP");
                 }
             });

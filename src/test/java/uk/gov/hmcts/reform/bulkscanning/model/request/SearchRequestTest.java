@@ -5,11 +5,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.util.Set;
 
 import static org.junit.Assert.fail;
 
@@ -54,7 +54,7 @@ public class SearchRequestTest {
         Set<ConstraintViolation<SearchRequest>> violations = validator.validate(searchRequest);
         if (violations.isEmpty()) {
             fail("should have thrown an Error Message on ccd_reference");
-        } else  {
+        } else {
             violations.stream().forEach(v -> {
                 if (v.getMessage().equals("ccd_reference length must be 16 Characters")) {
                     Assertions.assertThat(v.getMessage()).isEqualTo("ccd_reference length must be 16 Characters");
@@ -72,7 +72,7 @@ public class SearchRequestTest {
         Set<ConstraintViolation<SearchRequest>> violations = validator.validate(searchRequest);
         if (violations.isEmpty()) {
             fail("should have thrown an Error Message on exception_record");
-        }else  {
+        } else {
             violations.stream().forEach(v -> {
                 if (v.getMessage().equals("exception_record can't be Blank")) {
                     Assertions.assertThat(v.getMessage()).isEqualTo("exception_record can't be Blank");

@@ -24,7 +24,12 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,7 +60,7 @@ public class ReportServiceTest {
     ReportServiceImpl reportService;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         reportService = new ReportServiceImpl(paymentRepository,paymentMetadataRepository);
     }
 
@@ -88,7 +93,7 @@ public class ReportServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByReportTypeDataLoss() throws ParseException{
+    public void testRetrieveByReportTypeDataLoss() throws ParseException {
         List<EnvelopePayment> envelopePayments = new ArrayList<>();
         EnvelopePayment envelopePayment = EnvelopePayment.paymentWith()
             .dcnReference("dcnReference").source(Bulk_Scan.toString())
