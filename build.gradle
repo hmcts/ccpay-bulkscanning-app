@@ -175,7 +175,7 @@ checkstyleTest.enabled(false)
   dependencyManagement {
     imports {
       mavenBom "org.springframework.boot:spring-boot-dependencies:2.3.6.RELEASE"
-      mavenBom 'org.apache.logging.log4j:log4j-bom:2.15.0'
+      mavenBom 'org.apache.logging.log4j:log4j-bom:2.16.0'
     }
     dependencies {
       dependencySet(
@@ -207,8 +207,8 @@ checkstyleTest.enabled(false)
 dependencies {
   compile ('com.sun.xml.bind:jaxb-osgi:2.3.1')
   compile group: 'com.google.guava', name: 'guava', version: '30.1-jre'
-  compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.15.0'
-  compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.15.0'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.16.0'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.16.0'
   compile("org.springframework.boot:spring-boot-starter-web")
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
