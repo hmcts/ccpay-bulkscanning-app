@@ -64,7 +64,7 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
         if (!authorizedRoles.isEmpty() && Collections.disjoint(authorizedRoles, userInfo.getRoles())) {
 
             Optional<List<String>> currentRolesOptional = Optional.ofNullable(userInfo.getRoles());
-            List<String> currentRoles = new ArrayList<String>();
+            List<String> currentRoles = new ArrayList<>();
             if (currentRolesOptional.isPresent() && !currentRolesOptional.get().isEmpty()){
                 currentRoles = currentRolesOptional.get();
             }
