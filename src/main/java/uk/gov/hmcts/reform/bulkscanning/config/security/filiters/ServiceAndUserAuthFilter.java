@@ -12,10 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -67,7 +64,7 @@ public class ServiceAndUserAuthFilter extends OncePerRequestFilter {
         if (!authorizedRoles.isEmpty() && Collections.disjoint(authorizedRoles, userInfo.getRoles())) {
 
             Optional<List<String>> currentRolesOptional = Optional.ofNullable(userInfo.getRoles());
-            List<String> currentRoles = null;
+            List<String> currentRoles = new ArrayList<>();
             if (currentRolesOptional.isPresent() && !currentRolesOptional.get().isEmpty()){
                 currentRoles = currentRolesOptional.get();
             }
