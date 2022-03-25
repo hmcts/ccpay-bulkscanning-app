@@ -180,7 +180,7 @@ checkstyleTest.enabled(false)
     dependencies {
       dependencySet(
         group: 'com.fasterxml.jackson.core',
-        version: '2.13.0'
+        version: '2.10.1'
       ) {
         entry 'jackson-core'
         entry 'jackson-databind'
@@ -224,7 +224,7 @@ dependencies {
   compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.11'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   compile group: 'com.querydsl', name: 'querydsl-jpa', version:'4.2.2'
-  implementation 'com.github.hmcts.liquibase:liquibase-core:3.9.0'
+  implementation 'com.github.hmcts.liquibase:liquibase-core:3.8.2'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
   compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.13') {
     exclude(module: 'commons-logging')
