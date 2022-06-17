@@ -1,4 +1,5 @@
 #!groovy
+import uk.gov.hmcts.contino.AppPipelineDsl
 
 properties(
     [[$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/ccpay-bulkscanning-app.git'],
@@ -35,6 +36,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
+env.PACT_BROKER_URL = 'https://pact-broker.platform.hmcts.net'
+
 withPipeline(type, product, app) {
     //setVaultName('ccpay')
     loadVaultSecrets(secrets)
@@ -42,8 +45,6 @@ withPipeline(type, product, app) {
     //installCharts()
     //disableLegacyDeployment()
     enableAksStagingDeployment()
-
-
 
   after('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
@@ -71,4 +72,17 @@ withPipeline(type, product, app) {
 
   //Sync demo,ithc and perftest with master branch
   syncBranchesWithMaster(branchesToSync)
+}
+
+onMaster() {
+  enablePactAs([
+    AppPipelineDsl.PactRoles.PROVIDER,
+    AppPipelineDsl.PactRoles.CONSUMER
+  ])
+}
+onPR() {
+  enablePactAs([
+    AppPipelineDsl.PactRoles.PROVIDER,
+    AppPipelineDsl.PactRoles.CONSUMER
+  ])
 }
