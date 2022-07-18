@@ -84,7 +84,7 @@
       </notes>
       <cve>CVE-2022-22968</cve>
     </suppress>
-  
+
     <suppress until="2022-09-30">
         <notes>
             In Apache Tomcat 10.1.0-M1 to 10.1.0-M16, 10.0.0-M1 to 10.0.22, 9.0.30 to 9.0.64 and 8.5.50 to 8.5.81 the
@@ -102,6 +102,23 @@
         </notes>
         <cve>CVE-2022-33915</cve>
     </suppress>
+
+    <suppress until="2022-09-30">
+      <notes>
+        The RipudamanKaushikDal/projects repository through 2022-04-03 on GitHub allows absolute path traversal
+        because the Flask send_file function is used unsafely.
+      </notes>
+      <cve>CVE-2022-31569</cve>
+    </suppress>
+
+    <suppress until="2022-09-30">
+      <notes>
+        The nrlakin/homepage repository through 2017-03-06 on GitHub allows absolute path traversal because the
+        Flask send_file function is used unsafely.
+      </notes>
+      <cve>CVE-2022-31548</cve>
+    </suppress>
+
   <!-- Supression Group ends here -->
 </suppressions>
 
