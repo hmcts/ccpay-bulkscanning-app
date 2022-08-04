@@ -15,7 +15,7 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/bulk-scan
-    username: postgres
+    username: ${POSTGRES_USERNAME}
     password: dummy
     properties:
       charSet: UTF-8
