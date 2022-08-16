@@ -74,4 +74,27 @@ public class SearchController {
             throw new PaymentException(ex);
         }
     }
+
+    @ApiOperation("Case with unprocessed payment details by Payment DCN (invoked by payment app)")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Payments retrieved"),
+            @ApiResponse(code = 404, message = "Payments not found")
+    })
+    @GetMapping("/cases/dcn/{document_control_number}")
+    public ResponseEntity retrieveByDCN(
+            @PathVariable("document_control_number") String documentControlNumber) {
+        LOG.info("Retrieving payments for documentControlNumber : {}", documentControlNumber);
+        try {
+            SearchResponse searchResponse = searchService.retrieveByDcn(documentControlNumber);
+            if (Optional.ofNullable(searchResponse).isPresent()) {
+                LOG.info("SearchResponse : {}", searchResponse);
+                return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
+            } else {
+                LOG.info("Payments Not found for documentControlNumber : {}", documentControlNumber);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for documentControlNumber");
+            }
+        } catch (Exception ex) {
+            throw new PaymentException(ex);
+        }
+    }
 }
