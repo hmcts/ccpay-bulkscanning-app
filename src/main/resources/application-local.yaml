@@ -4,6 +4,7 @@ management:
       base-path: /
 server:
   shutdown: graceful
+  port: 8004
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:
   lifecycle:
@@ -14,9 +15,9 @@ spring:
     name: bulk-scanning
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bulk-scan
-    username: ${POSTGRES_USERNAME}
-    password: dummy
+    url: jdbc:postgresql://localhost:5432/bspayment
+    username: bspayment
+    password: bspayment
     properties:
       charSet: UTF-8
   jpa:
