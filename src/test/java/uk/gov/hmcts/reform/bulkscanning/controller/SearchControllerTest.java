@@ -84,8 +84,8 @@ public class SearchControllerTest {
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(true, resultActions.andReturn().getResponse()
-            .getContentAsString().contains("Exception in fetching Payments"));
+        Assert.assertTrue(resultActions.andReturn().getResponse()
+                .getContentAsString().contains("Exception in fetching Payments"));
     }
 
     @Test
@@ -104,13 +104,13 @@ public class SearchControllerTest {
     }
 
     @Test
-    public void testSearchPaymentWithCasesDcn() throws Exception{
+    public void testSearchPaymentWithCaseDcn() throws Exception{
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
                 .ccdReference("9881231111111111")
                 .build();
         when(searchService.retrieveByDcn(any(String.class)))
                 .thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases/dcn/987123111111111111111")
+        ResultActions resultActions = mockMvc.perform(get("/case/987123111111111111111")
                 .header("ServiceAuthorization", "service")
                 .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
@@ -129,10 +129,10 @@ public class SearchControllerTest {
     }
 
     @Test
-    public void testSearchPaymentWithCasesDcn_PaymentNotFound() throws Exception{
+    public void testSearchPaymentWithCaseDcn_PaymentNotFound() throws Exception{
         SearchResponse searchResponse = null;
         when(searchService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
-        ResultActions resultActions = mockMvc.perform(get("/cases/dcn/987123111111111111111")
+        ResultActions resultActions = mockMvc.perform(get("/case/987123111111111111111")
                 .header("ServiceAuthorization", "service")
                 .accept(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(404), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
@@ -146,17 +146,17 @@ public class SearchControllerTest {
                                                           .header("Authorization", "user")
                                                           .header("ServiceAuthorization", "service")
                                                           .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(true, resultActions.andReturn().getResponse()
-            .getContentAsString().contains("Exception in fetching Payments"));
+        Assert.assertTrue(resultActions.andReturn().getResponse()
+                .getContentAsString().contains("Exception in fetching Payments"));
     }
 
     @Test
-    public void testSearchPaymentWithCasesDcn_Exception() throws Exception{
+    public void testSearchPaymentWithCaseDcn_Exception() throws Exception{
         when(searchService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
-        ResultActions resultActions = mockMvc.perform(get("/cases/dcn/987123111111111111111")
+        ResultActions resultActions = mockMvc.perform(get("/case/987123111111111111111")
                 .header("ServiceAuthorization", "service")
                 .accept(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(true, resultActions.andReturn().getResponse()
+        Assert.assertTrue(resultActions.andReturn().getResponse()
                 .getContentAsString().contains("Exception in fetching Payments"));
     }
 
