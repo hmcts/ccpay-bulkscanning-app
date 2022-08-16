@@ -60,19 +60,7 @@ public class SearchController {
     public ResponseEntity retrieveByDCN(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("document_control_number") String documentControlNumber) {
-        LOG.info("Retrieving payments for documentControlNumber : {}", documentControlNumber);
-        try {
-            SearchResponse searchResponse = searchService.retrieveByDcn(documentControlNumber);
-            if (Optional.ofNullable(searchResponse).isPresent()) {
-                LOG.info("SearchResponse : {}", searchResponse);
-                return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
-            } else {
-                LOG.info("Payments Not found for documentControlNumber : {}", documentControlNumber);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payments Not found for documentControlNumber");
-            }
-        } catch (Exception ex) {
-            throw new PaymentException(ex);
-        }
+            return retrieveByDCN(documentControlNumber);
     }
 
     @ApiOperation("Case with unprocessed payment details by Payment DCN (invoked by payment app)")
