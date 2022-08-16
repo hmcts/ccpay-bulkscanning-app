@@ -154,7 +154,7 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
                     .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .antMatchers("/error").permitAll()
-                    .antMatchers(HttpMethod.GET, "/cases/dcn/**").permitAll()
+                    .antMatchers(HttpMethod.GET, "/case/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .oauth2ResourceServer()
