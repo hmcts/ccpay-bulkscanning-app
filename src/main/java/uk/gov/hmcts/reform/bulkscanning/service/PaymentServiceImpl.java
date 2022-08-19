@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.bulkscanning.audit.AppInsightsAuditRepository;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
@@ -144,9 +145,7 @@ public class PaymentServiceImpl implements PaymentService {
 
                 if (Optional.ofNullable(envelopeDB.getEnvelopePayments()).isPresent()
                     && !envelopeDB.getEnvelopePayments().isEmpty()) {
-                    envelopeDB.getEnvelopePayments().stream().forEach(payment -> {
-                        auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment);
-                    });
+                    envelopeDB.getEnvelopePayments().forEach(payment -> auditRepository.trackPaymentEvent("Bulk-Scan_PAYMENT", payment));
                 }
 
                 Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
@@ -178,13 +177,11 @@ public class PaymentServiceImpl implements PaymentService {
             && StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())
             && Optional.ofNullable(envelopeCases).isPresent()
             && !envelopeCases.isEmpty()) {
-            envelopeCases.stream().forEach(envelopeCase -> {
-                envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber());
-            });
+            envelopeCases.forEach(envelopeCase -> envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber()));
 
             envelopeCaseRepository.saveAll(envelopeCases);
-            return envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString()).collect(Collectors.toList())
-                .stream().collect(Collectors.joining(","));
+            return String.join(",", envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString())
+                    .collect(Collectors.toList()));
         }
 
         return "";
@@ -199,13 +196,20 @@ public class PaymentServiceImpl implements PaymentService {
             updateEnvelopePaymentStatus(envelope, PROCESSED);
             if (Optional.ofNullable(envelope.getEnvelopePayments()).isPresent()
                 && !envelope.getEnvelopePayments().isEmpty()) {
-                envelope.getEnvelopePayments().stream().forEach(payment -> {
-                    auditRepository.trackPaymentEvent("PAYMENT_STATUS_UPDATE", payment);
-                });
+                envelope.getEnvelopePayments().forEach(payment -> auditRepository.trackPaymentEvent("PAYMENT_STATUS_UPDATE", payment));
             }
             return dcn;
         }
         return null;
+    }
+
+    @Override
+    @Transactional
+    public void deletePayment(String dcn) {
+        long records = paymentRepository.deleteByDcnReference(dcn);
+        if (records == 0) {
+            throw new PaymentException("No records found for given DCN reference");
+        }
     }
 
     @Override
@@ -245,7 +249,7 @@ public class PaymentServiceImpl implements PaymentService {
         return Optional.ofNullable(payments).isPresent()
             && !payments.isEmpty()
             && payments.stream()
-            .map(payment -> payment.getPaymentStatus())
+            .map(EnvelopePayment::getPaymentStatus)
             .collect(Collectors.toList())
             .stream().allMatch(paymentStatus.toString()::equals);
     }
