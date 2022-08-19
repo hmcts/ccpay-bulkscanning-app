@@ -60,7 +60,7 @@ public class SearchController {
     public ResponseEntity retrieveByDCN(
         @RequestHeader("Authorization") String authorization,
         @RequestParam("document_control_number") String documentControlNumber) {
-            return retrieveByDCN(documentControlNumber);
+            return retrieveByDCN(documentControlNumber, false);
     }
 
     @ApiOperation("Case with unprocessed payment details by Payment DCN (invoked by payment app)")
@@ -70,10 +70,11 @@ public class SearchController {
     })
     @GetMapping("/case/{document_control_number}")
     public ResponseEntity retrieveByDCN(
-            @PathVariable("document_control_number") String documentControlNumber) {
+            @PathVariable("document_control_number") String documentControlNumber,
+            @RequestParam(defaultValue = "true") boolean internalFlag) {
         LOG.info("Retrieving payments for documentControlNumber : {}", documentControlNumber);
         try {
-            SearchResponse searchResponse = searchService.retrieveByDcn(documentControlNumber);
+            SearchResponse searchResponse = searchService.retrieveByDcn(documentControlNumber, internalFlag);
             if (Optional.ofNullable(searchResponse).isPresent()) {
                 LOG.info("SearchResponse : {}", searchResponse);
                 return ResponseEntity.status(HttpStatus.OK).body(searchResponse);

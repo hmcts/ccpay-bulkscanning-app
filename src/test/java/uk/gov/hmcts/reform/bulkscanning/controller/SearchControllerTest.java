@@ -93,7 +93,7 @@ public class SearchControllerTest {
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
             .ccdReference("9881231111111111")
             .build();
-        when(searchService.retrieveByDcn(any(String.class)))
+        when(searchService.retrieveByDcn(any(String.class), false))
             .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
                                                           .param("document_control_number", "987123111111111111111")
@@ -108,7 +108,7 @@ public class SearchControllerTest {
         SearchResponse searchResponse = SearchResponse.searchResponseWith()
                 .ccdReference("9881231111111111")
                 .build();
-        when(searchService.retrieveByDcn(any(String.class)))
+        when(searchService.retrieveByDcn(any(String.class), true))
                 .thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/case/987123111111111111111")
                 .header("ServiceAuthorization", "service")
@@ -119,7 +119,7 @@ public class SearchControllerTest {
     @Test
     public void testSearchPaymentWithDcn_PaymentNotFound() throws Exception{
         SearchResponse searchResponse = null;
-        when(searchService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
+        when(searchService.retrieveByDcn(any(String.class), false)).thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/cases")
                                                           .param("document_control_number", "987123111111111111111")
                                                           .header("Authorization", "user")
@@ -131,7 +131,7 @@ public class SearchControllerTest {
     @Test
     public void testSearchPaymentWithCaseDcn_PaymentNotFound() throws Exception{
         SearchResponse searchResponse = null;
-        when(searchService.retrieveByDcn(any(String.class))).thenReturn(searchResponse);
+        when(searchService.retrieveByDcn(any(String.class), true)).thenReturn(searchResponse);
         ResultActions resultActions = mockMvc.perform(get("/case/987123111111111111111")
                 .header("ServiceAuthorization", "service")
                 .accept(MediaType.APPLICATION_JSON));
@@ -140,7 +140,7 @@ public class SearchControllerTest {
 
     @Test
     public void testSearchPaymentWithDcn_Exception() throws Exception{
-        when(searchService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
+        when(searchService.retrieveByDcn(any(String.class), false)).thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/cases")
                                                           .param("document_control_number", "987123111111111111111")
                                                           .header("Authorization", "user")
@@ -152,7 +152,7 @@ public class SearchControllerTest {
 
     @Test
     public void testSearchPaymentWithCaseDcn_Exception() throws Exception{
-        when(searchService.retrieveByDcn(any(String.class))).thenThrow(new PaymentException("Exception in fetching Payments"));
+        when(searchService.retrieveByDcn(any(String.class), true)).thenThrow(new PaymentException("Exception in fetching Payments"));
         ResultActions resultActions = mockMvc.perform(get("/case/987123111111111111111")
                 .header("ServiceAuthorization", "service")
                 .accept(MediaType.APPLICATION_JSON));
