@@ -152,4 +152,10 @@ public class SearchServiceTest {
         SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE, false);
         assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
+
+    @Test
+    public void testRetrieveByDcno() {
+        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE, true);
+        assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
+    }
 }
