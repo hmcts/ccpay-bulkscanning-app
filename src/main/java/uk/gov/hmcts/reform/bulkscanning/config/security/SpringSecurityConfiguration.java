@@ -155,6 +155,7 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .antMatchers("/error").permitAll()
                     .antMatchers(HttpMethod.GET, "/case/**").permitAll()
+                    .antMatchers(HttpMethod.DELETE, "/bulk-scan-payment/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .oauth2ResourceServer()
