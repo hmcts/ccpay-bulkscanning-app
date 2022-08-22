@@ -151,7 +151,8 @@ public class PaymentServiceImpl implements PaymentService {
                 Optional<Envelope> envelope = envelopeRepository.findById(envelopeDB.getId());
 
                 if(envelope.isPresent()) {
-                    List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(envelopePayment -> envelopePayment.getDcnReference()).collect(
+                    List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(
+                            EnvelopePayment::getDcnReference).collect(
                         Collectors.toList());
 
                     listOfAllPayments.addAll(paymentDCNList);
@@ -207,7 +208,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void deletePayment(String dcn) {
         long records = paymentRepository.deleteByDcnReference(dcn);
-        if (records == 0) {
+        long metadataRecords = paymentMetadataRepository.deleteByDcnReference(dcn);
+        if (records == 0 || metadataRecords == 0) {
             throw new PaymentException("No records found for given DCN reference");
         }
     }

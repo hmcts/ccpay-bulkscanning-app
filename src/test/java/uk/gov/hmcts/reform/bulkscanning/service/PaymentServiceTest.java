@@ -266,13 +266,15 @@ public class PaymentServiceTest {
     @Test
     public void testDeletePayment() {
         when(paymentRepository.deleteByDcnReference(anyString())).thenReturn(1L);
-        paymentService.deletePayment("fdftg");
+        when(paymentMetadataRepository.deleteByDcnReference(anyString())).thenReturn(1L);
+        paymentService.deletePayment("fdftgrw");
         verify(paymentRepository, times(1)).deleteByDcnReference(anyString());
     }
 
     @Test
     public void testDeletePaymentWithException() {
         when(paymentRepository.deleteByDcnReference(anyString())).thenReturn(0L);
+        when(paymentMetadataRepository.deleteByDcnReference(anyString())).thenReturn(0L);
         Exception exception = assertThrows(PaymentException.class, () -> paymentService.deletePayment("fdftg"));
         String actualMessage = exception.getMessage();
         assertEquals("No records found for given DCN reference", actualMessage);
