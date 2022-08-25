@@ -75,6 +75,7 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.POST, "/bulk-scan-payment")
                     .antMatchers(HttpMethod.POST, "/bulk-scan-payments")
                     .antMatchers(HttpMethod.PUT, "/bulk-scan-payments")
+                    .antMatchers(HttpMethod.GET, "/case/**")
                     .and()
                     .exceptionHandling().accessDeniedHandler(bsAccessDeniedHandler)
                     .authenticationEntryPoint(bsAuthenticationEntryPoint);
