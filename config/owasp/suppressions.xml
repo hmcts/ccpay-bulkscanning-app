@@ -128,6 +128,42 @@
         </notes>
         <cve>CVE-2022-31197</cve>
     </suppress>
+
+    <suppress until="2022-09-30">
+        <notes>
+            In engineSetMode of BaseBlockCipher.java, there is a possible incorrect cryptographic algorithm chosen due
+            to an incomplete comparison. This could lead to local information disclosure with no additional execution
+            privileges needed. User interaction is not needed for exploitation.Product: AndroidVersions:
+            Android-10Android ID: A-148517383
+        </notes>
+        <cve>CVE-2020-0187</cve>
+    </suppress>
+
+    <suppress until="2022-09-30">
+        <notes>
+            The package org.yaml:snakeyaml from 0 and before 1.31 are vulnerable to Denial of Service (DoS) due missing
+            to nested depth limitation for collections.
+        </notes>
+        <cve>CVE-2022-25857</cve>
+    </suppress>
+
+    <suppress until="2022-09-30">
+        <notes>
+            In the thymeleaf-spring5:3.0.12 component, thymeleaf combined with specific scenarios in template injection
+            may lead to remote code execution.
+        </notes>
+        <cve>CVE-2021-43466</cve>
+    </suppress>
+
+    <suppress until="2022-09-30">
+        <notes>
+            Spring Security versions 5.3.x prior to 5.3.2, 5.2.x prior to 5.2.4, 5.1.x prior to 5.1.10, 5.0.x prior to
+            5.0.16 and 4.2.x prior to 4.2.16 use a fixed null initialization vector with CBC Mode in the implementation
+            of the queryable text encryptor. A malicious user with access to the data that has been encrypted using such
+            an encryptor may be able to derive the unencrypted values using a dictionary attack.
+        </notes>
+        <cve>CVE-2020-5408</cve>
+    </suppress>
   <!-- Supression Group ends here -->
 </suppressions>
 
