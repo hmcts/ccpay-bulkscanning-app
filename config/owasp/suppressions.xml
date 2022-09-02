@@ -182,6 +182,8 @@
             in the regular expression are possibly vulnerable to an authorization bypass
         </notes>
         <cve>CVE-2021-22119</cve>
+        <cve>CVE-2021-22044</cve>
+        <cve>CVE-2022-22978</cve>
     </suppress>
   <!-- Supression Group ends here -->
 </suppressions>
