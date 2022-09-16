@@ -145,6 +145,9 @@
             to nested depth limitation for collections.
         </notes>
         <cve>CVE-2022-25857</cve>
+        <cve>CVE-2022-38749</cve>
+        <cve>CVE-2022-38750</cve>
+        <cve>CVE-2022-38751</cve>
     </suppress>
 
     <suppress until="2022-09-30">
