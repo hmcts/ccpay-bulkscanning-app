@@ -115,14 +115,14 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByCCDReference() throws Exception {
+    public void testRetrieveByCCDReference() {
         SearchResponse searchResponse = paymentService.retrieveByCCDReference(TEST_DCN_REFERENCE);
         assertThat(searchResponse.getCcdReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
 
     @Test
     @Transactional
-    public void testRetrieveByExceptionRecord() throws Exception {
+    public void testRetrieveByExceptionRecord() {
         when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
@@ -148,8 +148,14 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByDcn() throws Exception {
-        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE);
+    public void testRetrieveByDcn() {
+        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE, false);
+        assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
+    }
+
+    @Test
+    public void testRetrieveByDcno() {
+        SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE, true);
         assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
 }

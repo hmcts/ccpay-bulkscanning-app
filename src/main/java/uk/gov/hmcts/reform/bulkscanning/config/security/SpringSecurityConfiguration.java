@@ -75,6 +75,7 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.POST, "/bulk-scan-payment")
                     .antMatchers(HttpMethod.POST, "/bulk-scan-payments")
                     .antMatchers(HttpMethod.PUT, "/bulk-scan-payments")
+                    .antMatchers(HttpMethod.GET, "/case/**")
                     .and()
                     .exceptionHandling().accessDeniedHandler(bsAccessDeniedHandler)
                     .authenticationEntryPoint(bsAuthenticationEntryPoint);
@@ -154,6 +155,8 @@ public class SpringSecurityConfiguration {
                     .antMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
                     .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .antMatchers("/error").permitAll()
+                    .antMatchers(HttpMethod.GET, "/case/**").permitAll()
+                    .antMatchers(HttpMethod.DELETE, "/bulk-scan-payment/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .oauth2ResourceServer()

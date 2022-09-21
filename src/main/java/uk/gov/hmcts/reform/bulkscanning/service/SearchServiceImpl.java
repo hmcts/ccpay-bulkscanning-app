@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentMetadataDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
@@ -62,11 +63,19 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     @Transactional
-    public SearchResponse retrieveByDcn(String documentControlNumber) {
-        List<EnvelopeCase> envelopeCases = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
-                                                                    .documentControlNumber(
-                                                                        documentControlNumber)
-                                                                    .build());
+    public SearchResponse retrieveByDcn(String documentControlNumber, boolean internalFlag) {
+        List<EnvelopeCase> envelopeCases;
+        if (internalFlag) {
+            envelopeCases = getEnvelopeCaseByDCNo(SearchRequest.searchRequestWith()
+                    .documentControlNumber(
+                            documentControlNumber)
+                    .build());
+        } else {
+            envelopeCases = getEnvelopeCaseByDCN(SearchRequest.searchRequestWith()
+                    .documentControlNumber(
+                            documentControlNumber)
+                    .build());
+        }
         if (envelopeCases == null) {
             // No Payment exists for the searched DCN
             LOG.info("Payment Not exists for the searched DCN !!!");
@@ -120,13 +129,9 @@ public class SearchServiceImpl implements SearchService {
         List<PaymentMetadata> paymentMetadataList = new ArrayList<>();
         if (Optional.ofNullable(envelopeCases).isPresent() && !envelopeCases.isEmpty()) {
             LOG.info("No of Envelopes exists : {}", envelopeCases.size());
-            envelopeCases.stream().forEach(envelopeCase -> {
-                envelopeCase.getEnvelope().getEnvelopePayments().stream()
-                    .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
-                    .forEach(envelopePayment -> {
-                        paymentMetadataList.add(getPaymentMetadata(envelopePayment.getDcnReference()));
-                    });
-            });
+            envelopeCases.forEach(envelopeCase -> envelopeCase.getEnvelope().getEnvelopePayments().stream()
+                .filter(envelopePayment -> envelopePayment.getPaymentStatus().equalsIgnoreCase(COMPLETE.toString()))
+                .forEach(envelopePayment -> paymentMetadataList.add(getPaymentMetadata(envelopePayment.getDcnReference()))));
         }
         return paymentMetadataList;
     }
@@ -163,5 +168,22 @@ public class SearchServiceImpl implements SearchService {
             return Collections.emptyList();
         }
         return Collections.emptyList();
+    }
+
+    private List<EnvelopeCase> getEnvelopeCaseByDCNo(SearchRequest searchRequest) {
+        Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
+        if (payment.isPresent()
+                && Optional.ofNullable(payment.get().getEnvelope()).isPresent()) {
+            EnvelopeCase envelopeCase = envelopeCaseRepository.findByEnvelopeId(payment.get().getEnvelope().getId()).orElse(
+                    null);
+            if (Optional.ofNullable(envelopeCase).isPresent()) {
+                searchRequest.setCcdReference(envelopeCase.getCcdReference());
+                searchRequest.setExceptionRecord(envelopeCase.getExceptionRecordReference());
+                return this.getEnvelopeCaseByCcdReference(searchRequest);
+            }
+            return Collections.emptyList();
+        } else {
+            throw new DcnNotExistsException();
+        }
     }
 }

@@ -16,4 +16,6 @@ public interface PaymentService {
     List<String> saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest);
     String updateCaseReferenceForExceptionRecord (String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest);
     String updatePaymentStatus(String dcn, PaymentStatus status);
+
+    void deletePayment(String dcn);
 }
