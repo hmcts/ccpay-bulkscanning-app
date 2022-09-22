@@ -4,5 +4,5 @@ import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 
 public interface SearchService {
     SearchResponse retrieveByCCDReference(String ccdReference);
-    SearchResponse retrieveByDcn(String documentControlNumber);
+    SearchResponse retrieveByDcn(String documentControlNumber, boolean internalFlag);
 }

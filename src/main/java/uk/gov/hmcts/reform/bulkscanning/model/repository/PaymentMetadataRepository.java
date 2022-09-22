@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface PaymentMetadataRepository extends CrudRepository<PaymentMetadata, Integer>, JpaSpecificationExecutor<PaymentMetadata> {
     Optional<PaymentMetadata> findByDcnReference(String dcnReference);
+
+    long deleteByDcnReference(String dcnReference);
 }

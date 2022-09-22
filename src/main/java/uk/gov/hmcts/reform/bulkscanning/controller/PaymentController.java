@@ -131,4 +131,16 @@ public class PaymentController {
         paymentService.updatePaymentStatus(dcn, status);
         return ResponseEntity.status(HttpStatus.OK).body("Updated");
     }
+
+    @ApiOperation(value = "Delete Bulk scan payment by DCN", notes = "Delete Bulk scan payment details for supplied DCN reference")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Bulk scan payment deleted successfully"),
+            @ApiResponse(code = 404, message = "Bulk scan payment not found for the given DCN")
+    })
+    @DeleteMapping("/bulk-scan-payment/{dcn}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePayment(@PathVariable String dcn) {
+        LOG.info("Request received to delete Bulk scan payment for DCN: {}", dcn);
+        paymentService.deletePayment(dcn);
+    }
 }
