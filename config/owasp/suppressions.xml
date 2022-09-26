@@ -149,7 +149,7 @@
         <cve>CVE-2022-38751</cve>
     </suppress>
 
-    <suppress until="2022-09-30">
+    <suppress until="2022-12-31">
         <notes>
             Using snakeYAML to parse untrusted YAML files may be vulnerable to Denial of Service attacks (DOS). If the
             parser is running on user supplied input, an attacker may supply content that causes the parser to crash by
@@ -158,7 +158,7 @@
         <cve>CVE-2022-38752</cve>
     </suppress>
 
-    <suppress until="2022-09-30">
+    <suppress until="2022-12-31">
         <notes>
             In the thymeleaf-spring5:3.0.12 component, thymeleaf combined with specific scenarios in template injection
             may lead to remote code execution.
@@ -166,7 +166,7 @@
         <cve>CVE-2021-43466</cve>
     </suppress>
 
-    <suppress until="2022-09-30">
+    <suppress until="2022-12-31">
         <notes>
             Spring Security versions 5.3.x prior to 5.3.2, 5.2.x prior to 5.2.4, 5.1.x prior to 5.1.10, 5.0.x prior to
             5.0.16 and 4.2.x prior to 4.2.16 use a fixed null initialization vector with CBC Mode in the implementation
@@ -176,7 +176,7 @@
         <cve>CVE-2020-5408</cve>
     </suppress>
 
-    <suppress until="2022-09-30">
+    <suppress until="2022-12-31">
         <notes>
             Spring Security versions 5.5.x prior to 5.5.7, 5.6.x prior to 5.6.4, and earlier unsupported versions
             contain an integer overflow vulnerability. When using the BCrypt class with the maximum work factor (31),
@@ -186,7 +186,7 @@
         <cve>CVE-2022-22976</cve>
     </suppress>
 
-    <suppress until="2022-09-30">
+    <suppress until="2022-12-31">
         <notes>
             In Spring Security versions 5.5.6 and 5.6.3 and older unsupported versions, RegexRequestMatcher can easily
             be misconfigured to be bypassed on some servlet containers. Applications using RegexRequestMatcher with `.`
