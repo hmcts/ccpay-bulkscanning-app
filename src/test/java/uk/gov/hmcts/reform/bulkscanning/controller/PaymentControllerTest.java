@@ -108,8 +108,8 @@ public class PaymentControllerTest {
                                                           .header("ServiceAuthorization", "service")
                                                           .content(asJsonString(createPaymentRequest("111122223333444411111")))
                                                           .contentType(MediaType.APPLICATION_JSON));
-        Assert.assertEquals(true, resultActions.andReturn().getResponse()
-            .getContentAsString().contains("Exception in fetching Metadata"));
+        Assert.assertTrue(resultActions.andReturn().getResponse()
+                .getContentAsString().contains("Exception in fetching Metadata"));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class PaymentControllerTest {
    @Test
    @Transactional
    public void testCreatePaymentForBulkScan() throws Exception{
-       String dcn[] = {"987111111111111111111","987211111111111111111"};
+       String[] dcn = {"987111111111111111111","987211111111111111111"};
        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
            ,dcn,"AA08");
 
@@ -176,6 +176,13 @@ public class PaymentControllerTest {
           .header("ServiceAuthorization", "service")
           .contentType(MediaType.APPLICATION_JSON));
         Assert.assertEquals(Integer.valueOf(200), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testDeletePayment() throws Exception {
+        ResultActions resultActions = mockMvc.perform(delete("/bulk-scan-payment/987211111111111111111")
+                .header("ServiceAuthorization", "service"));
+        Assert.assertEquals(Integer.valueOf(204), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     public static Envelope mockBulkScanningEnvelope() {
@@ -218,7 +225,7 @@ public class PaymentControllerTest {
             .build();
     }
 
-    public BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String dcn[], String responsibleServiceId) {
+    public BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn, String responsibleServiceId) {
         return BulkScanPaymentRequest
             .createBSPaymentRequestWith()
             .ccdCaseNumber(ccdCaseNumber)

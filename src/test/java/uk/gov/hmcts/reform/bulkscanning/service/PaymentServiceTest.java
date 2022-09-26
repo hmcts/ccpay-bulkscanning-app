@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.bulkscanning.audit.AppInsightsAuditRepository;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 import uk.gov.hmcts.reform.bulkscanning.mapper.BulkScanPaymentRequestMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.EnvelopeDtoMapper;
 import uk.gov.hmcts.reform.bulkscanning.mapper.PaymentDtoMapper;
@@ -42,9 +43,11 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.mockBulkScanningEnvelope;
 import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerFnTest.createBulkScanPaymentRequest;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
@@ -159,7 +162,7 @@ public class PaymentServiceTest {
     }
 
     @Test
-    public void testProcessPaymentFromExela() throws Exception {
+    public void testProcessPaymentFromExela() {
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
                                                                     .dcnReference(TEST_DCN_REFERENCE)
@@ -178,7 +181,7 @@ public class PaymentServiceTest {
 
     @Test
     @Transactional
-    public void testGetPaymentMetadata() throws Exception {
+    public void testGetPaymentMetadata() {
         PaymentMetadata paymentMetadata = paymentService.getPaymentMetadata(TEST_DCN_REFERENCE);
         assertThat(paymentMetadata.getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
@@ -198,8 +201,8 @@ public class PaymentServiceTest {
 
     @Test
     @Transactional
-    public void testProcessPaymentFromBulkScan() throws Exception {
-        String dcn[] = {"DCN1"};
+    public void testProcessPaymentFromBulkScan() {
+        String[] dcn = {"DCN1"};
         doReturn(Optional.ofNullable(mockBulkScanningEnvelope())).when(envelopeRepository).findById(null);
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
             ,dcn,"AA08", true);
@@ -211,8 +214,8 @@ public class PaymentServiceTest {
 
     @Test(expected = BulkScanCaseAlreadyExistsException.class)
     @Transactional
-    public void testProcessExistingPaymentFromBulkScan() throws Exception {
-        String dcn[] = {"DCN1"};
+    public void testProcessExistingPaymentFromBulkScan() {
+        String[] dcn = {"DCN1"};
         EnvelopePayment envelopePayment = mockBulkScanningEnvelope().getEnvelopePayments().get(0);
 
         //setting mockBulkScanningEnvelope
@@ -225,7 +228,7 @@ public class PaymentServiceTest {
 
     @Test()
     @Transactional
-    public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
+    public void testUpdateCaseReferenceForExceptionRecord() {
         List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
         EnvelopeCase envelopeCase = EnvelopeCase.caseWith().exceptionRecordReference(EXCEPTION_RECORD_REFERENCE).id(1).build();
         envelopeCaseList.add(envelopeCase);
@@ -238,13 +241,13 @@ public class PaymentServiceTest {
 
     @Test(expected = ExceptionRecordNotExistsException.class)
     @Transactional
-    public void testExceptionRecordNotExistsException() throws Exception {
+    public void testExceptionRecordNotExistsException() {
         paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,caseReferenceRequest);
     }
 
     @Test()
     @Transactional
-    public void testMarkPaymentAsProcessed() throws Exception {
+    public void testMarkPaymentAsProcessed() {
         EnvelopePayment envelopePayment = mockBulkScanningEnvelope().getEnvelopePayments().get(0);
 
         //setting mockBulkScanningEnvelope
@@ -256,12 +259,29 @@ public class PaymentServiceTest {
 
     @Test(expected = DcnNotExistsException.class)
     @Transactional
-    public void testDcnDoesNotExistExceptionPayment() throws Exception {
+    public void testDcnDoesNotExistExceptionPayment() {
         paymentService.updatePaymentStatus(CCD_CASE_REFERENCE_NOT_PRESENT, PaymentStatus.PROCESSED);
     }
 
+    @Test
+    public void testDeletePayment() {
+        when(paymentRepository.deleteByDcnReference(anyString())).thenReturn(1L);
+        when(paymentMetadataRepository.deleteByDcnReference(anyString())).thenReturn(1L);
+        paymentService.deletePayment("fdftgrw");
+        verify(paymentRepository, times(1)).deleteByDcnReference(anyString());
+    }
+
+    @Test
+    public void testDeletePaymentWithException() {
+        when(paymentRepository.deleteByDcnReference(anyString())).thenReturn(0L);
+        when(paymentMetadataRepository.deleteByDcnReference(anyString())).thenReturn(0L);
+        Exception exception = assertThrows(PaymentException.class, () -> paymentService.deletePayment("fdftg"));
+        String actualMessage = exception.getMessage();
+        assertEquals("No records found for given DCN reference", actualMessage);
+    }
+
     @Test()
-    public void testEntityMapper() throws Exception {
+    public void testEntityMapper() {
         PaymentDto paymentDto = PaymentDto.paymentDtoWith().id(1)
             .paymentStatus(INCOMPLETE)
             .dcnReference("111111111111111111")
