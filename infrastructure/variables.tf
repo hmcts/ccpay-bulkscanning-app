@@ -45,3 +45,7 @@ variable bulkscanning_api_gateway_certificate_thumbprints {
 variable "postgresql_version" {
   default = "11"
 }
+
+variable "additional_databases" {
+  default = []
+}
