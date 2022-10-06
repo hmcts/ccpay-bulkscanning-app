@@ -195,6 +195,8 @@
         <cve>CVE-2021-22119</cve>
         <cve>CVE-2021-22044</cve>
         <cve>CVE-2022-22978</cve>
+        <cve>CVE-2022-42003</cve>
+        <cve>CVE-2022-42004</cve>
     </suppress>
 
   <!-- Supression Group ends here -->
