@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <!-- Below are the supressions added fpr False Positive CVEs -->
-  <suppress until="2022-12-31">
+  <suppress until="2023-03-31">
     <notes>The CVE-2018-1258 and CVE-2021-22112 occurs from spring security libraries, despite the latest versions are used. This is confirmed as false positive
       and hence it is suppressed (https://github.com/jeremylong/DependencyCheck/issues/2952)
     </notes>
@@ -9,7 +9,7 @@
   </suppress>
 
 
-  <suppress until="2022-12-31">
+  <suppress until="2023-03-31">
     <notes> False positive reported at https://github.com/jeremylong/DependencyCheck/issues/1658.
       The Build fails with newer versions of the library
     </notes>
@@ -17,7 +17,7 @@
     <cve>CVE-2007-1652</cve>
   </suppress>
 
-  <suppress until="2022-12-31">
+  <suppress until="2023-03-31">
     <notes><![CDATA[
             This CVE is related to file type tag parsing. However, the associated CVE seems to be a false positive on the lang-tag jar.
             (https://github.com/jeremylong/DependencyCheck/issues/3043). The CVE occurs in the newer version.
@@ -28,14 +28,14 @@
     <cve>CVE-2020-29245</cve>
   </suppress>
 
-  <suppress until="2022-12-31">
+  <suppress until="2023-03-31">
     <notes>CVE-2021-28170 https://nvd.nist.gov/vuln/detail/CVE-2021-28170
       Spring Framework vulnerability, subject to review after Spring Boot upgrade to 2.4.x affected lib org.glassfish:jakarta.el:3.0.3
     </notes>
     <cve>CVE-2021-28170</cve>
   </suppress>
 
-   <suppress until="2022-12-31">
+   <suppress until="2023-03-31">
         <notes>A vulnerability in all versions of Nim-lang allows unauthenticated attackers to write files to
             arbitrary directories via a crafted zip file with dot-slash characters included in the name of the
             crafted file
@@ -43,40 +43,40 @@
         <cve>CVE-2020-23171</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>Major liquibase update to version 4.8.0+ needed, this will require code refactoring</notes>
         <cve>CVE-2022-0839</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>jackson-databind issue, upgrading to new version broke functional tests.</notes>
         <cve>CVE-2020-36518</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
       <notes>org.apache.poi issue, upgrading to new version and a large depth of nested objects</notes>
       <cve>CVE-2022-26336</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
       <notes>spring boot issue, upgrading to new version broke functional tests.</notes>
       <cve>CVE-2022-22965</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
       <notes>Spring Framework older unsupported versions, it is possible for a user to provide a specially
         crafted SpEL expression that may cause a denial of service condition</notes>
       <cve>CVE-2022-22950</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
       <notes>In Spring Framework versions 5.3.0 - 5.3.16 and older unsupported versions, it is possible for a user to
         provide a specially crafted SpEL expression that may cause a denial of service condition.
       </notes>
       <cve>CVE-2016-1000027</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
       <notes>In Spring Framework versions 5.3.0 - 5.3.18, 5.2.0 - 5.2.20, and older unsupported versions, the patterns for
         disallowedFields on a DataBinder are case sensitive which means a field is not effectively protected unless it is
         listed with both upper and lower case for the first character of the field, including upper and lower case for the
@@ -85,7 +85,7 @@
       <cve>CVE-2022-22968</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             In Apache Tomcat 10.1.0-M1 to 10.1.0-M16, 10.0.0-M1 to 10.0.22, 9.0.30 to 9.0.64 and 8.5.50 to 8.5.81 the
             Form authentication example in the examples web application displayed user provided data without filtering,
@@ -94,7 +94,7 @@
         <cve>CVE-2022-34305</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             Versions of the Amazon AWS Apache Log4j hotpatch package before log4j-cve-2021-44228-hotpatch-1.3.5 are
             affected by a race condition that could lead to a local privilege escalation. CVE-2022-33915 occured,
@@ -103,7 +103,7 @@
         <cve>CVE-2022-33915</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
       <notes>
         The RipudamanKaushikDal/projects repository through 2022-04-03 on GitHub allows absolute path traversal
         because the Flask send_file function is used unsafely.
@@ -111,7 +111,7 @@
       <cve>CVE-2022-31569</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
       <notes>
         The nrlakin/homepage repository through 2017-03-06 on GitHub allows absolute path traversal because the
         Flask send_file function is used unsafely.
@@ -119,7 +119,7 @@
       <cve>CVE-2022-31548</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             The PGJDBC implementation of the java.sql.ResultRow.refreshRow() method is not performing escaping of column names
             so a malicious column name that contains a statement terminator, e.g. ; could lead to SQL injection. This could
@@ -128,7 +128,7 @@
         </notes>
         <cve>CVE-2022-31197</cve>
     </suppress>
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             In engineSetMode of BaseBlockCipher.java, there is a possible incorrect cryptographic algorithm chosen due
             to an incomplete comparison. This could lead to local information disclosure with no additional execution
@@ -138,7 +138,7 @@
         <cve>CVE-2020-0187</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             The package org.yaml:snakeyaml from 0 and before 1.31 are vulnerable to Denial of Service (DoS) due missing
             to nested depth limitation for collections.
@@ -149,7 +149,7 @@
         <cve>CVE-2022-38751</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             Using snakeYAML to parse untrusted YAML files may be vulnerable to Denial of Service attacks (DOS). If the
             parser is running on user supplied input, an attacker may supply content that causes the parser to crash by
@@ -158,7 +158,7 @@
         <cve>CVE-2022-38752</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             In the thymeleaf-spring5:3.0.12 component, thymeleaf combined with specific scenarios in template injection
             may lead to remote code execution.
@@ -166,7 +166,7 @@
         <cve>CVE-2021-43466</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             Spring Security versions 5.3.x prior to 5.3.2, 5.2.x prior to 5.2.4, 5.1.x prior to 5.1.10, 5.0.x prior to
             5.0.16 and 4.2.x prior to 4.2.16 use a fixed null initialization vector with CBC Mode in the implementation
@@ -176,7 +176,7 @@
         <cve>CVE-2020-5408</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             Spring Security versions 5.5.x prior to 5.5.7, 5.6.x prior to 5.6.4, and earlier unsupported versions
             contain an integer overflow vulnerability. When using the BCrypt class with the maximum work factor (31),
@@ -186,7 +186,7 @@
         <cve>CVE-2022-22976</cve>
     </suppress>
 
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
             In Spring Security versions 5.5.6 and 5.6.3 and older unsupported versions, RegexRequestMatcher can easily
             be misconfigured to be bypassed on some servlet containers. Applications using RegexRequestMatcher with `.`
@@ -196,7 +196,7 @@
         <cve>CVE-2021-22044</cve>
         <cve>CVE-2022-22978</cve>
     </suppress>
-    <suppress until="2022-12-31">
+    <suppress until="2023-03-31">
         <notes>
           In FasterXML jackson-databind before 2.14.0-rc1, resource exhaustion can occur because of a lack of a check in
           primitive value deserializers to avoid deep wrapper array nesting,
@@ -205,11 +205,17 @@
         <cve>CVE-2022-42003</cve>
         <cve>CVE-2022-42004</cve>
     </suppress>
-  <suppress until="2022-12-31">
+  <suppress until="2023-03-31">
     <notes>
       Postgres jdbc vulnerability is not resolved by the most recent patch 42.4.3 and is being supressed until a newer version is available.
     </notes>
     <cve>CVE-2022-41946</cve>
+  </suppress>
+  <suppress until="2023-03-31">
+    <notes>
+      apache commons_net
+    </notes>
+    <cve>CVE-2021-37533</cve>
   </suppress>
   <!-- Supression Group ends here -->
 </suppressions>
