@@ -20,7 +20,6 @@ plugins {
   id "info.solidsoft.pitest" version '1.5.1'
 }
 
-
 apply plugin: 'net.serenity-bdd.aggregator'
 apply from: 'liquibase.gradle'
 group = 'uk.gov.hmcts.reform'
