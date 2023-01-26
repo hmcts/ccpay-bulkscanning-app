@@ -45,11 +45,11 @@ withNightlyPipeline("java", product, component) {
     enableFortifyScan()
     enableFullFunctionalTest()
 
-    after('fortify-scan') {
+    afterAlways('fortify-scan') {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     }
 
-  after('fullFunctionalTest') {
+  afterAlways('fullFunctionalTest') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     publishHTML target: [
       reportDir            : "target/site/serenity/",
