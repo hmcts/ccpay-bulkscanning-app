@@ -244,6 +244,14 @@
         </notes>
         <cve>CVE-2022-3064</cve>
     </suppress>
+    <suppress until="2023-03-31">
+      <notes>
+        Spring cloud cve
+      </notes>
+      <cve>CVE-2020-15522</cve>
+      <cve>CVE-2021-22053</cve>
+      <cve>CVE-2020-5412</cve>
+    </suppress>
   <!-- Supression Group ends here -->
 </suppressions>
 
