@@ -6,7 +6,6 @@
 
 The purpose of Bulk-Scanning API is to capture payment data from Bulk-scanning component and Exela and move it to pay-hub once all payment data has been received.
 
-
 ## What's inside this application
 
 The api is a working application with a setup. It contains:
