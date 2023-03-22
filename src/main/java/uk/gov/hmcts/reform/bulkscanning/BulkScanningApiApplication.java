@@ -21,6 +21,7 @@ public class BulkScanningApiApplication {
             SpringApplication.run(BulkScanningApiApplication.class, args);
         }catch (RuntimeException re) {
             LOG.error("Application crashed with error message: ", re);
+            LOG.error("Application crashed with error message: ", re);
         }
 
     }
