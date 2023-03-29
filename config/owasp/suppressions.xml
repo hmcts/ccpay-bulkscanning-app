@@ -47,6 +47,12 @@
     </notes>
     <cve>CVE-2022-26336</cve>
   </suppress>
+  <suppress until="2023-06-30">
+    <notes>
+      test
+    </notes>
+    <cve>CVE-2021-28170</cve>
+  </suppress>
 
   <!-- Supression Group ends here -->
 </suppressions>
