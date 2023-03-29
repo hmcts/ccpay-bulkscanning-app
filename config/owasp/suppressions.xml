@@ -57,7 +57,7 @@
     <notes>
       Upgrading tomcat causes unhealthy pipeline error.
     </notes>
-    <cve> CVE-2023-28708</cve>
+    <cve>CVE-2023-28708</cve>
   </suppress>
 
   <!-- Supression Group ends here -->
