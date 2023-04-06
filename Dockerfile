@@ -3,7 +3,8 @@ FROM debian:10 AS builder
 RUN apt update
 RUN apt install --yes libharfbuzz-dev
 
-FROM hmctspublic.azurecr.io/base/java:openjdk-11-distroless-1.4
+FROM hmctspublic.azurecr.io/base/java:11-distroless
+
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libharfbuzz.so.0 /usr/lib/x86_64-linux-gnu/libharfbuzz.so.0
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0 /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libgraphite2.so.3 /usr/lib/x86_64-linux-gnu/libgraphite2.so.3
