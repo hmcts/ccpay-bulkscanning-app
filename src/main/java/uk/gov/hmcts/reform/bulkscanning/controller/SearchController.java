@@ -76,7 +76,6 @@ public class SearchController {
         try {
             SearchResponse searchResponse = searchService.retrieveByDcn(documentControlNumber, internalFlag);
             if (Optional.ofNullable(searchResponse).isPresent()) {
-                LOG.info("SearchResponse : {}", searchResponse);
                 return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
             } else {
                 LOG.info("Payments Not found for documentControlNumber : {}", documentControlNumber);
