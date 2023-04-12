@@ -241,3 +241,4 @@ The following environment variables are required:
 
 - `APPINSIGHTS_INSTRUMENTATIONKEY`, app insights key to send telemetry events.
 
+
