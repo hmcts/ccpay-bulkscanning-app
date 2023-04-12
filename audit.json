@@ -66,5 +66,4 @@
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal_GET" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/_GET" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/robots.txt_GET": "ignore",
-
 }
