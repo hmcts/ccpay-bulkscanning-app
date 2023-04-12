@@ -60,7 +60,11 @@
   "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/cases?document_control_number=document_control_number_GET":"ignore",
   "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/cases/ccd_reference_GET" : "ignore",
   "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/bulk-scan-payments/dcn/status/COMPLETE_PATCH" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/report/data?date_from=date_from\u0026date_to=date_to\u0026report_type=DATA_LOSS_GET" : "ignore",  
+  "10054_Cookie without SameSite Attribute_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/report/data?date_from=date_from\u0026date_to=date_to\u0026report_type=DATA_LOSS_GET" : "ignore",
   "100000_A Client Error response code was returned by the server_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/bulk-scan-payment/dcn_DELETE" : "ignore",
-  "100000_A Client Error response code was returned by the server_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/case/document_control_number?internalFlag=true_GET" : "ignore"
+  "100000_A Client Error response code was returned by the server_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/case/document_control_number?internalFlag=true_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/robots.txt_GET": "ignore",
+  "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/isitemap.xml_GET": "ignore"
 }
