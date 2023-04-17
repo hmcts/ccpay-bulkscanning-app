@@ -67,5 +67,5 @@
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/_GET" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/robots.txt_GET": "ignore",
   "10096_Timestamp Disclosure - Unix_http://ccpay-bulkscanning-api-aat.service.core-compute-aat.internal/sitemap.xml_GET": "ignore",
-  "90022_Application_Error Disclosure - http://ccpay-refunds-api-aat.service.core-compute-aat.internal/v2/api-docs": "ignore"
+  "90022_Application_Error Disclosure - Unix_http://ccpay-refunds-api-aat.service.core-compute-aat.internal/v2/api-docs": "ignore"
 }
