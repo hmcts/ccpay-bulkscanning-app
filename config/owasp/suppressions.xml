@@ -269,6 +269,7 @@
       <notes>Tomcat-embed-core and websocket suppressed to fix appinsights issue
       </notes>
       <cve>CVE-2023-28708</cve>
+      <cve>CVE-2023-20863</cve>
     </suppress>
   <!-- Supression Group ends here -->
 </suppressions>
