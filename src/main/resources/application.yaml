@@ -19,7 +19,7 @@ spring:
     timeout-per-shutdown-phase: ${TIMEOUT_SERVER_SHUTDOWN_PHASE}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         jdbc:
