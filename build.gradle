@@ -180,7 +180,7 @@ checkstyleTest.enabled(false)
     dependencies {
       dependencySet(
         group: 'com.fasterxml.jackson.core',
-        version: '2.10.1'
+        version: '2.15.0'
       ) {
         entry 'jackson-core'
         entry 'jackson-databind'
