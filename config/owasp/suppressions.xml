@@ -270,6 +270,11 @@
       </notes>
       <cve>CVE-2023-28708</cve>
     </suppress>
+    <suppress until="2023-06-30">
+      <notes>Upgrading jackson-databind-2.11.2 broke pipelines
+      </notes>
+      <cve>CVE-2023-35116</cve>
+    </suppress>
   <!-- Supression Group ends here -->
 </suppressions>
 
