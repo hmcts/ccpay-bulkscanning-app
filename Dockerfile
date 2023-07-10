@@ -1,10 +1,11 @@
-ARG APP_INSIGHTS_AGENT_VERSION=3.4.10
+RG APP_INSIGHTS_AGENT_VERSION=3.4.14
 FROM debian:10 AS builder
 RUN apt update
 RUN apt install --yes libharfbuzz-dev
 
-FROM hmctspublic.azurecr.io/base/java:11-distroless
+FROM hmctspublic.azurecr.io/base/java:17-distroless
 
+COPY lib/applicationinsights.json /opt/app/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libharfbuzz.so.0 /usr/lib/x86_64-linux-gnu/libharfbuzz.so.0
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0 /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libgraphite2.so.3 /usr/lib/x86_64-linux-gnu/libgraphite2.so.3
@@ -18,4 +19,7 @@ COPY build/libs/bulk-scanning-payment-api.jar /opt/app/
 
 EXPOSE 4211
 
-CMD [ "bulk-scanning-payment-api.jar" ]
+CMD [ \
+    "--add-opens", "java.base/java.lang=ALL-UNNAMED", \
+    "payment-app.jar" \
+    ]
