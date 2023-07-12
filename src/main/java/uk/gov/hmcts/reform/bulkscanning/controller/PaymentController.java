@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +25,9 @@ import javax.validation.constraints.Size;
 import java.util.Optional;
 
 @RestController
-@Api(tags = {"Bulk Scanning Payment API"})
-@SwaggerDefinition(tags = {@Tag(name = "BSPaymentController",
-    description = "Bulk Scanning Payment API to be used by the scanning supplier to share the "
-        + "payment information contained in the envelope")})
-public class PaymentController {
+@Tag(name = "Bulk Scanning Payment API", description = "Bulk Scanning Payment API to be used by the scanning supplier to share the "
+    + "payment information contained in the envelope")
+    public class PaymentController {
 
     private static final Logger LOG = LoggerFactory.getLogger(PaymentController.class);
     private final PaymentService paymentService;
@@ -36,14 +37,13 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @ApiOperation(value = "Get the initial meta data from bulk Scanning",
-        notes = "Get the initial meta data from bulk Scanning")
+    @Operation(summary = "Get the initial meta data from bulk Scanning" )
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Bulk Scanning Data retrieved"),
-        @ApiResponse(code = 400, message = "Bad request"),
-        @ApiResponse(code = 401, message = "Failed authentication"),
-        @ApiResponse(code = 403, message = "Failed authorization"),
-        @ApiResponse(code = 409, message = "Payment DCN already exists")
+        @ApiResponse(responseCode = "201", description = "Bulk Scanning Data retrieved"),
+        @ApiResponse(responseCode = "400", description = "Bad request"),
+        @ApiResponse(responseCode = "401", description = "Failed authentication"),
+        @ApiResponse(responseCode = "403", description = "Failed authorization"),
+        @ApiResponse(responseCode = "409", description = "Payment DCN already exists")
     })
     @PostMapping("/bulk-scan-payments")
     public ResponseEntity<PaymentResponse> consumeInitialMetaDataBulkScanning(@Valid @RequestBody BulkScanPaymentRequest bsPaymentRequest) {
@@ -53,15 +53,15 @@ public class PaymentController {
                                         .build(), HttpStatus.CREATED);
     }
 
-    @ApiOperation("Provide meta information about the payments contained\n" +
+    @Operation(summary = "Provide meta information about the payments contained\n" +
         "in the envelope. This operation will be called after the banking process\n" +
         "has been done and payments have been allocated to a BGC slip / batch")
     @ApiResponses({
-        @ApiResponse(code = 201, message = "Bulk Scanning Data retrieved"),
-        @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
-        @ApiResponse(code = 401, message = "Failed authentication"),
-        @ApiResponse(code = 403, message = "Failed authorization"),
-        @ApiResponse(code = 409, message = "Payment DCN already exists")
+        @ApiResponse(responseCode = "201", description = "Bulk Scanning Data retrieved"),
+        @ApiResponse(responseCode = "400", description = "Request failed due to malformed syntax"),
+        @ApiResponse(responseCode = "401", description = "Failed authentication"),
+        @ApiResponse(responseCode = "403", description = "Failed authorization"),
+        @ApiResponse(responseCode = "409", description = "Payment DCN already exists")
     })
     @PostMapping("/bulk-scan-payment")
     public ResponseEntity<String> processPaymentFromExela(
@@ -82,13 +82,13 @@ public class PaymentController {
         }
     }
 
-    @ApiOperation("API Endpoint to update case reference for payment")
+    @Operation(summary = "API Endpoint to update case reference for payment")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Returns an envelope group id"),
-        @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
-        @ApiResponse(code = 401, message = "Failed authentication"),
-        @ApiResponse(code = 403, message = "Failed authorisation"),
-        @ApiResponse(code = 404, message = "Provided exception reference doesn't exist"),
+        @ApiResponse(responseCode = "200", description = "Returns an envelope group id"),
+        @ApiResponse(responseCode = "400", description = "Request failed due to malformed syntax"),
+        @ApiResponse(responseCode = "401", description = "Failed authentication"),
+        @ApiResponse(responseCode = "403", description = "Failed authorisation"),
+        @ApiResponse(responseCode = "404", description = "Provided exception reference doesn't exist"),
     })
     @PutMapping("/bulk-scan-payments")
     public ResponseEntity updateCaseReferenceForExceptionRecord(
@@ -114,13 +114,13 @@ public class PaymentController {
             ));
     }
 
-    @ApiOperation("API Endpoint to mark payment as processed")
+    @Operation(summary ="API Endpoint to mark payment as processed")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Returns an envelope group id"),
-        @ApiResponse(code = 400, message = "Request failed due to malformed syntax"),
-        @ApiResponse(code = 401, message = "Failed authentication"),
-        @ApiResponse(code = 403, message = "Failed authorisation"),
-        @ApiResponse(code = 404, message = "No record exists for provided DCN"),
+        @ApiResponse(responseCode = "200", description = "Returns an envelope group id"),
+        @ApiResponse(responseCode = "400", description = "Request failed due to malformed syntax"),
+        @ApiResponse(responseCode = "401", description = "Failed authentication"),
+        @ApiResponse(responseCode = "403", description = "Failed authorisation"),
+        @ApiResponse(responseCode = "404", description = "No record exists for provided DCN"),
     })
     @PatchMapping("/bulk-scan-payments/{dcn}/status/{status}")
     public ResponseEntity markPaymentAsProcessed(
@@ -132,10 +132,10 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.OK).body("Updated");
     }
 
-    @ApiOperation(value = "Delete Bulk scan payment by DCN", notes = "Delete Bulk scan payment details for supplied DCN reference")
+    @Operation(summary = "Delete Bulk scan payment by DCN, Delete Bulk scan payment details for supplied DCN reference")
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Bulk scan payment deleted successfully"),
-            @ApiResponse(code = 404, message = "Bulk scan payment not found for the given DCN")
+            @ApiResponse(responseCode = "204", description = "Bulk scan payment deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Bulk scan payment not found for the given DCN")
     })
     @DeleteMapping("/bulk-scan-payment/{dcn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

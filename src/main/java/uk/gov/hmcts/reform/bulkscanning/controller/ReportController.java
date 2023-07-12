@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
-import io.swagger.annotations.*;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +34,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.*;
 
 @RestController
-@Api(tags = {"Bulk Scanning Payment Report API"})
-@SwaggerDefinition(tags = {@Tag(name = "ReportController",
-    description = "Bulk Scanning Payment Report API to be used for generating Audit report")})
+@Tag( name = "Bulk Scanning Payment Report API",description = "Bulk Scanning Payment Report API to be used for generating Audit report")
 public class ReportController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
@@ -43,10 +45,10 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-    @ApiOperation("API to generate Report for Bulk_Scan_Payment System")
+    @Operation(summary = "API to generate Report for Bulk_Scan_Payment System")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Report Generated"),
-        @ApiResponse(code = 404, message = "No Data found to generate Report")
+        @ApiResponse(responseCode = "200", description = "Report Generated"),
+        @ApiResponse(responseCode = "404", description = "No Data found to generate Report")
     })
     @GetMapping("/report/download")
     public ResponseEntity<byte[]> retrieveByReportType(
@@ -83,10 +85,10 @@ public class ReportController {
         }
     }
 
-    @ApiOperation("API to retrieve Report Data from Bulk_Scan_Payment System")
+    @Operation(summary ="API to retrieve Report Data from Bulk_Scan_Payment System")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Report Generated"),
-        @ApiResponse(code = 404, message = "No Data found to generate Report")
+        @ApiResponse(responseCode = "200", description = "Report Generated"),
+        @ApiResponse(responseCode = "404", description = "No Data found to generate Report")
     })
     @GetMapping("/report/data")
     public ResponseEntity<List<BaseReportData>> retrieveDataByReportType(
