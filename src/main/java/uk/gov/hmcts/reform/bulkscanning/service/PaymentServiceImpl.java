@@ -169,6 +169,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
+    @SuppressWarnings("all")
     public String updateCaseReferenceForExceptionRecord(String exceptionRecordReference, CaseReferenceRequest caseReferenceRequest) {
         List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(
             exceptionRecordReference).
@@ -187,7 +188,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (envelopeCases == null || envelopeCases.isEmpty()){
             throw new ExceptionRecordNotExistsException();
         }
-        return "";
+        return ""; // no warning here
     }
 
     @Override
