@@ -122,6 +122,13 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
+    public void testRetrieveByCCDReferenceFail() {
+        SearchResponse searchResponse = paymentService.retrieveByCCDReference(CCD_CASE_REFERENCE);
+        assertThat(searchResponse.getCcdReference()).isEqualTo(CCD_CASE_REFERENCE);
+    }
+
+    @Test
+    @Transactional
     public void testRetrieveByExceptionRecord() {
         when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
