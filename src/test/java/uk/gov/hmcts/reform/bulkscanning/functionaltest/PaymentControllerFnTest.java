@@ -351,7 +351,7 @@ public class PaymentControllerFnTest {
     public void testSearchByCCDForProcessed() throws Exception {
         String dcns[] = {"111166667777888811111", "111166667777999911111"};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111666677774444"
-            , dcns, "AA08", true);
+            , dcns, "AA08", false);
 
         //Payment Request from Bulk-Scan System
         restActions.post("/bulk-scan-payments", bulkScanPaymentRequest);

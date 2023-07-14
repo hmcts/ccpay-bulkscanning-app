@@ -140,8 +140,7 @@ public class SearchServiceImpl implements SearchService {
         if (StringUtils.isNotEmpty(searchRequest.getCcdReference())
             && envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).isPresent()) {
             return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(Collections.emptyList());
-        } else if (StringUtils.isNotEmpty(searchRequest.getExceptionRecord())
-            && envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).isPresent()) {
+        } else if (isAnExceptionalRecrod(searchRequest)) {
             List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(Collections.emptyList());
             for (EnvelopeCase envelopeCase : envelopeCases) {
                 if (StringUtils.isNotEmpty(envelopeCase.getCcdReference())
@@ -154,6 +153,11 @@ public class SearchServiceImpl implements SearchService {
         return Collections.emptyList();
     }
 
+    private boolean isAnExceptionalRecrod(SearchRequest searchRequest){
+        Optional<List<EnvelopeCase>> a = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord());
+        return StringUtils.isNotEmpty(searchRequest.getExceptionRecord()) && a.isPresent() && !a.get().isEmpty();
+
+    }
     private List<EnvelopeCase> getEnvelopeCaseByDCN(SearchRequest searchRequest) {
         Optional<EnvelopePayment> payment = paymentRepository.findByDcnReference(searchRequest.getDocumentControlNumber());
         if (payment.isPresent()
