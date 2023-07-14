@@ -184,7 +184,7 @@ public class PaymentServiceImpl implements PaymentService {
             return String.join(",", envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString())
                     .collect(Collectors.toList()));
         }
-        if (envelopeCases ==null || envelopeCases.isEmpty()){
+        if (envelopeCases == null || envelopeCases.isEmpty()){
             throw new ExceptionRecordNotExistsException();
         }
         return "";

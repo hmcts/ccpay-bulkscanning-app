@@ -247,6 +247,14 @@ public class PaymentServiceTest {
         paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,caseReferenceRequest);
     }
 
+
+    @Test(expected = ExceptionRecordNotExistsException.class)
+    @Transactional
+    public void testExceptionRecordNotExists3Exception() {
+        doReturn(Optional.ofNullable(null)).when(envelopeCaseRepository).findByExceptionRecordReference(CCD_CASE_REFERENCE_NOT_PRESENT);
+        paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,caseReferenceRequest);
+    }
+
     @Test(expected = ExceptionRecordNotExistsException.class)
     @Transactional
     public void testExceptionRecordNotExists2Exception() {
