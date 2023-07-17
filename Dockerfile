@@ -1,4 +1,4 @@
-RG APP_INSIGHTS_AGENT_VERSION=3.4.14
+ARG APP_INSIGHTS_AGENT_VERSION=3.4.14
 FROM debian:10 AS builder
 RUN apt update
 RUN apt install --yes libharfbuzz-dev
