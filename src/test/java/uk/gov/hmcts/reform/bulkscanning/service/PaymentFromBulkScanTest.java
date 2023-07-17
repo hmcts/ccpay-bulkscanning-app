@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
+import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
@@ -35,16 +36,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.mockBulkScanningEnvelope;
+import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.mockBulkScanningEnvelopeNoEnvelope;
 import static uk.gov.hmcts.reform.bulkscanning.functionaltest.PaymentControllerFnTest.createBulkScanPaymentRequest;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -76,7 +80,7 @@ public class PaymentFromBulkScanTest {
     @Autowired
     private PaymentDtoMapper paymentDtoMapper;
 
-    @Autowired
+    @MockBean
     private BulkScanPaymentRequestMapper bsPaymentRequestMapper;
 
     @MockBean
@@ -160,6 +164,8 @@ public class PaymentFromBulkScanTest {
         Assert.assertTrue(listDCN.isEmpty());
     }
 
+
+
     @Test
     @Transactional
     public void testProcessPaymentFromBulkScanEmptyListOfAllPayments() {
@@ -195,6 +201,8 @@ public class PaymentFromBulkScanTest {
 
         Assert.assertTrue(listDCN.isEmpty());
     }
+
+    @Test
     @Transactional
     public void testProcessExistingPaymentFromBulkScan() {
         String[] dcn = {"DCN1"};
@@ -212,4 +220,73 @@ public class PaymentFromBulkScanTest {
         );
         paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
     }
+
+
+    @Test
+    @Transactional
+    public void testProcessPaymentFromBulkScanWithNoEnvelope() {
+        String[] dcn = {"DCN1"};
+
+        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
+            ,dcn,"AA08", false);
+
+
+        List<EnvelopePayment> envelopePaymentList = new ArrayList<>();
+
+        List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
+
+        Envelope envelope = getEnvelope(mockBulkScanPaymentRequest, envelopePaymentList, envelopeCaseList);
+
+        List<Envelope> returnExistingEnvelopeList = new ArrayList<>();
+        returnExistingEnvelopeList.add(envelope);
+
+        doReturn(returnExistingEnvelopeList).when(bulkScanningUtils).returnExistingEnvelopeList(any());
+        doReturn(envelope).when(bsPaymentRequestMapper).mapEnvelopeFromBulkScanPaymentRequest(any());
+
+        doReturn(Optional.ofNullable(mockBulkScanningEnvelopeNoEnvelope())).when(envelopeRepository).findById(null);
+
+        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
+
+        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
+    }
+
+    @Test
+    @Transactional
+    public void testProcessPaymentFromBulkScanWithNullEnvelope() {
+        String[] dcn = {"DCN1"};
+
+        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
+            ,dcn,"AA08", false);
+
+
+        List<EnvelopePayment> envelopePaymentList = new ArrayList<>();
+
+        List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
+
+        Envelope envelope = getEnvelope(mockBulkScanPaymentRequest, null, envelopeCaseList);
+
+        List<Envelope> returnExistingEnvelopeList = new ArrayList<>();
+        returnExistingEnvelopeList.add(envelope);
+
+        doReturn(returnExistingEnvelopeList).when(bulkScanningUtils).returnExistingEnvelopeList(any());
+        doReturn(envelope).when(bsPaymentRequestMapper).mapEnvelopeFromBulkScanPaymentRequest(any());
+
+        doReturn(Optional.ofNullable(mockBulkScanningEnvelopeNoEnvelope())).when(envelopeRepository).findById(null);
+
+        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
+
+        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
+    }
+
+    private static Envelope getEnvelope(BulkScanPaymentRequest mockBulkScanPaymentRequest, List<EnvelopePayment> envelopePaymentList, List<EnvelopeCase> envelopeCaseList) {
+        Envelope envelope = Envelope.envelopeWith()
+            .responsibleServiceId(ResponsibleSiteId.valueOf(mockBulkScanPaymentRequest.getResponsibleServiceId().toUpperCase(
+                Locale.UK)).toString())
+            .envelopePayments(envelopePaymentList)
+            .envelopeCases(envelopeCaseList)
+            .paymentStatus(INCOMPLETE.toString()) ////by default at initial status
+            .build();
+        return envelope;
+    }
+
 }
