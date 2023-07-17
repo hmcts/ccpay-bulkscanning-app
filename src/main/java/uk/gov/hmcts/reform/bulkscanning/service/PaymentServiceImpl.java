@@ -182,11 +182,9 @@ public class PaymentServiceImpl implements PaymentService {
             envelopeCaseRepository.saveAll(envelopeCases);
             return String.join(",", envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString())
                     .collect(Collectors.toList()));
-        }
-        if (envelopeCases == null || envelopeCases.isEmpty()){
+        }else{
             throw new ExceptionRecordNotExistsException();
         }
-        return result;
     }
 
     @Override
