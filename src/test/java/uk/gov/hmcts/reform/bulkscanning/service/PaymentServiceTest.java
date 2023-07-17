@@ -278,7 +278,6 @@ public class PaymentServiceTest {
     @Test(expected = ExceptionRecordNotExistsException.class)
     @Transactional
     public void testExceptionRecordNotExistsNullParameters() {
-        List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
         doReturn(Optional.ofNullable(null)).when(envelopeCaseRepository).findByExceptionRecordReference(CCD_CASE_REFERENCE_NOT_PRESENT);
         paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,null);
     }

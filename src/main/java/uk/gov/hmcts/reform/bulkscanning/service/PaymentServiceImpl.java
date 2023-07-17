@@ -176,7 +176,6 @@ public class PaymentServiceImpl implements PaymentService {
         String result = "";
         if (Optional.ofNullable(caseReferenceRequest).isPresent()
             && StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())
-            && Optional.ofNullable(envelopeCases).isPresent()
             && !envelopeCases.isEmpty()) {
             envelopeCases.forEach(envelopeCase -> envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber()));
 
