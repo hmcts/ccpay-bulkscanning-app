@@ -180,7 +180,7 @@ public class PaymentServiceImpl implements PaymentService {
             envelopeCases.forEach(envelopeCase -> envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber()));
 
             envelopeCaseRepository.saveAll(envelopeCases);
-            result = String.join(",", envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString())
+            return String.join(",", envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString())
                     .collect(Collectors.toList()));
         }
         if (envelopeCases == null || envelopeCases.isEmpty()){

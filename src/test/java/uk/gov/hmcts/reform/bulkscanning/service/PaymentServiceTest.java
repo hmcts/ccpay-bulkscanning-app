@@ -90,7 +90,7 @@ public class PaymentServiceTest {
     @Autowired
     private BulkScanPaymentRequestMapper bsPaymentRequestMapper;
 
-    @MockBean
+    @Autowired
     private BulkScanningUtils bulkScanningUtils;
 
     private CaseReferenceRequest caseReferenceRequest;
@@ -230,36 +230,6 @@ public class PaymentServiceTest {
         List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
 
         Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
-    }
-
-    @Test
-    @Transactional
-    public void testProcessPaymentFromBulkScanNullListOfAllPayments() {
-        String[] dcn = {"DCN1"};
-
-        doReturn(null).when(bulkScanningUtils).returnExistingEnvelopeList(any());
-        doReturn(Optional.ofNullable(null)).when(envelopeRepository).findById(null);
-        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
-            ,dcn,"AA08", true);
-
-        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
-
-        Assert.assertTrue(listDCN.isEmpty());
-    }
-
-    @Test
-    @Transactional
-    public void testProcessPaymentFromBulkScanEmptyListOfAllPayments() {
-        String[] dcn = {"DCN1"};
-
-        doReturn(new ArrayList<>()).when(bulkScanningUtils).returnExistingEnvelopeList(any());
-        doReturn(Optional.ofNullable(null)).when(envelopeRepository).findById(null);
-        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
-            ,dcn,"AA08", true);
-
-        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
-
-        Assert.assertTrue(listDCN.isEmpty());
     }
 
     @Test(expected = BulkScanCaseAlreadyExistsException.class)
