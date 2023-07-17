@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -146,6 +147,25 @@ public class PaymentFromBulkScanTest {
         String[] dcn = {"DCN1"};
 
         doReturn(null).when(bulkScanningUtils).returnExistingEnvelopeList(any());
+        doReturn(Optional.ofNullable(null)).when(envelopeRepository).findById(null);
+        BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(
+            CCD_CASE_REFERENCE,
+            dcn,
+            "AA08",
+            true
+        );
+
+        List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
+
+        Assert.assertTrue(listDCN.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void testProcessPaymentFromBulkScanEmptyListOfAllPayments() {
+        String[] dcn = {"DCN1"};
+
+        doReturn(new ArrayList<>()).when(bulkScanningUtils).returnExistingEnvelopeList(any());
         doReturn(Optional.ofNullable(null)).when(envelopeRepository).findById(null);
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(
             CCD_CASE_REFERENCE,
