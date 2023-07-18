@@ -15,6 +15,8 @@ server:
 spring:
   main:
     allow-bean-definition-overriding: true
+  config:
+    import: "optional:configtree:/mnt/secrets/ccpay/"
   lifecycle:
     timeout-per-shutdown-phase: ${TIMEOUT_SERVER_SHUTDOWN_PHASE}
   jpa:

@@ -17,8 +17,13 @@ java:
     "ccpay":
       resourceGroup: ccpay
       secrets:
-        - AppInsightsInstrumentationKey
-        - paybubble-s2s-secret
-        - paybubble-idam-client-secret
+        - name: bulkscanning-api-POSTGRES-PASS
+        - alias: POSTGRES_PASSWORD
+        - name: AppInsightsInstrumentationKey
+        - alias: azure.application-insights.instrumentation-key
+        - name: paybubble-s2s-secret
+        - alias: OIDC_S2S_SECRET
+        - name: paybubble-idam-client-secret
+        - alias: OIDC_CLIENT_SECRET
   postgresql:
     enabled: true
