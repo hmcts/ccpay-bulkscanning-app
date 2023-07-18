@@ -13,8 +13,6 @@ COPY --from=builder /lib/x86_64-linux-gnu/libpcre.so.3 /lib/x86_64-linux-gnu/lib
 
 LABEL maintainer="https://github.com/hmcts/ccpay-bulkscanning-app"
 
-
-COPY lib/AI-Agent.xml /opt/app/
 COPY build/libs/bulk-scanning-payment-api.jar /opt/app/
 
 EXPOSE 4211
