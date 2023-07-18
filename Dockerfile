@@ -21,5 +21,5 @@ EXPOSE 4211
 
 CMD [ \
     "--add-opens", "java.base/java.lang=ALL-UNNAMED", \
-    "payment-app.jar" \
+    "bulk-scanning-payment-api.jar" \
     ]
