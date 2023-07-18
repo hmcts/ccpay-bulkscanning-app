@@ -17,8 +17,6 @@ java:
     "ccpay":
       resourceGroup: ccpay
       secrets:
-        - name: bulkscanning-api-POSTGRES-PASS
-        - alias: POSTGRES_PASSWORD
         - name: AppInsightsInstrumentationKey
         - alias: azure.application-insights.instrumentation-key
         - name: paybubble-s2s-secret
