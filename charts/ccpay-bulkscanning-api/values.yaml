@@ -27,7 +27,7 @@ java:
     "ccpay":
       resourceGroup: ccpay
       secrets:
-        - name: bulkscanning-api-POSTGRES-PASSf
+        - name: bulkscanning-api-POSTGRES-PASS
           alias: POSTGRES_PASSWORD
         - name: app-insights-connection-string
           alias: azure.application-insights.instrumentation-key
