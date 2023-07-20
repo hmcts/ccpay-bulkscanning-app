@@ -265,7 +265,6 @@ dependencies {
 
 
 
-
   implementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: javaLoggingVersion
