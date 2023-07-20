@@ -102,7 +102,7 @@ oidc:
   issuer: ${OIDC_ISSUER}
 azure:
   application-insights:
-    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
+    instrumentation-key: ${app-insights-connection-string:dummy}
 idam:
   api:
     url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
