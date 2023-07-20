@@ -66,8 +66,7 @@ withPipeline(type, product, app) {
     ]
   }
 
-    enableSlackNotifications('#cc-payments-tech')
-    disableLegacyDeployment()
+  disableLegacyDeployment()
 
   //Sync demo,ithc and perftest with master branch
   syncBranchesWithMaster(branchesToSync)
