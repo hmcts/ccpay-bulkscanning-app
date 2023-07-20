@@ -240,5 +240,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 The following environment variables are required:
 
 - `APPINSIGHTS_INSTRUMENTATIONKEY`, app insights key to send telemetry events.
-
+It will be updated.
 
