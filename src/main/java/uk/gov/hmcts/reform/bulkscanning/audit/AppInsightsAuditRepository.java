@@ -21,7 +21,7 @@ public class AppInsightsAuditRepository implements AuditRepository {
     private final TelemetryClient telemetry;
 
     @Autowired
-    public AppInsightsAuditRepository(@Value("${azure.application-insights.instrumentation-key}") String instrumentationKey,
+    public AppInsightsAuditRepository(@Value("${app-insights-connection-string}") String instrumentationKey,
                                       TelemetryClient telemetry) {
         TelemetryConfiguration.getActive().setInstrumentationKey(instrumentationKey);
         telemetry.getContext().getComponent().setVersion(getClass().getPackage().getImplementationVersion());
