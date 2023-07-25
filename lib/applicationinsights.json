@@ -1,7 +1,7 @@
 {
   "connectionString": "${file:/mnt/secrets/ccpay/app-insights-connection-string}",
   "role": {
-    "name": "payment-app"
+    "name": "ccpay-bulkscanning"
   },
   "preview": {
     "sampling": {
