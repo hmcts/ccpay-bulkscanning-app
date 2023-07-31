@@ -128,6 +128,7 @@ public class SpringSecurityConfiguration {
             web.ignoring().antMatchers("/swagger-ui.html",
                                        "/webjars/springfox-swagger-ui/**",
                                        "/swagger-resources/**",
+                                       "/swagger-ui/**",
                                        "/v2/**",
                                        "/refdata/**",
                                        "/health",

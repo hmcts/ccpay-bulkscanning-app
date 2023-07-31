@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +17,8 @@ import uk.gov.hmcts.reform.bulkscanning.service.SearchService;
 import java.util.Optional;
 
 @RestController
-@Api(tags = {"Bulk Scanning Payment Search API"})
-@SwaggerDefinition(tags = {@Tag(name = "SearchController",
-    description = "Bulk Scanning Payment Search APIs to be used by Pay-Bubble to retrieve all unprocessed payments")})
-public class SearchController {
+@Tag(name = "Bulk Scanning Payment Search API",description = "Bulk Scanning Payment Search APIs to be used by Pay-Bubble to retrieve all unprocessed payments")
+    public class SearchController {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchController.class);
     private final SearchService searchService;
@@ -27,10 +28,10 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @ApiOperation("Case with unprocessed payments details by CCD Case Reference/Exception Record")
+    @Operation(summary = "Case with unprocessed payments details by CCD Case Reference/Exception Record")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Payments retrieved"),
-        @ApiResponse(code = 404, message = "Payments not found")
+        @ApiResponse(responseCode = "200", description = "Payments retrieved"),
+        @ApiResponse(responseCode = "404", description = "Payments not found")
     })
     @GetMapping("/cases/{ccd_reference}")
     public ResponseEntity retrieveByCCD(
@@ -51,10 +52,10 @@ public class SearchController {
         }
     }
 
-    @ApiOperation("Case with unprocessed payment details by Payment DCN")
+    @Operation(summary = "Case with unprocessed payment details by Payment DCN")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Payments retrieved"),
-        @ApiResponse(code = 404, message = "Payments not found")
+        @ApiResponse(responseCode = "200", description = "Payments retrieved"),
+        @ApiResponse(responseCode = "404", description = "Payments not found")
     })
     @GetMapping("/cases")
     public ResponseEntity retrieveByDCN(
@@ -63,10 +64,10 @@ public class SearchController {
             return retrieveByDCN(documentControlNumber, false);
     }
 
-    @ApiOperation("Case with unprocessed payment details by Payment DCN (invoked by payment app)")
+    @Operation(summary = "Case with unprocessed payment details by Payment DCN (invoked by payment app)")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Payments retrieved"),
-            @ApiResponse(code = 404, message = "Payments not found")
+            @ApiResponse(responseCode = "200", description = "Payments retrieved"),
+            @ApiResponse(responseCode = "404", description = "Payments not found")
     })
     @GetMapping("/case/{document_control_number}")
     public ResponseEntity retrieveByDCN(
