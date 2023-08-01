@@ -173,19 +173,18 @@ public class PaymentServiceImpl implements PaymentService {
         List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(
             exceptionRecordReference).
             orElseThrow(ExceptionRecordNotExistsException::new);
-
+        String result = "";
         if (Optional.ofNullable(caseReferenceRequest).isPresent()
             && StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())
-            && Optional.ofNullable(envelopeCases).isPresent()
             && !envelopeCases.isEmpty()) {
             envelopeCases.forEach(envelopeCase -> envelopeCase.setCcdReference(caseReferenceRequest.getCcdCaseNumber()));
 
             envelopeCaseRepository.saveAll(envelopeCases);
             return String.join(",", envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString())
                     .collect(Collectors.toList()));
+        }else{
+            throw new ExceptionRecordNotExistsException();
         }
-
-        return "";
     }
 
     @Override

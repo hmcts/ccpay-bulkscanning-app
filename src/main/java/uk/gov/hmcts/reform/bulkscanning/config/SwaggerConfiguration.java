@@ -2,54 +2,53 @@ package uk.gov.hmcts.reform.bulkscanning.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.schema.ModelRef;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Parameter;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-import uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication;
 
-import java.util.Arrays;
-import java.util.List;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import org.springdoc.core.customizers.OperationCustomizer;
+import org.springdoc.core.GroupedOpenApi;
+
 
 @Configuration
-@EnableSwagger2
 public class SwaggerConfiguration {
 
-    private List<Parameter> getGlobalOperationParameters() {
-        return Arrays.asList(
-            new ParameterBuilder()
-                .name("ServiceAuthorization")
-                .description("Service authorization header")
-                .required(true)
-                .parameterType("header")
-                .modelRef(new ModelRef("string"))
-                .build());
+    private static final String HEADER = "header";
+
+    @Bean
+    public GroupedOpenApi api() {
+
+        return GroupedOpenApi.builder()
+            .group("bulkscan")
+            .packagesToScan("uk.gov.hmcts.reform.bulkscanning.controller")
+            .pathsToMatch("/**")
+            .addOperationCustomizer(authorizationHeaders())
+            .build();
+    }
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI().components(new Components())
+            .info(new Info().title("Bulkscanning App").version("1.0.0"));
     }
 
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .globalOperationParameters(getGlobalOperationParameters())
-            .useDefaultResponseMessages(false)
-            .apiInfo(apiInfo())
-            .select()
-            .apis(RequestHandlerSelectors.basePackage(BulkScanningApiApplication.class.getPackage()
-                .getName() + ".controller"))
-            .paths(PathSelectors.any())
-            .build();
+    public OperationCustomizer authorizationHeaders() {
+        return (operation, handlerMethod) ->
+            operation
+                .addParametersItem(
+                    mandatoryStringParameter("Authorization", "User authorization header"))
+                .addParametersItem(
+                    mandatoryStringParameter("ServiceAuthorization", "Service authorization header"));
     }
 
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-            .title("Bulk Scannning API documentation")
-            .description("Bulk Scanning API documentation")
-            .build();
+    private Parameter mandatoryStringParameter(String name, String description) {
+        return new Parameter()
+            .name(name)
+            .description(description)
+            .required(true)
+            .in(HEADER)
+            .schema(new StringSchema());
     }
-
 }

@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.Envelope;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopeCase;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.PaymentMetadata;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeCaseRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataRepository;
@@ -44,6 +43,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.Currency.GBP;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentMethod.CHEQUE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESSED;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -180,6 +181,24 @@ public class PaymentServiceTest {
     }
 
     @Test
+    public void testProcessPaymentFromExelaForNullResponse() {
+        Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
+                                                                    .id(1)
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .paymentStatus(COMPLETE.toString())
+                                                                    .build());
+        Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
+        Optional<Envelope> envelope = Optional.of(Envelope.envelopeWith().id(1).envelopePayments(payments.get())
+                                                      .paymentStatus(PROCESSED.toString())
+                                                      .build());
+        envelopePayment.get().setEnvelope(envelope.get());
+        doReturn(envelopePayment).when(paymentRepository).findByDcnReference(any(String.class));
+
+        Envelope envelopeMock = paymentService.processPaymentFromExela(createPaymentRequest(), TEST_DCN_REFERENCE);
+        assertNull(envelopeMock);
+    }
+
+    @Test
     @Transactional
     public void testGetPaymentMetadata() {
         PaymentMetadata paymentMetadata = paymentService.getPaymentMetadata(TEST_DCN_REFERENCE);
@@ -241,7 +260,50 @@ public class PaymentServiceTest {
 
     @Test(expected = ExceptionRecordNotExistsException.class)
     @Transactional
-    public void testExceptionRecordNotExistsException() {
+    public void testExceptionRecordNotExists1Exception() {
+        List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
+        doReturn(Optional.ofNullable(envelopeCaseList)).when(envelopeCaseRepository).findByExceptionRecordReference(CCD_CASE_REFERENCE_NOT_PRESENT);
+        paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,caseReferenceRequest);
+    }
+
+    @Test(expected = ExceptionRecordNotExistsException.class)
+    @Transactional
+    public void testExceptionRecordNotExistsNoCaseReferenceNullException() {
+        List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
+        doReturn(Optional.ofNullable(envelopeCaseList)).when(envelopeCaseRepository).findByExceptionRecordReference(CCD_CASE_REFERENCE_NOT_PRESENT);
+        paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,null);
+    }
+
+    @Test(expected = ExceptionRecordNotExistsException.class)
+    @Transactional
+    public void testExceptionRecordNotExistsNullParameters() {
+        doReturn(Optional.ofNullable(null)).when(envelopeCaseRepository).findByExceptionRecordReference(CCD_CASE_REFERENCE_NOT_PRESENT);
+        paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,null);
+    }
+
+    @Test(expected = ExceptionRecordNotExistsException.class)
+    @Transactional
+    public void testExceptionRecordNotExistsNoCaseReferenceException() {
+
+        CaseReferenceRequest caseReferenceRequestLocal = CaseReferenceRequest.createCaseReferenceRequest()
+            .ccdCaseNumber(null)
+            .build();
+
+        List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
+        doReturn(Optional.ofNullable(envelopeCaseList)).when(envelopeCaseRepository).findByExceptionRecordReference(CCD_CASE_REFERENCE_NOT_PRESENT);
+        paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,caseReferenceRequestLocal);
+    }
+
+    @Test(expected = ExceptionRecordNotExistsException.class)
+    @Transactional
+    public void testExceptionRecordNotExists3Exception() {
+        doReturn(Optional.ofNullable(null)).when(envelopeCaseRepository).findByExceptionRecordReference(CCD_CASE_REFERENCE_NOT_PRESENT);
+        paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,caseReferenceRequest);
+    }
+
+    @Test(expected = ExceptionRecordNotExistsException.class)
+    @Transactional
+    public void testExceptionRecordNotExists2Exception() {
         paymentService.updateCaseReferenceForExceptionRecord(CCD_CASE_REFERENCE_NOT_PRESENT,caseReferenceRequest);
     }
 
@@ -254,13 +316,13 @@ public class PaymentServiceTest {
         envelopePayment.setEnvelope(mockBulkScanningEnvelope());
 
         doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference(DCN_REFERENCE);
-        assertThat(paymentService.updatePaymentStatus(DCN_REFERENCE, PaymentStatus.PROCESSED)).isEqualTo(DCN_REFERENCE);
+        assertThat(paymentService.updatePaymentStatus(DCN_REFERENCE, PROCESSED)).isEqualTo(DCN_REFERENCE);
     }
 
     @Test(expected = DcnNotExistsException.class)
     @Transactional
     public void testDcnDoesNotExistExceptionPayment() {
-        paymentService.updatePaymentStatus(CCD_CASE_REFERENCE_NOT_PRESENT, PaymentStatus.PROCESSED);
+        paymentService.updatePaymentStatus(CCD_CASE_REFERENCE_NOT_PRESENT, PROCESSED);
     }
 
     @Test
