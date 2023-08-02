@@ -402,10 +402,9 @@ serenity {
                        'uk.gov.hmcts.reform.bulkscanning.mapper.*',
                        'uk.gov.hmcts.reform.bulkscanning.model.*',
                        'uk.gov.hmcts.reform.bulkscanning.exception.*']
+    pitestVersion = '1.9.11'
     threads = 10
     outputFormats = ['XML', 'HTML']
-    historyInputLocation = 'build/reports/pitest/fastermutationtesting'
-    historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
     mutationThreshold = 90
   }
 
