@@ -405,6 +405,7 @@ serenity {
     pitestVersion = '1.9.11'
     threads = 10
     outputFormats = ['XML', 'HTML']
+    jvmArgs = ['-DtimeoutConstant=20000']
     mutationThreshold = 90
   }
 
