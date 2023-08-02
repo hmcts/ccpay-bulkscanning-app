@@ -18,7 +18,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.27.0'
   id 'org.sonarqube' version '3.0'
   id 'idea'
-  id "info.solidsoft.pitest" version '1.9.11'
+  id "info.solidsoft.pitest" version '1.9.0'
 }
 
 apply plugin: 'net.serenity-bdd.aggregator'
@@ -216,7 +216,7 @@ checkstyleTest.enabled(false)
     reformLogging   : '5.1.1',
     springBoot      : springBoot.class.package.implementationVersion,
     springfoxSwagger: '2.9.2',
-    pitest      : '1.3.2',
+    pitest      : '1.9.0',
     gradlePitest: '1.3.0',
     sonarPitest : '0.5',
     serenity                : '2.2.12',
@@ -402,10 +402,8 @@ serenity {
                        'uk.gov.hmcts.reform.bulkscanning.mapper.*',
                        'uk.gov.hmcts.reform.bulkscanning.model.*',
                        'uk.gov.hmcts.reform.bulkscanning.exception.*']
-    pitestVersion = '1.9.11'
     threads = 10
     outputFormats = ['XML', 'HTML']
-    jvmArgs = ['-DtimeoutConstant=20000']
     mutationThreshold = 90
   }
 
