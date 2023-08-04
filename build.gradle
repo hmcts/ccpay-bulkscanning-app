@@ -208,6 +208,10 @@ checkstyleTest.enabled(false)
         entry 'jackson-core'
         entry 'jackson-databind'
       }
+      // CVE-2020-8908
+      dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
+        entry 'guava'
+      }
     }
   }
 
