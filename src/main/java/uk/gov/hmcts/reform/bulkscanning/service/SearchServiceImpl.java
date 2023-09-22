@@ -138,6 +138,7 @@ public class SearchServiceImpl implements SearchService {
 
     private List<EnvelopeCase> getEnvelopeCaseByCcdReference(SearchRequest searchRequest) {
         if (StringUtils.isNotEmpty(searchRequest.getCcdReference())
+            && envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).isPresent()
             && !envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).get().isEmpty()) {
             return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(Collections.emptyList());
         } else if (StringUtils.isNotEmpty(searchRequest.getExceptionRecord())
@@ -145,6 +146,7 @@ public class SearchServiceImpl implements SearchService {
             List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(Collections.emptyList());
             for (EnvelopeCase envelopeCase : envelopeCases) {
                 if (StringUtils.isNotEmpty(envelopeCase.getCcdReference())
+                    && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()
                     && !envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get().isEmpty()) {
                     return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).orElse(Collections.emptyList());
                 }

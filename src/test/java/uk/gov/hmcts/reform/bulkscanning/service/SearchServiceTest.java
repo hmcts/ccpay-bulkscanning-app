@@ -122,8 +122,7 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByExceptionRecord() {
-        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
+    public void testRetrieveByExceptionRecordReturningCase() {
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
                                                                     .dcnReference(TEST_DCN_REFERENCE)
@@ -140,10 +139,37 @@ public class SearchServiceTest {
                                                               .exceptionRecordReference("EXP123")
                                                               .build());
         Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
+        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
         when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
         when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(cases);
         SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
         assertThat(searchResponse.getCcdReference()).isEqualTo("CCD123");
+    }
+
+    @Test
+    @Transactional
+    public void testRetrieveByExceptionRecordReturningExceptionRecord() {
+        Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
+                                                                    .id(1)
+                                                                    .dcnReference(TEST_DCN_REFERENCE)
+                                                                    .paymentStatus(COMPLETE.toString())
+                                                                    .build());
+        Optional<List<EnvelopePayment>> payments = Optional.of(Arrays.asList(envelopePayment.get()));
+        Optional<Envelope> envelope = Optional.of(Envelope.envelopeWith().id(1).envelopePayments(payments.get())
+                                                      .paymentStatus(COMPLETE.toString())
+                                                      .build());
+        Optional<EnvelopeCase> envelopeCase = Optional.of(EnvelopeCase.caseWith()
+                                                              .id(1)
+                                                              .envelope(envelope.get())
+                                                              .exceptionRecordReference("EXP123")
+                                                              .build());
+        Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
+        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
+        when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
+        when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(Optional.empty());
+        SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
+        assertThat(searchResponse.getCcdReference()).isEqualTo(null);
+        assertThat(searchResponse.getExceptionRecordReference()).isEqualTo("EXP123");
     }
 
     @Test
