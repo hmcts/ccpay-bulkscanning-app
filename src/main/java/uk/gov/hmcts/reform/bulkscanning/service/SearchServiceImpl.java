@@ -137,21 +137,26 @@ public class SearchServiceImpl implements SearchService {
     }
 
     private List<EnvelopeCase> getEnvelopeCaseByCcdReference(SearchRequest searchRequest) {
-        if (StringUtils.isNotEmpty(searchRequest.getCcdReference())
-            && envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).isPresent()
-            && !envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).get().isEmpty()) {
-            return envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference()).orElse(Collections.emptyList());
-        } else if (StringUtils.isNotEmpty(searchRequest.getExceptionRecord())
-            && envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).isPresent()) {
-            List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord()).orElse(Collections.emptyList());
-            for (EnvelopeCase envelopeCase : envelopeCases) {
-                if (StringUtils.isNotEmpty(envelopeCase.getCcdReference())
-                    && envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).isPresent()
-                    && !envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).get().isEmpty()) {
-                    return envelopeCaseRepository.findByCcdReference(envelopeCase.getCcdReference()).orElse(Collections.emptyList());
-                }
+        if (StringUtils.isNotEmpty(searchRequest.getCcdReference())) {
+            Optional<List<EnvelopeCase>> envelopeCases = envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference());
+            if (envelopeCases.isPresent() && !envelopeCases.get().isEmpty()) {
+                return envelopeCases.get();
             }
-            return envelopeCases;
+        }
+        if (StringUtils.isNotEmpty(searchRequest.getExceptionRecord())) {
+            Optional<List<EnvelopeCase>> envelopeCasesByExpRef = envelopeCaseRepository.findByExceptionRecordReference(searchRequest.getExceptionRecord());
+            if (envelopeCasesByExpRef.isPresent() && !envelopeCasesByExpRef.get().isEmpty()) {
+                for (EnvelopeCase envelopeCase : envelopeCasesByExpRef.get()) {
+                    if (StringUtils.isNotEmpty(envelopeCase.getCcdReference())) {
+                        Optional<List<EnvelopeCase>> envelopeCasesByCcdRef = envelopeCaseRepository.findByCcdReference(
+                            envelopeCase.getCcdReference());
+                        if (envelopeCasesByCcdRef.isPresent() && !envelopeCasesByCcdRef.get().isEmpty()) {
+                            return envelopeCasesByCcdRef.get();
+                        }
+                    }
+                }
+                return envelopeCasesByExpRef.get();
+            }
         }
         return Collections.emptyList();
     }
