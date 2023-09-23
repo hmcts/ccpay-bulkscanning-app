@@ -122,7 +122,7 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByCaseNumber() {
+    public void testRetrieveByCaseNumberReturnCase() {
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
                                                                     .dcnReference(TEST_DCN_REFERENCE)
@@ -146,7 +146,17 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByExceptionRecordReturningCase() {
+    public void testRetrieveByCaseNumberReturnEmptyList() {
+        when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(Optional.empty());
+        when(envelopeCaseRepository.findByExceptionRecordReference("CCD123")).thenReturn(Optional.empty());
+        SearchResponse searchResponse = paymentService.retrieveByCCDReference("CCD123");
+        assertThat(searchResponse.getCcdReference()).isEqualTo(null);
+        assertThat(searchResponse.getExceptionRecordReference()).isEqualTo(null);
+    }
+
+    @Test
+    @Transactional
+    public void testRetrieveByExceptionRecordReturnCase() {
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
                                                                     .dcnReference(TEST_DCN_REFERENCE)
@@ -172,7 +182,7 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
-    public void testRetrieveByExceptionRecordReturningExceptionRecord() {
+    public void testRetrieveByExceptionRecordReturnExceptionRecord() {
         Optional<EnvelopePayment> envelopePayment = Optional.of(EnvelopePayment.paymentWith()
                                                                     .id(1)
                                                                     .dcnReference(TEST_DCN_REFERENCE)
@@ -204,7 +214,7 @@ public class SearchServiceTest {
     }
 
     @Test
-    public void testRetrieveByDcno() {
+    public void testRetrieveByDcnInternalOff() {
         SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE, true);
         assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
     }
