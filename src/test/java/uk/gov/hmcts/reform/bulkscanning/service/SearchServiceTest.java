@@ -211,6 +211,14 @@ public class SearchServiceTest {
 
     @Test
     @Transactional
+    public void testNoSearchParamsReturnEmptyList() {
+        SearchResponse searchResponse = paymentService.retrieveByCCDReference(null);
+        assertThat(searchResponse.getCcdReference()).isEqualTo(null);
+        assertThat(searchResponse.getExceptionRecordReference()).isEqualTo(null);
+    }
+
+    @Test
+    @Transactional
     public void testRetrieveByDcn() {
         SearchResponse searchResponse = paymentService.retrieveByDcn(TEST_DCN_REFERENCE, false);
         assertThat(searchResponse.getPayments().get(0).getDcnReference()).isEqualTo(TEST_DCN_REFERENCE);
