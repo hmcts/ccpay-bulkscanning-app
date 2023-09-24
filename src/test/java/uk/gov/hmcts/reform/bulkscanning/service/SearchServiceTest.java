@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.bulkscanning.model.response.SearchResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -173,7 +174,8 @@ public class SearchServiceTest {
                                                               .exceptionRecordReference("EXP123")
                                                               .build());
         Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
-        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
+        Optional<List<EnvelopeCase>> emptyList = Optional.of(Collections.emptyList());
+        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(emptyList);
         when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
         when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(cases);
         SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
@@ -198,9 +200,10 @@ public class SearchServiceTest {
                                                               .exceptionRecordReference("EXP123")
                                                               .build());
         Optional<List<EnvelopeCase>> cases = Optional.of(Arrays.asList(envelopeCase.get()));
-        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(Optional.empty());
+        Optional<List<EnvelopeCase>> emptyList = Optional.of(Collections.emptyList());
+        when(envelopeCaseRepository.findByCcdReference("EXP123")).thenReturn(emptyList);
         when(envelopeCaseRepository.findByExceptionRecordReference("EXP123")).thenReturn(cases);
-        when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(Optional.empty());
+        when(envelopeCaseRepository.findByCcdReference("CCD123")).thenReturn(emptyList);
         SearchResponse searchResponse = paymentService.retrieveByCCDReference("EXP123");
         assertThat(searchResponse.getCcdReference()).isEqualTo(null);
         assertThat(searchResponse.getExceptionRecordReference()).isEqualTo("EXP123");
