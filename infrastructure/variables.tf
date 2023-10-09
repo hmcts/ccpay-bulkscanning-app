@@ -46,6 +46,7 @@ variable "postgresql_version" {
   default = "11"
 }
 
-variable "additional_databases" {
-  default = []
+variable "postgresql_flexible_server_version" {
+  default = "14"
 }
+

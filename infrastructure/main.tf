@@ -39,21 +39,24 @@ module "ccpay-bulkscanning-payment-database-v11" {
 }
 
 module "ccpay-bulkscanning-payment-database-v14" {
-  source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
+  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
   product = var.product
   component = var.component
+  business_area = "cft"
   name = "${var.product}-${var.component}-postgres-db-v14"
   location = var.location_app
   subscription = var.subscription
   env = var.env
-  postgresql_user = var.postgresql_user
-  database_name = var.database_name
-  sku_name = "GP_Gen5_2"
-  sku_tier = "GeneralPurpose"
+  pgsql_admin_username = local.postgresql_user
+  pgsql_databases = [
+    {
+      name : var.database_name
+    }
+  ]
   common_tags = var.common_tags
-  postgresql_version = var.postgresql_version
-  additional_databases = var.additional_databases
+  postgresql_version = var.postgresql_flexible_server_version
 }
+
 
 data "azurerm_key_vault" "payment_key_vault" {
   name = local.vaultName
