@@ -103,31 +103,31 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V14" {
   name      = join("-", [var.component, "POSTGRES-USER-V14"])
-  value     = module.ccpay-bulkscanning-payment-database-v14.user_name
+  value     = module.ccpay-bulkscanning-payment-database-v14.username
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS-V14" {
   name      = join("-", [var.component, "POSTGRES-PASS-V14"])
-  value     = module.ccpay-bulkscanning-payment-database-v14.postgresql_password
+  value     = module.ccpay-bulkscanning-payment-database-v14.password
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST-V14" {
   name      = join("-", [var.component, "POSTGRES-HOST-V14"])
-  value     =  module.ccpay-bulkscanning-payment-database-v14.host_name
+  value     =  module.ccpay-bulkscanning-payment-database-v14.fqdn
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT-V14" {
   name      = join("-", [var.component, "POSTGRES-PORT-V14"])
-  value     =  module.ccpay-bulkscanning-payment-database-v14.postgresql_listen_port
+  value     =  var.postgresql_flexible_server_port
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-V14" {
   name      = join("-", [var.component, "POSTGRES-DATABASE-V14"])
-  value     =  module.ccpay-bulkscanning-payment-database-v14.postgresql_database
+  value     =  var.database_name
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
