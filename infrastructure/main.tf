@@ -39,6 +39,9 @@ module "ccpay-bulkscanning-payment-database-v11" {
 }
 
 module "ccpay-bulkscanning-payment-database-v14" {
+  providers = {
+    azurerm.postgres_network = azurerm.postgres_network
+  }
   source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
   product = var.product
   component = var.component
@@ -47,16 +50,17 @@ module "ccpay-bulkscanning-payment-database-v14" {
   location = var.location_app
   subscription = var.subscription
   env = var.env
-  pgsql_admin_username = local.postgresql_user
+  pgsql_admin_username = var.postgresql_user
   pgsql_databases = [
     {
       name : var.database_name
     }
   ]
+  public_access = true
   common_tags = var.common_tags
   postgresql_version = var.postgresql_flexible_server_version
+  pgsql_version = "14"
 }
-
 
 data "azurerm_key_vault" "payment_key_vault" {
   name = local.vaultName
