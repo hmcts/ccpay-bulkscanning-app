@@ -48,7 +48,6 @@ module "ccpay-bulkscanning-payment-database-v14" {
   business_area = "cft"
   name = "${var.product}-${var.component}-postgres-db-v14"
   location = var.location_app
-  subscription = var.subscription
   env = var.env
   pgsql_admin_username = var.postgresql_user
   pgsql_databases = [
@@ -56,10 +55,10 @@ module "ccpay-bulkscanning-payment-database-v14" {
       name : var.database_name
     }
   ]
+  admin_user_object_id = var.jenkins_AAD_objectId
   public_access = true
   common_tags = var.common_tags
-  postgresql_version = var.postgresql_flexible_server_version
-  pgsql_version = "14"
+  pgsql_version = var.postgresql_flexible_sql_version
 }
 
 data "azurerm_key_vault" "payment_key_vault" {
