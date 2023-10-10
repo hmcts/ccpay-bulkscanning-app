@@ -47,7 +47,7 @@ variable "postgresql_version" {
 }
 
 variable "postgresql_flexible_sql_version" {
-  default = "14"
+  default = "15"
 }
 
 variable "postgresql_flexible_server_port" {
