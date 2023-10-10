@@ -109,19 +109,19 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {
   name      = join("-", [var.component, "POSTGRES-USER-V15"])
-  value     = module.ccpay-bulkscanning-payment-database-v14.username
+  value     = module.ccpay-bulkscanning-payment-database-v15.username
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS-V15" {
   name      = join("-", [var.component, "POSTGRES-PASS-V15"])
-  value     = module.ccpay-bulkscanning-payment-database-v14.password
+  value     = module.ccpay-bulkscanning-payment-database-v15.password
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST-V15" {
   name      = join("-", [var.component, "POSTGRES-HOST-V15"])
-  value     =  module.ccpay-bulkscanning-payment-database-v14.fqdn
+  value     =  module.ccpay-bulkscanning-payment-database-v15.fqdn
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
