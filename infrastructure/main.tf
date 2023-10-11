@@ -64,6 +64,10 @@ module "ccpay-bulkscanning-payment-database-v15" {
   admin_user_object_id = var.jenkins_AAD_objectId
   common_tags = var.common_tags
   pgsql_version = var.postgresql_flexible_sql_version
+
+  lifecycle {
+    prevent_destroy = true
+    }
 }
 
 data "azurerm_key_vault" "payment_key_vault" {
