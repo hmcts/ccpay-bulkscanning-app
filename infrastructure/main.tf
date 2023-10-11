@@ -62,7 +62,6 @@ module "ccpay-bulkscanning-payment-database-v15" {
       }
     ]
   admin_user_object_id = var.jenkins_AAD_objectId
-  public_access = true
   common_tags = var.common_tags
   pgsql_version = var.postgresql_flexible_sql_version
 }
