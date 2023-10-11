@@ -65,9 +65,6 @@ module "ccpay-bulkscanning-payment-database-v15" {
   common_tags = var.common_tags
   pgsql_version = var.postgresql_flexible_sql_version
 
-  lifecycle {
-    prevent_destroy = true
-    }
 }
 
 data "azurerm_key_vault" "payment_key_vault" {
