@@ -55,20 +55,19 @@ module "ccpay-bulkscanning-payment-database-v15" {
       name : var.database_name
     }
   ]
-  pgsql_server_configuration = [
-      {
-        name  = "azure.extensions"
-        value = "plpgsql"
-      },
-      {
-        name  = "azure.extensions"
-        value = "pg_stat_statements"
-       },
-       {
-        name  = "azure.extensions"
-        value = "pg_buffercache"
-        }
-    ]
+
+  resource "postgresql_extension" "plpgsql" {
+    name = "plpgsql"
+  }
+
+  resource "postgresql_extension" "pg_stat_statements" {
+    name = "pg_stat_statements"
+  }
+
+  resource "postgresql_extension" "pg_buffercache" {
+    name = "pg_buffercache"
+  }
+
   admin_user_object_id = var.jenkins_AAD_objectId
   common_tags = var.common_tags
   pgsql_version = var.postgresql_flexible_sql_version
