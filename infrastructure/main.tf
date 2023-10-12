@@ -57,15 +57,15 @@ module "ccpay-bulkscanning-payment-database-v15" {
   ]
   pgsql_server_configuration = [
       {
-        name  = "azure.extensions"
+        name  = azure.extensions
         value = "plpgsql"
       },
       {
-        name  = "azure.extensions"
+        name  = azure.extensions
         value = "pg_stat_statements"
        },
        {
-        name  = "azure.extensions"
+        name  = azure.extensions
         value = "pg_buffercache"
         }
     ]
