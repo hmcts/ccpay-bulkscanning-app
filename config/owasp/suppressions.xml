@@ -364,7 +364,18 @@
     </notes>
     <cve>CVE-2023-45648</cve>
   </suppress>
-
+  <suppress>
+    <notes>
+      Denial of Service in JSON-Java versions up to and including 20230618.
+    </notes>
+    <cve>CVE-2023-5072</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      The HTTP/2 protocol allows a denial of service
+    </notes>
+    <cve>CVE-2023-44487</cve>
+  </suppress>
 
 </suppressions>
 
