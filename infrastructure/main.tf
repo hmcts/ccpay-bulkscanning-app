@@ -67,6 +67,37 @@ module "ccpay-bulkscanning-payment-database-v15" {
 
 }
 
+module "ccpay-bulkscanning-payment-database-v15-replica" {
+  providers = {
+    azurerm.postgres_network = azurerm.postgres_network
+  }
+  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  product = var.product
+  component = var.component
+  business_area = "cft"
+  name = "${var.product}-${var.component}-postgres-db-v15-replica"
+  location = var.location_app
+  env = var.env
+  pgsql_admin_username = var.postgresql_user
+  pgsql_databases = [
+    {
+      name : var.database_name
+    }
+  ]
+  pgsql_server_configuration = [
+      {
+        name  = "azure.extensions"
+        value = "plpgsql,pg_stat_statements,pg_buffercache"
+      }
+    ]
+  admin_user_object_id = var.jenkins_AAD_objectId
+  common_tags = var.common_tags
+  pgsql_version = var.postgresql_flexible_sql_version
+  create_mode = "Replica"
+  source_service_id = module.ccpay-bulkscanning-payment-database-v15.id
+
+}
+
 data "azurerm_key_vault" "payment_key_vault" {
   name = local.vaultName
   resource_group_name = "ccpay-${var.env}"
@@ -133,6 +164,36 @@ resource "azurerm_key_vault_secret" "POSTGRES_PORT-V15" {
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-V15" {
   name      = join("-", [var.component, "POSTGRES-DATABASE-V15"])
+  value     =  var.database_name
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-USER-V15-REPLICA" {
+  name      = join("-", [var.component, "POSTGRES-USER-V15-REPLICA"])
+  value     = module.ccpay-bulkscanning-payment-database-v15-replica.username
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-PASS-V15-REPLICA" {
+  name      = join("-", [var.component, "POSTGRES-PASS-V15-REPLICA"])
+  value     = module.ccpay-bulkscanning-payment-database-v15-replica.password
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_HOST-V15-REPLICA" {
+  name      = join("-", [var.component, "POSTGRES-HOST-V15-REPLICA"])
+  value     =  module.ccpay-bulkscanning-payment-database-v15-replica.fqdn
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT-V15-REPLCA" {
+  name      = join("-", [var.component, "POSTGRES-PORT-V15-REPLICA"])
+  value     =  var.postgresql_flexible_server_port
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-V15-REPLICA" {
+  name      = join("-", [var.component, "POSTGRES-DATABASE-V15-REPLICA"])
   value     =  var.database_name
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
