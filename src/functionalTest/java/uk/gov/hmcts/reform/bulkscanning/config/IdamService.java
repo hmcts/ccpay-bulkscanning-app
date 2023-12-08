@@ -25,8 +25,7 @@ public class IdamService {
     public static final String BEARER = "Bearer ";
     public static final String GRANT_TYPE = "password";
     public static final String SCOPES = "openid profile roles";
-
-    private final IdamApi idamApi;
+    private static IdamApi idamApi;
     private final TestConfigProperties testConfig;
 
     private static final Logger LOG = LoggerFactory.getLogger(IdamService.class);
@@ -41,9 +40,9 @@ public class IdamService {
     }
 
 
-    public User createUserWith(String userGroup, String... roles) {
+    public User createUserWith(String... roles) {
         String email = nextUserEmail();
-        CreateUserRequest userRequest = userRequest(email, userGroup, roles);
+        CreateUserRequest userRequest = userRequest(email, roles);
         LOG.info("idamApi : " + idamApi.toString());
         LOG.info("userRequest : " + userRequest);
         try {
@@ -89,19 +88,22 @@ public class IdamService {
     }
 
 
-    private CreateUserRequest userRequest(String email, String userGroup, String[] roles) {
+    private CreateUserRequest userRequest(String email, String[] roles) {
         return CreateUserRequest.builder()
             .email(email)
             .password(testConfig.getTestUserPassword())
             .roles(Stream.of(roles)
                        .map(UserRole::new)
                        .collect(toList()))
-            .userGroup(new UserGroup(userGroup))
             .build();
     }
 
     private String nextUserEmail() {
         return String.format(testConfig.getGeneratedUserEmailPattern(), UUID.randomUUID().toString());
+    }
+
+    public static void deleteUser(String emailAddress) {
+        idamApi.deleteUser(emailAddress);
     }
 }
 

@@ -16,6 +16,9 @@ public interface IdamApi {
     @Headers("Content-Type: application/json")
     void createUser(CreateUserRequest createUserRequest);
 
+    @RequestLine("DELETE /testing-support/accounts/{email}")
+    void deleteUser(@Param("email") String email);
+
     @RequestLine("POST /o/token")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @Body("username={username}&password={password}&scope={scope}&grant_type="
