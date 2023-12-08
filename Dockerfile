@@ -1,7 +1,7 @@
 ARG APP_INSIGHTS_AGENT_VERSION=3.4.14
 FROM debian:10 AS builder
 RUN apt update
-RUN apt install --yes libharfbuzz-dev
+RUN apt install --yes libharfbuzz-dev=2.3.1-1
 
 FROM hmctspublic.azurecr.io/base/java:17-distroless
 
