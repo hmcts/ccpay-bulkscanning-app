@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.bulkscanning.validator;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.apache.commons.lang3.RandomUtils;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,16 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.bulkscanning.config.BulkScanPaymentTestService;
-import uk.gov.hmcts.reform.bulkscanning.config.IdamService;
 import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
 import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
-import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerFunctionalTest.createBulkScanCCDPayments;
+import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerFunctionalTest.createBulkScanCcdPayments;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @SpringBootTest
@@ -64,26 +58,26 @@ public class BulkScanValidatorFunctionalTest {
 
     @Test()
     public void testFieldLevelValidation() throws Exception {
-        BulkScanPaymentRequest bulkScanCCDPayments = createBulkScanCCDPayments(null, null, null, false);
-        Response bulkScanCCDPaymentsResponse = bulkScanPaymentTestService.postBulkScanCCDPayments(SERVICE_TOKEN, bulkScanCCDPayments);
-        bulkScanCCDPaymentsResponse.then().statusCode(BAD_REQUEST.value());
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(null, null, null, false);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(SERVICE_TOKEN, bulkScanCcdPayments);
+        bulkScanCcdPaymentsResponse.then().statusCode(BAD_REQUEST.value());
 
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(CCD_REFERENCE_MISSING));
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(PAYMENT_DCN_MISSING));
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(RESPONSIBLE_SERVICE_ID_MISSING));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(CCD_REFERENCE_MISSING));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(PAYMENT_DCN_MISSING));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(RESPONSIBLE_SERVICE_ID_MISSING));
     }
 
     @Test()
     public void testNegativeInvalidCcdAndDcnLength() throws Exception {
         String[] dcn = {""};
-        BulkScanPaymentRequest bulkScanCCDPayments = createBulkScanCCDPayments("", dcn, "AA08", false);
-        Response bulkScanCCDPaymentsResponse = bulkScanPaymentTestService.postBulkScanCCDPayments(SERVICE_TOKEN, bulkScanCCDPayments);
-        bulkScanCCDPaymentsResponse.then().statusCode(BAD_REQUEST.value());
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments("", dcn, "AA08", false);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(SERVICE_TOKEN, bulkScanCcdPayments);
+        bulkScanCcdPaymentsResponse.then().statusCode(BAD_REQUEST.value());
 
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(CCD_REFERENCE_MISSING));
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(INVALID_CCD_REFERENCE_LENGTH));
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(INVALID_CCD_REFERENCE_TYPE));
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(INVALID_DCN_LENGTH));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(CCD_REFERENCE_MISSING));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(INVALID_CCD_REFERENCE_LENGTH));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(INVALID_CCD_REFERENCE_TYPE));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(INVALID_DCN_LENGTH));
     }
 
     @Test()
@@ -91,11 +85,11 @@ public class BulkScanValidatorFunctionalTest {
         String ccdCaseNumber = "13115656" + RandomUtils.nextInt(10000000, 99999999);
         String[] dcn = {"6200000000001" + RandomUtils.nextInt(10000000, 99999999)};
 
-        BulkScanPaymentRequest bulkScanCCDPayments = createBulkScanCCDPayments(ccdCaseNumber, dcn, "XY123", false);
-        Response bulkScanCCDPaymentsResponse = bulkScanPaymentTestService.postBulkScanCCDPayments(SERVICE_TOKEN, bulkScanCCDPayments);
-        bulkScanCCDPaymentsResponse.then().statusCode(BAD_REQUEST.value());
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcn, "XY123", false);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(SERVICE_TOKEN, bulkScanCcdPayments);
+        bulkScanCcdPaymentsResponse.then().statusCode(BAD_REQUEST.value());
 
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(INVALID_SITE_ID_LENGTH));
-        Assert.assertTrue(bulkScanCCDPaymentsResponse.andReturn().asString().contains(INVALID_SITE_ID));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(INVALID_SITE_ID_LENGTH));
+        Assert.assertTrue(bulkScanCcdPaymentsResponse.andReturn().asString().contains(INVALID_SITE_ID));
     }
 }

@@ -24,7 +24,7 @@ public class BulkScanPaymentTestService {
             .header("ServiceAuthorization", serviceToken);
     }
 
-    public Response postBulkScanDCNPayment(String serviceToken, BulkScanPayment bulkScanPayment) {
+    public Response postBulkScanDcnPayment(String serviceToken, BulkScanPayment bulkScanPayment) {
         return givenWithServiceAuthHeader(serviceToken)
             .contentType(ContentType.JSON)
             .body(bulkScanPayment)
@@ -32,7 +32,7 @@ public class BulkScanPaymentTestService {
             .post("/bulk-scan-payment");
     }
 
-    public Response postBulkScanCCDPayments(String serviceToken, BulkScanPaymentRequest bulkScanPaymentRequest) {
+    public Response postBulkScanCcdPayments(String serviceToken, BulkScanPaymentRequest bulkScanPaymentRequest) {
         return givenWithServiceAuthHeader(serviceToken)
             .contentType(ContentType.JSON)
             .body(bulkScanPaymentRequest)
@@ -40,7 +40,8 @@ public class BulkScanPaymentTestService {
             .post("/bulk-scan-payments");
     }
 
-    public Response updateCaseReferenceForExceptionReference(String serviceToken, String exceptionReference, CaseReferenceRequest caseReferenceRequest) {
+    public Response updateCaseReferenceForExceptionReference(String serviceToken, String exceptionReference,
+                                                             CaseReferenceRequest caseReferenceRequest) {
         return givenWithServiceAuthHeader(serviceToken)
             .contentType(ContentType.JSON)
             .queryParam("exception_reference", exceptionReference)
@@ -55,20 +56,21 @@ public class BulkScanPaymentTestService {
             .patch("/bulk-scan-payments/{dcn}/status/{status}", dcn, status);
     }
 
-    public Response getCasesUnprocessedPaymentDetailsByDCN(String userToken, String serviceToken, String dcn) {
+    public Response getCasesUnprocessedPaymentDetailsByDcn(String userToken, String serviceToken, String dcn) {
         return givenWithAuthHeaders(userToken, serviceToken)
             .queryParam("document_control_number", dcn)
             .when()
             .get("/cases");
     }
 
-    public Response getUnprocessedPaymentDetailsByccdOrExceptionCaseReference(String userToken, String serviceToken, String ccdOrExceptionCaseReference) {
+    public Response getUnprocessedPaymentDetailsByCcdOrExceptionCaseReference(String userToken, String serviceToken,
+                                                                              String ccdOrExceptionCaseReference) {
         return givenWithAuthHeaders(userToken, serviceToken)
             .when()
             .get("/cases/{ccd_reference}", ccdOrExceptionCaseReference);
     }
 
-    public Response getUnprocessedPaymentDetailsByDCN(String userToken, String serviceToken, String dcn) {
+    public Response getUnprocessedPaymentDetailsByDcn(String userToken, String serviceToken, String dcn) {
         return givenWithAuthHeaders(userToken, serviceToken)
             .when()
             .get("/case/{dcn}", dcn);
@@ -90,7 +92,7 @@ public class BulkScanPaymentTestService {
             .get("/report/download");
     }
 
-    public Response deleteDCNPayment(String userToken, String serviceToken, String dcn) {
+    public Response deleteDcnPayment(String userToken, String serviceToken, String dcn) {
         return givenWithAuthHeaders(userToken, serviceToken)
             .when()
             .delete("/bulk-scan-payment/{dcn}", dcn);

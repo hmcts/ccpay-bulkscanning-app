@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
 import uk.gov.hmcts.reform.idam.client.models.test.CreateUserRequest;
-import uk.gov.hmcts.reform.idam.client.models.test.UserGroup;
 import uk.gov.hmcts.reform.idam.client.models.test.UserRole;
 
 import java.util.Base64;
