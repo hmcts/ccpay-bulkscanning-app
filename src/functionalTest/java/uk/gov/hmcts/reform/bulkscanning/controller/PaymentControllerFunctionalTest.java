@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.bulkscanning.controller;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,27 +16,37 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import uk.gov.hmcts.reform.bulkscanning.config.BulkScanPaymentTestService;
 import uk.gov.hmcts.reform.bulkscanning.config.IdamService;
 import uk.gov.hmcts.reform.bulkscanning.config.S2sTokenService;
 import uk.gov.hmcts.reform.bulkscanning.config.TestConfigProperties;
 import uk.gov.hmcts.reform.bulkscanning.config.TestContextConfiguration;
-import uk.gov.hmcts.reform.bulkscanning.model.enums.ResponsibleSiteId;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.EnvelopeRepository;
-import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
+import uk.gov.hmcts.reform.bulkscanning.config.User;
+import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPayment;
 import uk.gov.hmcts.reform.bulkscanning.model.request.BulkScanPaymentRequest;
 import uk.gov.hmcts.reform.bulkscanning.model.request.CaseReferenceRequest;
-import uk.gov.hmcts.reform.bulkscanning.service.PaymentService;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.bulkscanning.config.IdamService.CMC_CITIZEN_GROUP;
-import static uk.gov.hmcts.reform.bulkscanning.controller.PaymentControllerTest.createPaymentRequest;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.DCN_NOT_EXISTS;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.EXCEPTION_RECORD_NOT_EXISTS;
@@ -50,19 +61,6 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.EXCEP
 public class PaymentControllerFunctionalTest {
 
     @Autowired
-    PaymentService bulkScanConsumerService;
-
-    BulkScanPaymentRequest bulkScanPaymentRequest;
-
-    CaseReferenceRequest caseReferenceRequest;
-
-    @Autowired
-    PaymentRepository paymentRepository;
-
-    @Autowired
-    EnvelopeRepository envelopeRepository;
-
-    @Autowired
     private TestConfigProperties testProps;
 
     @Autowired
@@ -71,323 +69,728 @@ public class PaymentControllerFunctionalTest {
     @Autowired
     private S2sTokenService s2sTokenService;
 
+    @Autowired
+    private BulkScanPaymentTestService bulkScanPaymentTestService;
+
     private static String USER_TOKEN;
     private static String SERVICE_TOKEN;
     private static boolean TOKENS_INITIALIZED;
+    private static final int CCD_EIGHT_DIGIT_UPPER = 99999999;
+    private static final int CCD_EIGHT_DIGIT_LOWER = 10000000;
+    private static String userEmail;
+    private List<String> dcns = new ArrayList<>();
 
     @Before
     public void setUp() {
-        caseReferenceRequest = CaseReferenceRequest
-            .createCaseReferenceRequest()
-            .ccdCaseNumber("9982111111111111")
-            .build();
-
         if (!TOKENS_INITIALIZED) {
-            USER_TOKEN = idamService.createUserWith(CMC_CITIZEN_GROUP, "citizen").getAuthorisationToken();
+            User user = idamService.createUserWith(CMC_CITIZEN_GROUP, "citizen");
+            userEmail = user.getEmail();
+            USER_TOKEN = user.getAuthorisationToken();
             SERVICE_TOKEN = s2sTokenService.getS2sToken(testProps.s2sServiceName, testProps.s2sServiceSecret);
             TOKENS_INITIALIZED = true;
         }
     }
 
     @Test
-    public void testBulkScanningPaymentRequestFirst() throws Exception {
-        String[] dcn = {"987211111111111111111"};
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233335555",
-                                                                                     dcn, "AA08", true);
+    public void testBulkScanningPaymentRequestAndMarkPaymentAsProcessed() throws Exception {
+        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+        String[] dcn = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
 
-        //Post request
-        Response response = RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .body(bulkScanPaymentRequest)
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/bulk-scan-payments");
+        BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment
+        );
+        bulkScanDcnPaymentResponse.then().statusCode(CREATED.value()).and().toString().equals("created");
 
-        Assert.assertNotNull(response.andReturn().asString());
+        Response unprocessedPaymentDetailsByDcnResponse1 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn[0]
+        );
+        unprocessedPaymentDetailsByDcnResponse1.then().statusCode(OK.value())
+            .body("all_payments_status", is(equalTo("INCOMPLETE")));
 
-        //Post Repeat request
-        Response repeatResponse = RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .body(bulkScanPaymentRequest)
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/bulk-scan-payments");
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcn, "AA08", false);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments
+        );
+        bulkScanCcdPaymentsResponse.then().statusCode(CREATED.value()).body(
+            "payment_dcns",
+            equalTo(Arrays.asList(dcn))
+        );
 
-        Assert.assertTrue(StringUtils.containsIgnoreCase(
-            repeatResponse.andReturn().asString(),
-            BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST
-        ));
+        Response unprocessedPaymentDetailsByDcnResponse2 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn[0]
+        );
+        unprocessedPaymentDetailsByDcnResponse2.then().statusCode(OK.value())
+            .body("ccd_reference", is(equalTo(ccdCaseNumber)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn[0])))
+            .body("payments[0].bgc_reference", is(equalTo(bulkScanDcnPayment.getBankGiroCreditSlipNumber().toString())))
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment.getAmount())).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
 
         //PATCH Request
-        Response patchResp = RestAssured.given()
-            .header("Authorization", USER_TOKEN)
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .when()
-            .patch("/bulk-scan-payments/987211111111111111111/status/PROCESSED");
-
-        Assert.assertNotNull(patchResp.andReturn().asString());
-
-        //DCN Not exists Request
-        Response patchdcnnotexists = RestAssured.given()
-            .header("Authorization", USER_TOKEN)
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .when()
-            .patch("/bulk-scan-payments/987411111111111111111/status/PROCESSED");
-
-        Assert.assertTrue(StringUtils.containsIgnoreCase(
-            patchdcnnotexists.andReturn().asString(),
-            DCN_NOT_EXISTS
-        ));
+        Response patchResp = bulkScanPaymentTestService.updateBulkScanPaymentStatus(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn[0],
+            "PROCESSED"
+        );
+        patchResp.then().statusCode(OK.value());
     }
 
     @Test
-    @Transactional
-    public void testUpdateCaseReferenceForExceptionRecord() throws Exception {
-        String[] dcn = {"987511111111111111111"};
-        String[] dcn2 = {"987611111111111111111"};
+    public void testNegativeDuplicateBulkScanChequePayment() {
+        String[] dcn = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn[0]);
+
+        BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment
+        );
+        bulkScanDcnPaymentResponse.then().statusCode(CREATED.value()).and().toString().equals("created");
+
+        BulkScanPayment bulkScanDcnPayment1 = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse1 = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment1
+        );
+        bulkScanDcnPaymentResponse1.then().statusCode(CONFLICT.value()).and().toString().equals(
+            BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST);
+    }
+
+    @Test
+    public void testNegativeDuplicateBulkScanCcdPayment() {
+        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+        String[] dcn = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn[0]);
+
+        BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment
+        );
+        bulkScanDcnPaymentResponse.then().statusCode(CREATED.value()).and().toString().equals("created");
+
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcn, "AA08", false);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments
+        );
+        bulkScanCcdPaymentsResponse.then().statusCode(CREATED.value()).body(
+            "payment_dcns",
+            equalTo(Arrays.asList(dcn))
+        );
+
+        BulkScanPaymentRequest bulkScanCcdPayments1 = createBulkScanCcdPayments(ccdCaseNumber, dcn, "AA08", false);
+        Response bulkScanCcdPaymentsResponse1 = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments1
+        );
+        bulkScanCcdPaymentsResponse1.then().statusCode(CONFLICT.value()).and().toString().equals(
+            BULK_SCANNING_PAYMENT_DETAILS_ALREADY_EXIST);
+    }
+
+    @Test
+    public void testNegativeDcnNotExistsForBulkScanPaymentProcess() {
+        String[] dcn = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        Response updateBulkScanPaymentStatusResponse = bulkScanPaymentTestService.updateBulkScanPaymentStatus(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn[0],
+            "PROCESSED"
+        );
+        updateBulkScanPaymentStatusResponse.then().statusCode(NOT_FOUND.value()).and().toString().equals(DCN_NOT_EXISTS);
+    }
+
+    @Test
+    public void testUpdateCaseReferenceForMultipleEnvelopesExceptionRecordAndGetDetailsByDcns() throws Exception {
+        String[] dcn1 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn1[0]);
+        String[] dcn2 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn2[0]);
+
+        String exceptionReference = "11223344" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+
+        BulkScanPayment bulkScanDcnPayment1 = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn1[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse1 = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment1
+        );
+        bulkScanDcnPaymentResponse1.then().statusCode(CREATED.value()).and().toString().equals("created");
+
+        BulkScanPayment bulkScanDcnPayment2 = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn2[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse2 = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment2
+        );
+        bulkScanDcnPaymentResponse2.then().statusCode(CREATED.value()).and().toString().equals("created");
 
         //Multiple envelopes with same exception record
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444", dcn,
-                                                              "AA08", true);
-        bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
+        BulkScanPaymentRequest bulkScanCcdPayments1 = createBulkScanCcdPayments(exceptionReference, dcn1, "AA08", true);
+        Response bulkScanCcdPaymentsResponse1 = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments1
+        );
+        bulkScanCcdPaymentsResponse1.then().statusCode(CREATED.value()).body(
+            "payment_dcns",
+            equalTo(Arrays.asList(dcn1))
+        );
 
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444", dcn2,
-                                                              "AA08", true);
-        bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
+        BulkScanPaymentRequest bulkScanCcdPayments2 = createBulkScanCcdPayments(exceptionReference, dcn2, "AA08", true);
+        Response bulkScanCcdPaymentsResponse2 = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments2
+        );
+        bulkScanCcdPaymentsResponse2.then().statusCode(CREATED.value()).body(
+            "payment_dcns",
+            equalTo(Arrays.asList(dcn2))
+        );
 
-        Response resultActions = RestAssured.given()
-            .header("Authorization", USER_TOKEN)
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .body(caseReferenceRequest)
-            .contentType(ContentType.JSON)
-            .when()
-            .put("/bulk-scan-payments/?exception_reference=1111222233334444");
+        // verify exception ref payment details by dcn1
+        Response unprocessedPaymentDetailsByDcnResponse1 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn1[0]
+        );
+        unprocessedPaymentDetailsByDcnResponse1.then().statusCode(OK.value())
+            .body("exception_record_reference", is(equalTo(exceptionReference)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments1.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn1[0])))
+            .body(
+                "payments[0].bgc_reference",
+                is(equalTo(bulkScanDcnPayment1.getBankGiroCreditSlipNumber().toString()))
+            )
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment1.getAmount())).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment1.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment1.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
 
-        Assert.assertNotNull(resultActions.andReturn().asString());
+        // verify exception ref payment details by dcn2
+        Response unprocessedPaymentDetailsByDcnResponse2 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn2[0]
+        );
+        unprocessedPaymentDetailsByDcnResponse2.then().statusCode(OK.value())
+            .body("exception_record_reference", is(equalTo(exceptionReference)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments2.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn1[0])))
+            .body(
+                "payments[0].bgc_reference",
+                is(equalTo(bulkScanDcnPayment2.getBankGiroCreditSlipNumber().toString()))
+            )
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment2.getAmount())).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment2.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment2.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
+
+        CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest
+            .createCaseReferenceRequest()
+            .ccdCaseNumber(ccdCaseNumber)
+            .build();
+
+        Response response = bulkScanPaymentTestService.updateCaseReferenceForExceptionReference(
+            SERVICE_TOKEN,
+            exceptionReference,
+            caseReferenceRequest
+        );
+        response.then().statusCode(OK.value());
+        Assert.assertNotNull(response.andReturn().asString());
+
+        // verify ccd case ref payment details by dcn1
+        Response unprocessedPaymentDetailsByDcnResponse3 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn1[0]
+        );
+        unprocessedPaymentDetailsByDcnResponse3.then().statusCode(OK.value())
+            .body("ccd_reference", is(equalTo(ccdCaseNumber)))
+            .body("exception_record_reference", is(equalTo(exceptionReference)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments1.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn1[0])))
+            .body(
+                "payments[0].bgc_reference",
+                is(equalTo(bulkScanDcnPayment1.getBankGiroCreditSlipNumber().toString()))
+            )
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment1.getAmount())).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment1.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment1.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
+
+        // verify ccd case ref payment details by dcn2
+        Response unprocessedPaymentDetailsByDcnResponse4 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn2[0]
+        );
+        unprocessedPaymentDetailsByDcnResponse4.then().statusCode(OK.value())
+            .body("ccd_reference", is(equalTo(ccdCaseNumber)))
+            .body("exception_record_reference", is(equalTo(exceptionReference)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments2.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn1[0])))
+            .body(
+                "payments[0].bgc_reference",
+                is(equalTo(bulkScanDcnPayment2.getBankGiroCreditSlipNumber().toString()))
+            )
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment2.getAmount())).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment2.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment2.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
     }
 
     @Test
-    @Transactional
+    public void testUnprocessedPaymentDetailsWithDcn() {
+        String ccdCaseNumber = "12115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+        String[] dcn = {"6100000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn[0]);
+
+        BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment
+        );
+        bulkScanDcnPaymentResponse.then().statusCode(CREATED.value()).and().toString().equals("created");
+
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcn, "AA08", false);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments
+        );
+        bulkScanCcdPaymentsResponse.then().statusCode(CREATED.value()).body(
+            "payment_dcns",
+            equalTo(Arrays.asList(dcn))
+        );
+
+        Response unprocessedPaymentDetailsByDcnResponse1 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn[0]
+        );
+        unprocessedPaymentDetailsByDcnResponse1.then().statusCode(OK.value())
+            .body("ccd_reference", is(equalTo(ccdCaseNumber)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn[0])))
+            .body("payments[0].bgc_reference", is(equalTo(bulkScanDcnPayment.getBankGiroCreditSlipNumber().toString())))
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment.getAmount())).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
+
+        // Seems like duplicate endpoints on controller, not much different to the above one.
+        Response unprocessedPaymentDetailsByDcnResponse2 = bulkScanPaymentTestService.getCasesUnprocessedPaymentDetailsByDcn(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            dcn[0]
+        );
+        unprocessedPaymentDetailsByDcnResponse2.then().statusCode(OK.value())
+            .body("ccd_reference", is(equalTo(ccdCaseNumber)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn[0])))
+            .body("payments[0].bgc_reference", is(equalTo(bulkScanDcnPayment.getBankGiroCreditSlipNumber().toString())))
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment.getAmount())).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
+    }
+
+    @Test
+    public void testUnprocessedPaymentDetailsWithCcdCaseReference() {
+        String ccdCaseNumber = "13115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+        String[] dcn = {"6200000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn[0]);
+
+        BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment
+        );
+        bulkScanDcnPaymentResponse.then().statusCode(CREATED.value()).and().toString().equals("created");
+
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcn, "AA08", false);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments
+        );
+        bulkScanCcdPaymentsResponse.then().statusCode(CREATED.value()).body(
+            "payment_dcns",
+            equalTo(Arrays.asList(dcn))
+        );
+
+        Response response1 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByCcdOrExceptionCaseReference(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            ccdCaseNumber
+        );
+        response1.then().statusCode(OK.value());
+    }
+
+    @Test
+    public void testUnprocessedPaymentDetailsWithExceptionAndCcdCaseReference() {
+        String exceptionReference = "11223344" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+        String[] dcn = {"6200000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn[0]);
+
+        BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcn[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment
+        );
+        bulkScanDcnPaymentResponse.then().statusCode(CREATED.value()).and().toString().equals("created");
+
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(exceptionReference, dcn, "AA08", true);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments
+        );
+        bulkScanCcdPaymentsResponse.then().statusCode(CREATED.value()).body(
+            "payment_dcns",
+            equalTo(Arrays.asList(dcn))
+        );
+
+        Response exceptionCaseReferencePaymentDetailsResponse = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByCcdOrExceptionCaseReference(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            exceptionReference
+        );
+        exceptionCaseReferencePaymentDetailsResponse.then().statusCode(OK.value())
+            .body("exception_record_reference", is(equalTo(exceptionReference)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn[0])))
+            .body("payments[0].bgc_reference", is(equalTo(bulkScanDcnPayment.getBankGiroCreditSlipNumber().toString())))
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment.getAmount())).setScale(
+                    2,
+                    BigDecimal.ROUND_HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
+
+        String ccdCaseNumber = "13115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+        CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest
+            .createCaseReferenceRequest()
+            .ccdCaseNumber(ccdCaseNumber)
+            .build();
+
+        Response response = bulkScanPaymentTestService.updateCaseReferenceForExceptionReference(
+            SERVICE_TOKEN,
+            exceptionReference,
+            caseReferenceRequest
+        );
+        response.then().statusCode(OK.value());
+
+        Response ccdCaseReferencePaymentDetailsResponse = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByCcdOrExceptionCaseReference(
+            USER_TOKEN,
+            SERVICE_TOKEN,
+            ccdCaseNumber
+        );
+        ccdCaseReferencePaymentDetailsResponse.then().statusCode(OK.value())
+            .body("ccd_reference", is(equalTo(ccdCaseNumber)))
+            .body("exception_record_reference", is(equalTo(exceptionReference)))
+            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments.getResponsibleServiceId())))
+            .body("payments[0].id", notNullValue())
+            .body("payments[0].dcn_reference", is(equalTo(dcn[0])))
+            .body("payments[0].bgc_reference", is(equalTo(bulkScanDcnPayment.getBankGiroCreditSlipNumber().toString())))
+            .body(
+                "payments[0].amount",
+                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment.getAmount())).setScale(
+                    2,
+                    BigDecimal.ROUND_HALF_UP
+                )))
+            )
+            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment.getCurrency())))
+            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment.getMethod().toUpperCase())))
+            .body("payments[0].date_banked", notNullValue())
+            .body("payments[0].date_created", notNullValue())
+            .body("payments[0].date_updated", notNullValue())
+            .body("all_payments_status", is(equalTo("COMPLETE")));
+    }
+
+    @Test
     public void testExceptionRecordNotExists() throws Exception {
+        String exceptionReference = "11223344" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
 
-        Response resultActions = RestAssured.given()
-            .header("Authorization", USER_TOKEN)
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .body(caseReferenceRequest)
-            .contentType(ContentType.JSON)
-            .when()
-            .put("/bulk-scan-payments/?exception_reference=4444333322221111");
+        CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest
+            .createCaseReferenceRequest()
+            .ccdCaseNumber(ccdCaseNumber)
+            .build();
 
+        Response response = bulkScanPaymentTestService.updateCaseReferenceForExceptionReference(
+            SERVICE_TOKEN,
+            exceptionReference,
+            caseReferenceRequest
+        );
+        response.then().statusCode(NOT_FOUND.value());
         Assert.assertTrue(StringUtils.containsIgnoreCase(
-            resultActions.andReturn().asString(),
+            response.andReturn().asString(),
             EXCEPTION_RECORD_NOT_EXISTS
         ));
     }
 
     @Test
-    @Transactional
-    public void testMarkPaymentAsProcessed() throws Exception {
-        String[] dcn = {"987111111111111111111"};
-        bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
-                                                              dcn, "AA08", false);
-        bulkScanConsumerService.saveInitialMetadataFromBs(bulkScanPaymentRequest);
-
-        Response resultActions = RestAssured.given()
-            .header("Authorization", USER_TOKEN)
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .when()
-            .patch("/bulk-scan-payments/987111111111111111111/status/PROCESSED");
-
-        //Assert.assertEquals(resultActions.andReturn().getStatusCode(), OK.value());
-        Assert.assertNotNull(resultActions.andReturn().asString());
-    }
-
-    @Test
-    public void testMatchingPaymentsFromExcelaBulkScan() throws Exception {
-
-        //Request from Exela with one DCN
-        String[] dcn = {"111122224444555511111"};
-        Response exelaResp = RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .body(createPaymentRequest("111122224444555511111"))
-            .when()
-            .post("/bulk-scan-payment");
-
-        //Request from bulk scan with one DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
-                                                                                     dcn, "AA08", true);
-
-        //Post request
-        Response bsResp = RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .body(bulkScanPaymentRequest)
-            .when()
-            .post("/bulk-scan-payments");
-
-        /*//Complete payment
-        EnvelopePayment payment = paymentRepository.findByDcnReference("1111-2222-4444-5555").get();
-        Assert.assertEquals(COMPLETE.toString(), payment.getPaymentStatus());
-
-        //Complete envelope
-        Envelope finalEnvelope = envelopeRepository.findById(payment.getEnvelope().getId()).get();
-        Assert.assertEquals(COMPLETE.toString(), finalEnvelope.getPaymentStatus());*/
-        Assert.assertNotNull(exelaResp.andReturn().asString());
-        Assert.assertNotNull(bsResp.andReturn().asString());
-    }
-
-    @Test
-    public void testNonMatchingPaymentsFromExelaThenBulkScan() throws Exception {
-
-        //Request from Exela with one DCN
-        String[] dcn = {"111122223333666611111", "111122223333777711111"};
-        Response exelaResp = RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .body(createPaymentRequest("111122223333666611111"))
-            .when()
-            .post("/bulk-scan-payment");
-
-        //Request from bulk scan with two DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
-                                                                                     dcn, "AA08", true);
-
-        //Post request
-        Response bsResp = RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .body(bulkScanPaymentRequest)
-            .when()
-            .post("/bulk-scan-payments");
-
-        /*//Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-6666").get().getPaymentStatus()
-            , COMPLETE.toString());
-
-        //Non Complete Payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-7777").get().getPaymentStatus()
-            , INCOMPLETE.toString());*/
-        Assert.assertNotNull(exelaResp.andReturn().asString());
-        Assert.assertNotNull(bsResp.andReturn().asString());
-    }
-
-
-    @Test
-    public void testMatchingBulkScanFirstThenExela() throws Exception {
-        //Request from Bulk Scan with one DCN
-        String[] dcn = {"111122223333888811111", "111122223333999911111"};
-
-        //Request from bulk scan with two DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest("1111222233334444",
-                                                                                     dcn, "AA08", true);
-
-        //Post request
-        Response bsResp = RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .body(bulkScanPaymentRequest)
-            .when()
-            .post("/bulk-scan-payments");
-
-        Response exelaResp = RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .body(createPaymentRequest("111122223333888811111"))
-            .when()
-            .post("/bulk-scan-payment");
-
-        /*//Complete payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-8888").get().getPaymentStatus()
-            , COMPLETE.toString());
-
-        //Non Complete Payment
-        Assert.assertEquals(paymentRepository.findByDcnReference("1111-2222-3333-9999").get().getPaymentStatus()
-            , INCOMPLETE.toString());*/
-        Assert.assertNotNull(bsResp.andReturn().asString());
-        Assert.assertNotNull(exelaResp.andReturn().asString());
-
-    }
-
-    public static BulkScanPaymentRequest createBulkScanPaymentRequest(String ccdCaseNumber, String[] dcn,
-                                                                      String responsibleServiceId, boolean isExceptionRecord) {
-        return BulkScanPaymentRequest
-            .createBSPaymentRequestWith()
-            .ccdCaseNumber(ccdCaseNumber)
-            .documentControlNumbers(dcn)
-            .responsibleServiceId(ResponsibleSiteId.valueOf(responsibleServiceId).toString())
-            .isExceptionRecord(isExceptionRecord)
-            .build();
-    }
-
-    @Test
     public void testGeneratePaymentReport_Unprocessed() throws Exception {
+        String[] dcn1 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn1[0]);
+        String[] dcn2 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn2[0]);
 
-        String[] dcn = {"111122223333444411111", "111122223333444421111"};
-        String ccd = "1111222233334444";
-        createTestReportData(ccd, dcn);
+        String[] dcn = {dcn1[0], dcn2[0]};
+        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+
+        createTestReportData(ccdCaseNumber, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L)));
         params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
         params.add("report_type", "UNPROCESSED");
-        Response response = RestAssured.given()
-            .header("Authorization", USER_TOKEN)
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .params(params)
-            .when()
-            .get("/report/download");
-        Assert.assertEquals(200, response.andReturn().getStatusCode());
+
+        Response response1 = bulkScanPaymentTestService.retrieveReportData(USER_TOKEN, SERVICE_TOKEN, params);
+        response1.then().statusCode(OK.value());
+
+        Response response2 = bulkScanPaymentTestService.downloadReport(USER_TOKEN, SERVICE_TOKEN, params);
+        response2.then().statusCode(OK.value());
     }
 
     @Test
     public void testGeneratePaymentReport_DataLoss() throws Exception {
-        String[] dcn = {"111122223333555511111", "111122223333555521111"};
-        String ccd = "1111222233335555";
-        createTestReportData(ccd, dcn);
+        String[] dcn1 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn1[0]);
+        String[] dcn2 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        dcns.add(dcn2[0]);
+
+        String[] dcn = {dcn1[0], dcn2[0]};
+        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
+
+        createTestReportData(ccdCaseNumber, dcn);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("date_from", getReportDate(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L)));
         params.add("date_to", getReportDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L)));
         params.add("report_type", "DATA_LOSS");
-        Response response = RestAssured.given()
-            .header("Authorization", USER_TOKEN)
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .params(params)
-            .when()
-            .get("/report/download");
-        Assert.assertEquals(200, response.andReturn().getStatusCode());
+
+        Response response1 = bulkScanPaymentTestService.retrieveReportData(USER_TOKEN, SERVICE_TOKEN, params);
+        response1.then().statusCode(OK.value());
+
+        Response response2 = bulkScanPaymentTestService.downloadReport(USER_TOKEN, SERVICE_TOKEN, params);
+        response2.then().statusCode(OK.value());
     }
 
-    private void createTestReportData(String ccd, String... dcns) throws Exception {
-        //Request from Exela with one DCN
+    public static BulkScanPayment createBulkScanDcnPayment(BigDecimal amount, Integer bankGiroCreditSlipNumber, String bankedDate,
+                                                           String currency, String dcnReference, String method) {
 
-        RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .body(createPaymentRequest(dcns[0]))
-            .when()
-            .post("/bulk-scan-payment");
+        return BulkScanPayment
+            .createPaymentRequestWith()
+            .amount(amount)
+            .bankGiroCreditSlipNumber(bankGiroCreditSlipNumber)
+            .bankedDate(bankedDate)
+            .currency(currency)
+            .dcnReference(dcnReference)
+            .method(method)
+            .build();
+    }
 
-        //Request from bulk scan with one DCN
-        BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(ccd, dcns,
-                                                                                     "AA08", true);
+    public static BulkScanPaymentRequest createBulkScanCcdPayments(String ccdCaseNumber, String[] dcn,
+                                                                   String responsibleServiceId, boolean isExceptionRecord) {
+        return BulkScanPaymentRequest
+            .createBSPaymentRequestWith()
+            .ccdCaseNumber(ccdCaseNumber)
+            .documentControlNumbers(dcn)
+            .responsibleServiceId(responsibleServiceId)
+            .isExceptionRecord(isExceptionRecord)
+            .build();
+    }
 
-        //Post request
-        RestAssured.given()
-            .header("ServiceAuthorization", SERVICE_TOKEN)
-            .contentType(ContentType.JSON)
-            .body(bulkScanPaymentRequest)
-            .when()
-            .post("/bulk-scan-payments");
+    private void createTestReportData(String ccdCaseNumber, String... dcns) throws Exception {
+        //Request from bulk scan provider with one Dcn
+        BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
+            new BigDecimal(273),
+            964567,
+            LocalDate.now().toString(),
+            "GBP",
+            dcns[0],
+            "cheque"
+        );
+        Response bulkScanDcnPaymentResponse = bulkScanPaymentTestService.postBulkScanDcnPayment(
+            SERVICE_TOKEN,
+            bulkScanDcnPayment
+        );
+        bulkScanDcnPaymentResponse.then().statusCode(CREATED.value()).and().toString().equals("created");
+
+        BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcns, "AA08", false);
+        Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(
+            SERVICE_TOKEN,
+            bulkScanCcdPayments
+        );
+        bulkScanCcdPaymentsResponse.then().statusCode(CREATED.value()).body(
+            "payment_dcns",
+            equalTo(Arrays.asList(dcns))
+        );
     }
 
     private String getReportDate(Date date) {
         DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).format(reportNameDateFormat);
+        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).format(
+            reportNameDateFormat);
+    }
+
+    @After
+    public void deleteDcnPayment() {
+        if (!dcns.isEmpty()) {
+            dcns.forEach((dcn) -> bulkScanPaymentTestService.deleteDcnPayment(USER_TOKEN, SERVICE_TOKEN, dcn));
+        }
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        IdamService.deleteUser(userEmail);
     }
 
 }
