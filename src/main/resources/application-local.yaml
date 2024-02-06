@@ -16,7 +16,6 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5185/bspayment
     username: ${POSTGRES_USERNAME}
-    password: dummy
     properties:
       charSet: UTF-8
   jpa:
