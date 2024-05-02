@@ -16,8 +16,7 @@ public class BulkScanningApiApplication {
         try{
             //Setting Liquibase DB Lock property before Spring starts up.
             LiquibaseConfiguration.getInstance()
-                .getConfiguration(GlobalConfiguration.class)
-                .setUseDbLock(true);
+                .getConfiguration(GlobalConfiguration.class);
             SpringApplication.run(BulkScanningApiApplication.class, args);
         }catch (RuntimeException re) {
             LOG.error("Application crashed with error message: ", re);
