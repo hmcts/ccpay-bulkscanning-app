@@ -264,7 +264,7 @@ dependencies {
   implementation group: 'joda-time', name: 'joda-time', version: '2.10.5'
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
   implementation group: 'com.querydsl', name: 'querydsl-jpa', version:'4.2.2'
-  implementation 'com.github.hmcts.liquibase:liquibase-core:3.8.2'
+  implementation 'com.github.hmcts.liquibase:liquibase-core:4.27.0'
 
   implementation(group: 'org.postgresql', name: 'postgresql', version: '42.3.3') {
     exclude(module: 'commons-logging')
