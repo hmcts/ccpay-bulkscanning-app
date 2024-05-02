@@ -259,11 +259,6 @@
         <cve>CVE-2023-24998</cve>
     </suppress>
     <suppress>
-      <notes>SnakeYaml's Constructor() class does not restrict types which can be instantiated during deserialization.
-      </notes>
-      <cve>CVE-2022-1471</cve>
-    </suppress>
-    <suppress>
       <notes>Tomcat-embed-core and websocket suppressed to fix appinsights issue
       </notes>
       <cve>CVE-2023-28708</cve>
