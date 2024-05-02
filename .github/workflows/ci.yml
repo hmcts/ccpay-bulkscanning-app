@@ -32,8 +32,11 @@ jobs:
         run: ./gradlew test
       - name: Generate Jacoco report
         run: ./gradlew jacocoTestReport
-      - name: Publish report to Codecov
-        run: bash <(curl -s https://codecov.io/bash)
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./build/jacoco/test/jacocoTestReport.xml
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
