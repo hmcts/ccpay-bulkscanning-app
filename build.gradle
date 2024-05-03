@@ -209,7 +209,7 @@ checkstyleTest.enabled(false)
         entry 'jackson-databind'
       }
       // CVE-2020-8908
-      dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
+      dependencySet(group: 'com.google.guava', version: '32.1.3-jre') {
         entry 'guava'
       }
 
@@ -238,7 +238,7 @@ checkstyleTest.enabled(false)
 
 dependencies {
   implementation ('com.sun.xml.bind:jaxb-osgi:2.3.1')
-  implementation group: 'com.google.guava', name: 'guava', version: '30.1-jre'
+  implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
