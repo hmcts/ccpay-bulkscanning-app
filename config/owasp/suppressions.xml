@@ -250,10 +250,6 @@
       <cve>CVE-2022-45688</cve>
     </suppress>
     <suppress>
-        <notes>commons-fileupload</notes>
-        <cve>CVE-2023-24998</cve>
-    </suppress>
-    <suppress>
       <notes>Tomcat-embed-core and websocket suppressed to fix appinsights issue
       </notes>
       <cve>CVE-2023-28708</cve>
