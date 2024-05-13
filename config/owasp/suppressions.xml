@@ -42,11 +42,6 @@
     </suppress>
 
     <suppress>
-        <notes>jackson-databind issue, upgrading to new version broke functional tests.</notes>
-        <cve>CVE-2020-36518</cve>
-    </suppress>
-
-    <suppress>
       <notes>org.apache.poi issue, upgrading to new version and a large depth of nested objects</notes>
       <cve>CVE-2022-26336</cve>
     </suppress>
@@ -189,15 +184,6 @@
         <cve>CVE-2021-22044</cve>
         <cve>CVE-2022-22978</cve>
     </suppress>
-    <suppress>
-        <notes>
-          In FasterXML jackson-databind before 2.14.0-rc1, resource exhaustion can occur because of a lack of a check in
-          primitive value deserializers to avoid deep wrapper array nesting,
-          when the UNWRAP_SINGLE_VALUE_ARRAYS feature is enabled
-        </notes>
-        <cve>CVE-2022-42003</cve>
-        <cve>CVE-2022-42004</cve>
-    </suppress>
   <suppress>
     <notes>
       Postgres jdbc vulnerability is not resolved by the most recent patch 42.4.3 and is being supressed until a newer version is available.
@@ -263,12 +249,6 @@
         <notes>In spring framework versions prior to 5.2.24 release+ ,5.3.27+ and 6.0.8+ , it is possible for a user to provide a specially crafted SpEL expression that may cause a denial-of-service (DoS) condition.
         </notes>
         <cve>CVE-2023-20863</cve>
-    </suppress>
-    <suppress>
-      <notes>
-        jackson-databind 2.10.x through 2.12.x before 2.12.6 and 2.13.x before 2.13.1 allows attackers to cause a denial of service (2 GB transient heap usage per read) in uncommon situations involving JsonNode JDK serialization.
-      </notes>
-      <cve>CVE-2021-46877</cve>
     </suppress>
     <!-- Supression Group ends here -->
 
