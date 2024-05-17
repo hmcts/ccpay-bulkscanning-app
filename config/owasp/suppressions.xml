@@ -220,15 +220,6 @@
         <cve>CVE-2022-3064</cve>
     </suppress>
     <suppress>
-      <notes>
-        Spring cloud cve
-      </notes>
-      <cve>CVE-2020-15522</cve>
-      <cve>CVE-2021-22053</cve>
-      <cve>CVE-2020-5412</cve>
-      <cve>CVE-2023-20861</cve>
-    </suppress>
-    <suppress>
       <notes>A stack overflow in the XML.toJSONObject component of hutool-json v5.8.10
         allows attackers to cause a Denial of Service (DoS) via crafted JSON or XML data.
         New version of jackson-core needed to resolve this issue.
