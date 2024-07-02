@@ -19,7 +19,7 @@ variable "env" {
 }
 
 variable "subscription" {
-  type    = string
+  type = string
 }
 
 variable "common_tags" {
@@ -37,8 +37,8 @@ variable "postgresql_user" {
 }
 
 # thumbprint of the SSL certificate for API gateway tests
-variable bulkscanning_api_gateway_certificate_thumbprints {
-  type = list(string)
+variable "bulkscanning_api_gateway_certificate_thumbprints" {
+  type    = list(string)
   default = []
 }
 
