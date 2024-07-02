@@ -1,13 +1,7 @@
-provider "azurerm" {
-  features {}
-  skip_provider_registration = true
-}
-
 locals {
   cft_api_mgmt_suffix = var.apim_suffix == "" ? var.env : var.apim_suffix
   cft_api_mgmt_name     = join("-", ["cft-api-mgmt", local.cft_api_mgmt_suffix])
   cft_api_mgmt_rg       = join("-", ["cft", var.env, "network-rg"])
-  api_base_path = "bulk-scanning-payment"
 }
 
 resource "azurerm_template_deployment" "cft-bulk-scanning-payment" {
