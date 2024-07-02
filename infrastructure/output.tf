@@ -3,5 +3,5 @@ output "dummy_value" {
 }
 
 output "s2s_url" {
-  value = "${local.s2sUrl}"
+  value = local.s2sUrl
 }

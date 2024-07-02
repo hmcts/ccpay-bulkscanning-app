@@ -9,14 +9,14 @@ resource "azurerm_template_deployment" "cft-bulk-scanning-payment" {
   name                = "cft-bulk-scanning-payment-${var.env}"
   deployment_mode     = "Incremental"
   resource_group_name = local.cft_api_mgmt_rg
-  count               = var.env != "preview" ? 1: 0
+  count               = var.env != "preview" ? 1 : 0
 
   parameters = {
-    apiManagementServiceName  = local.cft_api_mgmt_rg
-    apiName                   = "bulk-scanning-payment-api"
-    apiProductName            = "bulk-scanning-payment"
-    serviceUrl                = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
-    apiBasePath               = local.api_base_path
-    policy                    = data.template_file.policy_template.rendered
+    apiManagementServiceName = local.cft_api_mgmt_rg
+    apiName                  = "bulk-scanning-payment-api"
+    apiProductName           = "bulk-scanning-payment"
+    serviceUrl               = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
+    apiBasePath              = local.api_base_path
+    policy                   = data.template_file.policy_template.rendered
   }
 }
