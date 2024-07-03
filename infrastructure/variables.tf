@@ -50,8 +50,6 @@ variable "postgresql_flexible_server_port" {
   default = "5432"
 }
 
-
-
 variable "jenkins_AAD_objectId" {
   description = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
