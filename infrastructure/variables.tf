@@ -62,3 +62,6 @@ variable "additional_databases" {
   default = []
 }
 
+variable "apim_suffix" {
+  default = ""
+}
