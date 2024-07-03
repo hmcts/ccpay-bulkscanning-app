@@ -6,7 +6,11 @@ variable "product" {
 variable "component" {
   type    = string
   default = "bulkscanning-api"
+}
 
+variable "product_name" {
+  type    = string
+  default = "bulk-scanning-payment"
 }
 
 variable "location_app" {
