@@ -17,8 +17,8 @@ resource "azurerm_key_vault_secret" "fee_pay_team_bulk_scan_subscription_key" {
 
 # Supplier subscription - Exela
 resource "azurerm_api_management_subscription" "exela_supplier_subscription" {
-  api_management_name = local.api_mgmt_name
-  resource_group_name = local.api_mgmt_rg
+  api_management_name = local.cft_api_mgmt_name
+  resource_group_name = local.cft_api_mgmt_rg
   product_id          = module.cft_api_mgmt_product.id
   display_name        = "Bulk Scanning Payment API - Exela Supplier Subscription"
   state               = "active"
@@ -32,8 +32,8 @@ resource "azurerm_key_vault_secret" "exela_supplier_subscription_key" {
 
 # Supplier subscription - Iron Mountain
 resource "azurerm_api_management_subscription" "iron_mountain_supplier_subscription" {
-  api_management_name = local.api_mgmt_name
-  resource_group_name = local.api_mgmt_rg
+  api_management_name = local.cft_api_mgmt_name
+  resource_group_name = local.cft_api_mgmt_rg
   product_id          = module.cft_api_mgmt_product.id
   display_name        = "Bulk Scanning Payment API - Iron Mountain Supplier Subscription"
   state               = "active"
