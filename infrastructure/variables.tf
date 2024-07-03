@@ -6,7 +6,11 @@ variable "product" {
 variable "component" {
   type    = string
   default = "bulkscanning-api"
+}
 
+variable "product_name" {
+  type    = string
+  default = "bulk-scanning-payment"
 }
 
 variable "location_app" {
@@ -19,7 +23,7 @@ variable "env" {
 }
 
 variable "subscription" {
-  type    = string
+  type = string
 }
 
 variable "common_tags" {
@@ -37,8 +41,8 @@ variable "postgresql_user" {
 }
 
 # thumbprint of the SSL certificate for API gateway tests
-variable bulkscanning_api_gateway_certificate_thumbprints {
-  type = list(string)
+variable "bulkscanning_api_gateway_certificate_thumbprints" {
+  type    = list(string)
   default = []
 }
 
@@ -50,8 +54,6 @@ variable "postgresql_flexible_server_port" {
   default = "5432"
 }
 
-
-
 variable "jenkins_AAD_objectId" {
   description = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
@@ -62,3 +64,6 @@ variable "additional_databases" {
   default = []
 }
 
+variable "apim_suffix" {
+  default = ""
+}
