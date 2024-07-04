@@ -7,6 +7,7 @@ resource "azurerm_api_management_subscription" "fee_pay_team_bulk_scan_subscript
   product_id          = module.cft_api_mgmt_product.id
   display_name        = "Bulk Scanning Payment API - Fee and Pay DTS Team Subscription"
   state               = "active"
+  provider            = azurerm.aks-cftapps
 }
 
 resource "azurerm_key_vault_secret" "fee_pay_team_bulk_scan_subscription_key" {
@@ -22,6 +23,7 @@ resource "azurerm_api_management_subscription" "exela_supplier_subscription" {
   product_id          = module.cft_api_mgmt_product.id
   display_name        = "Bulk Scanning Payment API - Exela Supplier Subscription"
   state               = "active"
+  provider            = azurerm.aks-cftapps
 }
 
 resource "azurerm_key_vault_secret" "exela_supplier_subscription_key" {
@@ -37,6 +39,7 @@ resource "azurerm_api_management_subscription" "iron_mountain_supplier_subscript
   product_id          = module.cft_api_mgmt_product.id
   display_name        = "Bulk Scanning Payment API - Iron Mountain Supplier Subscription"
   state               = "active"
+  provider            = azurerm.aks-cftapps
 }
 
 resource "azurerm_key_vault_secret" "iron_mountain_supplier_subscription_key" {
