@@ -9,7 +9,7 @@ module "cft_api_mgmt_product" {
   name          = var.product_name
   api_mgmt_name = local.cft_api_mgmt_name
   api_mgmt_rg   = local.cft_api_mgmt_rg
-  providers             = {
+  providers = {
     azurerm = azurerm.aks-cftapps
   }
 }
