@@ -20,9 +20,6 @@ resource "azurerm_template_deployment" "cft-bulk-scanning-payment" {
   deployment_mode     = "Incremental"
   resource_group_name = local.cft_api_mgmt_rg
   count               = var.env != "preview" ? 1 : 0
-  providers             = {
-    azurerm = azurerm.aks-cftapps
-  }
 
   parameters = {
     apiManagementServiceName = local.cft_api_mgmt_rg
