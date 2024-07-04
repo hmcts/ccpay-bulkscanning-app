@@ -14,19 +14,19 @@ module "cft_api_mgmt_product" {
   }
 }
 
-resource "azurerm_resource_group_template_deployment" "cft-bulk-scanning-payment" {
-  template_content    = data.template_file.api_template.rendered
+resource "azurerm_template_deployment" "cft-bulk-scanning-payment" {
+  template_body       = data.template_file.api_template.rendered
   name                = "cft-bulk-scanning-payment-${var.env}"
   deployment_mode     = "Incremental"
   resource_group_name = local.cft_api_mgmt_rg
   count               = var.env != "preview" ? 1 : 0
 
-  parameters_content = jsonencode({
-    apiManagementServiceName = { value = local.cft_api_mgmt_rg }
-    apiName                  = { value = "bulk-scanning-payment-api" }
-    apiProductName           = { value = "bulk-scanning-payment" }
-    serviceUrl               = { value = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal" }
-    apiBasePath              = { value = local.api_base_path }
-    policy                   = { value = data.template_file.policy_template.rendered }
-  })
+  parameters = {
+    apiManagementServiceName = local.cft_api_mgmt_rg
+    apiName                  = "bulk-scanning-payment-api"
+    apiProductName           = "bulk-scanning-payment"
+    serviceUrl               = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
+    apiBasePath              = local.api_base_path
+    policy                   = data.template_file.policy_template.rendered
+  }
 }
