@@ -1,7 +1,9 @@
 provider "azurerm" {
-  features {}
-  alias           = "aks-cftapps"
-  subscription_id = var.aks_subscription_id
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 locals {
@@ -30,7 +32,6 @@ resource "azurerm_template_deployment" "cft-bulk-scanning-payment" {
   deployment_mode     = "Incremental"
   resource_group_name = data.azurerm_resource_group.cft_api_mgmt_infra.name
   count               = var.env != "preview" ? 1 : 0
-  provider            = azurerm.aks-cftapps
 
   parameters = {
     apiManagementServiceName = local.cft_api_mgmt_rg
