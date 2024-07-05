@@ -1,3 +1,9 @@
+provider "azurerm" {
+  features {}
+  alias           = "aks-cftapps"
+  subscription_id = var.aks_subscription_id
+}
+
 locals {
   cft_api_mgmt_suffix = var.apim_suffix == "" ? var.env : var.apim_suffix
   cft_api_mgmt_name   = join("-", ["cft-api-mgmt", local.cft_api_mgmt_suffix])
