@@ -6,7 +6,11 @@ provider "azurerm" {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+      resource_group {
+        prevent_deletion_if_contains_resources = false
+      }
+  }
   alias           = "aks-cftapps"
   subscription_id = var.aks_subscription_id
 }
