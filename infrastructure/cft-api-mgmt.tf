@@ -38,7 +38,7 @@ module "cft_api_mgmt_policy" {
   api_mgmt_rg            = local.cft_api_mgmt_rg
   api_name               = module.cft_api_mgmt_api.name
   api_policy_xml_content = data.template_file.policy_template.rendered
-  providers             = {
+  providers = {
     azurerm = azurerm.aks-cftapps
   }
 }
