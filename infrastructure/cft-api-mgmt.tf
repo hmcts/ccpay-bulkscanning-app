@@ -1,3 +1,5 @@
+# Note for API docs see - https://github.com/hmcts/cnp-api-docs/tree/master/docs/specs
+
 locals {
   cft_api_mgmt_suffix = var.apim_suffix == "" ? var.env : var.apim_suffix
   cft_api_mgmt_name   = join("-", ["cft-api-mgmt", local.cft_api_mgmt_suffix])
@@ -5,28 +7,42 @@ locals {
 }
 
 module "cft_api_mgmt_product" {
-  source        = "git@github.com:hmcts/cnp-module-api-mgmt-product?ref=master"
-  name          = var.product_name
-  api_mgmt_name = local.cft_api_mgmt_name
-  api_mgmt_rg   = local.cft_api_mgmt_rg
+  source                        = "git@github.com:hmcts/cnp-module-api-mgmt-product?ref=master"
+  name                          = var.product_name
+  api_mgmt_name                 = local.cft_api_mgmt_name
+  api_mgmt_rg                   = local.cft_api_mgmt_rg
+  approval_required             = "false"
+  subscription_required         = "true"
+  product_access_control_groups = ["developers"]
   providers = {
     azurerm = azurerm.aks-cftapps
   }
 }
 
-resource "azurerm_template_deployment" "cft-bulk-scanning-payment" {
-  template_body       = data.template_file.api_template.rendered
-  name                = "cft-bulk-scanning-payment-${var.env}"
-  deployment_mode     = "Incremental"
-  resource_group_name = local.cft_api_mgmt_rg
-  count               = var.env != "preview" ? 1 : 0
+module "cft_api_mgmt_api" {
+  source        = "git@github.com:hmcts/cnp-module-api-mgmt-api?ref=master"
+  name          = join("-", [var.product_name, "api"])
+  display_name  = "Bulk Scanning Payment API"
+  api_mgmt_name = local.cft_api_mgmt_name
+  api_mgmt_rg   = local.cft_api_mgmt_rg
+  product_id    = module.cft_api_mgmt_product.product_id
+  path          = local.api_base_path
+  protocols     = ["http", "https"]
+  service_url   = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
+  swagger_url   = "https://raw.githubusercontent.com/hmcts/cnp-api-docs/master/docs/specs/ccpay-payment-app.bulk-scanning.json"
+  revision      = "1"
+  providers = {
+    azurerm = azurerm.aks-cftapps
+  }
+}
 
-  parameters = {
-    apiManagementServiceName = local.cft_api_mgmt_rg
-    apiName                  = "bulk-scanning-payment-api"
-    apiProductName           = "bulk-scanning-payment"
-    serviceUrl               = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
-    apiBasePath              = local.api_base_path
-    policy                   = data.template_file.policy_template.rendered
+module "cft_api_mgmt_policy" {
+  source                 = "git@github.com:hmcts/cnp-module-api-mgmt-api-policy?ref=master"
+  api_mgmt_name          = local.cft_api_mgmt_name
+  api_mgmt_rg            = local.cft_api_mgmt_rg
+  api_name               = module.cft_api_mgmt_api.name
+  api_policy_xml_content = data.template_file.policy_template.rendered
+  providers = {
+    azurerm = azurerm.aks-cftapps
   }
 }
