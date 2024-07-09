@@ -1,6 +1,6 @@
 # Subscription keys for the CFT APIM
 
-# Internal subscription - Bulk Scan DTS Team
+# Internal subscription - Fee and Payment DTS Team
 resource "azurerm_api_management_subscription" "fee_pay_team_bulk_scan_subscription" {
   api_management_name = local.cft_api_mgmt_name
   resource_group_name = local.cft_api_mgmt_rg
