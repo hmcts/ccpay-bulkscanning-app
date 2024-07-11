@@ -52,7 +52,7 @@ module "cft_api_mgmt_policy" {
   api_mgmt_name          = local.cft_api_mgmt_name
   api_mgmt_rg            = local.cft_api_mgmt_rg
   api_name               = module.cft_api_mgmt_api.name
-  api_policy_xml_content = data.template_file.cft_policy_template.rendered
+  api_policy_xml_content = data.cft_policy_template.cft_policy_template.rendered
   providers = {
     azurerm = azurerm.aks-cftapps
   }
