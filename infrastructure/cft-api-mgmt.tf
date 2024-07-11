@@ -5,7 +5,7 @@ locals {
   cft_api_mgmt_name   = join("-", ["cft-api-mgmt", local.cft_api_mgmt_suffix])
   cft_api_mgmt_rg     = join("-", ["cft", var.env, "network-rg"])
 
-  cft_api_policy    = replace(file("template/cft-api-policy.xml"), "ALLOWED_CERTIFICATE_THUMBPRINTS", local.thumbprints_in_quotes_str)
+  cft_api_policy = replace(file("template/cft-api-policy.xml"), "ALLOWED_CERTIFICATE_THUMBPRINTS", local.thumbprints_in_quotes_str)
 }
 
 data "template_file" "cft_policy_template" {
