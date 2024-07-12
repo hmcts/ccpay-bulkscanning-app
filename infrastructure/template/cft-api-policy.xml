@@ -5,16 +5,21 @@
   <inbound>
     <base/>
     <choose>
-      <when condition="@(context.Request.Headers[&quot;X-ARR-ClientCertThumbprint&quot;] == null)">
+      <when condition="@(context.Request.Headers["X-ARR-ClientCertThumbprint"] == null)">
         <return-response>
           <set-status code="401" />
           <set-body>Missing client certificate</set-body>
         </return-response>
       </when>
-      <when condition="@(!(new string[] {allowed_certificate_thumbprints}.Any(c => context.Request.Headers.ContainsKey(&quot;X-ARR-ClientCertThumbprint&quot;) && context.Request.Headers[&quot;X-ARR-ClientCertThumbprint&quot;].Contains(c))))">
+      <when condition="@(!(new string[] {${allowed_certificate_thumbprints}}.Any(c => context.Request.Headers.ContainsKey(&quot;X-ARR-ClientCertThumbprint&quot;) && context.Request.Headers[&quot;X-ARR-ClientCertThumbprint&quot;].Contains(c))))">
         <return-response>
           <set-status code="401" />
           <set-body>Invalid client certificate</set-body>
+        </return-response>
+      </when>
+      <when condition="@(context.Request.Certificate == null || context.Request.Certificate.NotAfter &lt; DateTime.Now || context.Request.Certificate.NotBefore &gt; DateTime.Now || !(new string[] {${allowed_certificate_thumbprints}}.Any(c => c == context.Request.Certificate.Thumbprint)))" >
+        <return-response>
+          <set-status code="401" reason="Invalid client certificate."/>
         </return-response>
       </when>
     </choose>
