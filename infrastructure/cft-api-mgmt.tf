@@ -9,7 +9,7 @@ locals {
 }
 
 data "template_file" "cft_policy_template" {
-  template = file("${path.module}/template/api-policy.xml")
+  template = file("${path.module}/template/cft-api-policy.xml")
 
   vars = {
     allowed_certificate_thumbprints = local.thumbprints_in_quotes_str
