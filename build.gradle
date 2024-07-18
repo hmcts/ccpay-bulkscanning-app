@@ -264,7 +264,6 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: javaLoggingVersion
 
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
-  implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
 
   implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
   implementation group: 'org.apache.poi', name: 'poi', version: '5.2.5'
@@ -282,8 +281,6 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '12.3'
   implementation group: 'org.jboss.aerogear', name: 'aerogear-otp-java', version:'1.0.0'
-  implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.1'
-
 
   testImplementation group: 'org.springframework.security', name: 'spring-security-test'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
