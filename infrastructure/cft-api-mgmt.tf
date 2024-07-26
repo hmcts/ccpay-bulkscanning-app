@@ -41,6 +41,7 @@ module "cft_api_mgmt_api" {
   protocols     = ["http", "https"]
   service_url   = "http://ccpay-bulkscanning-api-${var.env}.service.core-compute-${var.env}.internal"
   swagger_url   = "https://raw.githubusercontent.com/hmcts/cnp-api-docs/master/docs/specs/ccpay-payment-app.bulk-scanning.json"
+  protocols     = ["http", "https"]
   revision      = "1"
   providers = {
     azurerm = azurerm.aks-cftapps
