@@ -298,12 +298,12 @@ dependencies {
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.15.1'
   testImplementation 'com.github.hmcts:fortify-client:1.4.2:all'
 
-  testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
-  compileOnly 'org.projectlombok:lombok:1.18.28'
-  annotationProcessor 'org.projectlombok:lombok:1.18.28'
-  testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
-  functionalTestAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
-  smokeTestAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+  testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+  compileOnly 'org.projectlombok:lombok:1.18.34'
+  annotationProcessor 'org.projectlombok:lombok:1.18.34'
+  testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+  functionalTestAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+  smokeTestAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
 
   functionalTestImplementation sourceSets.test.runtimeClasspath
