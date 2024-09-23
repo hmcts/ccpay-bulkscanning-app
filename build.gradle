@@ -67,7 +67,7 @@ sourceSets {
   }
 
   checkstyle {
-    toolVersion "7.8.1"
+    toolVersion "7.8.2"
   }
 
   task smokeTest(type: Test, description: 'Runs the smoke tests', group: 'Verification') {
