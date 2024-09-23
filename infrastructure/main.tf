@@ -20,7 +20,7 @@ locals {
   #region API gateway
   thumbprints_in_quotes     = formatlist("&quot;%s&quot;", var.bulkscanning_api_gateway_certificate_thumbprints)
   thumbprints_in_quotes_str = join(",", local.thumbprints_in_quotes)
-  api_base_path = "bulk-scanning-payment"
+  api_base_path             = "bulk-scanning-payment"
 }
 
 
