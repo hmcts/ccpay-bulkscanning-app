@@ -58,6 +58,11 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.EXCEP
 @ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.yaml")
+@SuppressWarnings({
+    "PMD.JUnitTestsShouldIncludeAssert",
+    "PMD.UseLocaleWithCaseConversions",
+    "PMD.LiteralsFirstInComparisons"
+})
 public class PaymentControllerFunctionalTest {
 
     @Autowired
@@ -75,10 +80,10 @@ public class PaymentControllerFunctionalTest {
     private static String USER_TOKEN;
     private static String SERVICE_TOKEN;
     private static boolean TOKENS_INITIALIZED;
-    private static final int CCD_EIGHT_DIGIT_UPPER = 99999999;
-    private static final int CCD_EIGHT_DIGIT_LOWER = 10000000;
+    private static final int CCD_EIGHT_DIGIT_UPPER = 99_999_999;
+    private static final int CCD_EIGHT_DIGIT_LOWER = 10_000_000;
     private static String userEmail;
-    private List<String> dcns = new ArrayList<>();
+    private final List<String> dcns = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -98,7 +103,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn[0],
@@ -170,7 +175,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn[0],
@@ -184,7 +189,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment1 = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn[0],
@@ -206,7 +211,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn[0],
@@ -250,6 +255,7 @@ public class PaymentControllerFunctionalTest {
     }
 
     @Test
+    @SuppressWarnings("PMD.ExcessiveMethodLength")
     public void testUpdateCaseReferenceForMultipleEnvelopesExceptionRecordAndGetDetailsByDcns() {
         String[] dcn1 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
         dcns.add(dcn1[0]);
@@ -261,7 +267,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment1 = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn1[0],
@@ -275,7 +281,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment2 = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn2[0],
@@ -448,7 +454,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn[0],
@@ -530,7 +536,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn[0],
@@ -568,7 +574,7 @@ public class PaymentControllerFunctionalTest {
 
         BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcn[0],
@@ -752,7 +758,7 @@ public class PaymentControllerFunctionalTest {
         //Request from bulk scan provider with one Dcn
         BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
             new BigDecimal(273),
-            964567,
+            964_567,
             LocalDate.now().toString(),
             "GBP",
             dcns[0],
@@ -788,6 +794,7 @@ public class PaymentControllerFunctionalTest {
         }
     }
 
+    @SuppressWarnings("PMD.JUnit4TestShouldUseAfterAnnotation")
     @AfterClass
     public static void tearDown() {
         IdamService.deleteUser(userEmail);

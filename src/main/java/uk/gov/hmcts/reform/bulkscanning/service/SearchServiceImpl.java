@@ -136,6 +136,7 @@ public class SearchServiceImpl implements SearchService {
         return paymentMetadataList;
     }
 
+    @SuppressWarnings("PMD.CognitiveComplexity")
     private List<EnvelopeCase> getEnvelopeCaseByCcdReference(SearchRequest searchRequest) {
         if (StringUtils.isNotEmpty(searchRequest.getCcdReference())) {
             Optional<List<EnvelopeCase>> envelopeCases = envelopeCaseRepository.findByCcdReference(searchRequest.getCcdReference());

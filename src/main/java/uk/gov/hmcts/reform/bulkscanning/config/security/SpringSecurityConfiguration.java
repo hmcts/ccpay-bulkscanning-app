@@ -57,9 +57,6 @@ public class SpringSecurityConfiguration {
     @Value("${oidc.audience-list}")
     private String[] allowedAudiences;
 
-    @Value("${oidc.issuer}")
-    private String issuerOverride;
-
     public SpringSecurityConfiguration(
         final ServiceAuthFilter serviceAuthFilter,
         final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,

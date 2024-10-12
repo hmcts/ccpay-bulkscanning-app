@@ -38,7 +38,7 @@ public class PaymentMetadataDtoMapper {
 
     public PaymentMetadataDto fromRequest(BulkScanPayment bulkScanPayment, String dcnReference) {
         if(Optional.ofNullable(bulkScanPayment).isPresent()) {
-            String paymentMethod = bulkScanPayment.getMethod().equalsIgnoreCase("PostalOrder")
+            String paymentMethod = "PostalOrder".equalsIgnoreCase(bulkScanPayment.getMethod())
                 ? POSTAL_ORDER.toString()
                 : bulkScanPayment.getMethod().toUpperCase(Locale.UK);
             return PaymentMetadataDto.paymentMetadataDtoWith()

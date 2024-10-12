@@ -36,8 +36,8 @@ public class CaseReferenceRequestTest {
         if(violations.isEmpty()){
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number can't be Blank")){
+            violations.stream().forEach(v -> {
+                if("ccd_case_number can't be Blank".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number can't be Blank");
                 }
             });
@@ -52,8 +52,8 @@ public class CaseReferenceRequestTest {
         if(violations.isEmpty()){
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number should be numeric")){
+            violations.stream().forEach(v -> {
+                if("ccd_case_number should be numeric".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number should be numeric");
                 }
             });
@@ -69,7 +69,7 @@ public class CaseReferenceRequestTest {
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number length must be 16 Characters")){
+                if("ccd_case_number length must be 16 Characters".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number length must be 16 Characters");
                 }
             });

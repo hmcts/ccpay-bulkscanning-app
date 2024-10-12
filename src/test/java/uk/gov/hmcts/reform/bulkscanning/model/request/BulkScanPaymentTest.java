@@ -38,7 +38,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on document_control_number");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("document_control_number length must be 21 digits.")){
+                if("document_control_number length must be 21 digits.".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("document_control_number length must be 21 digits.");
                 }
             });
@@ -54,7 +54,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on amount");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("amount cannot have more than 2 decimal places")){
+                if("amount cannot have more than 2 decimal places".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("amount cannot have more than 2 decimal places");
                 }
             });
@@ -71,7 +71,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on amount");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("amount must be greater than or equal to 0.01")){
+                if("amount must be greater than or equal to 0.01".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("amount must be greater than or equal to 0.01");
                 }
             });
@@ -87,7 +87,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on Currency");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("currency can't be Blank")){
+                if("currency can't be Blank".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("currency can't be Blank");
                 }
             });
@@ -104,7 +104,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on bank_giro_credit_slip_number");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("bank_giro_credit_slip_number can't be Blank")){
+                if("bank_giro_credit_slip_number can't be Blank".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("bank_giro_credit_slip_number can't be Blank");
                 }
             });
@@ -120,7 +120,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on bank_giro_credit_slip_number");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("bank_giro_credit_slip_number must be Positive")){
+                if("bank_giro_credit_slip_number must be Positive".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("bank_giro_credit_slip_number must be Positive");
                 }
             });
@@ -136,7 +136,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on bank_giro_credit_slip_number");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("bank_giro_credit_slip_number length must not be greater than 6 digits")){
+                if("bank_giro_credit_slip_number length must not be greater than 6 digits".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("bank_giro_credit_slip_number length must not be greater than 6 digits");
                 }
             });
@@ -152,7 +152,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on banked_date");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("banked_date can't be Blank")){
+                if("banked_date can't be Blank".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("banked_date can't be Blank");
                 }
             });
@@ -169,7 +169,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on banked_date");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date")){
+                if("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("Invalid banked_Date. Date format should be YYYY-MM-DD (e.g. 2019-01-01). should never be a future date");
                 }
             });
@@ -185,7 +185,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on Cash/Cheque/PostalOrder");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("Invalid method. Accepted value Cash/Cheque/PostalOrder")){
+                if("Invalid method. Accepted value Cash/Cheque/PostalOrder".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("Invalid method. Accepted value Cash/Cheque/PostalOrder");
                 }
             });
@@ -201,7 +201,7 @@ public class BulkScanPaymentTest {
             fail("should have thrown an Error Message on Invalid currency");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("Invalid currency. Accepted value GBP")){
+                if("Invalid currency. Accepted value GBP".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("Invalid currency. Accepted value GBP");
                 }
             });

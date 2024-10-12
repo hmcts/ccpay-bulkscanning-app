@@ -60,6 +60,7 @@ import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.*;
 @AutoConfigureMockMvc()
 @ContextConfiguration(classes = TestContextConfiguration.class)
 @ActiveProfiles({"local", "test"})
+@SuppressWarnings("PMD.TooManyMethods")
 //@TestPropertySource(locations="classpath:application-local.yaml")
 public class PaymentControllerFnTest {
 
@@ -374,13 +375,13 @@ public class PaymentControllerFnTest {
         ResultActions resultActions = restActions.get("/cases", params);
 
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
-        Assert.assertEquals(true, resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
+        Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
 
         //Calling Search API by CCD and validate response
         resultActions = restActions.get("/cases/1111666677774444", params);
 
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
-        Assert.assertEquals(true, resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
+        Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains("\"all_payments_status\":\"PROCESSED\""));
     }
 
     @Test
