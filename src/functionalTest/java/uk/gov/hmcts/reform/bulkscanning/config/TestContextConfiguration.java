@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.path.json.config.JsonPathConfig;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.TestPropertySource;
-
-import javax.annotation.PostConstruct;
 
 import static io.restassured.config.JsonConfig.jsonConfig;
 

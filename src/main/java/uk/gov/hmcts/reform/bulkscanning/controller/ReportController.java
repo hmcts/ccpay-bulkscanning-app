@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.bulkscanning.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +24,16 @@ import uk.gov.hmcts.reform.bulkscanning.model.enums.ReportType;
 import uk.gov.hmcts.reform.bulkscanning.service.ReportService;
 import uk.gov.hmcts.reform.bulkscanning.utils.ExcelGeneratorUtil;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.*;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.atEndOfDay;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.atStartOfDay;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateForReportName;
+import static uk.gov.hmcts.reform.bulkscanning.utils.DateUtil.getDateTimeForReportName;
 
 @RestController
 @Tag( name = "Bulk Scanning Payment Report API",description = "Bulk Scanning Payment Report API to be used for generating Audit report")
@@ -46,10 +48,8 @@ public class ReportController {
     }
 
     @Operation(summary = "API to generate Report for Bulk_Scan_Payment System")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Report Generated"),
-        @ApiResponse(responseCode = "404", description = "No Data found to generate Report")
-    })
+    @ApiResponse(responseCode = "200", description = "Report Generated")
+    @ApiResponse(responseCode = "404", description = "No Data found to generate Report")
     @GetMapping("/report/download")
     public ResponseEntity<byte[]> retrieveByReportType(
         @RequestHeader("Authorization") String authorization,
@@ -58,7 +58,6 @@ public class ReportController {
         @RequestParam("report_type") ReportType reportType,
         HttpServletResponse response) throws IOException {
         LOG.info("Retrieving payments for reportType : {}", reportType);
-        byte[] reportBytes = null;
         HSSFWorkbook workbook = null;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             List<ReportData> reportDataList = reportService
@@ -70,7 +69,7 @@ public class ReportController {
             if(workbook != null){
                 workbook.write(baos);
             }
-            reportBytes = baos.toByteArray();
+            byte[] reportBytes = baos.toByteArray();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
             String fileName = reportType.toString() + "_"
@@ -79,17 +78,15 @@ public class ReportController {
                 + getDateTimeForReportName(new Date(System.currentTimeMillis()))
                 + ".xls";
             response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-            return new ResponseEntity<byte[]>(reportBytes, headers, HttpStatus.OK);
+            return new ResponseEntity<>(reportBytes, headers, HttpStatus.OK);
         } catch (Exception ex) {
             throw new PaymentException(ex);
         }
     }
 
     @Operation(summary ="API to retrieve Report Data from Bulk_Scan_Payment System")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Report Generated"),
-        @ApiResponse(responseCode = "404", description = "No Data found to generate Report")
-    })
+    @ApiResponse(responseCode = "200", description = "Report Generated")
+    @ApiResponse(responseCode = "404", description = "No Data found to generate Report")
     @GetMapping("/report/data")
     public ResponseEntity<List<BaseReportData>> retrieveDataByReportType(
         @RequestHeader("Authorization") String authorization,
@@ -103,7 +100,7 @@ public class ReportController {
                 .retrieveDataByReportType(atStartOfDay(fromDate), atEndOfDay(toDate), reportType);
             if (Optional.ofNullable(reportDataList).isPresent()) {
                 LOG.info("No of Records exists : {}", reportDataList.size());
-                return new ResponseEntity<List<BaseReportData>>(reportDataList, HttpStatus.OK);
+                return new ResponseEntity<>(reportDataList, HttpStatus.OK);
             } else {
                 LOG.info("No Data found for ReportType : {}", reportType);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

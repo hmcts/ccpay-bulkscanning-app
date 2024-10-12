@@ -73,18 +73,6 @@ spring:
       remove-abandoned-timeout: 60
       log-abandoned: true
       abandon-when-percentage-full: 0
-security:
-  anonymousPaths:
-    - "/health"
-    - "/health/liveness"
-    - "/health/readiness"
-    - "/actuator/**"
-    - "/loggers/**"
-    - "/swagger-ui.html"
-    - "/swagger-resources/**"
-    - "/v2/api-docs"
-    - "/webjars/springfox-swagger-ui/**"
-    - "/search/**"
 trusted:
   s2s:
     service:
