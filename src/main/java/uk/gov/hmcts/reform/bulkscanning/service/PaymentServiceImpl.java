@@ -34,10 +34,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Both;
-import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.*;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.INCOMPLETE;
+import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESSED;
 
 
 @Service
@@ -124,6 +125,7 @@ public class PaymentServiceImpl implements PaymentService {
         return null;
     }
 
+    @SuppressWarnings("PMD.CognitiveComplexity")
     @Override
     @Transactional
     public List<String> saveInitialMetadataFromBs(BulkScanPaymentRequest bsPaymentRequest) {
@@ -152,8 +154,7 @@ public class PaymentServiceImpl implements PaymentService {
 
                 if(envelope.isPresent()) {
                     List<String> paymentDCNList = envelope.get().getEnvelopePayments().stream().map(
-                            EnvelopePayment::getDcnReference).collect(
-                        Collectors.toList());
+                            EnvelopePayment::getDcnReference).toList();
 
                     listOfAllPayments.addAll(paymentDCNList);
                 }
@@ -173,7 +174,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<EnvelopeCase> envelopeCases = envelopeCaseRepository.findByExceptionRecordReference(
             exceptionRecordReference).
             orElseThrow(ExceptionRecordNotExistsException::new);
-        String result = "";
+
         if (Optional.ofNullable(caseReferenceRequest).isPresent()
             && StringUtils.isNotEmpty(caseReferenceRequest.getCcdCaseNumber())
             && !envelopeCases.isEmpty()) {
@@ -181,7 +182,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             envelopeCaseRepository.saveAll(envelopeCases);
             return String.join(",", envelopeCases.stream().map(envelopeCase -> envelopeCase.getId().toString())
-                    .collect(Collectors.toList()));
+                    .toList());
         }else{
             throw new ExceptionRecordNotExistsException();
         }
@@ -251,7 +252,7 @@ public class PaymentServiceImpl implements PaymentService {
             && !payments.isEmpty()
             && payments.stream()
             .map(EnvelopePayment::getPaymentStatus)
-            .collect(Collectors.toList())
+            .toList()
             .stream().allMatch(paymentStatus.toString()::equals);
     }
 
@@ -260,7 +261,7 @@ public class PaymentServiceImpl implements PaymentService {
             && !payments.isEmpty()
             && !payments.stream()
             .filter(payment -> payment.getPaymentStatus().equalsIgnoreCase(paymentStatus.toString()))
-            .collect(Collectors.toList())
+            .toList()
             .isEmpty();
     }
 

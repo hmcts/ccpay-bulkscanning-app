@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestConfigProperties {
 
     @Autowired

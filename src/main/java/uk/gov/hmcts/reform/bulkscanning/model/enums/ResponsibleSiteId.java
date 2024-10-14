@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.model.enums;
 
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public enum ResponsibleSiteId {
     AA07("Divorce"),
     AA08("Probate"),

@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.bulkscanning.model.dto;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.math.BigDecimal;
 
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder(builderMethodName = "recordWith")
 @AllArgsConstructor
 @NoArgsConstructor

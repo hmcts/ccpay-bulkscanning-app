@@ -145,7 +145,7 @@ public class PaymentControllerTest {
        when(paymentService.saveInitialMetadataFromBs(any(BulkScanPaymentRequest.class)))
            .thenReturn(Arrays.asList(dcn));
 
-       ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments/")
+       ResultActions resultActions = mockMvc.perform(post("/bulk-scan-payments")
            .header("ServiceAuthorization", "service")
            .content(asJsonString(bulkScanPaymentRequest))
            .contentType(MediaType.APPLICATION_JSON));
@@ -160,7 +160,7 @@ public class PaymentControllerTest {
             .ccdCaseNumber("9882111111111111")
             .build();
 
-        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments/?exception_reference=1111222233334444")
+        ResultActions resultActions = mockMvc.perform(put("/bulk-scan-payments?exception_reference=1111222233334444")
             .header("Authorization", "user")
             .header("ServiceAuthorization", "service")
             .content(asJsonString(caseReferenceRequest))

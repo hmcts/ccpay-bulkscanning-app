@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.config.security.authcheckerconfiguration;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
@@ -12,13 +13,11 @@ import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 import uk.gov.hmcts.reform.authorisation.validators.ServiceAuthTokenValidator;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -60,7 +59,7 @@ public class AuthCheckerConfiguration {
     public Function<HttpServletRequest, Optional<String>> userIdExtractor() {
         Pattern pattern = Pattern.compile("^/users/([^/]+)/.+$");
 
-        return (request) -> {
+        return request -> {
             Matcher matcher = pattern.matcher(request.getRequestURI());
             boolean matched = matcher.find();
             if(matched){
@@ -77,7 +76,6 @@ public class AuthCheckerConfiguration {
      */
     @Bean
     public Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor() {
-        return (any) -> Stream.of("payments", "citizen")
-            .collect(Collectors.toList());
+        return any -> Stream.of("payments", "citizen").toList();
     }
 }

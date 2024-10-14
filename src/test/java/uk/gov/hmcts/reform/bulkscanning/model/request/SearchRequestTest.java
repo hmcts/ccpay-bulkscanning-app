@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.bulkscanning.model.request;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.util.Set;
 
 import static org.junit.Assert.fail;
@@ -39,7 +39,7 @@ public class SearchRequestTest {
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_reference should be numeric")){
+                if("ccd_reference should be numeric".equals(v.getMessage())){
                     Assertions.assertThat(v.getMessage()).isEqualTo("ccd_reference should be numeric");
                 }
             });
@@ -56,7 +56,7 @@ public class SearchRequestTest {
             fail("should have thrown an Error Message on ccd_reference");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_reference length must be 16 Characters")){
+                if("ccd_reference length must be 16 Characters".equals(v.getMessage())){
                     Assertions.assertThat(v.getMessage()).isEqualTo("ccd_reference length must be 16 Characters");
                 }
             });
@@ -74,10 +74,10 @@ public class SearchRequestTest {
             fail("should have thrown an Error Message on exception_record");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("exception_record can't be Blank")){
+                if("exception_record can't be Blank".equals(v.getMessage())){
                     Assertions.assertThat(v.getMessage()).isEqualTo("exception_record can't be Blank");
                 }
-                if(v.getMessage().equals("document_control_number can't be Blank")){
+                if("document_control_number can't be Blank".equals(v.getMessage())){
                     Assertions.assertThat(v.getMessage()).isEqualTo("document_control_number can't be Blank");
                 }
             });

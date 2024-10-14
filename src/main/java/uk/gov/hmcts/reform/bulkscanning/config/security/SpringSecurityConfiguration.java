@@ -1,22 +1,25 @@
 package uk.gov.hmcts.reform.bulkscanning.config.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.converter.BSJwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.exception.BSAccessDeniedHandler;
@@ -25,8 +28,6 @@ import uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserA
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.bulkscanning.config.security.validator.AudienceValidator;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
@@ -41,158 +42,128 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 public class SpringSecurityConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SpringSecurityConfiguration.class);
     private static final String AUTHORISED_ROLE_PAYMENT = "payments";
     private static final String AUTHORISED_ROLE_CITIZEN = "citizen";
 
-    @Configuration
+    private final ServiceAuthFilter serviceAuthFilter;
+    private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
+    private final BSAccessDeniedHandler bsAccessDeniedHandler;
+    private final ServiceAndUserAuthFilter serviceAndUserAuthFilter;
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+
+    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${oidc.audience-list}")
+    private String[] allowedAudiences;
+
+    public SpringSecurityConfiguration(
+        final ServiceAuthFilter serviceAuthFilter,
+        final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
+        final BSJwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
+        final Function<HttpServletRequest, Optional<String>> userIdExtractor,
+        final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
+        final SecurityUtils securityUtils,
+        final BSAccessDeniedHandler bsAccessDeniedHandler
+    ) {
+        super();
+        this.serviceAuthFilter = serviceAuthFilter;
+        jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        this.serviceAndUserAuthFilter = new ServiceAndUserAuthFilter(
+            userIdExtractor, authorizedRolesExtractor, securityUtils);
+
+        this.bsAuthenticationEntryPoint = bsAuthenticationEntryPoint;
+        this.bsAccessDeniedHandler = bsAccessDeniedHandler;
+    }
+
+    /**
+     * Common security options for all security filter chains.
+     * Note: this modifies the http object in place.
+     * @param http HttpSecurity object that is being modified
+     * @throws Exception
+     */
+    private void commonSecurityOptions(HttpSecurity http) throws Exception {
+        http
+            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+            .csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .logout(AbstractHttpConfigurer::disable)
+            .exceptionHandling(excHandling -> excHandling
+                .accessDeniedHandler(bsAccessDeniedHandler)
+                .authenticationEntryPoint(bsAuthenticationEntryPoint)
+            );
+    }
+
+    @Bean
     @Order(1)
-    public static class ExternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-        private final ServiceAuthFilter serviceAuthFilter;
-        private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
-        private final BSAccessDeniedHandler bsAccessDeniedHandler;
-
-        @Autowired
-        public ExternalApiSecurityConfigurationAdapter(final ServiceAuthFilter serviceAuthFilter, final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
-                                                       final BSAccessDeniedHandler bsAccessDeniedHandler) {
-            super();
-            this.serviceAuthFilter = serviceAuthFilter;
-            this.bsAuthenticationEntryPoint = bsAuthenticationEntryPoint;
-            this.bsAccessDeniedHandler = bsAccessDeniedHandler;
-        }
-
-        @Override
-        protected void configure(HttpSecurity http) {
-            try {
-
-                http.addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
-                    .sessionManagement().sessionCreationPolicy(STATELESS).and().anonymous().disable()
-                    .csrf().disable()
-                    .formLogin().disable()
-                    .logout().disable()
-                    .requestMatchers()
-                    .antMatchers(HttpMethod.POST, "/bulk-scan-payment")
-                    .antMatchers(HttpMethod.POST, "/bulk-scan-payments")
-                    .antMatchers(HttpMethod.PUT, "/bulk-scan-payments")
-                    .antMatchers(HttpMethod.GET, "/case/**")
-                    .and()
-                    .exceptionHandling().accessDeniedHandler(bsAccessDeniedHandler)
-                    .authenticationEntryPoint(bsAuthenticationEntryPoint);
-
-            } catch (Exception e) {
-                LOG.info("Error in ExternalApiSecurityConfigurationAdapter: {}", e);
-            }
-        }
+    public SecurityFilterChain publicEndpointsFilterChain(HttpSecurity http) throws Exception {
+        commonSecurityOptions(http);
+        http
+            .securityMatcher(
+                "/swagger-ui.html",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/health",
+                "/health/liveness",
+                "/health/readiness",
+                "/mock-api/**",
+                "/")
+            .anonymous(Customizer.withDefaults())
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+        return http.build();
     }
 
-    @Configuration
+    @Bean
     @Order(2)
-    public static class InternalApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-        @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-        private String issuerUri;
-
-        @Value("${oidc.audience-list}")
-        private String[] allowedAudiences;
-
-        @Value("${oidc.issuer}")
-        private String issuerOverride;
-
-        private static final Logger LOG = LoggerFactory.getLogger(SpringSecurityConfiguration.class);
-        private final ServiceAuthFilter serviceAuthFilter;
-        private final ServiceAndUserAuthFilter serviceAndUserAuthFilter;
-        private final JwtAuthenticationConverter jwtAuthenticationConverter;
-        private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
-        private final BSAccessDeniedHandler bsAccessDeniedHandler;
-
-        @Inject
-        public InternalApiSecurityConfigurationAdapter(final BSJwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
-                                                       final ServiceAuthFilter serviceAuthFilter,
-                                                       final Function<HttpServletRequest, Optional<String>> userIdExtractor,
-                                                       final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
-                                                       final SecurityUtils securityUtils, final BSAuthenticationEntryPoint bsAuthenticationEntryPoint,
-                                                       final BSAccessDeniedHandler bsAccessDeniedHandler) {
-            super();
-            this.serviceAndUserAuthFilter = new ServiceAndUserAuthFilter(
-                userIdExtractor, authorizedRolesExtractor, securityUtils);
-            this.serviceAuthFilter = serviceAuthFilter;
-            jwtAuthenticationConverter = new JwtAuthenticationConverter();
-            jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-            this.bsAuthenticationEntryPoint = bsAuthenticationEntryPoint;
-            this.bsAccessDeniedHandler = bsAccessDeniedHandler;
-        }
-
-        @Override
-        public void configure(WebSecurity web) {
-            web.ignoring().antMatchers("/swagger-ui.html",
-                                       "/webjars/springfox-swagger-ui/**",
-                                       "/swagger-resources/**",
-                                       "/swagger-ui/**",
-                                       "/v3/**",
-                                       "/refdata/**",
-                                       "/health",
-                                       "/health/liveness",
-                                       "/health/readiness",
-                                       "/info",
-                                       "/favicon.ico",
-                                       "/mock-api/**",
-                                       "/");
-        }
-
-        @Override
-        protected void configure(HttpSecurity http) {
-            try {
-                http.addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
-                    .addFilterAfter(serviceAndUserAuthFilter, BearerTokenAuthenticationFilter.class)
-                    .sessionManagement().sessionCreationPolicy(STATELESS).and()
-                    .csrf().disable()
-                    .formLogin().disable()
-                    .logout().disable()
-                    .authorizeRequests()
-                    .antMatchers(HttpMethod.PATCH, "/bulk-scan-payments/**").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/cases/**").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/report/data").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                    .antMatchers(HttpMethod.GET, "/api/**").permitAll()
-                    .antMatchers("/error").permitAll()
-                    .antMatchers(HttpMethod.GET, "/case/**").permitAll()
-                    .antMatchers(HttpMethod.DELETE, "/bulk-scan-payment/**").permitAll()
-                    .anyRequest().authenticated()
-                    .and()
-                    .oauth2ResourceServer()
-                    .jwt()
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter)
-                    .and()
-                    .and()
-                    .oauth2Client()
-                    .and()
-                    .exceptionHandling().accessDeniedHandler(bsAccessDeniedHandler)
-                    .authenticationEntryPoint(bsAuthenticationEntryPoint);
-
-            } catch (Exception e) {
-                LOG.info("Error in InternalApiSecurityConfigurationAdapter: {}", e);
-            }
-        }
-
-        @Bean
-        @SuppressWarnings("unchecked")
-        JwtDecoder jwtDecoder() {
-            NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)
-                JwtDecoders.fromOidcIssuerLocation(issuerUri);
-
-            OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(Arrays.asList(allowedAudiences));
-
-            OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-
-            // Commented issuer validation as confirmed by IDAM
-           /* OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);*/
-            OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withTimestamp,
-                                                                                          audienceValidator);
-            jwtDecoder.setJwtValidator(withAudience);
-
-            return jwtDecoder;
-        }
+    public SecurityFilterChain serviceEndpointsFilterChain(HttpSecurity http) throws Exception {
+        commonSecurityOptions(http);
+        http
+            .securityMatchers(matchers -> matchers
+                .requestMatchers(HttpMethod.POST, "/bulk-scan-payment")
+                .requestMatchers(HttpMethod.POST, "/bulk-scan-payments")
+                .requestMatchers(HttpMethod.PUT, "/bulk-scan-payments")
+                .requestMatchers(HttpMethod.GET, "/case/**"))
+            .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
+            .oauth2Client(Customizer.withDefaults());
+        return http.build();
     }
 
+    @Bean
+    @Order(3)
+    public SecurityFilterChain privateEndpointsFilterChain(HttpSecurity http) throws Exception {
+        commonSecurityOptions(http);
+        http
+            .addFilterAfter(serviceAndUserAuthFilter, BearerTokenAuthenticationFilter.class)
+            .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.PATCH, "/bulk-scan-payments/**").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                .requestMatchers(HttpMethod.GET, "/cases/**").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                .requestMatchers(HttpMethod.GET, "/report/data").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                .requestMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                .requestMatchers(HttpMethod.DELETE, "/bulk-scan-payment/**").permitAll()
+                .requestMatchers("/error").permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
+            .oauth2Client(Customizer.withDefaults());
+        return http.build();
+    }
+
+    @Bean
+    JwtDecoder jwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)
+            JwtDecoders.fromOidcIssuerLocation(issuerUri);
+
+        OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(Arrays.asList(allowedAudiences));
+
+        OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
+
+        OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(
+            withTimestamp, audienceValidator);
+        jwtDecoder.setJwtValidator(withAudience);
+
+        return jwtDecoder;
+    }
 }

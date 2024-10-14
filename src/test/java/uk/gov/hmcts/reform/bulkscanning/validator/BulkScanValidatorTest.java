@@ -71,7 +71,6 @@ public class BulkScanValidatorTest {
     @Test()
     @Transactional
     public void testFieldLevelValidation() throws Exception{
-        String dcn[] = {""};
         BulkScanPaymentRequest bulkScanPaymentRequest = createBulkScanPaymentRequest(null
             , null, "AA08", false);
 
@@ -85,9 +84,7 @@ public class BulkScanValidatorTest {
 
     @Test()
     @Transactional
-    public void testRequestValidation_AdditionalFields() throws Exception{
-
-
+    public void testRequestValidation_AdditionalFields() throws Exception {
         ResultActions resultActions = restActions.post("/bulk-scan-payment", new ExelaPayment(BigDecimal.ONE,
                                                                                                 "123456",
                                                                                                 "2019-01-01",
@@ -97,7 +94,6 @@ public class BulkScanValidatorTest {
                                                                                                 "Unknown"));
 
         Assert.assertEquals(Integer.valueOf(400), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
-
         Assert.assertTrue(resultActions.andReturn().getResponse().getContentAsString().contains(UNKNOWN_FIELD));
     }
 

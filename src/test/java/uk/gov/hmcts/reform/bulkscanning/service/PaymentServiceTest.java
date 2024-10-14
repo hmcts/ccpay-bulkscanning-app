@@ -228,7 +228,7 @@ public class PaymentServiceTest {
 
         List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
 
-        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
+        Assert.assertTrue("dcn1".equalsIgnoreCase(listDCN.get(0)));
     }
 
     @Test(expected = BulkScanCaseAlreadyExistsException.class)
@@ -254,8 +254,8 @@ public class PaymentServiceTest {
 
         doReturn(Optional.ofNullable(envelopeCaseList)).when(envelopeCaseRepository).findByExceptionRecordReference(EXCEPTION_RECORD_REFERENCE);
 
-        Assert.assertTrue(paymentService.
-            updateCaseReferenceForExceptionRecord(EXCEPTION_RECORD_REFERENCE,caseReferenceRequest).equalsIgnoreCase("1"));
+        Assert.assertTrue("1".equalsIgnoreCase(
+            paymentService.updateCaseReferenceForExceptionRecord(EXCEPTION_RECORD_REFERENCE,caseReferenceRequest)));
     }
 
     @Test(expected = ExceptionRecordNotExistsException.class)

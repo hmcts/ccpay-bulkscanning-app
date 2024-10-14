@@ -86,8 +86,6 @@ public class PaymentFromBulkScanTest {
     @MockBean
     private BulkScanningUtils bulkScanningUtils;
 
-    private CaseReferenceRequest caseReferenceRequest;
-
     @Autowired
     private AppInsightsAuditRepository auditRepository;
 
@@ -141,7 +139,7 @@ public class PaymentFromBulkScanTest {
         when(envelopeCaseRepository.findByEnvelopeId(any(Integer.class))).thenReturn(envelopeCase);
         when(paymentMetadataRepository.findByDcnReference(TEST_DCN_REFERENCE)).thenReturn(paymentMetadata);
 
-        caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest().ccdCaseNumber(CCD_CASE_REFERENCE).build();
+        CaseReferenceRequest.createCaseReferenceRequest().ccdCaseNumber(CCD_CASE_REFERENCE).build();
     }
 
 
@@ -204,13 +202,14 @@ public class PaymentFromBulkScanTest {
 
     @Test
     @Transactional
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     public void testProcessExistingPaymentFromBulkScan() {
         String[] dcn = {"DCN1"};
         EnvelopePayment envelopePayment = mockBulkScanningEnvelope().getEnvelopePayments().get(0);
 
         //setting mockBulkScanningEnvelope
         envelopePayment.setEnvelope(mockBulkScanningEnvelope());
-        doReturn(Optional.ofNullable(envelopePayment)).when(paymentRepository).findByDcnReference("DCN1");
+        doReturn(Optional.of(envelopePayment)).when(paymentRepository).findByDcnReference("DCN1");
 
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(
             CCD_CASE_REFERENCE,
@@ -247,7 +246,7 @@ public class PaymentFromBulkScanTest {
 
         List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
 
-        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
+        Assert.assertTrue("dcn1".equalsIgnoreCase(listDCN.get(0)));
     }
 
     @Test
@@ -257,9 +256,6 @@ public class PaymentFromBulkScanTest {
 
         BulkScanPaymentRequest mockBulkScanPaymentRequest = createBulkScanPaymentRequest(CCD_CASE_REFERENCE
             ,dcn,"AA08", false);
-
-
-        List<EnvelopePayment> envelopePaymentList = new ArrayList<>();
 
         List<EnvelopeCase> envelopeCaseList = new ArrayList<>();
 
@@ -275,7 +271,7 @@ public class PaymentFromBulkScanTest {
 
         List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
 
-        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
+        Assert.assertTrue("dcn1".equalsIgnoreCase(listDCN.get(0)));
     }
 
 
@@ -311,19 +307,17 @@ public class PaymentFromBulkScanTest {
 
         List<String> listDCN = paymentService.saveInitialMetadataFromBs(mockBulkScanPaymentRequest);
 
-        Assert.assertTrue(listDCN.get(0).equalsIgnoreCase("dcn1"));
+        Assert.assertTrue("dcn1".equalsIgnoreCase(listDCN.get(0)));
     }
 
     private static Envelope getEnvelope(BulkScanPaymentRequest mockBulkScanPaymentRequest, List<EnvelopePayment> envelopePaymentList, List<EnvelopeCase> envelopeCaseList) {
-
-        Envelope envelope = Envelope.envelopeWith()
+        return Envelope.envelopeWith()
             .responsibleServiceId(ResponsibleSiteId.valueOf(mockBulkScanPaymentRequest.getResponsibleServiceId().toUpperCase(
                 Locale.UK)).toString())
             .envelopePayments(envelopePaymentList)
             .envelopeCases(envelopeCaseList)
             .paymentStatus(INCOMPLETE.toString()) ////by default at initial status
             .build();
-        return envelope;
     }
 
 }

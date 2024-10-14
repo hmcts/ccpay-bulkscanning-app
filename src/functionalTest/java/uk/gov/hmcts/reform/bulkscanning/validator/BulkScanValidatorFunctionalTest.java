@@ -82,8 +82,8 @@ public class BulkScanValidatorFunctionalTest {
 
     @Test()
     public void testNegativeInvalidSiteId() throws Exception {
-        String ccdCaseNumber = "13115656" + RandomUtils.nextInt(10000000, 99999999);
-        String[] dcn = {"6200000000001" + RandomUtils.nextInt(10000000, 99999999)};
+        String ccdCaseNumber = "13115656" + RandomUtils.nextInt(10_000_000, 99_999_999);
+        String[] dcn = {"6200000000001" + RandomUtils.nextInt(10_000_000, 99_999_999)};
 
         BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcn, "XY123", false);
         Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(SERVICE_TOKEN, bulkScanCcdPayments);

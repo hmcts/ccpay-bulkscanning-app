@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.bulkscanning.config.security;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +10,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import uk.gov.hmcts.reform.bulkscanning.config.security.authcheckerconfiguration.AuthCheckerConfiguration;
 
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader= AnnotationConfigContextLoader.class,classes = AuthCheckerConfiguration.class)
@@ -38,7 +37,7 @@ public class AuthCheckerConfigurationTest {
         request.setRequestURI("/users/test/test1");
         request.setQueryString("param1=value1&param");
         Optional<String> value = userIdExtractor.apply(request);
-        assertThat(value.get()).isEqualTo("test");
+        assertThat(value).contains("test");
     }
 
     @Test

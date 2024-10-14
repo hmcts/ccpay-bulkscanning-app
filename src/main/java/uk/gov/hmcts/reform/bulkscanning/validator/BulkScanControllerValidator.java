@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.bulkscanning.validator;
 
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -20,12 +22,10 @@ import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.DCN_NOT_EXISTS;
 import static uk.gov.hmcts.reform.bulkscanning.utils.BulkScanningConstants.EXCEPTION_RECORD_NOT_EXISTS;
@@ -86,7 +86,7 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,
-                                                                  HttpStatus status, WebRequest request) {
+                                                                  HttpStatusCode status, WebRequest request) {
 
         Map<String, Object> body = new ConcurrentHashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -97,7 +97,7 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
             .getFieldErrors()
             .stream()
             .map(FieldError:: getDefaultMessage)
-            .collect(Collectors.toList());
+            .toList();
 
         body.put("errors", errors);
         LOG.error("Error_Response : {}", errors);
@@ -110,16 +110,17 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
 
     }
 
+
     @Override
     public ResponseEntity<Object> handleHttpMessageNotReadable(
-        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         String exceptionMessage = null;
 
         Throwable rootCause = ex.getRootCause();
-        if(rootCause instanceof UnrecognizedPropertyException)
+        if(rootCause instanceof UnrecognizedPropertyException cause)
         {
-            exceptionMessage = "Unknown field: " + ((UnrecognizedPropertyException) rootCause).getPropertyName();
+            exceptionMessage = "Unknown field: " + cause.getPropertyName();
             logger.debug("exceptionMessage: " + exceptionMessage);
         }
 
@@ -128,7 +129,7 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
         body.put("status", status.value());
         body.put("error", exceptionMessage);
 
-        return new ResponseEntity<Object>(body, new HttpHeaders(), status);
+        return new ResponseEntity<>(body, new HttpHeaders(), status);
     }
 
 

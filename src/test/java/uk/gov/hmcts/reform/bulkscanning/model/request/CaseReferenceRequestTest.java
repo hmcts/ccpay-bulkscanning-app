@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.bulkscanning.model.request;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,8 +36,8 @@ public class CaseReferenceRequestTest {
         if(violations.isEmpty()){
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number can't be Blank")){
+            violations.stream().forEach(v -> {
+                if("ccd_case_number can't be Blank".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number can't be Blank");
                 }
             });
@@ -52,8 +52,8 @@ public class CaseReferenceRequestTest {
         if(violations.isEmpty()){
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
-            violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number should be numeric")){
+            violations.stream().forEach(v -> {
+                if("ccd_case_number should be numeric".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number should be numeric");
                 }
             });
@@ -69,7 +69,7 @@ public class CaseReferenceRequestTest {
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("ccd_case_number length must be 16 Characters")){
+                if("ccd_case_number length must be 16 Characters".equals(v.getMessage())){
                     assertThat(v.getMessage()).isEqualTo("ccd_case_number length must be 16 Characters");
                 }
             });
