@@ -29,6 +29,7 @@ public class IdamService {
 
     private static final Logger LOG = LoggerFactory.getLogger(IdamService.class);
 
+    @SuppressWarnings("PMD.AssignmentToNonFinalStatic")
     @Autowired
     public IdamService(TestConfigProperties testConfig) {
         this.testConfig = testConfig;

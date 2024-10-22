@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.config.security.filiters;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,12 +22,13 @@ import uk.gov.hmcts.reform.bulkscanning.config.security.authcheckerconfiguration
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.OK;

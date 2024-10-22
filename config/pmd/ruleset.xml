@@ -103,7 +103,7 @@
     <exclude name="UncommentedEmptyMethodBody"/>
   </rule>
   <rule ref="category/java/errorprone.xml">
-    <exclude name="BeanMembersShouldSerialize"/>
+    <exclude name="NonSerializableClass"/>
     <exclude name="MissingSerialVersionUID"/>
     <exclude name="DataflowAnomalyAnalysis"/>
     <exclude name="AvoidDuplicateLiterals"/>

@@ -40,7 +40,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
     @Test
     public void shouldReturnEmptyAuthoritiesWhenClaimNotAvailable() {
         Jwt jwt = Mockito.mock(Jwt.class);
-        when(jwt.containsClaim(anyString())).thenReturn(false);
+        when(jwt.hasClaim(anyString())).thenReturn(false);
         Collection<GrantedAuthority> authorities = converter.convert(jwt);
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
@@ -48,7 +48,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
     @Test
     public void shouldReturnEmptyAuthoritiesWhenClaimValueNotEquals() {
         Jwt jwt = Mockito.mock(Jwt.class);
-        when(jwt.containsClaim(anyString())).thenReturn(true);
+        when(jwt.hasClaim(anyString())).thenReturn(true);
         when(jwt.getClaim(anyString())).thenReturn("Test");
         Collection<GrantedAuthority> authorities = converter.convert(jwt);
         assertNotNull(authorities);
@@ -58,7 +58,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
     @Test
     public void shouldReturnEmptyAuthoritiesWhenIdamReturnsNoUsers() {
         Jwt jwt = Mockito.mock(Jwt.class);
-        when(jwt.containsClaim(anyString())).thenReturn(true);
+        when(jwt.hasClaim(anyString())).thenReturn(true);
         when(jwt.getClaim(anyString())).thenReturn("access_token");
         when(jwt.getTokenValue()).thenReturn("access_token");
         UserInfo userInfo = mock(UserInfo.class);
@@ -73,7 +73,7 @@ public class BSJwtGrantedAuthoritiesConverterTest {
     @Test
     public void shouldReturnAuthoritiesWhenIdamReturnsUserRoles() {
         Jwt jwt = Mockito.mock(Jwt.class);
-        when(jwt.containsClaim(anyString())).thenReturn(true);
+        when(jwt.hasClaim(anyString())).thenReturn(true);
         when(jwt.getClaim(anyString())).thenReturn("access_token");
         when(jwt.getTokenValue()).thenReturn("access_token");
         UserInfo userInfo = mock(UserInfo.class);

@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.bulkscanning.model.request;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.util.Set;
 
 import static org.junit.Assert.fail;
@@ -40,7 +40,7 @@ public class BulkScanPaymentRequestTest {
             fail("should have thrown an Error Message on Invalid Site Id");
         }else{
             violations.stream().forEach(v->{
-                if(v.getMessage().equals("Invalid site_id. Accepted values are AA08 or AA07 or AA09")){
+                if("Invalid site_id. Accepted values are AA08 or AA07 or AA09".equals(v.getMessage())){
                     Assertions.assertThat(v.getMessage()).isEqualTo("Invalid site_id. Accepted values are AA08 or AA07 or AA09");
                 }
             });
@@ -57,7 +57,7 @@ public class BulkScanPaymentRequestTest {
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
             violations.stream().forEach(v -> {
-                if (v.getMessage().equals("ccd_case_number should be numeric")) {
+                if ("ccd_case_number should be numeric".equals(v.getMessage())) {
                     Assertions.assertThat(v.getMessage()).isEqualTo("ccd_case_number should be numeric");
                 }
             });
@@ -73,7 +73,7 @@ public class BulkScanPaymentRequestTest {
             fail("should have thrown an Error Message on ccd_case_number");
         }else {
             violations.stream().forEach(v -> {
-                if (v.getMessage().equals("ccd_case_number length must be 16 digits")) {
+                if ("ccd_case_number length must be 16 digits".equals(v.getMessage())) {
                     Assertions.assertThat(v.getMessage()).isEqualTo("ccd_case_number length must be 16 digits");
                 }
             });

@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles({"local", "test"})
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class ScannedChequeTester {
     @MockBean
     private ClientRegistrationRepository clientRegistrationRepository;
