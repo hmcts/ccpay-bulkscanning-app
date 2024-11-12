@@ -1,9 +1,9 @@
-ARG APP_INSIGHTS_AGENT_VERSION=3.4.14
+ARG APP_INSIGHTS_AGENT_VERSION=3.6.2
 FROM debian:10 AS builder
 RUN apt update
 RUN apt install --yes libharfbuzz-dev=2.3.1-1
 
-FROM hmctspublic.azurecr.io/base/java:17-distroless
+FROM hmctspublic.azurecr.io/base/java:21-distroless
 
 COPY lib/applicationinsights.json /opt/app/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libharfbuzz.so.0 /usr/lib/x86_64-linux-gnu/libharfbuzz.so.0
