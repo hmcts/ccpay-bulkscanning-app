@@ -55,5 +55,4 @@ public class AuthCheckerConfigurationTest {
         Collection<String> value = authorizedServicesExtractor.apply(request);
         assertFalse(value.isEmpty(),"Services are empty");
     }
-    
 }
