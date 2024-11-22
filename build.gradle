@@ -250,7 +250,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure'
   testImplementation group: 'org.springframework.security', name: 'spring-security-test'
-  testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.2'
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.4'
 
   testImplementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
