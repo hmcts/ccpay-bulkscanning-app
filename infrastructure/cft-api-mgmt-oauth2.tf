@@ -11,9 +11,9 @@ data "template_file" "cft_oauth2_policy_template" {
   template = file("${path.module}/template/cft-api-policy-oauth2.xml")
 
   vars = {
-    tenant_id         = data.azurerm_key_vault_secret.apim-bulk-scanning-tenant-id.value
-    client_id         = data.azurerm_key_vault_secret.apim-bulk-scanning-client-id.value
-    app_id            = data.azurerm_key_vault_secret.apim-bulk-scanning-app-id.value
+    tenant_id         = data.azurerm_key_vault_secret.tenant_id.value
+    client_id         = data.azurerm_key_vault_secret.apim_client_id.value
+    app_id            = data.azurerm_key_vault_secret.apim_app_id.value
     s2s_client_id     = data.azurerm_key_vault_secret.s2s_client_id.value
     s2s_client_secret = data.azurerm_key_vault_secret.s2s_client_secret.value
     s2s_base_url      = local.s2sUrl
