@@ -17,7 +17,7 @@ resource "azurerm_api_management_api_diagnostic" "apim_bulk_scanning_payments_lo
     headers_to_log = [
       "content-type",
       "accept",
-      "origin",
+      "origin"
     ]
   }
 
@@ -26,7 +26,7 @@ resource "azurerm_api_management_api_diagnostic" "apim_bulk_scanning_payments_lo
     headers_to_log = [
       "content-type",
       "content-length",
-      "origin",
+      "origin"
     ]
   }
 
@@ -35,7 +35,7 @@ resource "azurerm_api_management_api_diagnostic" "apim_bulk_scanning_payments_lo
     headers_to_log = [
       "content-type",
       "accept",
-      "origin",
+      "origin"
     ]
   }
 
@@ -44,11 +44,11 @@ resource "azurerm_api_management_api_diagnostic" "apim_bulk_scanning_payments_lo
     headers_to_log = [
       "content-type",
       "content-length",
-      "origin",
+      "origin"
     ]
   }
 
   depends_on = [
-    module.api_mgmt
+    module.cft_api_mgmt_oauth2_api
   ]
 }
