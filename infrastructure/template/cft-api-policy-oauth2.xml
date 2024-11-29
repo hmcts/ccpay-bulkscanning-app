@@ -4,7 +4,6 @@
   </backend>
   <inbound>
     <base/>
-    <choose/>
     <validate-azure-ad-token header-name="Authorization" tenant-id="${tenant_id}" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. Access token is missing or invalid.">
       <client-application-ids>
         <application-id>${client_id}</application-id>
