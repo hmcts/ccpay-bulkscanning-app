@@ -8,12 +8,12 @@
   <!-- Throttle, authorize, validate, cache, or transform the requests -->
   <inbound>
     <base />
-    <validate-azure-ad-token header-name="Authorization" tenant-id="${cft_oauth2_tenant_id}" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. Access token is missing or invalid.">
+    <validate-azure-ad-token header-name="Authorization" tenant-id="{{cft_oauth2_tenant_id}}" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. Access token is missing or invalid.">
       <client-application-ids>
-        <application-id>${cft_oauth2_client_id}</application-id>
+        <application-id>{{cft_oauth2_client_id}}</application-id>
       </client-application-ids>
       <audiences>
-        <audience>${cft_oauth2_app_id}</audience>
+        <audience>{{cft_oauth2_app_id}}</audience>
       </audiences>
     </validate-azure-ad-token>
   </inbound>
