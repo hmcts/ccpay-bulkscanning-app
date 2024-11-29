@@ -16,14 +16,6 @@
         <audience>${cft_oauth2_app_id}</audience>
       </audiences>
     </validate-azure-ad-token>
-    <validate-azure-ad-token header-name="Authorization" tenant-id="${tenant_id}" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. Access token is missing or invalid.">
-      <client-application-ids>
-        <application-id>${client_id}</application-id>
-      </client-application-ids>
-      <audiences>
-        <audience>${app_id}</audience>
-      </audiences>
-    </validate-azure-ad-token>
   </inbound>
   <!-- Control if and how the requests are forwarded to services  -->
   <backend>
