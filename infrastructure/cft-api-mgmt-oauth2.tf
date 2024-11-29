@@ -46,23 +46,23 @@ module "cft_api_mgmt_oauth2_api" {
   protocols             = ["http", "https"]
   content_format        = "openapi-link"
   subscription_required = "false"
-  revision              = "1"
+  revision              = "2"
   providers = {
     azurerm = azurerm.aks-cftapps
   }
 }
 
-# module "cft_api_mgmt_oauth2_policy" {
-#   source                 = "git@github.com:hmcts/cnp-module-api-mgmt-api-policy?ref=master"
-#   api_mgmt_name          = local.cft_api_mgmt_oauth2_name
-#   api_mgmt_rg            = local.cft_api_mgmt_oauth2_rg
-#   api_name               = module.cft_api_mgmt_oauth2_api.name
-#   api_policy_xml_content = data.template_file.cft_oauth2_policy_template.rendered
-#   providers = {
-#     azurerm = azurerm.aks-cftapps
-#   }
-#
-#   depends_on = [
-#     module.cft_api_mgmt_oauth2_api
-#   ]
-# }
+module "cft_api_mgmt_oauth2_policy" {
+  source                 = "git@github.com:hmcts/cnp-module-api-mgmt-api-policy?ref=master"
+  api_mgmt_name          = local.cft_api_mgmt_oauth2_name
+  api_mgmt_rg            = local.cft_api_mgmt_oauth2_rg
+  api_name               = module.cft_api_mgmt_oauth2_api.name
+  api_policy_xml_content = data.template_file.cft_oauth2_policy_template.rendered
+  providers = {
+    azurerm = azurerm.aks-cftapps
+  }
+
+  depends_on = [
+    module.cft_api_mgmt_oauth2_api
+  ]
+}
