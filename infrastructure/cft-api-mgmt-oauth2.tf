@@ -8,7 +8,7 @@ locals {
 }
 
 data "template_file" "cft_oauth2_policy_template" {
-  template = file("${path.module}/template/cft-api-policy-oauth2-2.xml")
+  template = file("${path.module}/template/cft-api-policy-oauth2.xml")
 
   vars = {
     cft_oauth2_tenant_id = data.azurerm_key_vault_secret.tenant_id.value
