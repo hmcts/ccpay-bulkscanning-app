@@ -12,6 +12,8 @@
         <audience>${cft_oauth2_app_id}</audience>
       </audiences>
     </validate-azure-ad-token>
+    <!-- remove OAuth2 Authorization header -->
+    <set-header name="Authorization" exists-action="delete" />
     <!-- generate totp -->
     <set-variable name="client_id" value="${s2s_client_id}" />
     <set-variable name="client_secret" value="${s2s_client_secret}" />
