@@ -104,3 +104,18 @@ data "azurerm_key_vault_secret" "s2s_client_id" {
   name         = "gateway-s2s-client-id"
   key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
+
+data "azurerm_key_vault_secret" "apim_app_id" {
+  name         = "apim-bulk-scanning-app-id"
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "apim_client_id" {
+  name         = "apim-bulk-scanning-client-id"
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "tenant_id" {
+  name         = "apim-bulk-scanning-tenant-id"
+  key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+}
