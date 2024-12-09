@@ -4,7 +4,7 @@ locals {
   cft_api_mgmt_oauth2_suffix = var.apim_suffix == "" ? var.env : var.apim_suffix
   cft_api_mgmt_oauth2_name   = join("-", ["cft-api-mgmt", local.cft_api_mgmt_suffix])
   cft_api_mgmt_oauth2_rg     = join("-", ["cft", var.env, "network-rg"])
-  cft_api_oauth2_base_path   = "bulk-scanning-payments"
+  cft_api_oauth2_base_path   = "payments-bulk-scanning-api"
 }
 
 data "template_file" "cft_oauth2_policy_template" {
@@ -22,7 +22,7 @@ data "template_file" "cft_oauth2_policy_template" {
 
 module "cft_api_mgmt_oauth2_product" {
   source                        = "git@github.com:hmcts/cnp-module-api-mgmt-product?ref=master"
-  name                          = "bulk-scanning-payments"
+  name                          = "payments-bulk-scanning-api"
   api_mgmt_name                 = local.cft_api_mgmt_oauth2_name
   api_mgmt_rg                   = local.cft_api_mgmt_oauth2_rg
   approval_required             = "false"
