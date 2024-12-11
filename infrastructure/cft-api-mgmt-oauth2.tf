@@ -22,7 +22,7 @@ data "template_file" "cft_oauth2_policy_template" {
 
 module "cft_api_mgmt_oauth2_product" {
   source                        = "git@github.com:hmcts/cnp-module-api-mgmt-product?ref=master"
-  name                          = "payments-bulk-scanning-api"
+  name                          = "payments-bulk-scanning"
   api_mgmt_name                 = local.cft_api_mgmt_oauth2_name
   api_mgmt_rg                   = local.cft_api_mgmt_oauth2_rg
   approval_required             = "false"
