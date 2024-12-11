@@ -35,7 +35,7 @@ module "cft_api_mgmt_oauth2_product" {
 
 module "cft_api_mgmt_oauth2_api" {
   source                = "git@github.com:hmcts/cnp-module-api-mgmt-api?ref=master"
-  name                  = "bulk-scanning-payments-api"
+  name                  = "payments-bulk-scanning-api"
   display_name          = "Bulk Scanning Payments API"
   api_mgmt_name         = local.cft_api_mgmt_oauth2_name
   api_mgmt_rg           = local.cft_api_mgmt_oauth2_rg
