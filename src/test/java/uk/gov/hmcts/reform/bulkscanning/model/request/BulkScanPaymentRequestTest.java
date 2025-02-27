@@ -40,7 +40,7 @@ public class BulkScanPaymentRequestTest {
             fail("should have thrown an Error Message on Invalid Site Id");
         }else{
             violations.stream().forEach(v->{
-                if("Invalid site_id. Accepted values are AA08 or AA07 or AA09".equals(v.getMessage())){
+                if("Invalid site_id. Accepted values are AA08, AA07, AA09, ABA1 and ABA5".equals(v.getMessage())){
                     Assertions.assertThat(v.getMessage()).isEqualTo("Invalid site_id. Accepted values are AA08 or AA07 or AA09");
                 }
             });

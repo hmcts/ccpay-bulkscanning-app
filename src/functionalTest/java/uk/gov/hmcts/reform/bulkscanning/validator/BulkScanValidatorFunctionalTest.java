@@ -30,7 +30,7 @@ public class BulkScanValidatorFunctionalTest {
     public static final String RESPONSIBLE_SERVICE_ID_MISSING = "site_id can't be Blank";
     public static final String CCD_REFERENCE_MISSING = "ccd_case_number can't be Blank";
     public static final String PAYMENT_DCN_MISSING = "document_control_numbers can't be Blank";
-    public static final String INVALID_SITE_ID = "Invalid site_id. Accepted values are AA08 or AA07 or AA09 or ABA1";
+    public static final String INVALID_SITE_ID = "Invalid site_id. Accepted values are AA08, AA07, AA09, ABA1 and ABA5";
     public static final String INVALID_SITE_ID_LENGTH = "site_id length must be 4 Characters";
     public static final String INVALID_CCD_REFERENCE_LENGTH = "ccd_case_number length must be 16 digits";
     public static final String INVALID_DCN_LENGTH = "document_control_number must be 21 digit numeric";
