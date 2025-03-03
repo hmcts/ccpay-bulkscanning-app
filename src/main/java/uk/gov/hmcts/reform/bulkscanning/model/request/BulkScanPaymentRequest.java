@@ -48,9 +48,9 @@ public class BulkScanPaymentRequest {
     private String[] documentControlNumbers;
 
     @JsonIgnore
-    @AssertFalse(message = "Invalid site_id. Accepted values are AA08 or AA07 or AA09 or ABA1")
+    @AssertFalse(message = "Invalid site_id. Accepted values are AA08, AA07, AA09, ABA1 and ABA5")
     public boolean isValidResponsibleServiceId() {
-        String[] validResponsibleServiceIds = {"AA08", "AA07", "AA09", "ABA1"};
+        String[] validResponsibleServiceIds = {"AA08", "AA07", "AA09", "ABA1", "ABA5"};
         return responsibleServiceId != null && !Arrays.asList(validResponsibleServiceIds).stream().anyMatch(vm -> vm.equalsIgnoreCase(
             responsibleServiceId));
     }
