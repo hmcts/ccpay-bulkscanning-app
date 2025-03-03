@@ -195,7 +195,7 @@ def versions = [
   apachePoi         : '5.3.0',
   hmctsLogging      : '6.1.6',
   log4j             : '2.24.1',
-  lombok            : '1.18.34',
+  lombok            : '1.18.36',
   springBoot        : springBoot.class.package.implementationVersion,
   sonarPitest       : '0.5',
   serenity          : '4.2.3',
