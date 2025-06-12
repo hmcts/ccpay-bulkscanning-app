@@ -14,7 +14,7 @@ def product = "ccpay"
 def app = "bulkscanning-api"
 
 // Configure branches to sync with master branch
-def branchesToSync = ['demo', 'ithc', 'perftest']
+def branchesToSync = ['demo', 'perftest']
 
 def secrets = [
   'ccpay-${env}': [
