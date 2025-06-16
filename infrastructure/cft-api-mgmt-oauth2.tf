@@ -68,33 +68,22 @@ module "cft_api_mgmt_oauth2_policy" {
   ]
 }
 
-resource "null_resource" "generate_one_time_password" {
+data "external" "generate_one_time_password" {
   depends_on = [
     data.azurerm_key_vault_secret.s2s_client_secret
   ]
-  provisioner "local-exec" {
-    command = <<EOT
-      python -c "
-import base64, hmac, hashlib, time
-client_secret = '${var.s2s_client_secret}'
-key = base64.b32decode(client_secret.upper())
-timestamp = int(time.time() // 30)
-msg = timestamp.to_bytes(8, 'big')
-hmac_hash = hmac.new(key, msg, hashlib.sha1).digest()
-offset = hmac_hash[-1] & 0xf
-code = (int.from_bytes(hmac_hash[offset:offset+4], 'big') & 0x7fffffff) % 1000000
-print(f'{code:06}')
-      "
-    EOT
-    interpreter = ["bash", "-c"]
-  }
 
-  triggers = {
+  program = [
+    "python3",
+    "${path.module}/scripts/one_time_password.py"
+  ]
+
+  query = {
     client_secret = var.s2s_client_secret
   }
 }
 
 output "one_time_password" {
-  value = null_resource.generate_one_time_password.provisioner.local-exec.result
+  value     = data.external.generate_one_time_password.result["one_time_password"]
   sensitive = true
 }
