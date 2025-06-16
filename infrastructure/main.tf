@@ -21,13 +21,8 @@ locals {
   thumbprints_in_quotes     = formatlist("&quot;%s&quot;", var.bulkscanning_api_gateway_certificate_thumbprints)
   thumbprints_in_quotes_str = join(",", local.thumbprints_in_quotes)
   api_base_path             = "bulk-scanning-payment"
-  db_server_name            = "${var.product}-${var.component}-postgres-db-v15"
 }
 
-data "azurerm_key_vault" "payment_key_vault" {
-  name                = local.vaultName
-  resource_group_name = "ccpay-${var.env}"
-}
 
 module "ccpay-bulkscanning-payment-database-v15" {
   providers = {
@@ -37,7 +32,7 @@ module "ccpay-bulkscanning-payment-database-v15" {
   product              = var.product
   component            = var.component
   business_area        = "cft"
-  name                 = local.db_server_name
+  name                 = "${var.product}-${var.component}-postgres-db-v15"
   location             = var.location_app
   env                  = var.env
   pgsql_admin_username = var.postgresql_user
@@ -59,12 +54,12 @@ module "ccpay-bulkscanning-payment-database-v15" {
   admin_user_object_id = var.jenkins_AAD_objectId
   common_tags          = var.common_tags
   pgsql_version        = var.postgresql_flexible_sql_version
-  action_group_name           = join("-", [var.db_monitor_action_group_name, local.db_server_name, var.env])
-  email_address_key           = var.db_alert_email_address_key
-  email_address_key_vault_id  = data.azurerm_key_vault.payment_key_vault.id
-  cpu_threshold               = var.cpu_threshold
-  memory_threshold            = var.memory_threshold
-  storage_threshold           = var.storage_threshold
+
+}
+
+data "azurerm_key_vault" "payment_key_vault" {
+  name                = local.vaultName
+  resource_group_name = "ccpay-${var.env}"
 }
 
 # Populate Vault with DB info
