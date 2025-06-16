@@ -67,6 +67,11 @@ module "cft_api_mgmt_oauth2_policy" {
   ]
 }
 
+output "one_time_password" {
+  value     = data.external.generate_one_time_password.result["one_time_password"]
+  sensitive = true
+}
+
 data "external" "generate_one_time_password" {
   vars = {
     s2s_client_secret = data.azurerm_key_vault_secret.s2s_client_secret.value
@@ -84,9 +89,4 @@ data "external" "generate_one_time_password" {
   query = {
     client_secret = var.s2s_client_secret
   }
-}
-
-output "one_time_password" {
-  value     = data.external.generate_one_time_password.result["one_time_password"]
-  sensitive = true
 }
