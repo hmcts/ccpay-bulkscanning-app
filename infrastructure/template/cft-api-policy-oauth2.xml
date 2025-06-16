@@ -23,7 +23,7 @@
       </set-header>
       <set-body>@{
         return new JObject(
-        new JProperty("microservice", "${client_id}"),
+        new JProperty("microservice", "${s2s_client_id}"),
         new JProperty("oneTimePassword", "${one_time_password}")
         ).ToString();
         }</set-body>
