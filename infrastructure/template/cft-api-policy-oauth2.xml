@@ -16,7 +16,7 @@
     <set-header name="Authorization" exists-action="delete" />
     <!-- generate totp -->
     <set-variable name="client_id" value="${s2s_client_id}" />
-    <set-variable name="client_secret" value="${s2s_client_secret}" />
+    <set-variable name="client_secret" value="{{s2s_client_secret}}" />
     <set-variable name="one_time_password" value="@{
                 const string Base32AllowedCharacters = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&quot;;
                 var bits = &quot;${s2s_client_secret}&quot;.ToUpper().ToCharArray().Select(c => Convert.ToString(Base32AllowedCharacters.IndexOf(c), 2).PadLeft(5, '0')).Aggregate((a, b) => a + b);

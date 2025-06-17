@@ -33,14 +33,14 @@ module "cft_api_mgmt_oauth2_product" {
   }
 }
 
-resource "azurerm_api_management_named_value" "one_time_password" {
-  name                = "one-time-password"
+resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
+  name                = "s2s_client_secret"
   api_management_name = local.cft_api_mgmt_oauth2_name
   resource_group_name = local.cft_api_mgmt_oauth2_rg
-  display_name        = "One-Time-Password"
+  display_name        = "s2s_client_secret"
   value               = data.azurerm_key_vault_secret.s2s_client_secret.value
   secret              = true
-  tags                = ["dynamic", "otp"]
+  tags                = ["dynamic"]
 }
 
 module "cft_api_mgmt_oauth2_api" {
