@@ -60,10 +60,6 @@ resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
   value               = data.azurerm_key_vault_secret.s2s_client_secret.value
   secret              = true
   tags                = ["dynamic"]
-  description         = "S2S Client Secret for Bulk Scanning Payments API"
-  providers = {
-    azurerm = azurerm.aks-cftapps
-  }
 }
 
 module "cft_api_mgmt_oauth2_policy" {
