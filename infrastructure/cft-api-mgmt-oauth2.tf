@@ -4,6 +4,7 @@ locals {
   cft_api_mgmt_oauth2_suffix = var.apim_suffix == "" ? var.env : var.apim_suffix
   cft_api_mgmt_oauth2_name   = join("-", ["cft-api-mgmt", local.cft_api_mgmt_suffix])
   cft_api_mgmt_oauth2_rg     = join("-", ["cft", var.env, "network-rg"])
+  cft_api_mgmt_ccpay_rg      = join("-", [var.product, var.env])
   cft_api_oauth2_base_path   = "payments-bulk-scanning-api"
 }
 
@@ -54,7 +55,7 @@ module "cft_api_mgmt_oauth2_api" {
 
 resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
   name                = "s2s_client_secret"
-  resource_group_name = local.cft_api_mgmt_oauth2_rg
+  resource_group_name = local.cft_api_mgmt_ccpay_rg
   api_management_name = module.cft_api_mgmt_oauth2_api.name
   display_name        = "s2s_client_secret"
   value               = data.azurerm_key_vault_secret.s2s_client_secret.value
