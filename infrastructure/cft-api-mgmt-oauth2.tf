@@ -33,16 +33,6 @@ module "cft_api_mgmt_oauth2_product" {
   }
 }
 
-resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
-  name                = "s2s_client_secret"
-  api_management_name = local.cft_api_mgmt_oauth2_name
-  resource_group_name = local.cft_api_mgmt_oauth2_rg
-  display_name        = "s2s_client_secret"
-  value               = data.azurerm_key_vault_secret.s2s_client_secret.value
-  secret              = true
-  tags                = ["dynamic"]
-}
-
 module "cft_api_mgmt_oauth2_api" {
   source                = "git@github.com:hmcts/cnp-module-api-mgmt-api?ref=master"
   name                  = "payments-bulk-scanning-api"
@@ -57,6 +47,20 @@ module "cft_api_mgmt_oauth2_api" {
   content_format        = "openapi-link"
   subscription_required = "false"
   revision              = "2"
+  providers = {
+    azurerm = azurerm.aks-cftapps
+  }
+}
+
+resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
+  name                = "s2s_client_secret"
+  resource_group_name = local.cft_api_mgmt_oauth2_rg
+  api_management_name = module.cft_api_mgmt_oauth2_api.name
+  display_name        = "s2s_client_secret"
+  value               = data.azurerm_key_vault_secret.s2s_client_secret.value
+  secret              = true
+  tags                = ["dynamic"]
+  description         = "S2S Client Secret for Bulk Scanning Payments API"
   providers = {
     azurerm = azurerm.aks-cftapps
   }
