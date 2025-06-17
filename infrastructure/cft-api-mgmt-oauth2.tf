@@ -33,6 +33,20 @@ module "cft_api_mgmt_oauth2_product" {
   }
 }
 
+resource "azurerm_api_management_named_value" "one_time_password" {
+  name                = "one-time-password"
+  api_management_name = local.cft_api_mgmt_oauth2_name
+  resource_group_name = local.cft_api_mgmt_oauth2_rg
+  display_name        = "One-Time-Password"
+  value               = data.external.generate_one_time_password.result["one_time_password"]
+  secret              = true
+  tags                = ["dynamic", "otp"]
+
+  depends_on = [
+    data.external.generate_one_time_password
+  ]
+}
+
 module "cft_api_mgmt_oauth2_api" {
   source                = "git@github.com:hmcts/cnp-module-api-mgmt-api?ref=master"
   name                  = "payments-bulk-scanning-api"
