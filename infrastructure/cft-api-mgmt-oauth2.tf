@@ -41,10 +41,6 @@ resource "azurerm_api_management_named_value" "one_time_password" {
   value               = data.azurerm_key_vault_secret.s2s_client_secret.value
   secret              = true
   tags                = ["dynamic", "otp"]
-
-  depends_on = [
-    data.external.generate_one_time_password
-  ]
 }
 
 module "cft_api_mgmt_oauth2_api" {
