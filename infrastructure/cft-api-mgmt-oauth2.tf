@@ -55,7 +55,7 @@ module "cft_api_mgmt_oauth2_api" {
 resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret_two" {
   name                = "ccpay-s2s-client-secret-two"
   resource_group_name = local.cft_api_mgmt_oauth2_rg
-  api_management_name = module.cft_api_mgmt_oauth2_api.name
+  api_management_name = local.cft_api_mgmt_oauth2_name
   display_name        = "ccpay-s2s-client-secret-two"
   value               = data.azurerm_key_vault_secret.s2s_client_secret.value
   secret              = true
