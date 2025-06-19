@@ -23,6 +23,12 @@ data "template_file" "cft_oauth2_policy_template" {
   ]
 }
 
+resource "azurerm_role_assignment" "ccpay_apim_keyvault_access" {
+  scope                = data.azurerm_key_vault_secret.s2s_client_secret.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = module.cft_api_mgmt_oauth2_api.identity[0].principal_id
+}
+
 resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
   name                = "ccpay-s2s-client-secret"
   resource_group_name = local.cft_api_mgmt_oauth2_rg
