@@ -19,7 +19,7 @@ data "template_file" "cft_oauth2_policy_template" {
   }
 
   depends_on = [
-    resource.azurerm_api_management_named_value.ccpay_s2s_client_id
+    resource.azurerm_api_management_named_value.ccpay_s2s_client_secret
   ]
 }
 
