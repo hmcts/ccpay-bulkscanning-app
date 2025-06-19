@@ -15,7 +15,6 @@ data "template_file" "cft_oauth2_policy_template" {
     cft_oauth2_client_id = data.azurerm_key_vault_secret.apim_client_id.value
     cft_oauth2_app_id    = data.azurerm_key_vault_secret.apim_app_id.value
     s2s_client_id        = data.azurerm_key_vault_secret.s2s_client_id.value
-    s2s_client_secret    = data.azurerm_key_vault_secret.s2s_client_secret.value
     s2s_base_url         = local.s2sUrl
   }
 }
@@ -52,19 +51,7 @@ module "cft_api_mgmt_oauth2_api" {
   }
 }
 
-resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
-  name                = "ccpay-s2s-client-secret"
-  resource_group_name = local.cft_api_mgmt_oauth2_rg
-  api_management_name = local.cft_api_mgmt_oauth2_name
-  display_name        = "ccpay-s2s-client-secret"
-  value               = data.azurerm_key_vault_secret.s2s_client_secret.value
-  secret              = true
-  provider            = azurerm.aks-cftapps
 
-  depends_on = [
-    module.cft_api_mgmt_oauth2_api
-  ]
-}
 
 module "cft_api_mgmt_oauth2_policy" {
   source                 = "git@github.com:hmcts/cnp-module-api-mgmt-api-policy?ref=master"
