@@ -16,46 +16,31 @@
     <set-header name="Authorization" exists-action="delete" />
     <!-- generate totp -->
     <set-variable name="client_id" value="${s2s_client_id}" />
-    <set-variable name="client_secret" value="blaa" />
+    <set-variable name="client_secret" value="BLAAAAAAAAAAA" />
     <set-variable name="one_time_password" value="@{
-      const string Base32Chars = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&quot;;
+                const string Base32AllowedCharacters = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&quot;;
+                var bits = &quot;S2S_CLIENT_SECRET&quot;.ToUpper().ToCharArray().Select(c => Convert.ToString(Base32AllowedCharacters.IndexOf(c), 2).PadLeft(5, '0')).Aggregate((a, b) => a + b);
+                var secretKeyBytes = Enumerable.Range(0, bits.Length / 8).Select(i => Convert.ToByte(bits.Substring(i * 8, 8), 2)).ToArray();
 
-      string clientSecret = ((string)context.Variables[&quot;client_secret&quot;]).ToUpperInvariant();
+                var unixTimestamp = (long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                var timeIndex = unixTimestamp / 30;
+                byte[] challenge = BitConverter.GetBytes(timeIndex);
+                if (BitConverter.IsLittleEndian) {
+                    Array.Reverse(challenge);
+                }
 
-      // Convert Base32 string to binary string
-      var binaryString = string.Concat(
-          clientSecret.Select(c => Convert.ToString(Base32Chars.IndexOf(c), 2).PadLeft(5, '0'))
-      );
-
-      // Convert binary string to byte array
-      var secretKeyBytes = Enumerable.Range(0, binaryString.Length / 8)
-          .Select(i => Convert.ToByte(binaryString.Substring(i * 8, 8), 2))
-          .ToArray();
-
-      // Calculate the time step (30-second intervals)
-      long timestamp = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
-      long timestep = timestamp / 30;
-
-      // Convert timestep to byte array (big-endian)
-      byte[] challenge = BitConverter.GetBytes(timestep);
-      if (BitConverter.IsLittleEndian) Array.Reverse(challenge);
-
-      // HMAC-SHA1
-      using var hmac = new System.Security.Cryptography.HMACSHA1(secretKeyBytes);
-      byte[] hash = hmac.ComputeHash(challenge);
-
-      // Dynamic truncation
-      int offset = hash[^1] & 0x0F;
-      int binaryCode = (hash[offset] & 0x7F) << 24
-                     | (hash[offset + 1] & 0xFF) << 16
-                     | (hash[offset + 2] & 0xFF) << 8
-                     | (hash[offset + 3] & 0xFF);
-
-      // Modulo to get 6-digit code
-      int otp = binaryCode % 1000000;
-
-      return otp.ToString(&quot;D6&quot;);
-    }"/>
+                HMACSHA1 hmac = new HMACSHA1(secretKeyBytes);
+                byte[] hash = hmac.ComputeHash(challenge);
+                int offset = hash[19] &amp; 0xf;
+                int truncatedHash = hash[offset] &amp; 0x7f;
+                for (int i = 1; i &lt; 4; i++)
+                {
+                    truncatedHash &lt;&lt;= 8;
+                    truncatedHash |= hash[offset + i] &amp; 0xff;
+                }
+                truncatedHash %= 1000000;
+                return truncatedHash.ToString(&quot;D6&quot;);
+            }"/>
     <send-request ignore-error="false" timeout="20" response-variable-name="s2sBearerToken" mode="new">
       <set-url>${s2s_base_url}/lease</set-url>
       <set-method>POST</set-method>
