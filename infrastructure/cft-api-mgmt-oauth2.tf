@@ -15,9 +15,36 @@ data "template_file" "cft_oauth2_policy_template" {
     cft_oauth2_client_id = data.azurerm_key_vault_secret.apim_client_id.value
     cft_oauth2_app_id    = data.azurerm_key_vault_secret.apim_app_id.value
     s2s_client_id        = data.azurerm_key_vault_secret.s2s_client_id.value
-    s2s_client_secret    = data.azurerm_key_vault_secret.s2s_client_secret.value
     s2s_base_url         = local.s2sUrl
   }
+
+  depends_on = [
+    resource.azurerm_api_management_named_value.ccpay_s2s_client_secret
+  ]
+}
+
+# resource "azurerm_role_assignment" "ccpay_apim_keyvault_access" {
+#   scope                = data.azurerm_key_vault_secret.s2s_client_secret.id
+#   role_definition_name = "Key Vault Secrets User"
+#   principal_id         = module.cft_api_mgmt_oauth2_api.identity[0].principal_id
+# }
+
+resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
+  name                = "ccpay-s2s-client-secret"
+  resource_group_name = local.cft_api_mgmt_oauth2_rg
+  api_management_name = local.cft_api_mgmt_oauth2_name
+  display_name        = "ccpay-s2s-client-secret"
+  value               = data.azurerm_key_vault_secret.s2s_client_secret.value
+  secret              = true
+  provider            = azurerm.aks-cftapps
+
+#   value_from_key_vault {
+#     secret_id = data.azurerm_key_vault_secret.s2s_client_secret.id
+#   }
+
+  depends_on = [
+    module.cft_api_mgmt_oauth2_api
+  ]
 }
 
 module "cft_api_mgmt_oauth2_product" {
@@ -51,16 +78,6 @@ module "cft_api_mgmt_oauth2_api" {
     azurerm = azurerm.aks-cftapps
   }
 }
-
-# resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
-#   name                = "ccpay_s2s_client_secret"
-#   resource_group_name = local.cft_api_mgmt_oauth2_name
-#   api_management_name = local.cft_api_mgmt_oauth2_rg
-#   display_name        = "s2s_client_secret"
-#   value               = data.azurerm_key_vault_secret.s2s_client_secret.value
-#   secret              = true
-#   tags                = ["dynamic"]
-# }
 
 module "cft_api_mgmt_oauth2_policy" {
   source                 = "git@github.com:hmcts/cnp-module-api-mgmt-api-policy?ref=master"
