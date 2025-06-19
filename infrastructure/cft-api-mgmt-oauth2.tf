@@ -28,9 +28,13 @@ resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
   resource_group_name = local.cft_api_mgmt_oauth2_rg
   api_management_name = local.cft_api_mgmt_oauth2_name
   display_name        = "ccpay-s2s-client-secret"
-  value               = data.azurerm_key_vault_secret.s2s_client_secret.value
+#   value               = data.azurerm_key_vault_secret.s2s_client_secret.value
   secret              = true
   provider            = azurerm.aks-cftapps
+
+  value_from_key_vault {
+    secret_id = data.azurerm_key_vault_secret.s2s_client_secret.id
+  }
 
   depends_on = [
     module.cft_api_mgmt_oauth2_api
