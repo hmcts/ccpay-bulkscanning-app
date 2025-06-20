@@ -24,7 +24,7 @@
 <!--        </return-response>-->
 <!--      </when>-->
     </choose>
-    <!-- generate totp -->
+    <!-- generate totp - using static values -->
     <set-variable name="client_id" value="${s2s_client_id}" />
     <set-variable name="client_secret" value="S2S_CLIENT_SECRET" />
     <set-variable name="one_time_password" value="@{
