@@ -51,8 +51,6 @@ module "cft_api_mgmt_oauth2_api" {
   }
 }
 
-
-
 module "cft_api_mgmt_oauth2_policy" {
   source                 = "git@github.com:hmcts/cnp-module-api-mgmt-api-policy?ref=master"
   api_mgmt_name          = local.cft_api_mgmt_oauth2_name
