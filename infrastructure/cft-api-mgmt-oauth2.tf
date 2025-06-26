@@ -19,11 +19,11 @@ data "template_file" "cft_oauth2_policy_template" {
   }
 
   depends_on = [
-    resource.azurerm_api_management_named_value.ccpay_s2s_client_secret
+    resource.azurerm_api_management_named_value.ccpay_s2s_client_secret_oauth2
   ]
 }
 
-resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret" {
+resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret_oauth2" {
   name                = "ccpay-s2s-client-secret"
   resource_group_name = local.cft_api_mgmt_oauth2_rg
   api_management_name = local.cft_api_mgmt_oauth2_name
