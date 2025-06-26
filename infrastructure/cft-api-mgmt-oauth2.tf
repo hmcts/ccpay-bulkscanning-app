@@ -17,10 +17,6 @@ data "template_file" "cft_oauth2_policy_template" {
     s2s_client_id        = data.azurerm_key_vault_secret.s2s_client_id.value
     s2s_base_url         = local.s2sUrl
   }
-
-  depends_on = [
-    resource.azurerm_api_management_named_value.ccpay_s2s_client_secret_oauth2
-  ]
 }
 
 resource "azurerm_api_management_named_value" "ccpay_s2s_client_secret_oauth2" {
