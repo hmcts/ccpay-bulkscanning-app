@@ -181,7 +181,7 @@ dependencyUpdates.resolutionStrategy = {
 repositories {
   mavenLocal()
   mavenCentral()
-  maven { url 'https://jitpack.io' }
+  maven { url = 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
 }
 
 dependencyManagement {
@@ -193,7 +193,7 @@ dependencyManagement {
 
 def versions = [
   apachePoi         : '5.3.0',
-  hmctsLogging      : '6.1.6',
+  hmctsLogging      : '6.1.9',
   log4j             : '2.24.1',
   lombok            : '1.18.34',
   springBoot        : springBoot.class.package.implementationVersion,
@@ -207,9 +207,9 @@ apply from: "${rootDir}/cve-resolution-strategy.gradle"
 dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.hmctsLogging
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.hmctsLogging
-  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.0.3'
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.3'
-  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.2.0'
+  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.1.1'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.4'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.2'
   implementation group: 'com.google.guava', name: 'guava', version: '33.3.1-jre'
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.41.2'
   implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
@@ -244,7 +244,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   implementation group: 'org.springframework.security', name: 'spring-security-web'
 
-  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.4', classifier: 'all'
+  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.9', classifier: 'all'
   testImplementation group: 'com.h2database', name: 'h2'
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
@@ -341,4 +341,3 @@ pitest {
   outputFormats = ['XML', 'HTML']
   mutationThreshold = 90
 }
-
