@@ -23,7 +23,7 @@ public class AppInsightsAuditRepositoryTest {
     @Before
     public void setUp(){
         telemetry = spy(TelemetryClient.class);
-        appInsightsAuditRepository = new AppInsightsAuditRepository("key",telemetry);
+        appInsightsAuditRepository = new AppInsightsAuditRepository(telemetry);
     }
 
     @Test
