@@ -259,7 +259,7 @@ public class PaymentControllerFunctionalTest {
     public void testUpdateCaseReferenceForMultipleEnvelopesExceptionRecordAndGetDetailsByDcns() {
         String[] dcn1 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
         dcns.add(dcn1[0]);
-        String[] dcn2 = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
+        String[] dcn2 = {"6600000000002" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
         dcns.add(dcn2[0]);
 
         String exceptionReference = "11223344" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
@@ -353,7 +353,7 @@ public class PaymentControllerFunctionalTest {
             .body("exception_record_reference", is(equalTo(exceptionReference)))
             .body("responsible_service_id", is(equalTo(bulkScanCcdPayments2.getResponsibleServiceId())))
             .body("payments[0].id", notNullValue())
-            .body("payments[0].dcn_reference", is(equalTo(dcn1[0])))
+            .body("payments[0].dcn_reference", is(equalTo(dcn2[0])))
             .body(
                 "payments[0].bgc_reference",
                 is(equalTo(bulkScanDcnPayment2.getBankGiroCreditSlipNumber().toString()))
@@ -426,7 +426,7 @@ public class PaymentControllerFunctionalTest {
             .body("exception_record_reference", is(equalTo(exceptionReference)))
             .body("responsible_service_id", is(equalTo(bulkScanCcdPayments2.getResponsibleServiceId())))
             .body("payments[0].id", notNullValue())
-            .body("payments[0].dcn_reference", is(equalTo(dcn1[0])))
+            .body("payments[0].dcn_reference", is(equalTo(dcn2[0])))
             .body(
                 "payments[0].bgc_reference",
                 is(equalTo(bulkScanDcnPayment2.getBankGiroCreditSlipNumber().toString()))
