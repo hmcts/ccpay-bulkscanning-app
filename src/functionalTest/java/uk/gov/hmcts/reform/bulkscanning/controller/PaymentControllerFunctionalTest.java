@@ -34,10 +34,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -320,27 +317,31 @@ public class PaymentControllerFunctionalTest {
             SERVICE_TOKEN,
             dcn1[0]
         );
+
+        // Extract payments array from response
+        List<Map<String, Object>> dcnPayments = unprocessedPaymentDetailsByDcnResponse1.jsonPath().getList("payments");
+        int dcnIndex = findDcnIndexInPayments(dcnPayments, dcn1[0]);
         unprocessedPaymentDetailsByDcnResponse1.then().statusCode(OK.value())
             .body("exception_record_reference", is(equalTo(exceptionReference)))
             .body("responsible_service_id", is(equalTo(bulkScanCcdPayments1.getResponsibleServiceId())))
-            .body("payments[0].id", notNullValue())
-            .body("payments[0].dcn_reference", is(equalTo(dcn1[0])))
+            .body("payments[" + dcnIndex + "].id", notNullValue())
+            .body("payments[" + dcnIndex + "].dcn_reference", is(equalTo(dcn1[0])))
             .body(
-                "payments[0].bgc_reference",
+                "payments[" + dcnIndex + "].bgc_reference",
                 is(equalTo(bulkScanDcnPayment1.getBankGiroCreditSlipNumber().toString()))
             )
             .body(
-                "payments[0].amount",
+                "payments[" + dcnIndex + "].amount",
                 is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment1.getAmount())).setScale(
                     2,
                     RoundingMode.HALF_UP
                 )))
             )
-            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment1.getCurrency())))
-            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment1.getMethod().toUpperCase())))
-            .body("payments[0].date_banked", notNullValue())
-            .body("payments[0].date_created", notNullValue())
-            .body("payments[0].date_updated", notNullValue())
+            .body("payments[" + dcnIndex + "].currency", is(equalTo(bulkScanDcnPayment1.getCurrency())))
+            .body("payments[" + dcnIndex + "].payment_method", is(equalTo(bulkScanDcnPayment1.getMethod().toUpperCase())))
+            .body("payments[" + dcnIndex + "].date_banked", notNullValue())
+            .body("payments[" + dcnIndex + "].date_created", notNullValue())
+            .body("payments[" + dcnIndex + "].date_updated", notNullValue())
             .body("all_payments_status", is(equalTo("COMPLETE")));
 
         // verify exception ref payment details by dcn2
@@ -349,27 +350,31 @@ public class PaymentControllerFunctionalTest {
             SERVICE_TOKEN,
             dcn2[0]
         );
+
+        // Extract payments array from response
+        dcnPayments = unprocessedPaymentDetailsByDcnResponse2.jsonPath().getList("payments");
+        dcnIndex = findDcnIndexInPayments(dcnPayments, dcn2[0]);
         unprocessedPaymentDetailsByDcnResponse2.then().statusCode(OK.value())
             .body("exception_record_reference", is(equalTo(exceptionReference)))
             .body("responsible_service_id", is(equalTo(bulkScanCcdPayments2.getResponsibleServiceId())))
-            .body("payments[0].id", notNullValue())
-            .body("payments[0].dcn_reference", is(equalTo(dcn2[0])))
+            .body("payments[" + dcnIndex + "].id", notNullValue())
+            .body("payments[" + dcnIndex + "].dcn_reference", is(equalTo(dcn2[0])))
             .body(
-                "payments[0].bgc_reference",
+                "payments[" + dcnIndex + "].bgc_reference",
                 is(equalTo(bulkScanDcnPayment2.getBankGiroCreditSlipNumber().toString()))
             )
             .body(
-                "payments[0].amount",
+                "payments[" + dcnIndex + "].amount",
                 is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment2.getAmount())).setScale(
                     2,
                     RoundingMode.HALF_UP
                 )))
             )
-            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment2.getCurrency())))
-            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment2.getMethod().toUpperCase())))
-            .body("payments[0].date_banked", notNullValue())
-            .body("payments[0].date_created", notNullValue())
-            .body("payments[0].date_updated", notNullValue())
+            .body("payments[" + dcnIndex + "].currency", is(equalTo(bulkScanDcnPayment2.getCurrency())))
+            .body("payments[" + dcnIndex + "].payment_method", is(equalTo(bulkScanDcnPayment2.getMethod().toUpperCase())))
+            .body("payments[" + dcnIndex + "].date_banked", notNullValue())
+            .body("payments[" + dcnIndex + "].date_created", notNullValue())
+            .body("payments[" + dcnIndex + "].date_updated", notNullValue())
             .body("all_payments_status", is(equalTo("COMPLETE")));
 
         CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest
@@ -391,28 +396,32 @@ public class PaymentControllerFunctionalTest {
             SERVICE_TOKEN,
             dcn1[0]
         );
+
+        // Extract payments array from response
+        dcnPayments = unprocessedPaymentDetailsByDcnResponse3.jsonPath().getList("payments");
+        dcnIndex = findDcnIndexInPayments(dcnPayments, dcn1[0]);
         unprocessedPaymentDetailsByDcnResponse3.then().statusCode(OK.value())
             .body("ccd_reference", is(equalTo(ccdCaseNumber)))
             .body("exception_record_reference", is(equalTo(exceptionReference)))
             .body("responsible_service_id", is(equalTo(bulkScanCcdPayments1.getResponsibleServiceId())))
-            .body("payments[0].id", notNullValue())
-            .body("payments[0].dcn_reference", is(equalTo(dcn1[0])))
+            .body("payments[" + dcnIndex + "].id", notNullValue())
+            .body("payments[" + dcnIndex + "].dcn_reference", is(equalTo(dcn1[0])))
             .body(
-                "payments[0].bgc_reference",
+                "payments[" + dcnIndex + "].bgc_reference",
                 is(equalTo(bulkScanDcnPayment1.getBankGiroCreditSlipNumber().toString()))
             )
             .body(
-                "payments[0].amount",
+                "payments[" + dcnIndex + "].amount",
                 is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment1.getAmount())).setScale(
                     2,
                     RoundingMode.HALF_UP
                 )))
             )
-            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment1.getCurrency())))
-            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment1.getMethod().toUpperCase())))
-            .body("payments[0].date_banked", notNullValue())
-            .body("payments[0].date_created", notNullValue())
-            .body("payments[0].date_updated", notNullValue())
+            .body("payments[" + dcnIndex + "].currency", is(equalTo(bulkScanDcnPayment1.getCurrency())))
+            .body("payments[" + dcnIndex + "].payment_method", is(equalTo(bulkScanDcnPayment1.getMethod().toUpperCase())))
+            .body("payments[" + dcnIndex + "].date_banked", notNullValue())
+            .body("payments[" + dcnIndex + "].date_created", notNullValue())
+            .body("payments[" + dcnIndex + "].date_updated", notNullValue())
             .body("all_payments_status", is(equalTo("COMPLETE")));
 
         // verify ccd case ref payment details by dcn2
@@ -421,28 +430,32 @@ public class PaymentControllerFunctionalTest {
             SERVICE_TOKEN,
             dcn2[0]
         );
+
+        // Extract payments array from response
+        dcnPayments = unprocessedPaymentDetailsByDcnResponse4.jsonPath().getList("payments");
+        dcnIndex = findDcnIndexInPayments(dcnPayments, dcn2[0]);
         unprocessedPaymentDetailsByDcnResponse4.then().statusCode(OK.value())
             .body("ccd_reference", is(equalTo(ccdCaseNumber)))
             .body("exception_record_reference", is(equalTo(exceptionReference)))
             .body("responsible_service_id", is(equalTo(bulkScanCcdPayments2.getResponsibleServiceId())))
-            .body("payments[0].id", notNullValue())
-            .body("payments[0].dcn_reference", is(equalTo(dcn2[0])))
+            .body("payments[" + dcnIndex + "].id", notNullValue())
+            .body("payments[" + dcnIndex + "].dcn_reference", is(equalTo(dcn2[0])))
             .body(
-                "payments[0].bgc_reference",
+                "payments[" + dcnIndex + "].bgc_reference",
                 is(equalTo(bulkScanDcnPayment2.getBankGiroCreditSlipNumber().toString()))
             )
             .body(
-                "payments[0].amount",
+                "payments[" + dcnIndex + "].amount",
                 is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment2.getAmount())).setScale(
                     2,
                     RoundingMode.HALF_UP
                 )))
             )
-            .body("payments[0].currency", is(equalTo(bulkScanDcnPayment2.getCurrency())))
-            .body("payments[0].payment_method", is(equalTo(bulkScanDcnPayment2.getMethod().toUpperCase())))
-            .body("payments[0].date_banked", notNullValue())
-            .body("payments[0].date_created", notNullValue())
-            .body("payments[0].date_updated", notNullValue())
+            .body("payments[" + dcnIndex + "].currency", is(equalTo(bulkScanDcnPayment2.getCurrency())))
+            .body("payments[" + dcnIndex + "].payment_method", is(equalTo(bulkScanDcnPayment2.getMethod().toUpperCase())))
+            .body("payments[" + dcnIndex + "].date_banked", notNullValue())
+            .body("payments[" + dcnIndex + "].date_created", notNullValue())
+            .body("payments[" + dcnIndex + "].date_updated", notNullValue())
             .body("all_payments_status", is(equalTo("COMPLETE")));
     }
 
@@ -785,6 +798,19 @@ public class PaymentControllerFunctionalTest {
         DateTimeFormatter reportNameDateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).format(
             reportNameDateFormat);
+    }
+
+    private int findDcnIndexInPayments(List<Map<String, Object>> payments, String dcnToFind) {
+        // Find index for dcn1[0]
+        int dcn1Index = -1;
+        for (int i = 0; i < payments.size(); i++) {
+            if (dcnToFind.equals(payments.get(i).get("dcn_reference"))) {
+                dcn1Index = i;
+                break;
+            }
+        }
+        Assert.assertTrue("DCN not found in payments", dcn1Index != -1);
+        return dcn1Index;
     }
 
     @After
