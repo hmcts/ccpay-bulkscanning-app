@@ -123,7 +123,6 @@ public class PaymentControllerFunctionalTest {
         unprocessedPaymentDetailsByDcnResponse1.then().statusCode(OK.value())
             .body("all_payments_status", is(equalTo("INCOMPLETE")));
 
-        // move ccdCaseNumber declaration close to first usage to satisfy VariableDeclarationUsageDistance
         String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
         BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcn, "AA08", false);
         Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(
@@ -265,7 +264,6 @@ public class PaymentControllerFunctionalTest {
         dcns.add(dcn2[0]);
 
         String exceptionReference = "11223344" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
-        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
 
         BulkScanPayment bulkScanDcnPayment1 = createBulkScanDcnPayment(new BigDecimal(273), 964_567,
                                                                        LocalDate.now().toString(), "GBP", dcn1[0], "cheque");
@@ -306,8 +304,10 @@ public class PaymentControllerFunctionalTest {
                               dcn2[0],
                               bulkScanDcnPayment2);
 
+        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
         CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest().ccdCaseNumber(ccdCaseNumber).build();
-        Response updateResp = bulkScanPaymentTestService.updateCaseReferenceForExceptionReference(SERVICE_TOKEN, exceptionReference, caseReferenceRequest);
+        Response updateResp =
+            bulkScanPaymentTestService.updateCaseReferenceForExceptionReference(SERVICE_TOKEN, exceptionReference, caseReferenceRequest);
         updateResp.then().statusCode(OK.value());
         Assert.assertNotNull(updateResp.andReturn().asString());
 
@@ -718,7 +718,7 @@ public class PaymentControllerFunctionalTest {
                 break;
             }
         }
-        Assert.assertTrue("DCN not found in payments", dcn1Index != -1);
+        Assert.assertTrue("DCN not found in payments", dcnIndex != -1);
         return dcnIndex;
     }
 
