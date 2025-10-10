@@ -99,7 +99,6 @@ public class PaymentControllerFunctionalTest {
 
     @Test
     public void testBulkScanningPaymentRequestAndMarkPaymentAsProcessed() {
-        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
         String[] dcn = {"6600000000001" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER)};
 
         BulkScanPayment bulkScanDcnPayment = createBulkScanDcnPayment(
@@ -124,6 +123,8 @@ public class PaymentControllerFunctionalTest {
         unprocessedPaymentDetailsByDcnResponse1.then().statusCode(OK.value())
             .body("all_payments_status", is(equalTo("INCOMPLETE")));
 
+        // move ccdCaseNumber declaration close to first usage to satisfy VariableDeclarationUsageDistance
+        String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
         BulkScanPaymentRequest bulkScanCcdPayments = createBulkScanCcdPayments(ccdCaseNumber, dcn, "AA08", false);
         Response bulkScanCcdPaymentsResponse = bulkScanPaymentTestService.postBulkScanCcdPayments(
             SERVICE_TOKEN,
@@ -287,17 +288,21 @@ public class PaymentControllerFunctionalTest {
 
         // verify exception ref payment details by dcn1
         Response resp1 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(USER_TOKEN, SERVICE_TOKEN, dcn1[0]);
+        Map<String, String> expectedTopLevel1 = Map.of("exception_record_reference", exceptionReference);
+        String expectedResponsible1 = bulkScanCcdPayments1.getResponsibleServiceId();
         assertPaymentResponse(resp1,
-                              Map.of("exception_record_reference", exceptionReference),
-                              bulkScanCcdPayments1.getResponsibleServiceId(),
+                              expectedTopLevel1,
+                              expectedResponsible1,
                               dcn1[0],
                               bulkScanDcnPayment1);
 
         // verify exception ref payment details by dcn2
         Response resp2 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(USER_TOKEN, SERVICE_TOKEN, dcn2[0]);
+        Map<String, String> expectedTopLevel2 = Map.of("exception_record_reference", exceptionReference);
+        String expectedResponsible2 = bulkScanCcdPayments2.getResponsibleServiceId();
         assertPaymentResponse(resp2,
-                              Map.of("exception_record_reference", exceptionReference),
-                              bulkScanCcdPayments2.getResponsibleServiceId(),
+                              expectedTopLevel2,
+                              expectedResponsible2,
                               dcn2[0],
                               bulkScanDcnPayment2);
 
@@ -308,17 +313,19 @@ public class PaymentControllerFunctionalTest {
 
         // verify ccd case ref payment details by dcn1 (expect both ccd and exception present)
         Response resp3 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(USER_TOKEN, SERVICE_TOKEN, dcn1[0]);
+        Map<String, String> expectedTopLevel3 = Map.of("exception_record_reference", exceptionReference, "ccd_reference", ccdCaseNumber);
         assertPaymentResponse(resp3,
-                              Map.of("exception_record_reference", exceptionReference, "ccd_reference", ccdCaseNumber),
-                              bulkScanCcdPayments1.getResponsibleServiceId(),
+                              expectedTopLevel3,
+                              expectedResponsible1,
                               dcn1[0],
                               bulkScanDcnPayment1);
 
         // verify ccd case ref payment details by dcn2
         Response resp4 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(USER_TOKEN, SERVICE_TOKEN, dcn2[0]);
+        Map<String, String> expectedTopLevel4 = Map.of("exception_record_reference", exceptionReference, "ccd_reference", ccdCaseNumber);
         assertPaymentResponse(resp4,
-                              Map.of("exception_record_reference", exceptionReference, "ccd_reference", ccdCaseNumber),
-                              bulkScanCcdPayments2.getResponsibleServiceId(),
+                              expectedTopLevel4,
+                              expectedResponsible2,
                               dcn2[0],
                               bulkScanDcnPayment2);
     }
@@ -343,12 +350,16 @@ public class PaymentControllerFunctionalTest {
             validatable = validatable.body(e.getKey(), is(equalTo(e.getValue())));
         }
 
+        // extract expected amount to avoid long inline expression
+        BigDecimal expectedAmount = new BigDecimal(String.valueOf(expectedPayment.getAmount()))
+            .setScale(2, RoundingMode.HALF_UP);
+
         validatable
             .body("responsible_service_id", is(equalTo(expectedResponsibleServiceId)))
             .body("payments[" + index + "].id", notNullValue())
             .body("payments[" + index + "].dcn_reference", is(equalTo(expectedDcn)))
             .body("payments[" + index + "].bgc_reference", is(equalTo(expectedPayment.getBankGiroCreditSlipNumber().toString())))
-            .body("payments[" + index + "].amount", is(equalTo(new BigDecimal(String.valueOf(expectedPayment.getAmount())).setScale(2, RoundingMode.HALF_UP))))
+            .body("payments[" + index + "].amount", is(equalTo(expectedAmount)))
             .body("payments[" + index + "].currency", is(equalTo(expectedPayment.getCurrency())))
             .body("payments[" + index + "].payment_method", is(equalTo(expectedPayment.getMethod().toUpperCase())))
             .body("payments[" + index + "].date_banked", notNullValue())
@@ -699,16 +710,16 @@ public class PaymentControllerFunctionalTest {
     }
 
     private int findDcnIndexInPayments(List<Map<String, Object>> payments, String dcnToFind) {
-        // Find index for dcn1[0]
-        int dcn1Index = -1;
+        // Find index for dcn
+        int dcnIndex = -1;
         for (int i = 0; i < payments.size(); i++) {
             if (dcnToFind.equals(payments.get(i).get("dcn_reference"))) {
-                dcn1Index = i;
+                dcnIndex = i;
                 break;
             }
         }
         Assert.assertTrue("DCN not found in payments", dcn1Index != -1);
-        return dcn1Index;
+        return dcnIndex;
     }
 
     @After
