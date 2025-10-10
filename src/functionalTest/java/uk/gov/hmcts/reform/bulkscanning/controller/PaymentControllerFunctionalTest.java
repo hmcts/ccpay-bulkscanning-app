@@ -34,7 +34,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -262,200 +266,94 @@ public class PaymentControllerFunctionalTest {
         String exceptionReference = "11223344" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
         String ccdCaseNumber = "11115656" + RandomUtils.nextInt(CCD_EIGHT_DIGIT_LOWER, CCD_EIGHT_DIGIT_UPPER);
 
-        BulkScanPayment bulkScanDcnPayment1 = createBulkScanDcnPayment(
-            new BigDecimal(273),
-            964_567,
-            LocalDate.now().toString(),
-            "GBP",
-            dcn1[0],
-            "cheque"
-        );
-        Response bulkScanDcnPaymentResponse1 = bulkScanPaymentTestService.postBulkScanDcnPayment(
-            SERVICE_TOKEN,
-            bulkScanDcnPayment1
-        );
-        bulkScanDcnPaymentResponse1.then().statusCode(CREATED.value()).and().toString().equals("created");
+        BulkScanPayment bulkScanDcnPayment1 = createBulkScanDcnPayment(new BigDecimal(273), 964_567,
+                                                                       LocalDate.now().toString(), "GBP", dcn1[0], "cheque");
+        bulkScanPaymentTestService.postBulkScanDcnPayment(SERVICE_TOKEN, bulkScanDcnPayment1)
+            .then().statusCode(CREATED.value());
 
-        BulkScanPayment bulkScanDcnPayment2 = createBulkScanDcnPayment(
-            new BigDecimal(273),
-            964_567,
-            LocalDate.now().toString(),
-            "GBP",
-            dcn2[0],
-            "cheque"
-        );
-        Response bulkScanDcnPaymentResponse2 = bulkScanPaymentTestService.postBulkScanDcnPayment(
-            SERVICE_TOKEN,
-            bulkScanDcnPayment2
-        );
-        bulkScanDcnPaymentResponse2.then().statusCode(CREATED.value()).and().toString().equals("created");
+        BulkScanPayment bulkScanDcnPayment2 = createBulkScanDcnPayment(new BigDecimal(273), 964_567,
+                                                                       LocalDate.now().toString(), "GBP", dcn2[0], "cheque");
+        bulkScanPaymentTestService.postBulkScanDcnPayment(SERVICE_TOKEN, bulkScanDcnPayment2)
+            .then().statusCode(CREATED.value());
 
-        //Multiple envelopes with same exception record
+        // Multiple envelopes with same exception record
         BulkScanPaymentRequest bulkScanCcdPayments1 = createBulkScanCcdPayments(exceptionReference, dcn1, "AA08", true);
-        Response bulkScanCcdPaymentsResponse1 = bulkScanPaymentTestService.postBulkScanCcdPayments(
-            SERVICE_TOKEN,
-            bulkScanCcdPayments1
-        );
-        bulkScanCcdPaymentsResponse1.then().statusCode(CREATED.value()).body(
-            "payment_dcns",
-            equalTo(Arrays.asList(dcn1))
-        );
+        bulkScanPaymentTestService.postBulkScanCcdPayments(SERVICE_TOKEN, bulkScanCcdPayments1)
+            .then().statusCode(CREATED.value()).body("payment_dcns", equalTo(Arrays.asList(dcn1)));
 
         BulkScanPaymentRequest bulkScanCcdPayments2 = createBulkScanCcdPayments(exceptionReference, dcn2, "AA08", true);
-        Response bulkScanCcdPaymentsResponse2 = bulkScanPaymentTestService.postBulkScanCcdPayments(
-            SERVICE_TOKEN,
-            bulkScanCcdPayments2
-        );
-        bulkScanCcdPaymentsResponse2.then().statusCode(CREATED.value()).body(
-            "payment_dcns",
-            equalTo(Arrays.asList(dcn2))
-        );
+        bulkScanPaymentTestService.postBulkScanCcdPayments(SERVICE_TOKEN, bulkScanCcdPayments2)
+            .then().statusCode(CREATED.value()).body("payment_dcns", equalTo(Arrays.asList(dcn2)));
 
         // verify exception ref payment details by dcn1
-        Response unprocessedPaymentDetailsByDcnResponse1 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
-            USER_TOKEN,
-            SERVICE_TOKEN,
-            dcn1[0]
-        );
-
-        // Extract payments array from response
-        List<Map<String, Object>> dcnPayments = unprocessedPaymentDetailsByDcnResponse1.jsonPath().getList("payments");
-        int dcnIndex = findDcnIndexInPayments(dcnPayments, dcn1[0]);
-        unprocessedPaymentDetailsByDcnResponse1.then().statusCode(OK.value())
-            .body("exception_record_reference", is(equalTo(exceptionReference)))
-            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments1.getResponsibleServiceId())))
-            .body("payments[" + dcnIndex + "].id", notNullValue())
-            .body("payments[" + dcnIndex + "].dcn_reference", is(equalTo(dcn1[0])))
-            .body(
-                "payments[" + dcnIndex + "].bgc_reference",
-                is(equalTo(bulkScanDcnPayment1.getBankGiroCreditSlipNumber().toString()))
-            )
-            .body(
-                "payments[" + dcnIndex + "].amount",
-                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment1.getAmount())).setScale(
-                    2,
-                    RoundingMode.HALF_UP
-                )))
-            )
-            .body("payments[" + dcnIndex + "].currency", is(equalTo(bulkScanDcnPayment1.getCurrency())))
-            .body("payments[" + dcnIndex + "].payment_method", is(equalTo(bulkScanDcnPayment1.getMethod().toUpperCase())))
-            .body("payments[" + dcnIndex + "].date_banked", notNullValue())
-            .body("payments[" + dcnIndex + "].date_created", notNullValue())
-            .body("payments[" + dcnIndex + "].date_updated", notNullValue())
-            .body("all_payments_status", is(equalTo("COMPLETE")));
+        Response resp1 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(USER_TOKEN, SERVICE_TOKEN, dcn1[0]);
+        assertPaymentResponse(resp1,
+                              Map.of("exception_record_reference", exceptionReference),
+                              bulkScanCcdPayments1.getResponsibleServiceId(),
+                              dcn1[0],
+                              bulkScanDcnPayment1);
 
         // verify exception ref payment details by dcn2
-        Response unprocessedPaymentDetailsByDcnResponse2 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
-            USER_TOKEN,
-            SERVICE_TOKEN,
-            dcn2[0]
-        );
+        Response resp2 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(USER_TOKEN, SERVICE_TOKEN, dcn2[0]);
+        assertPaymentResponse(resp2,
+                              Map.of("exception_record_reference", exceptionReference),
+                              bulkScanCcdPayments2.getResponsibleServiceId(),
+                              dcn2[0],
+                              bulkScanDcnPayment2);
 
-        // Extract payments array from response
-        dcnPayments = unprocessedPaymentDetailsByDcnResponse2.jsonPath().getList("payments");
-        dcnIndex = findDcnIndexInPayments(dcnPayments, dcn2[0]);
-        unprocessedPaymentDetailsByDcnResponse2.then().statusCode(OK.value())
-            .body("exception_record_reference", is(equalTo(exceptionReference)))
-            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments2.getResponsibleServiceId())))
-            .body("payments[" + dcnIndex + "].id", notNullValue())
-            .body("payments[" + dcnIndex + "].dcn_reference", is(equalTo(dcn2[0])))
-            .body(
-                "payments[" + dcnIndex + "].bgc_reference",
-                is(equalTo(bulkScanDcnPayment2.getBankGiroCreditSlipNumber().toString()))
-            )
-            .body(
-                "payments[" + dcnIndex + "].amount",
-                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment2.getAmount())).setScale(
-                    2,
-                    RoundingMode.HALF_UP
-                )))
-            )
-            .body("payments[" + dcnIndex + "].currency", is(equalTo(bulkScanDcnPayment2.getCurrency())))
-            .body("payments[" + dcnIndex + "].payment_method", is(equalTo(bulkScanDcnPayment2.getMethod().toUpperCase())))
-            .body("payments[" + dcnIndex + "].date_banked", notNullValue())
-            .body("payments[" + dcnIndex + "].date_created", notNullValue())
-            .body("payments[" + dcnIndex + "].date_updated", notNullValue())
-            .body("all_payments_status", is(equalTo("COMPLETE")));
+        CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest.createCaseReferenceRequest().ccdCaseNumber(ccdCaseNumber).build();
+        Response updateResp = bulkScanPaymentTestService.updateCaseReferenceForExceptionReference(SERVICE_TOKEN, exceptionReference, caseReferenceRequest);
+        updateResp.then().statusCode(OK.value());
+        Assert.assertNotNull(updateResp.andReturn().asString());
 
-        CaseReferenceRequest caseReferenceRequest = CaseReferenceRequest
-            .createCaseReferenceRequest()
-            .ccdCaseNumber(ccdCaseNumber)
-            .build();
-
-        Response response = bulkScanPaymentTestService.updateCaseReferenceForExceptionReference(
-            SERVICE_TOKEN,
-            exceptionReference,
-            caseReferenceRequest
-        );
-        response.then().statusCode(OK.value());
-        Assert.assertNotNull(response.andReturn().asString());
-
-        // verify ccd case ref payment details by dcn1
-        Response unprocessedPaymentDetailsByDcnResponse3 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
-            USER_TOKEN,
-            SERVICE_TOKEN,
-            dcn1[0]
-        );
-
-        // Extract payments array from response
-        dcnPayments = unprocessedPaymentDetailsByDcnResponse3.jsonPath().getList("payments");
-        dcnIndex = findDcnIndexInPayments(dcnPayments, dcn1[0]);
-        unprocessedPaymentDetailsByDcnResponse3.then().statusCode(OK.value())
-            .body("ccd_reference", is(equalTo(ccdCaseNumber)))
-            .body("exception_record_reference", is(equalTo(exceptionReference)))
-            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments1.getResponsibleServiceId())))
-            .body("payments[" + dcnIndex + "].id", notNullValue())
-            .body("payments[" + dcnIndex + "].dcn_reference", is(equalTo(dcn1[0])))
-            .body(
-                "payments[" + dcnIndex + "].bgc_reference",
-                is(equalTo(bulkScanDcnPayment1.getBankGiroCreditSlipNumber().toString()))
-            )
-            .body(
-                "payments[" + dcnIndex + "].amount",
-                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment1.getAmount())).setScale(
-                    2,
-                    RoundingMode.HALF_UP
-                )))
-            )
-            .body("payments[" + dcnIndex + "].currency", is(equalTo(bulkScanDcnPayment1.getCurrency())))
-            .body("payments[" + dcnIndex + "].payment_method", is(equalTo(bulkScanDcnPayment1.getMethod().toUpperCase())))
-            .body("payments[" + dcnIndex + "].date_banked", notNullValue())
-            .body("payments[" + dcnIndex + "].date_created", notNullValue())
-            .body("payments[" + dcnIndex + "].date_updated", notNullValue())
-            .body("all_payments_status", is(equalTo("COMPLETE")));
+        // verify ccd case ref payment details by dcn1 (expect both ccd and exception present)
+        Response resp3 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(USER_TOKEN, SERVICE_TOKEN, dcn1[0]);
+        assertPaymentResponse(resp3,
+                              Map.of("exception_record_reference", exceptionReference, "ccd_reference", ccdCaseNumber),
+                              bulkScanCcdPayments1.getResponsibleServiceId(),
+                              dcn1[0],
+                              bulkScanDcnPayment1);
 
         // verify ccd case ref payment details by dcn2
-        Response unprocessedPaymentDetailsByDcnResponse4 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(
-            USER_TOKEN,
-            SERVICE_TOKEN,
-            dcn2[0]
-        );
+        Response resp4 = bulkScanPaymentTestService.getUnprocessedPaymentDetailsByDcn(USER_TOKEN, SERVICE_TOKEN, dcn2[0]);
+        assertPaymentResponse(resp4,
+                              Map.of("exception_record_reference", exceptionReference, "ccd_reference", ccdCaseNumber),
+                              bulkScanCcdPayments2.getResponsibleServiceId(),
+                              dcn2[0],
+                              bulkScanDcnPayment2);
+    }
 
-        // Extract payments array from response
-        dcnPayments = unprocessedPaymentDetailsByDcnResponse4.jsonPath().getList("payments");
-        dcnIndex = findDcnIndexInPayments(dcnPayments, dcn2[0]);
-        unprocessedPaymentDetailsByDcnResponse4.then().statusCode(OK.value())
-            .body("ccd_reference", is(equalTo(ccdCaseNumber)))
-            .body("exception_record_reference", is(equalTo(exceptionReference)))
-            .body("responsible_service_id", is(equalTo(bulkScanCcdPayments2.getResponsibleServiceId())))
-            .body("payments[" + dcnIndex + "].id", notNullValue())
-            .body("payments[" + dcnIndex + "].dcn_reference", is(equalTo(dcn2[0])))
-            .body(
-                "payments[" + dcnIndex + "].bgc_reference",
-                is(equalTo(bulkScanDcnPayment2.getBankGiroCreditSlipNumber().toString()))
-            )
-            .body(
-                "payments[" + dcnIndex + "].amount",
-                is(equalTo(new BigDecimal(String.valueOf(bulkScanDcnPayment2.getAmount())).setScale(
-                    2,
-                    RoundingMode.HALF_UP
-                )))
-            )
-            .body("payments[" + dcnIndex + "].currency", is(equalTo(bulkScanDcnPayment2.getCurrency())))
-            .body("payments[" + dcnIndex + "].payment_method", is(equalTo(bulkScanDcnPayment2.getMethod().toUpperCase())))
-            .body("payments[" + dcnIndex + "].date_banked", notNullValue())
-            .body("payments[" + dcnIndex + "].date_created", notNullValue())
-            .body("payments[" + dcnIndex + "].date_updated", notNullValue())
+    /*
+     * Helper: assert top-level expected fields (like ccd_reference / exception_record_reference),
+     * locate the payment with the supplied DCN and assert common payment fields.
+     */
+    private void assertPaymentResponse(Response response,
+                                       Map<String, String> expectedTopLevelFields,
+                                       String expectedResponsibleServiceId,
+                                       String expectedDcn,
+                                       BulkScanPayment expectedPayment) {
+        List<Map<String, Object>> payments = response.jsonPath().getList("payments");
+        int index = findDcnIndexInPayments(payments, expectedDcn);
+
+        // start assertions
+        var validatable = response.then().statusCode(OK.value());
+
+        // assert provided top-level fields (supports both exception_record_reference and ccd_reference)
+        for (Map.Entry<String, String> e : expectedTopLevelFields.entrySet()) {
+            validatable = validatable.body(e.getKey(), is(equalTo(e.getValue())));
+        }
+
+        validatable
+            .body("responsible_service_id", is(equalTo(expectedResponsibleServiceId)))
+            .body("payments[" + index + "].id", notNullValue())
+            .body("payments[" + index + "].dcn_reference", is(equalTo(expectedDcn)))
+            .body("payments[" + index + "].bgc_reference", is(equalTo(expectedPayment.getBankGiroCreditSlipNumber().toString())))
+            .body("payments[" + index + "].amount", is(equalTo(new BigDecimal(String.valueOf(expectedPayment.getAmount())).setScale(2, RoundingMode.HALF_UP))))
+            .body("payments[" + index + "].currency", is(equalTo(expectedPayment.getCurrency())))
+            .body("payments[" + index + "].payment_method", is(equalTo(expectedPayment.getMethod().toUpperCase())))
+            .body("payments[" + index + "].date_banked", notNullValue())
+            .body("payments[" + index + "].date_created", notNullValue())
+            .body("payments[" + index + "].date_updated", notNullValue())
             .body("all_payments_status", is(equalTo("COMPLETE")));
     }
 
