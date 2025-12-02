@@ -56,7 +56,7 @@ auth:
     client:
       baseUrl: https://idam-api.aat.platform.hmcts.net
 test:
-  url: ${TEST_URL:http://localhost:8000}
+  url: ${TEST_URL:http://localhost:8080}
   user:
     password: ${TEST_USER_PASSWORD}
 
