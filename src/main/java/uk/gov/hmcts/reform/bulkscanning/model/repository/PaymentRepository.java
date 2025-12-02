@@ -5,6 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,11 @@ public interface PaymentRepository extends CrudRepository<EnvelopePayment, Integ
 
     Optional<List<EnvelopePayment>> findByEnvelopeId(Integer envelopeId);
 
-    Optional<List<EnvelopePayment>> findByPaymentStatus(String paymentStatus);
+    Optional<List<EnvelopePayment>> findByPaymentStatusAndDateCreatedBetween(
+        String paymentStatus,
+        LocalDateTime fromDate,
+        LocalDateTime toDate
+    );
 
     long deleteByDcnReference(String dcnReference);
 }

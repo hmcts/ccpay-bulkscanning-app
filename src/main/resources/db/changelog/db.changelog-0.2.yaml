@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 200000
+      author: DaveJ
+      changes:
+        - sql:
+          splitStatements:
+          sql: >
+            CREATE INDEX IF NOT EXISTS ix_envelope_payment_date_created ON envelope_payment USING btree (date_created);
+            CREATE INDEX IF NOT EXISTS ix_envelope_payment_status ON envelope_payment USING btree (envelope_payment_status);
