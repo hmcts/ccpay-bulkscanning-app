@@ -88,9 +88,6 @@ auth:
 oidc:
   audience-list: ${OIDC_AUDIENCE_LIST}
   issuer: ${OIDC_ISSUER}
-azure:
-  application-insights:
-    instrumentation-key: ${ccpay.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
 idam:
   api:
     url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
