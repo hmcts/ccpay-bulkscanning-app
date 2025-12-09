@@ -18,7 +18,9 @@ import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentMetadataReposito
 import uk.gov.hmcts.reform.bulkscanning.model.repository.PaymentRepository;
 import uk.gov.hmcts.reform.bulkscanning.utils.DateUtil;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_Scan;
 import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.COMPLETE;
@@ -69,169 +71,163 @@ public class ReportServiceImpl implements ReportService {
         return Collections.emptyList();
     }
 
-    private List<BaseReportData> buildReportDataDataLoss(Date fromDate, Date toDate) {
-        List<BaseReportData> reportDataList = new ArrayList<>();
-        List<ReportDataDataLoss> dataList = new ArrayList<>();
-        Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString());
-        if (payments.isPresent()) {
-            LOG.info("No of Payments found for Report Type : DATA_LOSS : {}", payments.get().size());
-            payments.get().stream()
-                .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
-                    && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
-                .forEach(payment -> {
-                    dataList.add(populateReportDataDataLoss(payment));
-            });
-            dataList.sort(Comparator.comparing(ReportDataDataLoss::getLossResp));
-            dataList.stream().forEach(data -> reportDataList.add(data));
+    private void setPaymentMetadataFields(PaymentMetadata metadata, Object record) {
+        if (record instanceof ReportData) {
+            ((ReportData) record).setDateBanked(metadata.getDateBanked().toString());
+            ((ReportData) record).setBgcBatch(metadata.getBgcReference());
+            ((ReportData) record).setPaymentMethod(metadata.getPaymentMethod());
+            ((ReportData) record).setAmount(metadata.getAmount());
+        } else if (record instanceof ReportDataDataLoss) {
+            ((ReportDataDataLoss) record).setDateBanked(metadata.getDateBanked().toString());
+            ((ReportDataDataLoss) record).setBgcBatch(metadata.getBgcReference());
+            ((ReportDataDataLoss) record).setPaymentMethod(metadata.getPaymentMethod());
+            ((ReportDataDataLoss) record).setAmount(metadata.getAmount());
+        } else if (record instanceof ReportDataUnprocessed) {
+            ((ReportDataUnprocessed) record).setDateBanked(metadata.getDateBanked().toString());
+            ((ReportDataUnprocessed) record).setBgcBatch(metadata.getBgcReference());
+            ((ReportDataUnprocessed) record).setPaymentMethod(metadata.getPaymentMethod());
+            ((ReportDataUnprocessed) record).setAmount(metadata.getAmount());
         }
-        return reportDataList;
     }
 
-    private List<BaseReportData> buildReportDataUnprocessed(Date fromDate, Date toDate) {
-        List<BaseReportData> reportDataList = new ArrayList<>();
-        Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString());
-        if (payments.isPresent()) {
-            LOG.info("No of Payments found for Report Type : UNPROCESSED : {}", payments.get().size());
-            payments.get().stream()
-                .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
-                    && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
-                .forEach(payment -> {
-                    reportDataList.add(populateReportDataUnprocessed(payment));
-                });
-            reportDataList.sort(Comparator.comparing(BaseReportData::getRespServiceId));
+    private void setEnvelopeFields(EnvelopePayment payment, Object record) {
+        if (payment.getEnvelope() != null) {
+            String respServiceId = payment.getEnvelope().getResponsibleServiceId();
+            if (record instanceof ReportData) {
+                ((ReportData) record).setRespServiceId(respServiceId);
+                if (respServiceId != null) {
+                    ResponsibleSiteId siteId = ResponsibleSiteId.valueOf(respServiceId);
+                    ((ReportData) record).setRespServiceName(siteId.value());
+                }
+            } else if (record instanceof ReportDataDataLoss) {
+                ((ReportDataDataLoss) record).setRespServiceId(respServiceId);
+                if (respServiceId != null) {
+                    ResponsibleSiteId siteId = ResponsibleSiteId.valueOf(respServiceId);
+                    ((ReportDataDataLoss) record).setRespServiceName(siteId.value());
+                }
+            } else if (record instanceof ReportDataUnprocessed) {
+                ((ReportDataUnprocessed) record).setRespServiceId(respServiceId);
+                if (respServiceId != null) {
+                    ResponsibleSiteId siteId = ResponsibleSiteId.valueOf(respServiceId);
+                    ((ReportDataUnprocessed) record).setRespServiceName(siteId.value());
+                }
+                if (payment.getEnvelope().getEnvelopeCases() != null && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
+                    var caseData = payment.getEnvelope().getEnvelopeCases().stream().findFirst().orElse(null);
+                    if (caseData != null) {
+                        ((ReportDataUnprocessed) record).setCcdRef(StringUtils.defaultString(caseData.getCcdReference()));
+                        ((ReportDataUnprocessed) record).setExceptionRef(StringUtils.defaultString(caseData.getExceptionRecordReference()));
+                    }
+                }
+            }
         }
-        return reportDataList;
+    }
+
+    private void setPaymentAssetDcn(EnvelopePayment payment, Object record) {
+        if (record instanceof ReportData) {
+            ((ReportData) record).setPaymentAssetDcn(payment.getDcnReference());
+        } else if (record instanceof ReportDataDataLoss) {
+            ((ReportDataDataLoss) record).setPaymentAssetDcn(payment.getDcnReference());
+        } else if (record instanceof ReportDataUnprocessed) {
+            ((ReportDataUnprocessed) record).setPaymentAssetDcn(payment.getDcnReference());
+        }
+    }
+
+    private void populateCommonFields(EnvelopePayment payment, Object record) {
+        setPaymentAssetDcn(payment, record);
+        paymentMetadataRepository.findByDcnReference(payment.getDcnReference())
+            .ifPresent(metadata -> setPaymentMetadataFields(metadata, record));
+        setEnvelopeFields(payment, record);
     }
 
     private ReportDataDataLoss populateReportDataDataLoss(EnvelopePayment payment) {
         ReportDataDataLoss record = ReportDataDataLoss.recordWith().build();
-        record.setPaymentAssetDcn(payment.getDcnReference());
-        Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
-        if (paymentMetadata.isPresent()) {
-            record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
-            record.setBgcBatch(paymentMetadata.get().getBgcReference());
-            record.setPaymentMethod(paymentMetadata.get().getPaymentMethod());
-            record.setAmount(paymentMetadata.get().getAmount());
-        }
-        if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
-            record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
-                record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
-            }
-        }
-        String lossResp = payment.getSource().equalsIgnoreCase(Bulk_Scan.toString())
-            ? FEE_PAY : Bulk_Scan.toString();
+        populateCommonFields(payment, record);
+        String lossResp = Bulk_Scan.toString().equalsIgnoreCase(payment.getSource()) ? FEE_PAY : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
 
     private ReportDataUnprocessed populateReportDataUnprocessed(EnvelopePayment payment) {
         ReportDataUnprocessed record = ReportDataUnprocessed.recordWith().build();
-        record.setPaymentAssetDcn(payment.getDcnReference());
-        Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
-        if (paymentMetadata.isPresent()) {
-            record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
-            record.setBgcBatch(paymentMetadata.get().getBgcReference());
-            record.setPaymentMethod(paymentMetadata.get().getPaymentMethod());
-            record.setAmount(paymentMetadata.get().getAmount());
-        }
-        if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
-            record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
-                record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
-            }
-            if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()
-                && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
-                String ccdRef = Optional.ofNullable(payment.getEnvelope().getEnvelopeCases().get(0).getCcdReference()).isPresent()
-                                    ? payment.getEnvelope().getEnvelopeCases().get(0).getCcdReference()
-                                    : StringUtils.EMPTY;
-                record.setCcdRef(ccdRef);
-                String exceptionRef = Optional.ofNullable(payment.getEnvelope().getEnvelopeCases().get(0).getExceptionRecordReference()).isPresent()
-                    ? payment.getEnvelope().getEnvelopeCases().get(0).getExceptionRecordReference()
-                    : StringUtils.EMPTY;
-                record.setExceptionRef(exceptionRef);
-            }
-        }
+        populateCommonFields(payment, record);
         return record;
-    }
-
-    private List<ReportData> buildDataLossReportData(Date fromDate, Date toDate, List<ReportData> reportDataList) {
-        Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(INCOMPLETE.toString());
-        if (payments.isPresent()) {
-            LOG.info("No of Payments found for Report Type : DATA_LOSS : {}", payments.get().size());
-            payments.get().stream()
-                .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
-                    && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
-                .forEach(payment -> {
-                    reportDataList.add(populateDataLossReportData(payment));
-                });
-            reportDataList.sort(Comparator.comparing(ReportData::getLossResp));
-        }
-        return reportDataList;
-    }
-
-    private List<ReportData> buildUnprocessedReportData(Date fromDate, Date toDate, List<ReportData> reportDataList) {
-        Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatus(COMPLETE.toString());
-        if (payments.isPresent()) {
-            LOG.info("No of Payments found for Report Type : UNPROCESSED : {}", payments.get().size());
-            payments.get().stream()
-                .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
-                    && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
-                .forEach(payment -> {
-                    reportDataList.add(populateUnprocessedReportData(payment));
-                });
-            reportDataList.sort(Comparator.comparing(ReportData::getRespServiceId));
-        }
-        return reportDataList;
     }
 
     private ReportData populateDataLossReportData(EnvelopePayment payment) {
         ReportData record = ReportData.recordWith().build();
-        record.setPaymentAssetDcn(payment.getDcnReference());
-        Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
-        if (paymentMetadata.isPresent()) {
-            record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
-            record.setBgcBatch(paymentMetadata.get().getBgcReference());
-            record.setPaymentMethod(paymentMetadata.get().getPaymentMethod());
-            record.setAmount(paymentMetadata.get().getAmount());
-        }
-        if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
-            record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
-                record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
-            }
-        }
-        String lossResp = payment.getSource().equalsIgnoreCase(Bulk_Scan.toString())
-            ? FEE_PAY : Bulk_Scan.toString();
+        populateCommonFields(payment, record);
+        String lossResp = Bulk_Scan.toString().equalsIgnoreCase(payment.getSource()) ? FEE_PAY : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
 
     private ReportData populateUnprocessedReportData(EnvelopePayment payment) {
         ReportData record = ReportData.recordWith().build();
-        record.setPaymentAssetDcn(payment.getDcnReference());
-        Optional<PaymentMetadata> paymentMetadata = paymentMetadataRepository.findByDcnReference(payment.getDcnReference());
-        if (paymentMetadata.isPresent()) {
-            record.setDateBanked(paymentMetadata.get().getDateBanked().toString());
-            record.setBgcBatch(paymentMetadata.get().getBgcReference());
-            record.setPaymentMethod(paymentMetadata.get().getPaymentMethod());
-            record.setAmount(paymentMetadata.get().getAmount());
-        }
-        if (Optional.ofNullable(payment.getEnvelope()).isPresent()) {
-            record.setRespServiceId(payment.getEnvelope().getResponsibleServiceId());
-            if(Optional.ofNullable(payment.getEnvelope().getResponsibleServiceId()).isPresent()
-                && Optional.ofNullable(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId())).isPresent()){
-                record.setRespServiceName(ResponsibleSiteId.valueOf(payment.getEnvelope().getResponsibleServiceId()).value());
-            }
-            if (Optional.ofNullable(payment.getEnvelope().getEnvelopeCases()).isPresent()
-                && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
-                record.setCcdRef(payment.getEnvelope().getEnvelopeCases().get(0).getCcdReference());
-                record.setExceptionRef(payment.getEnvelope().getEnvelopeCases().get(0).getExceptionRecordReference());
+        populateCommonFields(payment, record);
+        if (payment.getEnvelope() != null && payment.getEnvelope().getEnvelopeCases() != null
+            && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
+            var caseData = payment.getEnvelope().getEnvelopeCases().stream().findFirst().orElse(null);
+            if (caseData != null) {
+                record.setCcdRef(caseData.getCcdReference());
+                record.setExceptionRef(caseData.getExceptionRecordReference());
             }
         }
         return record;
+    }
+
+    private List<BaseReportData> buildReportDataDataLoss(Date fromDate, Date toDate) {
+        LocalDateTime from = DateUtil.dateToLocalDateTime(fromDate);
+        LocalDateTime to = DateUtil.dateToLocalDateTime(toDate);
+        return paymentRepository.findByPaymentStatusAndDateCreatedBetween(INCOMPLETE.toString(), from, to)
+            .map(payments -> payments.stream()
+                .map(this::populateReportDataDataLoss)
+                .sorted(Comparator.comparing(ReportDataDataLoss::getLossResp))
+                .map(r -> (BaseReportData) r)
+                .collect(Collectors.toList()))
+            .orElse(Collections.emptyList());
+    }
+
+    private List<BaseReportData> buildReportDataUnprocessed(Date fromDate, Date toDate) {
+        LocalDateTime from = DateUtil.dateToLocalDateTime(fromDate);
+        LocalDateTime to = DateUtil.dateToLocalDateTime(toDate);
+        return paymentRepository.findByPaymentStatusAndDateCreatedBetween(COMPLETE.toString(), from, to)
+            .map(payments -> payments.stream()
+                .map(this::populateReportDataUnprocessed)
+                .sorted(Comparator.comparing(BaseReportData::getRespServiceId))
+                .map(r -> (BaseReportData) r)
+                .collect(Collectors.toList()))
+            .orElse(Collections.emptyList());
+    }
+
+    private List<ReportData> buildDataLossReportData(Date fromDate, Date toDate, List<ReportData> reportDataList) {
+        LocalDateTime from = DateUtil.dateToLocalDateTime(fromDate);
+        LocalDateTime to = DateUtil.dateToLocalDateTime(toDate);
+        Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatusAndDateCreatedBetween(INCOMPLETE.toString(), from, to);
+        if (payments.isPresent()) {
+            LOG.info("No of Payments found for Report Type : DATA_LOSS : {}", payments.get().size());
+            payments.get().stream()
+                .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
+                    && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
+                .map(this::populateDataLossReportData)
+                .sorted(Comparator.comparing(ReportData::getLossResp))
+                .forEach(reportDataList::add);
+        }
+        return reportDataList;
+    }
+
+    private List<ReportData> buildUnprocessedReportData(Date fromDate, Date toDate, List<ReportData> reportDataList) {
+        LocalDateTime from = DateUtil.dateToLocalDateTime(fromDate);
+        LocalDateTime to = DateUtil.dateToLocalDateTime(toDate);
+        Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatusAndDateCreatedBetween(COMPLETE.toString(), from, to);
+        if (payments.isPresent()) {
+            LOG.info("No of Payments found for Report Type : UNPROCESSED : {}", payments.get().size());
+            payments.get().stream()
+                .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
+                    && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
+                .map(this::populateUnprocessedReportData)
+                .sorted(Comparator.comparing(ReportData::getRespServiceId))
+                .forEach(reportDataList::add);
+        }
+        return reportDataList;
     }
 }

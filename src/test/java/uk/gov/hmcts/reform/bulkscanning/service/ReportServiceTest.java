@@ -67,7 +67,8 @@ public class ReportServiceTest {
                                             .dateCreated(LocalDateTime.of(2021,1,15,10,10))
                                             .build();
         envelopePayments.add(envelopePayment);
-        when(paymentRepository.findByPaymentStatus(any(String.class))).thenReturn(Optional.of(envelopePayments));
+        when(paymentRepository.findByPaymentStatusAndDateCreatedBetween(any(String.class), any(LocalDateTime.class), any(LocalDateTime.class
+        ))).thenReturn(Optional.of(envelopePayments));
 
 
         PaymentMetadata paymentMetadata = PaymentMetadata.paymentMetadataWith()
@@ -95,7 +96,8 @@ public class ReportServiceTest {
             .dateCreated(LocalDateTime.of(2021,1,15,10,10))
             .build();
         envelopePayments.add(envelopePayment);
-        when(paymentRepository.findByPaymentStatus(any(String.class))).thenReturn(Optional.of(envelopePayments));
+        when(paymentRepository.findByPaymentStatusAndDateCreatedBetween(any(String.class), any(LocalDateTime.class), any(LocalDateTime.class
+        ))).thenReturn(Optional.of(envelopePayments));
         PaymentMetadata paymentMetadata = PaymentMetadata.paymentMetadataWith()
             .dateBanked(LocalDateTime.now())
             .bgcReference("bgc-reference")
