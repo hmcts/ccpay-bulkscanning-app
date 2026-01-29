@@ -56,12 +56,12 @@ module "ccpay-bulkscanning-payment-database-v15" {
       value = "pg_stat_statements,pg_buffercache"
     }
   ]
-  admin_user_object_id = var.jenkins_AAD_objectId
-  common_tags          = var.common_tags
-  pgsql_version        = var.postgresql_flexible_sql_version
-  action_group_name           = join("-", [var.db_monitor_action_group_name, local.db_server_name, var.env])
-  email_address_key           = var.db_alert_email_address_key
-  email_address_key_vault_id  = data.azurerm_key_vault.payment_key_vault.id
+  admin_user_object_id       = var.jenkins_AAD_objectId
+  common_tags                = var.common_tags
+  pgsql_version              = var.postgresql_flexible_sql_version
+  action_group_name          = join("-", [var.db_monitor_action_group_name, local.db_server_name, var.env])
+  email_address_key          = var.db_alert_email_address_key
+  email_address_key_vault_id = data.azurerm_key_vault.payment_key_vault.id
 }
 
 # Populate Vault with DB info
