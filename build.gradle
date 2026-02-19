@@ -2,7 +2,7 @@ import java.util.stream.Collectors
 
 buildscript {
   dependencies {
-    classpath "net.serenity-bdd:serenity-single-page-report:4.2.3"
+    classpath "net.serenity-bdd:serenity-single-page-report:4.3.4"
   }
 }
 
