@@ -197,7 +197,7 @@ def versions = [
   appinsights       : '3.7.4',
   hmctsLogging      : '6.1.9',
   log4j             : '2.24.1',
-  lombok            : '1.18.34',
+  lombok            : '1.18.42',
   springBoot        : springBoot.class.package.implementationVersion,
   sonarPitest       : '0.5',
   serenity          : '4.2.3',
