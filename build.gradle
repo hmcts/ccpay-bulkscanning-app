@@ -231,7 +231,7 @@ dependencies {
   implementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
   implementation group: 'org.jboss.aerogear', name: 'aerogear-otp-java', version:'1.0.0'
   implementation group: 'org.liquibase', name: 'liquibase-core', version: '4.27.0'
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
   implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
