@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.bulkscanning.model.repository;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.bulkscanning.model.entity.EnvelopePayment;
@@ -16,7 +17,15 @@ public interface PaymentRepository extends CrudRepository<EnvelopePayment, Integ
 
     Optional<List<EnvelopePayment>> findByEnvelopeId(Integer envelopeId);
 
-    Optional<List<EnvelopePayment>> findByPaymentStatusAndDateCreatedBetween(
+    @Query("""
+        select distinct ep
+        from EnvelopePayment ep
+        left join fetch ep.envelope e
+        left join fetch e.envelopeCases
+        where ep.paymentStatus = :paymentStatus
+          and ep.dateCreated between :fromDate and :toDate
+        """)
+    Optional<List<EnvelopePayment>> findForReportByPaymentStatusAndDateCreatedBetween(
         String paymentStatus,
         LocalDateTime fromDate,
         LocalDateTime toDate

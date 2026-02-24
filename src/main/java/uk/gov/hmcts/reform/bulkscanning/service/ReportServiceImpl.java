@@ -48,27 +48,22 @@ public class ReportServiceImpl implements ReportService {
     @Transactional
     public List<ReportData> retrieveByReportType(Date fromDate, Date toDate, ReportType reportType) {
         LOG.info("Retrieving data for Report Type : {}", reportType);
-        List<ReportData> reportDataList = new ArrayList<>();
-        if (reportType.equals(ReportType.UNPROCESSED)) {
-            return buildUnprocessedReportData(fromDate, toDate, reportDataList);
-        }
-        if (reportType.equals(ReportType.DATA_LOSS)) {
-            return buildDataLossReportData(fromDate, toDate, reportDataList);
-        }
-        return Collections.emptyList();
+
+        return switch (reportType) {
+            case UNPROCESSED -> buildUnprocessedReportData(fromDate, toDate);
+            case DATA_LOSS -> buildDataLossReportData(fromDate, toDate);
+        };
     }
 
     @Override
     @Transactional
     public List<BaseReportData> retrieveDataByReportType(Date fromDate, Date toDate, ReportType reportType) {
         LOG.info("Retrieving data for Report Type : {}", reportType);
-        if (reportType.equals(ReportType.UNPROCESSED)) {
-            return buildReportDataUnprocessed(fromDate, toDate);
-        }
-        if (reportType.equals(ReportType.DATA_LOSS)) {
-            return buildReportDataDataLoss(fromDate, toDate);
-        }
-        return Collections.emptyList();
+
+        return switch (reportType) {
+            case UNPROCESSED -> buildReportDataUnprocessed(fromDate, toDate);
+            case DATA_LOSS -> buildReportDataDataLoss(fromDate, toDate);
+        };
     }
 
     private void setPaymentMetadataFields(PaymentMetadata metadata, Object record) {
@@ -113,10 +108,8 @@ public class ReportServiceImpl implements ReportService {
                 }
                 if (payment.getEnvelope().getEnvelopeCases() != null && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
                     var caseData = payment.getEnvelope().getEnvelopeCases().stream().findFirst().orElse(null);
-                    if (caseData != null) {
-                        ((ReportDataUnprocessed) record).setCcdRef(StringUtils.defaultString(caseData.getCcdReference()));
-                        ((ReportDataUnprocessed) record).setExceptionRef(StringUtils.defaultString(caseData.getExceptionRecordReference()));
-                    }
+                    ((ReportDataUnprocessed) record).setCcdRef(StringUtils.defaultString(caseData.getCcdReference()));
+                    ((ReportDataUnprocessed) record).setExceptionRef(StringUtils.defaultString(caseData.getExceptionRecordReference()));
                 }
             }
         }
@@ -132,102 +125,135 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    private void populateCommonFields(EnvelopePayment payment, Object record) {
+    private void populateCommonFields(EnvelopePayment payment, Object record, Map<String, PaymentMetadata> metadataByDcn) {
         setPaymentAssetDcn(payment, record);
-        paymentMetadataRepository.findByDcnReference(payment.getDcnReference())
-            .ifPresent(metadata -> setPaymentMetadataFields(metadata, record));
+        var metadata = metadataByDcn.get(payment.getDcnReference());
+        if (metadata != null) {
+            setPaymentMetadataFields(metadata, record);
+        }
         setEnvelopeFields(payment, record);
     }
 
-    private ReportDataDataLoss populateReportDataDataLoss(EnvelopePayment payment) {
+    private ReportDataDataLoss populateReportDataDataLoss(EnvelopePayment payment, Map<String, PaymentMetadata> metadataByDcn) {
         ReportDataDataLoss record = ReportDataDataLoss.recordWith().build();
-        populateCommonFields(payment, record);
+        populateCommonFields(payment, record, metadataByDcn);
         String lossResp = Bulk_Scan.toString().equalsIgnoreCase(payment.getSource()) ? FEE_PAY : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
 
-    private ReportDataUnprocessed populateReportDataUnprocessed(EnvelopePayment payment) {
+    private ReportDataUnprocessed populateReportDataUnprocessed(EnvelopePayment payment, Map<String, PaymentMetadata> metadataByDcn) {
         ReportDataUnprocessed record = ReportDataUnprocessed.recordWith().build();
-        populateCommonFields(payment, record);
+        populateCommonFields(payment, record, metadataByDcn);
         return record;
     }
 
-    private ReportData populateDataLossReportData(EnvelopePayment payment) {
+    private ReportData populateDataLossReportData(EnvelopePayment payment, Map<String, PaymentMetadata> metadataByDcn) {
         ReportData record = ReportData.recordWith().build();
-        populateCommonFields(payment, record);
+        populateCommonFields(payment, record, metadataByDcn);
         String lossResp = Bulk_Scan.toString().equalsIgnoreCase(payment.getSource()) ? FEE_PAY : Bulk_Scan.toString();
         record.setLossResp(lossResp);
         return record;
     }
 
-    private ReportData populateUnprocessedReportData(EnvelopePayment payment) {
+    private ReportData populateUnprocessedReportData(EnvelopePayment payment, Map<String, PaymentMetadata> metadataByDcn) {
         ReportData record = ReportData.recordWith().build();
-        populateCommonFields(payment, record);
+        populateCommonFields(payment, record, metadataByDcn);
         if (payment.getEnvelope() != null && payment.getEnvelope().getEnvelopeCases() != null
             && !payment.getEnvelope().getEnvelopeCases().isEmpty()) {
-            var caseData = payment.getEnvelope().getEnvelopeCases().stream().findFirst().orElse(null);
-            if (caseData != null) {
-                record.setCcdRef(caseData.getCcdReference());
-                record.setExceptionRef(caseData.getExceptionRecordReference());
-            }
+            var caseData = payment.getEnvelope().getEnvelopeCases().getFirst();
+            record.setCcdRef(caseData.getCcdReference());
+            record.setExceptionRef(caseData.getExceptionRecordReference());
         }
         return record;
+    }
+
+    private Map<String, PaymentMetadata> loadMetadataByDcn(List<EnvelopePayment> payments) {
+        if (payments == null || payments.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Set<String> dcnRefs = payments.stream()
+            .map(EnvelopePayment::getDcnReference)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        if (dcnRefs.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return paymentMetadataRepository.findAllByDcnReferenceIn(dcnRefs)
+            .stream()
+            .filter(Objects::nonNull)
+            .filter(m -> m.getDcnReference() != null)
+            .collect(Collectors.toMap(PaymentMetadata::getDcnReference, m -> m, (a, b) -> a));
     }
 
     private List<BaseReportData> buildReportDataDataLoss(Date fromDate, Date toDate) {
         LocalDateTime from = DateUtil.dateToLocalDateTime(fromDate);
         LocalDateTime to = DateUtil.dateToLocalDateTime(toDate);
-        return paymentRepository.findByPaymentStatusAndDateCreatedBetween(INCOMPLETE.toString(), from, to)
-            .map(payments -> payments.stream()
-                .map(this::populateReportDataDataLoss)
-                .sorted(Comparator.comparing(ReportDataDataLoss::getLossResp))
-                .map(r -> (BaseReportData) r)
-                .collect(Collectors.toList()))
+
+        List<EnvelopePayment> payments = paymentRepository
+            .findForReportByPaymentStatusAndDateCreatedBetween(INCOMPLETE.toString(), from, to)
             .orElse(Collections.emptyList());
+
+        Map<String, PaymentMetadata> metadataByDcn = loadMetadataByDcn(payments);
+
+        return payments.stream()
+            .map(p -> populateReportDataDataLoss(p, metadataByDcn))
+            .sorted(Comparator.comparing(ReportDataDataLoss::getLossResp))
+            .map(r -> (BaseReportData) r)
+            .collect(Collectors.toList());
     }
 
     private List<BaseReportData> buildReportDataUnprocessed(Date fromDate, Date toDate) {
         LocalDateTime from = DateUtil.dateToLocalDateTime(fromDate);
         LocalDateTime to = DateUtil.dateToLocalDateTime(toDate);
-        return paymentRepository.findByPaymentStatusAndDateCreatedBetween(COMPLETE.toString(), from, to)
-            .map(payments -> payments.stream()
-                .map(this::populateReportDataUnprocessed)
-                .sorted(Comparator.comparing(BaseReportData::getRespServiceId))
-                .map(r -> (BaseReportData) r)
-                .collect(Collectors.toList()))
+
+        List<EnvelopePayment> payments = paymentRepository
+            .findForReportByPaymentStatusAndDateCreatedBetween(COMPLETE.toString(), from, to)
             .orElse(Collections.emptyList());
+
+        Map<String, PaymentMetadata> metadataByDcn = loadMetadataByDcn(payments);
+
+        return payments.stream()
+            .map(p -> populateReportDataUnprocessed(p, metadataByDcn))
+            .sorted(Comparator.comparing(BaseReportData::getRespServiceId, Comparator.nullsLast(String::compareTo)))
+            .map(r -> (BaseReportData) r)
+            .collect(Collectors.toList());
     }
 
-    private List<ReportData> buildDataLossReportData(Date fromDate, Date toDate, List<ReportData> reportDataList) {
+    private List<ReportData> buildDataLossReportData(Date fromDate, Date toDate) {
         LocalDateTime from = DateUtil.dateToLocalDateTime(fromDate);
         LocalDateTime to = DateUtil.dateToLocalDateTime(toDate);
-        Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatusAndDateCreatedBetween(INCOMPLETE.toString(), from, to);
-        if (payments.isPresent()) {
-            LOG.info("No of Payments found for Report Type : DATA_LOSS : {}", payments.get().size());
-            payments.get().stream()
-                .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
-                    && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
-                .map(this::populateDataLossReportData)
-                .sorted(Comparator.comparing(ReportData::getLossResp))
-                .forEach(reportDataList::add);
-        }
-        return reportDataList;
+
+        List<EnvelopePayment> payments = paymentRepository
+            .findForReportByPaymentStatusAndDateCreatedBetween(INCOMPLETE.toString(), from, to)
+            .orElse(Collections.emptyList());
+
+        LOG.info("No of Payments found for Report Type : DATA_LOSS : {}", payments.size());
+        Map<String, PaymentMetadata> metadataByDcn = loadMetadataByDcn(payments);
+
+        return payments.stream()
+            .map(p -> populateDataLossReportData(p, metadataByDcn))
+            .sorted(Comparator.comparing(ReportData::getLossResp))
+            .collect(Collectors.toList());
     }
 
-    private List<ReportData> buildUnprocessedReportData(Date fromDate, Date toDate, List<ReportData> reportDataList) {
+    private List<ReportData> buildUnprocessedReportData(Date fromDate, Date toDate) {
         LocalDateTime from = DateUtil.dateToLocalDateTime(fromDate);
         LocalDateTime to = DateUtil.dateToLocalDateTime(toDate);
-        Optional<List<EnvelopePayment>> payments = paymentRepository.findByPaymentStatusAndDateCreatedBetween(COMPLETE.toString(), from, to);
-        if (payments.isPresent()) {
-            LOG.info("No of Payments found for Report Type : UNPROCESSED : {}", payments.get().size());
-            payments.get().stream()
-                .filter(payment -> DateUtil.localDateTimeToDate(payment.getDateCreated()).after(fromDate)
-                    && DateUtil.localDateTimeToDate(payment.getDateCreated()).before(toDate))
-                .map(this::populateUnprocessedReportData)
-                .sorted(Comparator.comparing(ReportData::getRespServiceId))
-                .forEach(reportDataList::add);
-        }
-        return reportDataList;
+
+        List<EnvelopePayment> payments = paymentRepository
+            .findForReportByPaymentStatusAndDateCreatedBetween(COMPLETE.toString(), from, to)
+            .orElse(Collections.emptyList());
+
+        LOG.info("No of Payments found for Report Type : UNPROCESSED : {}", payments.size());
+        Map<String, PaymentMetadata> metadataByDcn = loadMetadataByDcn(payments);
+
+        return payments.stream()
+            .map(p -> populateUnprocessedReportData(p, metadataByDcn))
+            .sorted(Comparator.comparing(ReportData::getRespServiceId, Comparator.nullsLast(String::compareTo)))
+            .collect(Collectors.toList());
     }
 }
