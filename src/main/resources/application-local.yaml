@@ -51,7 +51,7 @@ spring:
             client-secret: internal
 oidc:
   audience-list: internal,paybubble
-  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
+  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/realms/root/realms/hmcts}
 
 auth:
   provider:
