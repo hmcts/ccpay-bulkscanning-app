@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -28,9 +27,11 @@ import uk.gov.hmcts.reform.bulkscanning.config.security.exception.BSAuthenticati
 import uk.gov.hmcts.reform.bulkscanning.config.security.filiters.ServiceAndUserAuthFilter;
 import uk.gov.hmcts.reform.bulkscanning.config.security.utils.SecurityUtils;
 import uk.gov.hmcts.reform.bulkscanning.config.security.validator.AudienceValidator;
+import uk.gov.hmcts.reform.bulkscanning.config.security.validator.MultiIssuerValidator;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -54,6 +55,9 @@ public class SpringSecurityConfiguration {
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String issuerUri;
+
+    @Value("${oidc.issuer}")
+    private String issuerOverride;
 
     @Value("${oidc.audience-list}")
     private String[] allowedAudiences;
@@ -158,12 +162,16 @@ public class SpringSecurityConfiguration {
             JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(Arrays.asList(allowedAudiences));
-
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerUri);
+
+        List<String> validIssuers = Arrays.asList(issuerUri, issuerOverride);
+        OAuth2TokenValidator<Jwt> withIssuers = new MultiIssuerValidator(validIssuers);
 
         OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(
-            withTimestamp, withIssuer, audienceValidator);
+            withTimestamp,
+            withIssuers,
+            audienceValidator
+        );
         jwtDecoder.setJwtValidator(withAudience);
 
         return jwtDecoder;
