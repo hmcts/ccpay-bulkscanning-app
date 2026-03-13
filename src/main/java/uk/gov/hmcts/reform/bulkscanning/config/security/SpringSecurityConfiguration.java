@@ -142,7 +142,7 @@ public class SpringSecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/cases/**").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
                 .requestMatchers(HttpMethod.GET, "/report/data").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
                 .requestMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
-                .requestMatchers(HttpMethod.DELETE, "/bulk-scan-payment/**").hasAuthority(AUTHORISED_ROLE_PAYMENT)
+                .requestMatchers(HttpMethod.DELETE, "/bulk-scan-payment/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             )
