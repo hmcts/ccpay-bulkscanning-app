@@ -41,7 +41,6 @@ import java.util.Optional;
         try {
             SearchResponse searchResponse = searchService.retrieveByCCDReference(ccdReference);
             if (Optional.ofNullable(searchResponse).isPresent()) {
-                LOG.info("SearchResponse : {}", searchResponse);
                 return ResponseEntity.status(HttpStatus.OK).body(searchResponse);
             } else {
                 LOG.info("Payments Not found for ccdReference : {}", ccdReference);
