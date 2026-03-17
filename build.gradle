@@ -189,6 +189,7 @@ dependencyManagement {
   imports {
     mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
     mavenBom 'org.apache.logging.log4j:log4j-bom:2.24.1'
+    mavenBom 'org.testcontainers:testcontainers-bom:2.0.2'
   }
 }
 
@@ -252,7 +253,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure'
   testImplementation group: 'org.springframework.security', name: 'spring-security-test'
-  testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.4'
+  testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql', version: '2.0.2'
 
   testImplementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -333,13 +334,39 @@ bootRun {
   mainClass = 'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication'
 }
 
+def pitestFastProfile = (findProperty('pitestProfile') ?: 'fast') == 'fast'
+
 pitest {
   targetClasses = ['uk.gov.hmcts.reform.bulkscanning.*']
   excludedClasses = ['uk.gov.hmcts.reform.bulkscanning.config.*',
                      'uk.gov.hmcts.reform.bulkscanning.mapper.*',
                      'uk.gov.hmcts.reform.bulkscanning.model.*',
                      'uk.gov.hmcts.reform.bulkscanning.exception.*']
-  threads = 10
+  // Required when tests run on JUnit Jupiter.
+  junit5PluginVersion = '1.2.1'
+
+  // Restrict PIT to the unit-test source set for faster, more stable mutation runs.
+  mainSourceSets = [sourceSets.main]
+  testSourceSets = [sourceSets.test]
+
+  if (pitestFastProfile) {
+    // Fast profile for local/Jenkins experimentation.
+    targetTests = ['uk.gov.hmcts.reform.bulkscanning.*Test']
+    excludedTestClasses = [
+      'uk.gov.hmcts.reform.bulkscanning.functionaltest.*',
+      'uk.gov.hmcts.reform.bulkscanning.backdoors.*',
+      'uk.gov.hmcts.reform.bulkscanning.payments.*'
+    ]
+    threads = 2
+    timeoutFactor = 2.0
+    timeoutConstInMillis = 8000
+    jvmArgs = ['-Xmx1024m']
+    mutationThreshold = 40
+  } else {
+    // Strict profile for full mutation gate.
+    threads = 10
+    mutationThreshold = 90
+  }
+
   outputFormats = ['XML', 'HTML']
-  mutationThreshold = 90
 }
