@@ -180,7 +180,6 @@ dependencyUpdates.resolutionStrategy = {
 }
 
 repositories {
-  mavenLocal()
   mavenCentral()
   maven { url = 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
 }
@@ -334,7 +333,7 @@ bootRun {
   mainClass = 'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication'
 }
 
-def pitestFastProfile = (findProperty('pitestProfile') ?: 'fast') == 'fast'
+def pitestFastProfile = (findProperty('pitestProfile') ?: 'strict') == 'fast'
 
 pitest {
   targetClasses = ['uk.gov.hmcts.reform.bulkscanning.*']
@@ -350,20 +349,24 @@ pitest {
   testSourceSets = [sourceSets.test]
 
   if (pitestFastProfile) {
-    // Fast profile for local/Jenkins experimentation.
+    // Fast profile for local experimentation.
     targetTests = ['uk.gov.hmcts.reform.bulkscanning.*Test']
     excludedTestClasses = [
       'uk.gov.hmcts.reform.bulkscanning.functionaltest.*',
       'uk.gov.hmcts.reform.bulkscanning.backdoors.*',
-      'uk.gov.hmcts.reform.bulkscanning.payments.*'
+      'uk.gov.hmcts.reform.bulkscanning.payments.*',
+      'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplicationTest',
+      'uk.gov.hmcts.reform.bulkscanning.config.*',
+      'uk.gov.hmcts.reform.bulkscanning.audit.*'
     ]
-    threads = 2
-    timeoutFactor = 2.0
-    timeoutConstInMillis = 8000
-    jvmArgs = ['-Xmx1024m']
+    // Conservative parallelism and higher timeout ceiling to reduce minion churn.
+    threads = 1
+    timeoutFactor = 4.0
+    timeoutConstInMillis = 30000
+    jvmArgs = ['-Xmx1536m']
     mutationThreshold = 40
   } else {
-    // Strict profile for full mutation gate.
+    // Strict profile for full mutation gate (default).
     threads = 10
     mutationThreshold = 90
   }
