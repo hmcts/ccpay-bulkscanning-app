@@ -180,7 +180,6 @@ dependencyUpdates.resolutionStrategy = {
 }
 
 repositories {
-  mavenLocal()
   mavenCentral()
   maven { url = 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
 }
@@ -189,6 +188,7 @@ dependencyManagement {
   imports {
     mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
     mavenBom 'org.apache.logging.log4j:log4j-bom:2.24.1'
+    mavenBom 'org.testcontainers:testcontainers-bom:2.0.2'
   }
 }
 
@@ -252,7 +252,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure'
   testImplementation group: 'org.springframework.security', name: 'spring-security-test'
-  testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.4'
+  testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql', version: '2.0.2'
 
   testImplementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -333,13 +333,43 @@ bootRun {
   mainClass = 'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplication'
 }
 
+def pitestFastProfile = (findProperty('pitestProfile') ?: 'strict') == 'fast'
+
 pitest {
   targetClasses = ['uk.gov.hmcts.reform.bulkscanning.*']
   excludedClasses = ['uk.gov.hmcts.reform.bulkscanning.config.*',
                      'uk.gov.hmcts.reform.bulkscanning.mapper.*',
                      'uk.gov.hmcts.reform.bulkscanning.model.*',
                      'uk.gov.hmcts.reform.bulkscanning.exception.*']
-  threads = 10
+  // Required when tests run on JUnit Jupiter.
+  junit5PluginVersion = '1.2.1'
+
+  // Restrict PIT to the unit-test source set for faster, more stable mutation runs.
+  mainSourceSets = [sourceSets.main]
+  testSourceSets = [sourceSets.test]
+
+  if (pitestFastProfile) {
+    // Fast profile for local experimentation.
+    targetTests = ['uk.gov.hmcts.reform.bulkscanning.*Test']
+    excludedTestClasses = [
+      'uk.gov.hmcts.reform.bulkscanning.functionaltest.*',
+      'uk.gov.hmcts.reform.bulkscanning.backdoors.*',
+      'uk.gov.hmcts.reform.bulkscanning.payments.*',
+      'uk.gov.hmcts.reform.bulkscanning.BulkScanningApiApplicationTest',
+      'uk.gov.hmcts.reform.bulkscanning.config.*',
+      'uk.gov.hmcts.reform.bulkscanning.audit.*'
+    ]
+    // Conservative parallelism and higher timeout ceiling to reduce minion churn.
+    threads = 1
+    timeoutFactor = 4.0
+    timeoutConstInMillis = 30000
+    jvmArgs = ['-Xmx1536m']
+    mutationThreshold = 40
+  } else {
+    // Strict profile for full mutation gate (default).
+    threads = 10
+    mutationThreshold = 90
+  }
+
   outputFormats = ['XML', 'HTML']
-  mutationThreshold = 90
 }
