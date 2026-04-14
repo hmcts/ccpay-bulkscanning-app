@@ -207,6 +207,33 @@ docker image rm <image-id>
 
 There is no need to remove postgres and java or similar core images.
 
+### Running PIT mutation tests
+
+This project supports two PIT profiles selected via `-PpitestProfile`:
+
+- `strict` (default): full mutation gate with stricter threshold.
+- `fast`: optimized for faster local feedback.
+
+Run PIT with the default strict profile:
+
+```bash
+./gradlew --no-daemon pitest
+```
+
+Run PIT in fast profile:
+
+```bash
+./gradlew --no-daemon pitest -PpitestProfile=fast
+```
+
+Run PIT in strict profile explicitly:
+
+```bash
+./gradlew --no-daemon pitest -PpitestProfile=strict
+```
+
+For Jenkins, prefer explicit profile selection so pipeline behavior is predictable.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
