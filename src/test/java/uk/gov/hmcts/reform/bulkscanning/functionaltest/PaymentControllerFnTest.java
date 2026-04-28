@@ -416,6 +416,51 @@ public class PaymentControllerFnTest {
     }
 
     @Test
+    @WithMockUser(authorities = "payments")
+    public void testDeletePaymentRequiresAuthorizedService() {
+        String dcn = "111166667777123451111";
+
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn));
+
+        MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        RestActions unauthenticatedRestActions = new RestActions(mvc, objectMapper);
+        ResultActions resultActions = unauthenticatedRestActions.delete("/bulk-scan-payment/" + dcn);
+
+        Assert.assertEquals(401, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
+    @WithMockUser(authorities = "payments")
+    public void testDeletePaymentWithAuthorizedRoleAndService() {
+        String dcn = "111166667777123453333";
+
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn));
+
+        ResultActions resultActions = restActions.delete("/bulk-scan-payment/" + dcn);
+
+        Assert.assertEquals(204, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
+    @WithMockUser(authorities = "UnAuthorisedPaymentRole")
+    public void testDeletePaymentRequiresAuthorizedRole() {
+        String dcn = "111166667777123452222";
+
+        restActions.post("/bulk-scan-payment", createPaymentRequest(dcn));
+
+        MockMvc mvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        RestActions unauthorizedRoleRestActions = new RestActions(mvc, objectMapper);
+        unauthorizedRoleRestActions
+            .withAuthorizedService("cmc")
+            .withAuthorizedUser()
+            .withReturnUrl("https://www.gooooogle.com");
+
+        ResultActions resultActions = unauthorizedRoleRestActions.delete("/bulk-scan-payment/" + dcn);
+
+        Assert.assertEquals(403, resultActions.andReturn().getResponse().getStatus());
+    }
+
+    @Test
     @WithMockUser(authorities = "UnAuthorisedPaymentRole")
     public void testInvalidAuthorisedUser() {
         String[] dcns = {"111166667777888821111", "111166667777999921111"};
