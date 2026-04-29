@@ -8,7 +8,7 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmctspublic.azurecr.io/payment/ccpay-bulkscanning-api
+    image: hmctsprod.azurecr.io/payment/ccpay-bulkscanning-api
     environment:
       # these environment variables are used by java-logging library
       - ROOT_APPENDER
@@ -50,7 +50,7 @@ services:
       - ccpay-bulkscanning-db-data:/var/lib/postgresql/data
 
   service-auth-provider-api:
-    image: hmctspublic.azurecr.io/rpe/service-auth-provider
+    image: hmctsprod.azurecr.io/rpe/service-auth-provider
     environment:
       - microserviceKeys_divorce=AAAAAAAAAAAAAAAA
       - microserviceKeys_payment_app=AAAAAAAAAAAAAAAB
@@ -84,7 +84,7 @@ services:
       - 1025:1025
       - 8025:8025
   idam-api:
-    image: hmctspublic.azurecr.io/idam/api:stable
+    image: hmctsprod.azurecr.io/idam/api:stable
     depends_on:
       - fr-am
       - shared-db
@@ -115,7 +115,7 @@ services:
       - IDAM_SPI_FORGEROCK_IDM_PIN_DEFAULTPASSWORD=${IDAM_SPI_FORGEROCK_IDM_PIN_DEFAULTPASSWORD}
       - APPSETTING_NODE_PATH=/opt/app
   idam-web-public:
-    image: hmctspublic.azurecr.io/idam/web-public:stable
+    image: hmctsprod.azurecr.io/idam/web-public:stable
     depends_on:
       - idam-api
     ports:
@@ -124,7 +124,7 @@ services:
       - JAVA_OPTS=-Xms128m -Xms512m
       - STRATEGIC_SERVICE_URL=http://idam-api:5000
   idam-web-admin:
-    image: hmctspublic.azurecr.io/idam/web-admin:stable
+    image: hmctsprod.azurecr.io/idam/web-admin:stable
     depends_on:
       - idam-api
     ports:
