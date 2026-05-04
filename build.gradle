@@ -201,7 +201,7 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   sonarPitest       : '0.5',
   serenity          : '4.2.3',
-  serenityCucumber  : '4.2.3'
+  serenityCucumber  : '4.3.4'
 ]
 
 apply from: "${rootDir}/cve-resolution-strategy.gradle"
