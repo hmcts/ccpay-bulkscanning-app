@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -183,6 +184,13 @@ public class PaymentControllerTest {
         ResultActions resultActions = mockMvc.perform(delete("/bulk-scan-payment/987211111111111111111")
                 .header("ServiceAuthorization", "service"));
         Assert.assertEquals(Integer.valueOf(204), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testDeletePaymentRequiresAuthentication() throws Exception {
+        MockMvc securedMockMvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        ResultActions resultActions = securedMockMvc.perform(delete("/bulk-scan-payment/987211111111111111111"));
+        Assert.assertEquals(Integer.valueOf(401), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     public static Envelope mockBulkScanningEnvelope() {
