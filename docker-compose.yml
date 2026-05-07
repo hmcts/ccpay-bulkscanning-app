@@ -58,7 +58,7 @@ services:
       - 8085:8489
 
   fr-am:
-    image: hmctsprivate.azurecr.io/idam/idam-fr-am:latest
+    image: hmctsprod.azurecr.io/idam/idam-fr-am:latest
     hostname: localam
     depends_on:
       - shared-db
@@ -66,7 +66,7 @@ services:
       - 8080:8080
       - 1389:1389
   fr-idm:
-    image: hmctsprivate.azurecr.io/idam/idam-fr-idm:latest
+    image: hmctsprod.azurecr.io/idam/idam-fr-idm:latest
     hostname: localidm
     depends_on:
       - fr-am
@@ -75,7 +75,7 @@ services:
       - 18080:18080
       - 9010:9010
   shared-db:
-    image: hmctsprivate.azurecr.io/idam/shared-db:latest
+    image: hmctsprod.azurecr.io/idam/shared-db:latest
     ports:
       - 5432:5432
   smtp-server:
