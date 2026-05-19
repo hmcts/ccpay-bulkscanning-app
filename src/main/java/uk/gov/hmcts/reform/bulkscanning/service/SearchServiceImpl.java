@@ -77,7 +77,7 @@ public class SearchServiceImpl implements SearchService {
                     .build());
         }
         if (envelopeCases == null) {
-            // No Payment exists for the searched DCN
+            // No Payment exists for the searched DCN Number
             LOG.info("Payment Not exists for the searched DCN !!!");
             return null;
         }
