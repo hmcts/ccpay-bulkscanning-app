@@ -48,7 +48,7 @@ spring:
         registration:
           oidc:
             client-id: internal
-            client-secret: internal
+            client-secret: ${OIDC_CLIENT_SECRET}
 oidc:
   audience-list: internal,paybubble
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
@@ -71,5 +71,5 @@ idam:
     services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw,internal
   s2s-auth:
     url: http://localhost:23443
-    totp_secret: AAAAAAAAAAAAAAAA
+    totp_secret: ${TOTP_SECRET}
     microservice: internal
