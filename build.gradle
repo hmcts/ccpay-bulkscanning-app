@@ -246,7 +246,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   implementation group: 'org.springframework.security', name: 'spring-security-web'
 
-  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.9', classifier: 'all'
+  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
   testImplementation group: 'com.h2database', name: 'h2'
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
