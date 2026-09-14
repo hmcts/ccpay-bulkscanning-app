@@ -8,11 +8,11 @@
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="GuardLogStatement"/>
-    <exclude name="JUnitTestContainsTooManyAsserts"/>
+    <exclude name="UnitTestContainsTooManyAsserts"/>
     <exclude name="UseVarargs"/>
     <!-- excluded for time being due to test classes-->
     <exclude name="UnusedPrivateField"/>
-    <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+    <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
 
   </rule>
 
@@ -23,7 +23,6 @@
     <exclude name="MethodArgumentCouldBeFinal"/>
     <exclude name="OnlyOneReturn"/>
     <exclude name="TooManyStaticImports"/>
-    <exclude name="DefaultPackage"/>
     <exclude name="CommentDefaultAccessModifier"/>
     <exclude name="ShortClassName"/>
     <exclude name="FieldNamingConventions"/>
@@ -94,7 +93,7 @@
   </rule>
   <rule ref="category/java/design.xml/ExcessiveImports">
     <properties>
-      <property name="minimum" value="100.0" />
+      <property name="minimum" value="100" />
     </properties>
   </rule>
   <rule ref="category/java/documentation.xml">
@@ -105,7 +104,6 @@
   <rule ref="category/java/errorprone.xml">
     <exclude name="NonSerializableClass"/>
     <exclude name="MissingSerialVersionUID"/>
-    <exclude name="DataflowAnomalyAnalysis"/>
     <exclude name="AvoidDuplicateLiterals"/>
     <exclude name="CloseResource"/>
   </rule>
