@@ -1,5 +1,8 @@
 .gradle
 /build/
+/bin/main/
+/bin/test/
+/bin/functionalTest/
 !gradle/wrapper/gradle-wrapper.jar
 src/main/resources/application-local.yaml
 
