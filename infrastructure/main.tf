@@ -33,14 +33,15 @@ module "ccpay-bulkscanning-payment-database-v15" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
-  source               = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
-  product              = var.product
-  component            = var.component
-  business_area        = "cft"
-  name                 = local.db_server_name
-  location             = var.location_app
-  env                  = var.env
-  pgsql_admin_username = var.postgresql_user
+  source                    = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  product                   = var.product
+  component                 = var.component
+  business_area             = "cft"
+  name                      = local.db_server_name
+  location                  = var.location_app
+  env                       = var.env
+  pgsql_admin_username      = var.postgresql_user
+  enable_write_group_access = true
 
   # Setup Access Reader db user
   force_user_permissions_trigger = "1"
