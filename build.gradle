@@ -181,7 +181,7 @@ dependencyManagement {
 
 def versions = [
   apachePoi         : '5.5.1',
-  appinsights       : '3.7.8',
+  appinsights       : '3.7.10',
   hmctsLogging      : '8.0.0',
   log4j             : '2.26.1',
   lombok            : '1.18.48',
