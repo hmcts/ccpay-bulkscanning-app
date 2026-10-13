@@ -8,17 +8,16 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.bulkscanning.backdoors.RestActions;
 import uk.gov.hmcts.reform.bulkscanning.config.TestContextConfiguration;
@@ -71,13 +70,13 @@ public class CasePaymentDeletionControllerFnTest {
     @Autowired
     private PaymentMetadataRepository paymentMetadataRepository;
 
-    @MockBean
+    @MockitoBean
     private ClientRegistrationRepository clientRegistrationRepository;
 
-    @MockBean
+    @MockitoBean
     private SecurityUtils securityUtils;
 
-    @MockBean
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     private RestActions restActions;
@@ -95,10 +94,14 @@ public class CasePaymentDeletionControllerFnTest {
     }
 
     @Test
-    @Transactional
     @WithMockUser(authorities = "disposer-payment-user")
     public void testDeleteByCcdCaseReference_success() {
         seedBulkScanPaymentData(CCD_CASE_NUMBER, DCN);
+
+        Optional<List<EnvelopeCase>> seededCases = envelopeCaseRepository.findByCcdReference(CCD_CASE_NUMBER);
+        Assert.assertTrue(seededCases.isPresent() && !seededCases.get().isEmpty());
+        Assert.assertTrue(paymentRepository.findByDcnReference(DCN).isPresent());
+        Assert.assertTrue(paymentMetadataRepository.findByDcnReference(DCN).isPresent());
 
         ResultActions resultActions = restActions.delete("/cases/" + CCD_CASE_NUMBER + "/bulk-scan-payments");
 
