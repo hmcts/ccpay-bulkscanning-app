@@ -32,4 +32,6 @@ public interface PaymentRepository extends CrudRepository<EnvelopePayment, Integ
     );
 
     long deleteByDcnReference(String dcnReference);
+
+    long deleteByEnvelopeId(Integer envelopeId);
 }

@@ -44,6 +44,7 @@ public class SpringSecurityConfiguration {
 
     private static final String AUTHORISED_ROLE_PAYMENT = "payments";
     private static final String AUTHORISED_ROLE_CITIZEN = "citizen";
+    private static final String AUTHORISED_ROLE_DISPOSER_PAYMENT_USER = "disposer-payment-user";
 
     private final ServiceAuthFilter serviceAuthFilter;
     private final BSAuthenticationEntryPoint bsAuthenticationEntryPoint;
@@ -140,6 +141,7 @@ public class SpringSecurityConfiguration {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.PATCH, "/bulk-scan-payments/**").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
                 .requestMatchers(HttpMethod.DELETE, "/bulk-scan-payment/**").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
+                .requestMatchers(HttpMethod.DELETE, "/cases/*/bulk-scan-payments").hasAuthority(AUTHORISED_ROLE_DISPOSER_PAYMENT_USER)
                 .requestMatchers(HttpMethod.GET, "/cases/**").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
                 .requestMatchers(HttpMethod.GET, "/report/data").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)
                 .requestMatchers(HttpMethod.GET, "/report/download").hasAnyAuthority(AUTHORISED_ROLE_PAYMENT, AUTHORISED_ROLE_CITIZEN)

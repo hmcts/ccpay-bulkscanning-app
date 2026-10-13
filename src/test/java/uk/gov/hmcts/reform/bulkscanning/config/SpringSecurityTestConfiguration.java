@@ -39,6 +39,8 @@ public class SpringSecurityTestConfiguration {
             public String getServiceName(String authHeader) {
                 if (StringUtils.containsIgnoreCase(authHeader, "cmc")) {
                     return "cmc";
+                } else if (StringUtils.containsIgnoreCase(authHeader, "disposer-fee-and-pay")) {
+                    return "disposer-fee-and-pay";
                 } else {
                     return "invalid-service";
                 }
@@ -48,6 +50,7 @@ public class SpringSecurityTestConfiguration {
         //Test Authorised services
         List<String> authorisedServices = new ArrayList<>();
         authorisedServices.add("cmc");
+        authorisedServices.add("disposer-fee-and-pay");
 
         ServiceAuthTokenValidator serviceAuthTokenValidator = new ServiceAuthTokenValidator(serviceAuthorisationApi);
         return new ServiceAuthFilter(serviceAuthTokenValidator, authorisedServices);

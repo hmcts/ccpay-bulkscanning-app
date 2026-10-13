@@ -96,6 +96,30 @@ public class ServiceAndUserAuthFilterTest {
                                                           "Access Denied Current user roles are : [null]"));
     }
 
+    @Test
+    public void shouldReturn200ResponseWhenDisposerRoleMatchesCaseBulkScanPaymentsDeletePath() throws Exception {
+        request.setMethod("DELETE");
+        request.setRequestURI("/cases/1747738470383168/bulk-scan-payments");
+        when(SecurityContextHolder.getContext().getAuthentication())
+            .thenReturn(getJWTAuthenticationTokenBasedOnRoles("disposer-payment-user"));
+        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("user123", "disposer-payment-user"));
+
+        filter.doFilterInternal(request, response, filterChain);
+        assertThat(response.getStatus()).isEqualTo(OK.value());
+    }
+
+    @Test
+    public void shouldReturn403WhenPaymentsRoleUsedOnCaseBulkScanPaymentsDeletePath() throws Exception {
+        request.setMethod("DELETE");
+        request.setRequestURI("/cases/1747738470383168/bulk-scan-payments");
+        when(SecurityContextHolder.getContext().getAuthentication())
+            .thenReturn(getJWTAuthenticationTokenBasedOnRoles("payments"));
+        when(securityUtils.getUserInfo()).thenReturn(getUserInfoBasedOnUidRoles("user123", "payments"));
+
+        filter.doFilterInternal(request, response, filterChain);
+        assertThat(response.getStatus()).isEqualTo(FORBIDDEN.value());
+    }
+
     public static UserInfo getUserInfoBasedOnUidRoles(String uid, String roles){
         return UserInfo.builder()
             .uid(uid)

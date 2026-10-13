@@ -17,4 +17,6 @@ public interface EnvelopeCaseRepository extends CrudRepository<EnvelopeCase, Int
     Optional<List<EnvelopeCase>> findByExceptionRecordReference(String exceptionRecordReference);
 
     Optional<EnvelopeCase> findByEnvelopeId(Integer envelopeId);
+
+    long deleteByCcdReference(String ccdReference);
 }
