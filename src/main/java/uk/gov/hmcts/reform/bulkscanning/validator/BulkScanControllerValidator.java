@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.bulkscanning.audit.AppInsightsAuditRepository;
 import uk.gov.hmcts.reform.bulkscanning.exception.BulkScanCaseAlreadyExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.DcnNotExistsException;
 import uk.gov.hmcts.reform.bulkscanning.exception.ExceptionRecordNotExistsException;
+import uk.gov.hmcts.reform.bulkscanning.exception.PaymentDeletionException;
 import uk.gov.hmcts.reform.bulkscanning.exception.PaymentException;
 
 import java.time.LocalDateTime;
@@ -81,6 +82,15 @@ public class BulkScanControllerValidator extends ResponseEntityExceptionHandler 
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity handlePaymentException(PaymentException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PaymentDeletionException.class)
+    public ResponseEntity handlePaymentDeletionException(PaymentDeletionException ex) {
+        LOG.error("Payment deletion failed: {}", ex.getMessage(), ex);
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(ex.getMessage());
     }
 
     @Override

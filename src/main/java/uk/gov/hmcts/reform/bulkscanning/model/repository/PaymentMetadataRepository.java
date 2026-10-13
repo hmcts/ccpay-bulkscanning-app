@@ -18,4 +18,6 @@ public interface PaymentMetadataRepository extends CrudRepository<PaymentMetadat
     List<PaymentMetadata> findAllByDcnReferenceIn(Collection<String> dcnReferences);
 
     long deleteByDcnReference(String dcnReference);
+
+    long deleteByDcnReferenceIn(Collection<String> dcnReferences);
 }

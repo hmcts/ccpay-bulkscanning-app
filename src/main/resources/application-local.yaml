@@ -68,7 +68,7 @@ idam:
   api:
     url: ${IDAM_API_URL:http://localhost:23443}
   s2s-authorised:
-    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw,internal
+    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw,internal,disposer-fee-and-pay
   s2s-auth:
     url: http://localhost:23443
     totp_secret: ${S2S_TOTP_SECRET}

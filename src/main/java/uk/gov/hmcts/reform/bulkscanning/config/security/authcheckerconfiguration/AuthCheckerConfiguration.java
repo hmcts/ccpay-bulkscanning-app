@@ -28,6 +28,8 @@ import java.util.stream.Stream;
 @EnableFeignClients(basePackageClasses = {IdamApi.class, ServiceAuthorisationApi.class})
 public class AuthCheckerConfiguration {
 
+    public static final String DELETE = "DELETE";
+
     /**
      * Auth token generator for s2s api
      * @param secret
@@ -71,11 +73,21 @@ public class AuthCheckerConfiguration {
     }
 
     /**
-     * Bean to specify authorised roles for Fees&Pay
+     * Bean to specify authorised roles for Fees&Pay.
+     * CCD case deletion requires disposer-payment-user; other endpoints use payments/citizen.
      * @return
      */
     @Bean
     public Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor() {
-        return any -> Stream.of("payments", "citizen").toList();
+        return request -> {
+            String requestUri = request.getRequestURI();
+            if (DELETE.equalsIgnoreCase(request.getMethod())
+                && requestUri != null
+                && requestUri.contains("/cases/")
+                && requestUri.endsWith("/bulk-scan-payments")) {
+                return Stream.of("disposer-payment-user").toList();
+            }
+            return Stream.of("payments", "citizen").toList();
+        };
     }
 }

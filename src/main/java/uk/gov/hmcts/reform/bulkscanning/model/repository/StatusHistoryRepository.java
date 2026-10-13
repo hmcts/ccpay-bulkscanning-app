@@ -7,4 +7,6 @@ import uk.gov.hmcts.reform.bulkscanning.model.entity.StatusHistory;
 
 @Repository
 public interface StatusHistoryRepository extends CrudRepository<StatusHistory, Integer>, JpaSpecificationExecutor<StatusHistory> {
+
+    long deleteByEnvelopeId(Integer envelopeId);
 }

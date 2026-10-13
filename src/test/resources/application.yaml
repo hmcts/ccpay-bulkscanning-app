@@ -62,7 +62,7 @@ idam:
   api:
     url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
   s2s-authorised:
-    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw
+    services: ccpay_bubble, cmc, bulk_scan_payment_processor, api_gw, probate_frontend, divorce_frontend, ccd_gw,disposer-fee-and-pay
   s2s-auth:
     url: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     totp_secret: dummy
