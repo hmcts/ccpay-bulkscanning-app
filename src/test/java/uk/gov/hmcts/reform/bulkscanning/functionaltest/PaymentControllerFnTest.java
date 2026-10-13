@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -91,13 +91,13 @@ public class PaymentControllerFnTest {
     @InjectMocks
     ServiceAndUserAuthFilter serviceAndUserAuthFilter;
 
-    @MockBean
+    @MockitoBean
     private ClientRegistrationRepository clientRegistrationRepository;
 
-    @MockBean
+    @MockitoBean
     SecurityUtils securityUtils;
 
-    @MockBean
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     RestActions restActions;

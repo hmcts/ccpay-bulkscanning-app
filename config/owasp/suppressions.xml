@@ -1,6 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <!-- Below are the supressions added for False Positive CVEs -->
+
+  <suppress>
+    <notes>
+      CVE-2025-21199 is a privilege escalation in the Azure Agent Installer, not the Application Insights
+      Java SDK. Suppress for com.microsoft.azure/applicationinsights-core@3.7.8 only.
+    </notes>
+    <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights-core@3\.7\.8$</packageUrl>
+    <cve>CVE-2025-21199</cve>
+  </suppress>
+
+  <suppress until="2027-03-31Z">
+    <notes>
+      All Spring Framework 6.2.19 modules (spring-*) carry the same CVEs. 6.2.19 is the final OSS release
+      of the 6.2.x line (EOL 2026-06-30); the 6.2.20 fixes are HeroDevs NES-only (not on Maven Central).
+      Not exploitable in this app: no view rendering (XsltView / UrlFileNameViewController / FreeMarker), no
+      UrlHandlerFilter, no RSocket, no SSE, no SpEL evaluation of user-supplied expressions, and the servlet
+      stack runs on embedded Tomcat (not WebFlux/Jetty). Remove when migrating to Spring Boot 4.
+    </notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework/spring-.*@6\.2\.19$</packageUrl>
+    <cve>CVE-2026-59313</cve>
+    <cve>CVE-2026-59314</cve>
+    <cve>CVE-2026-47892</cve>
+    <cve>CVE-2026-59283</cve>
+    <cve>CVE-2026-47893</cve>
+    <cve>CVE-2026-59280</cve>
+    <cve>CVE-2026-47890</cve>
+    <cve>CVE-2026-47891</cve>
+    <cve>CVE-2026-59281</cve>
+    <cve>CVE-2026-59282</cve>
+    <cve>CVE-2026-47883</cve>
+    <cve>CVE-2026-47884</cve>
+    <cve>CVE-2026-47885</cve>
+    <cve>CVE-2026-47886</cve>
+    <cve>CVE-2026-47887</cve>
+    <cve>CVE-2026-47888</cve>
+    <cve>CVE-2026-47889</cve>
+  </suppress>
+
+  <suppress until="2027-03-31Z">
+    <notes>
+      All Spring Security 6.5.11 modules (spring-security-*) carry the same CVEs. 6.5.11 is the latest
+      Boot 3.5-compatible OSS line (EOL 2026-06-30); the 6.5.12 fixes are HeroDevs NES-only (not on
+      Maven Central). No WebAuthn, embedded LDAP or AesBytesEncryptor usage; the OSS fix only lands in
+      Spring Security 7.x / Spring Boot 4.x. Remove when migrating to Spring Boot 4.
+    </notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-.*@6\.5\.11$</packageUrl>
+    <cve>CVE-2026-59270</cve>
+    <cve>CVE-2026-59276</cve>
+    <cve>CVE-2026-47841</cve>
+    <cve>CVE-2026-47842</cve>
+    <cve>CVE-2026-41707</cve>
+  </suppress>
+
+  <suppress until="2027-03-31Z">
+    <notes>
+      Spring Data JPA 3.5.13 is the latest Boot 3.5-compatible OSS line (EOL 2026-06-30); the 3.5.14 fix is
+      HeroDevs NES-only and not on Maven Central. No native queries or Sort parameters taken from untrusted
+      input; the OSS fix only lands in Spring Data 2026.x / Spring Boot 4.x.
+      Remove when this app migrates to Spring Boot 4.
+    </notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework\.data/spring-data-jpa@3\.5\.13$</packageUrl>
+    <cve>CVE-2026-47834</cve>
+  </suppress>
+
+  <suppress until="2027-03-31Z">
+    <notes>
+      CVE-2026-59284 needs a writable /actuator/env endpoint. This app only exposes the health endpoint
+      (management.endpoints.*.exposure), so env is not reachable. 4.3.3 is the latest Spring Cloud Commons
+      in the Boot 3.5 release train (2025.0.x). Remove when migrating to Spring Boot 4.
+    </notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring-cloud-.*@4\.3\.3$</packageUrl>
+    <cve>CVE-2026-59284</cve>
+  </suppress>
 </suppressions>
-
-
