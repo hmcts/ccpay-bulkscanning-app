@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -62,16 +62,16 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.PaymentStatus.PROCESS
 public class PaymentServiceTest {
     private PaymentService paymentService;
 
-    @MockBean
+    @MockitoBean
     private PaymentRepository paymentRepository;
 
-    @MockBean
+    @MockitoBean
     private PaymentMetadataRepository paymentMetadataRepository;
 
-    @MockBean
+    @MockitoBean
     private EnvelopeRepository envelopeRepository;
 
-    @MockBean
+    @MockitoBean
     private EnvelopeCaseRepository envelopeCaseRepository;
 
     @Autowired
@@ -97,10 +97,10 @@ public class PaymentServiceTest {
     @Autowired
     private AppInsightsAuditRepository auditRepository;
 
-    @MockBean
+    @MockitoBean
     private ClientRegistrationRepository clientRegistrationRepository;
 
-    @MockBean
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     public static final String CCD_CASE_REFERENCE = "1111222233334444";

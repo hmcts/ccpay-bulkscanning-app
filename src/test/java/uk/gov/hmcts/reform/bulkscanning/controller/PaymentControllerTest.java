@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -53,16 +54,16 @@ public class PaymentControllerTest {
 
     MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private PaymentService paymentService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @MockBean
+    @MockitoBean
     private ClientRegistrationRepository clientRegistrationRepository;
 
-    @MockBean
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     @Before
@@ -183,6 +184,13 @@ public class PaymentControllerTest {
         ResultActions resultActions = mockMvc.perform(delete("/bulk-scan-payment/987211111111111111111")
                 .header("ServiceAuthorization", "service"));
         Assert.assertEquals(Integer.valueOf(204), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
+    }
+
+    @Test
+    public void testDeletePaymentRequiresAuthentication() throws Exception {
+        MockMvc securedMockMvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        ResultActions resultActions = securedMockMvc.perform(delete("/bulk-scan-payment/987211111111111111111"));
+        Assert.assertEquals(Integer.valueOf(401), Integer.valueOf(resultActions.andReturn().getResponse().getStatus()));
     }
 
     public static Envelope mockBulkScanningEnvelope() {

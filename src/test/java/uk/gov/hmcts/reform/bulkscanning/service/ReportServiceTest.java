@@ -4,7 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,11 +39,17 @@ import static uk.gov.hmcts.reform.bulkscanning.model.enums.EnvelopeSource.Bulk_S
 @ActiveProfiles({"local", "test"})
 public class ReportServiceTest {
 
-    @MockBean
+    @MockitoBean
     PaymentRepository paymentRepository;
 
-    @MockBean
+    @MockitoBean
     PaymentMetadataRepository paymentMetadataRepository;
+
+    @MockitoBean
+    ClientRegistrationRepository clientRegistrationRepository;
+
+    @MockitoBean
+    JwtDecoder jwtDecoder;
 
     ReportServiceImpl reportService;
 

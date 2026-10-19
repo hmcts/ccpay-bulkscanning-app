@@ -33,14 +33,15 @@ module "ccpay-bulkscanning-payment-database-v15" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
-  source               = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
-  product              = var.product
-  component            = var.component
-  business_area        = "cft"
-  name                 = local.db_server_name
-  location             = var.location_app
-  env                  = var.env
-  pgsql_admin_username = var.postgresql_user
+  source                    = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  product                   = var.product
+  component                 = var.component
+  business_area             = "cft"
+  name                      = local.db_server_name
+  location                  = var.location_app
+  env                       = var.env
+  pgsql_admin_username      = var.postgresql_user
+  enable_write_group_access = true
 
   # Setup Access Reader db user
   force_user_permissions_trigger = "1"
@@ -56,12 +57,14 @@ module "ccpay-bulkscanning-payment-database-v15" {
       value = "pg_stat_statements,pg_buffercache"
     }
   ]
-  admin_user_object_id = var.jenkins_AAD_objectId
-  common_tags          = var.common_tags
-  pgsql_version        = var.postgresql_flexible_sql_version
-  action_group_name           = join("-", [var.db_monitor_action_group_name, local.db_server_name, var.env])
-  email_address_key           = var.db_alert_email_address_key
-  email_address_key_vault_id  = data.azurerm_key_vault.payment_key_vault.id
+  admin_user_object_id       = var.jenkins_AAD_objectId
+  common_tags                = var.common_tags
+  pgsql_version              = var.postgresql_flexible_sql_version
+  action_group_name          = join("-", [var.db_monitor_action_group_name, local.db_server_name, var.env])
+  email_address_key          = var.db_alert_email_address_key
+  email_address_key_vault_id = data.azurerm_key_vault.payment_key_vault.id
+  # Add service criticality param
+  service_criticality        = var.service_criticality
 }
 
 # Populate Vault with DB info
