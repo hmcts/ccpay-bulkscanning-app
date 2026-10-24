@@ -173,7 +173,7 @@ repositories {
 
 dependencyManagement {
   imports {
-    mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.3'
+    mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.4'
     mavenBom 'org.apache.logging.log4j:log4j-bom:2.26.1'
     mavenBom 'org.testcontainers:testcontainers-bom:2.0.5'
   }
