@@ -188,7 +188,7 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   sonarPitest       : '0.5',
   serenity          : '4.2.3',
-  serenityCucumber  : '4.2.3'
+  serenityCucumber  : '4.3.4'
 ]
 
 // CVE-2026-54515 - newer than the Jackson managed by Spring Boot 3.5.16. Set via the BOM
